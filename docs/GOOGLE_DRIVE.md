@@ -2,24 +2,17 @@
 
 ## Configurar uma vez
 
-1. No [Google Cloud Console](https://console.cloud.google.com/), selecione ou crie um projeto pessoal.
-2. Ative a [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com).
-3. No Google Auth Platform, configure nome, e-mail de suporte e público da aplicação. Para uso pessoal em teste, adicione a conta que é proprietária da pasta em Usuários de teste.
-4. Em Acesso a dados, configure `https://www.googleapis.com/auth/drive`. Esse escopo permite encontrar bancos JSON já existentes e criar arquivos na pasta escolhida. Ele é amplo; a aplicação limita suas consultas à pasta configurada. Uso público requer atender às políticas do Google. O token não é persistido.
-5. Em Clientes, crie um cliente do tipo **Aplicativo da Web**.
-6. Adicione a origem exata do site, sem caminho nem barra final, às **Origens JavaScript autorizadas**. Para desenvolvimento, use `http://localhost:5173`. Para o site publicado, use o domínio mostrado em Ajustes. Esse fluxo usa popup e não necessita URL de redirecionamento.
-7. Copie apenas o **ID público do cliente**, terminado em `.apps.googleusercontent.com`. Não use um client secret.
-8. No Foco, abra **Ajustes → Google Drive**, cole o ID, confira a pasta e salve. Clique **Conectar Google Drive** e autorize a conta proprietária.
+O responsável pela plataforma configura um cliente OAuth público único. Leia [LOGIN_GOOGLE.md](LOGIN_GOOGLE.md). Os estudantes apenas entram com Google e escolhem sua pasta do Meu Drive. Não precisam criar projetos no Google Cloud.
 
-A pasta inicial é [QConcursos IA](https://drive.google.com/drive/folders/1BsRHtMhLBHVSpn7gqIZCjuE4JaGbitPV). É possível substituir o ID pelo link de outra pasta. A aplicação verifica que a conta pode adicionar arquivos antes de sincronizar. Arquivos herdam as permissões da pasta; a pasta fornecida tinha leitura por link na configuração observada. Para progresso privado, use uma pasta privada. O sistema não altera permissões.
+Cada usuário informa o ID ou link da pasta durante a primeira entrada, ou em Ajustes. A conta conectada precisa ter permissão para adicionar arquivos. As pastas não são alteradas pelo sistema e os arquivos herdam suas permissões; use uma pasta privada para histórico pessoal.
 
 ## Durante o estudo
 
-Após conectar, o sistema localiza os JSONs `foco-progresso-*.json`, carrega arquivos ainda não lidos, valida os eventos e une os históricos. Em seguida envia alterações locais. Se não houver arquivo, cria o primeiro automaticamente.
+Após conectar, o sistema localiza seus JSONs `foco-progresso-<sub>-*.json`, confirma a propriedade da conta e do conteúdo, carrega arquivos ainda não lidos, valida os eventos e une os históricos. Em seguida envia alterações locais. Se não houver arquivo, cria o primeiro automaticamente.
 
 Cada mudança é salva localmente imediatamente. Com autorização ativa, o envio ao Drive ocorre após 6 segundos de inatividade; concluir uma sessão também dispara uma sincronização. O botão Sincronizar permite executar o processo manualmente. Ao voltar ao site ou recuperar a rede, a sincronização é tentada enquanto o token continua válido.
 
-Após recarregar/abrir o site, é necessário conectar o Google novamente. Tokens são temporários e mantidos só em memória, seguindo o modelo de tokens da Google Identity Services. Ao expirar, o site mostra “Reconectar Drive”; os dados locais continuam salvos. Não existe envio em segundo plano com o navegador fechado.
+Após recarregar/abrir o site, é necessário entrar com Google novamente. Tokens são temporários e mantidos só em memória, seguindo o modelo de tokens da Google Identity Services. Ao expirar, o site mostra “Reconectar Drive”; os dados locais continuam salvos. Não existe envio em segundo plano com o navegador fechado.
 
 ## Evitar perdas e sobrescritas
 
@@ -39,13 +32,13 @@ O cache local guarda apenas IDs de eventos/arquivos confirmados e um lote penden
 
 ## Bancos diretamente do Drive
 
-Em **Meus bancos → Buscar no Drive**, o app lista arquivos JSON da pasta, excluindo os diários de progresso. A seleção baixa e valida o arquivo antes de importá-lo. Bancos importados pelo computador também são incluídos no histórico sincronizado e reaparecem em outro computador depois da conexão.
+Em **Meus bancos → Buscar no Drive**, o app lista arquivos JSON da pasta, excluindo os diários de progresso. A seleção baixa e valida o arquivo antes de importá-lo. Ao conectar, novos bancos JSON são importados automaticamente sem substituir IDs existentes. Bancos importados pelo computador também são incluídos no histórico sincronizado e reaparecem em outro computador depois da conexão.
 
 ## Falhas comuns
 
 | Mensagem | Verificação |
 |---|---|
-| ID OAuth não configurado | Informe o ID de cliente Web e salve |
+| ID OAuth não configurado | O responsável configura o ID global no build; veja LOGIN_GOOGLE.md |
 | `origin_mismatch` | Autorize exatamente o domínio mostrado em Ajustes |
 | Acesso bloqueado pelo Google | Configure consentimento, escopo e usuário de teste |
 | Sem permissão na pasta | Conecte a conta proprietária ou com edição |
@@ -61,4 +54,4 @@ Em **Meus bancos → Buscar no Drive**, o app lista arquivos JSON da pasta, excl
 - [Drive API — buscar arquivos](https://developers.google.com/workspace/drive/api/guides/search-files)
 - [Drive API — generateIds](https://developers.google.com/workspace/drive/api/reference/rest/v3/files/generateIds)
 
-Consentimento real e escrita do **site** precisam ser verificados após o cliente OAuth estar configurado. Testes HTTP simulados e acesso do assistente à pasta não substituem essa verificação.
+Consentimento real e escrita do **site** precisam ser verificados após o cliente OAuth global estar configurado. Testes HTTP simulados e acesso do assistente à pasta não substituem essa verificação.

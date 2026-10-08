@@ -55,17 +55,21 @@ Após erro, a questão vence em 1 dia. Após acertos consecutivos, os intervalos
 
 No simulado, as escolhas são salvas como rascunho de sessão; eventos de desempenho são emitidos ao concluir, e o gabarito é apresentado somente então. Questões puladas não são computadas como respostas erradas. O aproveitamento final usa todas as questões, portanto as puladas reduzem esse percentual. A taxa geral de acertos usa apenas tentativas efetivamente respondidas.
 
+## Login e usuários
+
+Entrada exclusivamente com Google. Cada conta usa um perfil independente, identificado pelo `sub` verificado no endpoint Google UserInfo. Preferências, progresso local e cache são separados por conta. Configure um único ID OAuth público para a plataforma em `public/app-config.json` ou `PUBLIC_GOOGLE_CLIENT_ID`; veja [LOGIN_GOOGLE.md](docs/LOGIN_GOOGLE.md). O login real permanece aguardando esse ID. Os estudantes não precisam configurar clientes próprios.
+
 ## Google Drive
 
-O projeto implementa acesso direto às APIs oficiais do Google através de Google Identity Services. O token fica somente em memória e expira. Nenhum segredo OAuth é necessário em uma aplicação estática com esse modelo. A pasta padrão é `1BsRHtMhLBHVSpn7gqIZCjuE4JaGbitPV`.
+O projeto implementa acesso direto às APIs oficiais do Google através de Google Identity Services. O token fica somente em memória e expira. Nenhum segredo OAuth é necessário em uma aplicação estática com esse modelo. Cada conta escolhe sua própria pasta do Meu Drive. Novas contas começam sem pasta configurada.
 
-**Ativação necessária:** criar um cliente OAuth no Google Cloud, autorizar o domínio publicado e informar seu ID público na tela Ajustes. A conexão do Drive usada por esta conversa não disponibiliza credenciais automaticamente ao site. Leia [GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md). Após cada abertura/recarregamento, clique em Conectar Google Drive para conceder uma sessão de acesso. A carga remota acontece antes do primeiro envio.
+**Ativação necessária:** o responsável configura uma vez o cliente OAuth no build publicado e autoriza o domínio. Depois, cada usuário apenas entra com Google e informa sua pasta. A conexão do Drive usada por esta conversa não disponibiliza credenciais automaticamente ao site. Leia [GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md). Após abrir/recarregar, entre com Google. A autorização adicional do Drive é solicitada quando necessária; a carga remota acontece antes do primeiro envio.
 
 Para prevenir sobrescritas concorrentes sem um backend central, o Drive recebe lotes JSON imutáveis `foco-progresso-*.json`, unidos por ID. É uma decisão deliberada em vez de reescrever um único arquivo compartilhado. A exportação produz o arquivo consolidado. Bancos importados e sessões também são sincronizados. Não apague lotes: eles constituem o histórico persistente.
 
 ## Publicação e GitHub
 
-Este projeto está preparado para Sites, Vercel e GitHub Pages. Veja [DEPLOY.md](docs/DEPLOY.md).
+Este projeto está preparado para Sites, Vercel e GitHub Pages. A hospedagem da tela de login é acessível por URL, enquanto cada visitante autoriza somente seus próprios dados Google. Veja [DEPLOY.md](docs/DEPLOY.md).
 
 O repositório GitHub do usuário não foi criado nem inspecionado: a integração foi dispensada nesta solicitação. Antes de criar um repositório futuramente, procure um existente para esse projeto. O checkout Sites possui versionamento Git próprio, que não é um repositório do GitHub do usuário.
 
@@ -80,7 +84,7 @@ Um workflow incluído executa testes e build e publica no GitHub Pages a cada pu
 - Os arquivos criados herdam o compartilhamento da pasta. Uma pasta acessível por link pode expor o histórico a quem tiver acesso ao arquivo. Use uma pasta privada para histórico pessoal; o sistema não altera permissões do Drive.
 - Até 5.000 questões por banco, arquivo JSON até 10 MB, 100.000 eventos por documento e 10.000 arquivos por busca. O armazenamento local também depende da cota do navegador. Exportar e manter o Drive sincronizado reduz dependência do dispositivo.
 - Funciona sem conexão com o Drive. A aplicação não oferece refresh tokens nem sincronização quando fechada; autorizações expiradas precisam de nova ação de conexão.
-- Histórico local não é criptografado. Use seu perfil pessoal do navegador.
+- Histórico local é separado por conta e não é criptografado. Use seu perfil pessoal do navegador.
 
 ## Verificação
 

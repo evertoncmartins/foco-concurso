@@ -24,11 +24,11 @@ O workflow `.github/workflows/pages.yml` executa teste, verificação e build; f
 
 ## Vercel
 
-`vercel.json` define build com testes e diretório `dist`. Ao importar um repositório no Vercel, use o preset Other. Cada push em `main` publica a versão de produção; branches podem gerar previews. Não há variáveis secretas para o frontend. O OAuth client ID configurado em Ajustes é público e fica no navegador do usuário; configure a origem Vercel no Google Cloud.
+`vercel.json` define build com testes e diretório `dist`. Ao importar um repositório no Vercel, use o preset Other. Cada push em `main` publica a versão de produção; branches podem gerar previews. Não há variáveis secretas para o frontend. Configure `PUBLIC_GOOGLE_CLIENT_ID` no build ou `googleClientId` em `public/app-config.json`. É um ID público compartilhado pela aplicação; autorize a origem Vercel no Google Cloud.
 
 ## Sites
 
-`.openai/hosting.json` aponta para `dist/`. O código e o build são versionados pelo fluxo de Sites. O site nasce privado e mantém esse acesso. Não há dependência de connector em tempo de execução: o acesso ao Drive utiliza OAuth próprio, concedido pelo visitante.
+`.openai/hosting.json` aponta para `dist/`. O código e o build são versionados pelo fluxo de Sites. A primeira versão nasceu privada. Na atualização de usuários, a tela de entrada é disponibilizada por URL para que as pessoas entrem com Google; nenhum progresso pessoal é publicado no servidor. Não há dependência de connector em tempo de execução: o acesso ao Drive utiliza OAuth próprio, concedido pelo visitante.
 
 ## Alterações futuras
 
