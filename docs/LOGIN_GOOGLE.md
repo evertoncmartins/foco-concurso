@@ -18,7 +18,13 @@ Os estudantes **não precisam criar clientes OAuth próprios**. A plataforma usa
 6. Configure `googleClientId` em `public/app-config.json` com o ID terminado em `.apps.googleusercontent.com`, ou configure a variável de build `PUBLIC_GOOGLE_CLIENT_ID`.
 7. Gere e publique o build. O ID é público e não é uma senha. Não configure client secret no frontend.
 
-O cliente Google ainda não foi fornecido nesta atualização. Sem ele, a tela indica que o login aguarda configuração e não simula uma entrada. A opção “Configuração do responsável” permite validar um ID nesse navegador; ela não configura os demais visitantes. Para disponibilizar a todos, o ID precisa estar no build publicado.
+Em 08/10/2026, o cliente **Foco Web** foi criado no projeto `foco-estudos-ecm`, com a origem `https://foco-concursos.ecmdigital.chatgpt.site`, e seu ID público foi configurado no build da plataforma. Não há redirecionamento cadastrado: esta implementação usa o modelo de token em popup do Google Identity Services.
+
+O aplicativo Google está em **modo de teste**, com público externo e a conta do responsável cadastrada como usuário de teste. Para testar com outras pessoas, adicione suas contas em [Público no Google Cloud](https://console.cloud.google.com/auth/audience?project=foco-estudos-ecm). O site ser acessível por URL não elimina as restrições do aplicativo OAuth. A liberação geral ainda exige cumprir o processo aplicável de publicação/verificação do Google.
+
+O nome salvo na tela de consentimento é **Foco Estudos Concursos**. A Google Drive API está ativada, e os escopos `openid`, `userinfo.email`, `userinfo.profile` e `https://www.googleapis.com/auth/drive` foram confirmados no console. Nenhuma conta de faturamento foi vinculada.
+
+A opção “Configuração do responsável” permite validar outro ID nesse navegador; ela não configura os demais visitantes. Se o ID do build estiver vazio em outra instalação, a tela indica que o login aguarda configuração e não simula uma entrada. Consentimento real e sincronização de ponta a ponta ainda precisam ser conferidos pela conta de teste.
 
 ## Fluxo do usuário
 

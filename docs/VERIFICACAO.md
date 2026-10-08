@@ -32,7 +32,8 @@ Os layouts possuem breakpoints de 1.200, 960 e 700 px, navegação inferior no c
 
 ## Integrações pendentes
 
-- A pasta do Drive foi confirmada como “QConcursos IA” e estava vazia. A API de sincronização do site está implementada, mas o cliente OAuth global para login/Drive ainda não foi configurado. Consentimento, carga e escrita reais pelo frontend permanecem sem verificação. O estado inicial do site informa salvamento local.
+- A pasta do Drive foi confirmada como “QConcursos IA” e estava vazia. Em 08/10/2026, foi criado o projeto Google Cloud `foco-estudos-ecm` e o cliente Web `Foco Web`, com a origem exata do site e seu ID público no build. O OAuth está em modo de teste, com a conta do responsável na lista de teste. Consentimento, carga e escrita reais pelo frontend permanecem sem verificação; a configuração no console não substitui esse teste.
+- A API do Drive foi confirmada como ativada no console. Os quatro escopos de perfil/Drive foram salvos, e a conta de teste foi confirmada na tabela de usuários. O nome de consentimento salvo é “Foco Estudos Concursos”. Não foram realizados login no site, consentimento ou gravação real de progresso nesta configuração.
 - O GitHub foi dispensado. Nenhum repositório na conta do usuário foi criado ou consultado. O código possui README, guias, workflow GitHub Pages, configuração Vercel e versionamento no fluxo Sites.
 - A hospedagem é concluída e verificada pelo resultado nativo de publicação. Esse resultado confirma entrega do site, não testes reais do Google OAuth nem UI em celular.
 

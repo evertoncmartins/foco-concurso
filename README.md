@@ -57,13 +57,13 @@ No simulado, as escolhas são salvas como rascunho de sessão; eventos de desemp
 
 ## Login e usuários
 
-Entrada exclusivamente com Google. Cada conta usa um perfil independente, identificado pelo `sub` verificado no endpoint Google UserInfo. Preferências, progresso local e cache são separados por conta. Configure um único ID OAuth público para a plataforma em `public/app-config.json` ou `PUBLIC_GOOGLE_CLIENT_ID`; veja [LOGIN_GOOGLE.md](docs/LOGIN_GOOGLE.md). O login real permanece aguardando esse ID. Os estudantes não precisam configurar clientes próprios.
+Entrada exclusivamente com Google. Cada conta usa um perfil independente, identificado pelo `sub` verificado no endpoint Google UserInfo. Preferências, progresso local e cache são separados por conta. O cliente OAuth público do projeto `foco-estudos-ecm` está configurado em `public/app-config.json`; veja [LOGIN_GOOGLE.md](docs/LOGIN_GOOGLE.md). O aplicativo Google permanece em modo de teste, com acesso às contas cadastradas na lista de usuários de teste. Os estudantes não precisam configurar clientes próprios.
 
 ## Google Drive
 
 O projeto implementa acesso direto às APIs oficiais do Google através de Google Identity Services. O token fica somente em memória e expira. Nenhum segredo OAuth é necessário em uma aplicação estática com esse modelo. Cada conta escolhe sua própria pasta do Meu Drive. Novas contas começam sem pasta configurada.
 
-**Ativação necessária:** o responsável configura uma vez o cliente OAuth no build publicado e autoriza o domínio. Depois, cada usuário apenas entra com Google e informa sua pasta. A conexão do Drive usada por esta conversa não disponibiliza credenciais automaticamente ao site. Leia [GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md). Após abrir/recarregar, entre com Google. A autorização adicional do Drive é solicitada quando necessária; a carga remota acontece antes do primeiro envio.
+**Configuração da instalação:** o cliente OAuth do Foco foi criado com a origem do site publicado. Em outras hospedagens, o responsável precisa autorizar a nova origem no Google Cloud. Cada usuário entra com Google e informa sua pasta. A conexão do Drive usada por esta conversa não disponibiliza credenciais automaticamente ao site. Leia [GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md). Após abrir/recarregar, entre com Google. A autorização adicional do Drive é solicitada quando necessária; a carga remota acontece antes do primeiro envio.
 
 Para prevenir sobrescritas concorrentes sem um backend central, o Drive recebe lotes JSON imutáveis `foco-progresso-*.json`, unidos por ID. É uma decisão deliberada em vez de reescrever um único arquivo compartilhado. A exportação produz o arquivo consolidado. Bancos importados e sessões também são sincronizados. Não apague lotes: eles constituem o histórico persistente.
 
