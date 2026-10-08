@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "meu-banco-exemplo",
+  "name": "Nome do banco de questões",
+  "description": "Conteúdo, objetivo e data de atualização.",
+  "questions": [
+    {
+      "id": "tema-001",
+      "discipline": "Legislação",
+      "subject": "Provimento",
+      "topic": "Investidura",
+      "statement": "Conforme o art. 7º da Lei nº 8.112/1990, quando ocorre a investidura em cargo público?",
+      "options": [
+        {"id": "A", "text": "Na aprovação no concurso."},
+        {"id": "B", "text": "Na posse."},
+        {"id": "C", "text": "No primeiro dia de exercício."},
+        {"id": "D", "text": "Na inscrição no concurso."}
+      ],
+      "correctOption": "B",
+      "explanation": "A posse é o momento da investidura. Aprovação e exercício são etapas distintas.",
+      "reference": {"label": "Lei nº 8.112/1990, art. 7º", "url": "https://www.planalto.gov.br/ccivil_03/leis/l8112compilado.htm"},
+      "difficulty": "easy",
+      "tags": ["IFSP", "posse"]
+    }
+  ]
+}
