@@ -21,12 +21,22 @@ async function tick(){await new Promise(resolve=>setImmediate(resolve));}
 // This checks state/ordering, not visual rendering or actual Google consent.
 function runtime(options={}){
   const browserStorage=new TemporaryStorage(),nodes=new Map(),listeners={};
-  let googleReady=options.googleReady??true,authorizations=0;
+  let googleReady=options.googleReady??true,authorizations=0,preparations=0;
   const node=selector=>{
-    if(!nodes.has(selector))nodes.set(selector,{innerHTML:'',textContent:'',content:'',open:false,classList:{add(){},remove(){}},focus(){},close(){this.open=false;},querySelector(){return null;},scrollIntoView(){}});
+    if(!nodes.has(selector)){
+      const element={innerHTML:'',textContent:'',content:'',open:false,classList:{add(){},remove(){}},focus(){},close(){this.open=false;},querySelector(){return null;},scrollIntoView(){}};
+      if(selector==='#app'){
+        let html='';Object.defineProperty(element,'innerHTML',{get:()=>html,set:value=>{
+          html=value;const question=html.match(/class="question-body" data-question="([^"]+)"/);
+          if(question)nodes.set('.question-body',{dataset:{question:question[1]},scrollTop:0});else nodes.delete('.question-body');
+        }});
+      }
+      nodes.set(selector,element);
+    }
     return nodes.get(selector);
   };
   const document={documentElement:{dataset:{theme:'light'}},fullscreenElement:null,addEventListener(name,fn){(listeners[name]??=[]).push(fn);},querySelector(selector){
+    if(selector==='.question-body')return nodes.get(selector)||null;
     if(['#app','#toast','#dialog','#main','#bank-file','#progress-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
     return null;
   },async emit(name,event){for(const fn of listeners[name]??[])await fn(event);}};
@@ -35,7 +45,7 @@ function runtime(options={}){
   const media=new Map();
   const matchMedia=query=>{if(!media.has(query))media.set(query,{matches:query.includes('701'),addEventListener(){}});return media.get(query);};
   const profile={sub:'111',name:'Estudante',email:'test@example.test'};
-  const auth={profile,token:'fixture',expires:Date.now()+3600000,generation:0,canAppData:options.canAppData??true,canDrive:options.canDrive??true,clientId:'test.apps.googleusercontent.com',signOut(){this.profile=null;this.token=null;},async authorize(){authorizations++;if(options.authorizationError)throw options.authorizationError;this.profile=profile;this.token='fixture';this.canAppData=true;this.canDrive=true;return authorization();}};
+  const auth={profile,token:'fixture',expires:Date.now()+3600000,generation:0,canAppData:options.canAppData??true,canDrive:options.canDrive??true,clientId:'test.apps.googleusercontent.com',prepareAuthorization(){preparations++;},signOut(){this.profile=null;this.token=null;},async authorize(){authorizations++;if(options.authorizationError)throw options.authorizationError;this.profile=profile;this.token='fixture';this.canAppData=true;this.canDrive=true;return authorization();}};
   function authorization(){return {profile:auth.profile,token:auth.token,expires:auth.expires,canAppData:auth.canAppData,canDrive:auth.canDrive};}
   class Settings extends DriveSettings{
     async restore(){if(options.folderWait)await options.folderWait.promise;if(options.folderError)throw options.folderError;return options.folder===null?null:{folderId:'my-folder'};}
@@ -56,7 +66,7 @@ function runtime(options={}){
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
   const target=dataset=>({dataset,disabled:false,closest(){return this;},matches(){return false;}});
-  return {auth,document,browserStorage,value,get authorizations(){return authorizations;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),start:()=>value('openAccount(authorization())')};
+  return {auth,document,browserStorage,value,get authorizations(){return authorizations;},get preparations(){return preparations;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),start:()=>value('openAccount(authorization())')};
 }
 
 test('login só libera Google após carregar e exige novo clique para abrir autorização',async()=>{
@@ -64,7 +74,7 @@ test('login só libera Google após carregar e exige novo clique para abrir auto
   assert.match(app.html(),/data-action="login"[^>]*disabled/);
   await app.click('login');assert.match(app.html(),/Preparando Google/);assert.equal(app.authorizations,0);
   sdkWait.resolve();await tick();
-  assert(!/data-action="login"[^>]*disabled/.test(app.html()));assert.equal(app.authorizations,0);
+  assert(!/data-action="login"[^>]*disabled/.test(app.html()));assert.equal(app.authorizations,0);assert(app.preparations>0);
   await app.click('login');assert.equal(app.authorizations,1);assert.equal(app.auth.profile.sub,'111');
 });
 
@@ -78,10 +88,21 @@ test('falha de carga permite tentar novamente ou usar visitante sem iniciar logi
 });
 
 test('erro no popup mantém login habilitado para nova tentativa explícita',async()=>{
-  const options={authorizationError:new Error('Permita pop-ups para este site'),folder:null},app=runtime(options);app.auth.signOut();
-  await app.click('login');assert.match(app.html(),/Permita pop-ups/);assert.equal(app.auth.profile,null);
+  const options={authorizationError:Object.assign(new Error('Permita pop-ups para este site'),{code:'popup_failed_to_open'}),folder:null},app=runtime(options);app.auth.signOut();
+  await app.click('login');assert.match(app.html(),/Permita pop-ups/);assert.equal(app.auth.profile,null);assert.match(app.html(),/Como liberar a janela de entrada/);assert.match(app.html(),/Ajuda do Firefox/);
   assert(!/data-action="login"[^>]*disabled/.test(app.html()));assert.equal(app.authorizations,1);
-  options.authorizationError=null;await app.click('login');assert.equal(app.authorizations,2);assert.equal(app.auth.profile.sub,'111');
+  options.authorizationError=null;await app.click('login');assert.equal(app.authorizations,2);assert.equal(app.auth.profile.sub,'111');assert(!app.html().includes('Como liberar a janela de entrada'));
+});
+
+test('rolagem interna é mantida ao selecionar e trocar tema, e reinicia na próxima questão',async()=>{
+  const app=runtime();app.auth.signOut();await app.click('guest');
+  await app.value(`(async()=>{await newSession(model.questions.slice(0,2).map(q=>q.key));navigate('session');})()`);
+  app.document.querySelector('.question-body').scrollTop=180;
+  const option=app.value('model.questions[0].correctOption');await app.click('select',{option});
+  assert.equal(app.document.querySelector('.question-body').scrollTop,180);
+  await app.click('toggle-theme');assert.equal(app.document.querySelector('.question-body').scrollTop,180);
+  await app.click('answer');assert.equal(app.document.querySelector('.question-body').scrollTop,180);
+  await app.click('next');assert.equal(app.document.querySelector('.question-body').scrollTop,0);
 });
 
 test('visitante mantém progresso na sessão e não recupera dados após nova instância',async()=>{

@@ -11,6 +11,12 @@
 .entry-account-note,.entry-guest-note{font-size:12px;line-height:1.7;color:var(--home-muted);margin:12px auto 0;max-width:350px}
 .entry-google-status{font-size:11px;line-height:1.7;color:var(--home-muted);margin-top:10px}
 .entry-google-retry{margin-top:12px}
+.entry-login-help{text-align:left;margin-top:12px;padding:16px;background:var(--detail-blue-soft);border:1px solid var(--border);border-radius:12px;font-size:12px;color:var(--text)}
+.entry-login-help summary{cursor:pointer;font-weight:600;color:var(--detail-blue)}
+.entry-login-help p{margin-top:12px;line-height:1.7}
+.entry-login-help code{display:block;margin-top:12px;font-size:11px;overflow-wrap:anywhere}
+.entry-help-links{display:flex;gap:16px;flex-wrap:wrap;margin-block:12px}
+.entry-login-help .btn{width:100%}
 .entry-divider{display:flex;align-items:center;gap:14px;color:var(--home-muted);font-size:11px;margin:22px 0 18px}
 .entry-divider:before,.entry-divider:after{content:'';height:1px;flex:1;background:var(--border)}
 .entry-guest{width:100%;min-height:50px;border-radius:12px;font-size:14px;background:transparent}
