@@ -64,3 +64,11 @@ A infraestrutura de navegador para Sites continuava indisponível. Aparência fi
 A tela de login foi reduzida à identidade Foco, uma frase de orientação e ao botão Google. A troca de tema permanece discreta no canto superior. Foram removidos a apresentação lateral, os blocos de benefícios, o ícone ilustrativo e as frases adicionais. Celular e desktop usam uma composição única centralizada. Erros, carregamento e configuração ausente continuam explícitos. A autenticação e a página após entrar permanecem as mesmas.
 
 Foram verificadas a sintaxe dos módulos e as variantes HTML de acesso normal, carregamento, erro e configuração ausente. Não foram criados novos testes para a alteração visual. A inspeção visual em navegador/aparelho real segue indisponível.
+
+## Modo foco e menu recolhível 1.4.0 — 09/10/2026
+
+Durante uma sessão no desktop, o botão no canto superior direito ativa um layout sem menu e solicita tela cheia nativa. O documento raiz permanece estável durante o redesenho de respostas, comentários e próximas questões. A saída nativa (incluindo Esc), o botão de saída, a pausa, a conclusão e a mudança para largura de celular restauram a interface. Se o navegador recusar tela cheia ou não oferecer essa API, o layout de foco continua disponível com aviso. O menu pode ser recolhido para uma coluna de ícones com nomes acessíveis e títulos; a preferência é salva por conta neste navegador e preservada ao entrar/sair do modo foco.
+
+67 testes automatizados passaram, incluindo oito cenários de tela cheia simulada: entrada e redesenho, saída nativa, permissão recusada, API ausente, mudança de largura, saída durante entrada pendente, cliques repetidos e preservação de tela cheia iniciada fora do modo foco. Uma execução adicional do código real da aplicação com DOM e eventos simulados verificou recolher/recuperar menu, isolamento da preferência entre contas, seleção preservada ao entrar/sair, resposta correta, próxima questão, Esc, conclusão, simulado sem gabarito antecipado e pausa.
+
+A sintaxe e o build foram verificados. Esses ensaios não comprovam a aparência nem a tela cheia no navegador real. O recurso de navegador exigido pelo ambiente de Sites continua indisponível; não houve teste visual de desktop ou celular nesta atualização.

@@ -5,6 +5,8 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 ## Funcionalidades
 
 - Temas claro, escuro e automático; navegação adaptada para celulares.
+- Menu lateral recolhível no desktop, com preferência salva por conta neste navegador.
+- Modo foco em tela cheia durante as questões: botão no canto superior direito; saída pelo botão ou Esc, sem perder a seleção. Se a tela cheia for recusada ou indisponível, o layout sem menus continua funcionando. Ao pausar ou concluir, a interface normal é restaurada.
 - Entrada compacta e início com ação principal de estudo, meta diária, atalhos e bancos; layout dedicado ao celular.
 - Importação e exportação de bancos JSON; ativação, desativação e remoção.
 - Sessões recomendadas, aleatórias, não respondidas, erros, favoritas, revisão, filtros por assunto e simulados.
