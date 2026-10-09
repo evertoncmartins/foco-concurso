@@ -4,7 +4,33 @@
 
 O responsável pela plataforma configura um cliente OAuth público único. Leia [LOGIN_GOOGLE.md](LOGIN_GOOGLE.md). Os estudantes apenas entram com Google e escolhem sua pasta do Meu Drive. Não precisam criar projetos no Google Cloud.
 
-Cada usuário informa o ID ou link da pasta durante a primeira entrada, ou em Ajustes. A conta conectada precisa ter permissão para adicionar arquivos. As pastas não são alteradas pelo sistema e os arquivos herdam suas permissões; use uma pasta privada para histórico pessoal.
+Cada usuário informa o ID ou link da pasta durante a primeira entrada, ou em Ajustes. Após conectar, o ID fica salvo na área privada `appDataFolder` da própria conta Google e é recuperado em outros dispositivos. A conta conectada precisa ter permissão para adicionar arquivos. As pastas não são alteradas pelo sistema e os arquivos herdam suas permissões; use uma pasta privada para histórico pessoal.
+
+## Recuperação automática da pasta (1.2.0)
+
+O login solicita perfil e `https://www.googleapis.com/auth/drive.appdata`. A configuração pertence ao usuário conectado, não ao proprietário do projeto Google Cloud. Ela não aparece nos arquivos comuns do Meu Drive. O escopo deve ser declarado em **Google Auth Platform → Acesso a dados** pelo responsável.
+
+O app lê os snapshots `foco-configuracao.json` em `spaces=appDataFolder` antes de decidir qual pasta conectar. Cada snapshot contém somente versão do schema, identificação do aplicativo/conta, revisão lógica, ID da alteração e ID da pasta. Não contém token, senha, questões ou respostas. Exemplo:
+
+```json
+{
+  "schemaVersion": 1,
+  "app": "foco-concursos",
+  "kind": "folder-settings",
+  "owner": {"provider": "google", "subject": "ID_ESTAVEL_DA_CONTA"},
+  "revision": 1,
+  "changeId": "UUID_DA_ALTERACAO",
+  "folderId": "ID_DA_PASTA_ESCOLHIDA"
+}
+```
+
+A pasta remota prevalece sobre uma configuração local antiga. Quando não existe configuração remota, a pasta local é migrada somente depois da validação de acesso. Uma falha de leitura não é interpretada como ausência de configuração.
+
+As escolhas de pasta são snapshots imutáveis. A maior revisão lógica prevalece; mudanças simultâneas na mesma revisão usam a data do Drive e o ID do arquivo como desempate determinístico. Não é usado o relógio do dispositivo para decidir a revisão. Os snapshots anteriores continuam preservados; não há exclusão nem sobrescrita.
+
+Uploads pendentes ficam no armazenamento local da conta com um ID pré-gerado para `appDataFolder`; repetir após falha não cria outra configuração. Se outra pessoa/dispositivo da mesma conta mudou a pasta enquanto um envio estava pendente, o envio antigo é bloqueado. Salvar novamente em Ajustes confirma uma nova escolha explícita. Não confunda essa configuração com o diário de progresso: o progresso e os bancos permanecem na pasta escolhida.
+
+Se a autorização retornada no login incluir o acesso Drive já concedido, a recuperação do progresso acontece automaticamente. Se o Google solicitar nova permissão, o app recupera a pasta e oferece **Autorizar minha pasta**. Nenhum token é persistido. Se o usuário apagar os dados do aplicativo nas configurações do Drive, precisará informar a pasta novamente; os arquivos de progresso da pasta escolhida não são removidos pelo app.
 
 ## Durante o estudo
 
@@ -52,6 +78,7 @@ Em **Meus bancos → Buscar no Drive**, o app lista arquivos JSON da pasta, excl
 - [Google Identity Services — modelo de tokens](https://developers.google.com/identity/oauth2/web/guides/use-token-model)
 - [Drive API — upload multipart](https://developers.google.com/workspace/drive/api/guides/manage-uploads)
 - [Drive API — buscar arquivos](https://developers.google.com/workspace/drive/api/guides/search-files)
+- [Drive API — configuração privada appDataFolder](https://developers.google.com/workspace/drive/api/guides/appdata)
 - [Drive API — generateIds](https://developers.google.com/workspace/drive/api/reference/rest/v3/files/generateIds)
 
 Consentimento real e escrita do **site** precisam ser verificados após o cliente OAuth global estar configurado. Testes HTTP simulados e acesso do assistente à pasta não substituem essa verificação.

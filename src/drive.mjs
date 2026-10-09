@@ -4,30 +4,40 @@ import {GoogleAccount,prepareGoogle} from './auth.mjs';
 export const DEFAULT_FOLDER='1BsRHtMhLBHVSpn7gqIZCjuE4JaGbitPV';
 const API='https://www.googleapis.com/drive/v3';
 export class DriveSync extends EventTarget {
-  constructor(store,config,account=null) {super();this.store=store;this.storage=store.storage;this.userId=store.storage.userId||null;this.config=config;this.account=account;this.token=null;this.expires=0;this.status='local';this.busy=false;this.timer=null;this.lastSync=null;this.folder=null;this.closed=false;this.generation=0;}
+  constructor(store,config,account=null,settings=null) {super();this.store=store;this.storage=store.storage;this.userId=store.storage.userId||null;this.config=config;this.account=account;this.settings=settings;this.token=null;this.expires=0;this.status='local';this.busy=false;this.connecting=false;this.timer=null;this.lastSync=null;this.folder=null;this.closed=false;this.generation=0;}
   setStatus(status,message=''){this.status=status;this.message=message;this.dispatchEvent(new Event('status'));}
   async prepare(){
     return prepareGoogle();
   }
-  async connect(){
-    if(!this.config.folderId)throw new Error('Informe sua pasta do Google Drive primeiro.');
+  async connect(folderId){
+    if(this.busy||this.connecting)throw new Error('Aguarde a conexão ou sincronização terminar.');
     const account=this.account||new GoogleAccount(this.config.clientId);
     const result=await account.authorize(true);
     if(this.userId&&result.profile.sub!==this.userId)throw new Error('A conta Google não corresponde ao perfil conectado.');
-    await this.useAuthorization(result);
+    await this.useAuthorization(result,folderId?{folderId}:{});
   }
-  async useAuthorization(result){
+  async useAuthorization(result,{folderId}={}){
     if(this.closed)throw new Error('A sessão foi encerrada.');
     if(this.userId&&result.profile?.sub!==this.userId)throw new Error('A conta Google não corresponde ao perfil conectado.');
+    if(this.busy||this.connecting)throw new Error('Aguarde a conexão ou sincronização terminar.');
+    this.connecting=true;clearTimeout(this.timer);
+    try{
+    if(this.settings&&!folderId){const saved=await this.settings.restore();if(saved)this.setFolder(saved.folderId);}
+    const selected=folderId||this.config.folderId;
+    if(!selected)throw new Error('Informe sua pasta do Google Drive primeiro.');
     this.token=result.token;this.expires=result.expires;
-    this.folder=await this.request(`${API}/files/${encodeURIComponent(this.config.folderId)}?fields=id,name,mimeType,driveId,capabilities(canAddChildren)`);
+    this.folder=await this.request(`${API}/files/${encodeURIComponent(selected)}?fields=id,name,mimeType,driveId,capabilities(canAddChildren)`);
     if(this.folder.mimeType!=='application/vnd.google-apps.folder'||!this.folder.capabilities?.canAddChildren){this.disconnect();throw new Error('Escolha a conta proprietária da pasta ou uma conta com permissão para adicionar arquivos.');}
     if(this.folder.driveId){this.disconnect();throw new Error('Escolha uma pasta do seu Meu Drive. Drives compartilhados institucionais ainda não são suportados.');}
-    await this.sync();
-    return this.importNewBanks();
+    if(this.settings)await this.settings.save(selected,{explicit:!!folderId});
+    this.setFolder(selected);
+    await this.sync({duringConnect:true});
+    return await this.importNewBanks();
+    }catch(e){this.disconnect();this.setStatus('error',e.message);throw e;}finally{this.connecting=false;if(this.status==='pending')this.schedule();}
   }
+  setFolder(folderId){this.config.folderId=folderId;this.dispatchEvent(new Event('config'));}
   disconnect(){this.generation++;this.token=null;this.expires=0;this.folder=null;clearTimeout(this.timer);this.setStatus('local','Drive desconectado. O progresso continua salvo neste dispositivo.');}
-  close(){this.closed=true;this.disconnect();}
+  close(){this.closed=true;this.settings?.close();this.disconnect();}
   async request(url,options={}) {
     if(!this.token||Date.now()>=this.expires-10000){this.token=null;this.setStatus('expired','Entre novamente no Google para sincronizar.');throw new Error('A autorização do Google expirou. O progresso local está salvo.');}
     if(this.closed)throw new Error('A sessão foi encerrada.');
@@ -48,8 +58,9 @@ export class DriveSync extends EventTarget {
   saveCache(cache){this.storage.setItem(this.cacheKey(),JSON.stringify(cache));}
   progressPrefix(){return this.userId?`foco-progresso-${this.userId}-`:'foco-progresso-';}
   async readFile(file){if(Number(file.size)>10*1024*1024)throw new Error(`${file.name}: arquivo maior que 10 MB.`);return this.request(`${API}/files/${encodeURIComponent(file.id)}?alt=media`);}
-  schedule(){if(!this.token)return;clearTimeout(this.timer);this.setStatus('pending','Alterações locais aguardando envio.');this.timer=setTimeout(()=>this.sync().catch(()=>{}),6000);}
-  async sync(){
+  schedule(){if(!this.token||this.connecting)return;clearTimeout(this.timer);this.setStatus('pending','Alterações locais aguardando envio.');this.timer=setTimeout(()=>this.sync().catch(()=>{}),6000);}
+  async sync({duringConnect=false}={}){
+    if(this.connecting&&!duringConnect)throw new Error('Aguarde a conexão da pasta terminar.');
     if(this.busy)return;this.busy=true;this.setStatus('syncing','Unindo os históricos do Drive e deste dispositivo…');
     try{
       const cache=this.cache(), files=(await this.list(`name contains '${this.progressPrefix()}' and mimeType = 'application/json'`)).filter(f=>f.name.startsWith(this.progressPrefix())&&(!this.userId||f.ownedByMe===true));
@@ -79,6 +90,6 @@ export class DriveSync extends EventTarget {
   async importNewBanks(){
     const files=await this.bankFiles();let imported=0,skipped=0;
     for(const file of files){try{const bank=validateBank(await this.readFile(file));const existing=this.store.model().banks.find(b=>b.id===bank.id);if(existing){skipped++;continue;}const hadBank=this.store.events.some(e=>e.type==='bank'&&e.bank.id===bank.id);if(hadBank){skipped++;continue;}await this.store.add([{type:'bank',bank},{type:'bank-state',bankId:bank.id,value:'enabled'}]);imported++;}catch(e){if(e.status||this.closed||!this.token)throw e;skipped++;}}
-    if(imported)await this.sync();this.bankImportSummary={imported,skipped};return this.bankImportSummary;
+    if(imported)await this.sync({duringConnect:this.connecting});this.bankImportSummary={imported,skipped};return this.bankImportSummary;
   }
 }

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {AccountStorage,normalizeGoogleProfile,parseFolder,assertProgressOwner} from '../src/account.mjs';
-import {GoogleAccount,fetchGoogleProfile,IDENTITY_SCOPES,DRIVE_SCOPE,validClientId} from '../src/auth.mjs';
+import {GoogleAccount,fetchGoogleProfile,IDENTITY_SCOPES,DRIVE_SCOPE,APPDATA_SCOPE,validClientId} from '../src/auth.mjs';
 import {Store} from '../src/store.mjs';
 import {DriveSync} from '../src/drive.mjs';
 class MemoryStorage{data=new Map();get length(){return this.data.size;}key(i){return [...this.data.keys()][i]??null;}getItem(k){return this.data.get(k)??null;}setItem(k,v){this.data.set(k,String(v));}removeItem(k){this.data.delete(k);}}
@@ -20,14 +20,24 @@ test('identidade usa ID estável e só aceita perfil com e-mail verificado',()=>
 test('link de pasta é validado sem aceitar arquivo, domínio falso ou parâmetros injetados',()=>{assert.equal(parseFolder('https://drive.google.com/drive/folders/folder_123?usp=sharing'),'folder_123');assert.equal(parseFolder('https://drive.google.com/drive/u/0/folders/folder-123'),'folder-123');assert.throws(()=>parseFolder('https://evil.test/drive/folders/123'),/Google Drive/);assert.throws(()=>parseFolder('https://drive.google.com/file/d/123'),/pasta/);assert.throws(()=>parseFolder("abc' or trashed=true"),/ID/);});
 test('configuração OAuth só aceita um identificador público',()=>{assert(validClientId(clientId));assert(!validClientId('access-token'));assert(!validClientId('client-secret'));assert(!validClientId(''));});
 test('perfil é confirmado pelo endpoint HTTPS Google com Bearer e sem token na URL',async()=>{let seen;const p=await fetchGoogleProfile('fixture-token',async(url,options)=>{seen={url,options};return response(profile('111'));});assert.equal(p.sub,'111');assert.equal(seen.url,'https://openidconnect.googleapis.com/v1/userinfo');assert.equal(seen.options.headers.Authorization,'Bearer fixture-token');assert.equal(seen.options.cache,'no-store');assert(!seen.url.includes('fixture-token'));await assert.rejects(()=>fetchGoogleProfile('invalid',async()=>response({},401)),/confirmar/);});
-test('login solicita perfil; Drive só é solicitado após autorização adicional',async()=>{
+test('login solicita perfil e configuração privada; pasta de estudos pede autorização adicional',async()=>{
   const oldGoogle=globalThis.google,oldFetch=globalThis.fetch;const configs=[];
   globalThis.google={accounts:{oauth2:{hasGrantedAllScopes:(r,...scopes)=>scopes.every(s=>r.scope.split(' ').includes(s)),initTokenClient:config=>{configs.push(config);return {requestAccessToken:()=>config.callback({access_token:'fixture-token',expires_in:3600,scope:config.scope})};}}}};globalThis.fetch=async()=>response(profile('111'));
-  try{const auth=new GoogleAccount(clientId);await auth.authorize();assert(!configs[0].scope.includes(DRIVE_SCOPE));assert.equal(auth.profile.sub,'111');await auth.authorize(true);assert(configs[1].scope.includes(DRIVE_SCOPE));assert.equal(configs[1].login_hint,'111');assert(auth.canDrive);auth.signOut();assert.equal(auth.profile,null);assert.equal(auth.token,null);}finally{globalThis.google=oldGoogle;globalThis.fetch=oldFetch;}
+  try{const auth=new GoogleAccount(clientId);const result=await auth.authorize();assert(!configs[0].scope.split(' ').includes(DRIVE_SCOPE));assert(configs[0].scope.split(' ').includes(APPDATA_SCOPE));assert.equal(auth.profile.sub,'111');assert(result.canAppData);assert(!result.canDrive);await auth.authorize(true);assert(configs[1].scope.split(' ').includes(DRIVE_SCOPE));assert.equal(configs[1].login_hint,'111');assert(auth.canDrive);auth.signOut();assert.equal(auth.profile,null);assert.equal(auth.token,null);assert(!auth.canAppData);}finally{globalThis.google=oldGoogle;globalThis.fetch=oldFetch;}
 });
 test('trocar conta durante consentimento do Drive é recusado',async()=>{
   const oldGoogle=globalThis.google,oldFetch=globalThis.fetch;globalThis.google={accounts:{oauth2:{hasGrantedAllScopes:()=>true,initTokenClient:config=>({requestAccessToken:()=>config.callback({access_token:'other-user-token',expires_in:3600,scope:config.scope})})}}};globalThis.fetch=async()=>response(profile('222'));
   try{const auth=new GoogleAccount(clientId);auth.profile=normalizeGoogleProfile(profile('111'));auth.token='first-user-token';await assert.rejects(()=>auth.authorize(true),/diferente/);assert.equal(auth.profile.sub,'111');assert.equal(auth.token,'first-user-token');}finally{globalThis.google=oldGoogle;globalThis.fetch=oldFetch;}
+});
+test('permissão de configuração negada mantém login e estudo local disponíveis',async()=>{
+  const oldGoogle=globalThis.google,oldFetch=globalThis.fetch;
+  globalThis.google={accounts:{oauth2:{hasGrantedAllScopes:(r,...scopes)=>scopes.every(s=>r.scope.split(' ').includes(s)),initTokenClient:config=>({requestAccessToken:()=>config.callback({access_token:'fixture-token',expires_in:3600,scope:IDENTITY_SCOPES})})}}};globalThis.fetch=async()=>response(profile('111'));
+  try{const auth=new GoogleAccount(clientId);const result=await auth.authorize();assert.equal(result.profile.sub,'111');assert(!result.canAppData);await assert.rejects(()=>auth.authorize(true),/configuração privada/);}finally{globalThis.google=oldGoogle;globalThis.fetch=oldFetch;}
+});
+test('login reutiliza escopos Drive já concedidos para recuperar progresso sem segundo popup',async()=>{
+  const oldGoogle=globalThis.google,oldFetch=globalThis.fetch;let popups=0;
+  globalThis.google={accounts:{oauth2:{hasGrantedAllScopes:(r,...scopes)=>scopes.every(s=>r.scope.split(' ').includes(s)),initTokenClient:config=>{assert(config.include_granted_scopes);return {requestAccessToken:()=>{popups++;config.callback({access_token:'fixture-token',expires_in:3600,scope:`${config.scope} ${DRIVE_SCOPE}`});}};}}}};globalThis.fetch=async()=>response(profile('111'));
+  try{const auth=new GoogleAccount(clientId);const result=await auth.authorize();assert(result.canDrive);assert(result.canAppData);assert.equal(popups,1);}finally{globalThis.google=oldGoogle;globalThis.fetch=oldFetch;}
 });
 test('Drive recusa autorização de outra conta antes de ler a pasta',async()=>{const store=new Store(new AccountStorage(new MemoryStorage(),'111'));const drive=new DriveSync(store,{folderId:'folder'}, {authorize:async()=>({profile:profile('222'),token:'wrong',expires:Date.now()+10000})});await assert.rejects(()=>drive.connect(),/corresponde/);assert.equal(drive.token,null);});
 test('mesma pasta mantém prefixos, caches e lotes de progresso separados por conta',async()=>{

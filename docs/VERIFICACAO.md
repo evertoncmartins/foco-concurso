@@ -2,7 +2,7 @@
 
 ## Executado
 
-44 testes automatizados passaram em Node.js. Verificação de sintaxe de todos os módulos passou. O build estático foi gerado sem dependências de produção.
+59 testes automatizados passaram em Node.js na versão 1.2.0. Verificação de sintaxe de todos os módulos passou. O build estático foi gerado sem dependências de produção.
 
 | Fluxo | Evidência |
 |---|---|
@@ -24,7 +24,13 @@
 
 ## Atualização de login e múltiplas contas
 
-Mais 15 testes passaram: isolamento de respostas/configurações/cache no mesmo navegador, não atribuição automática do legado, proprietário nos backups, perfil Google verificado, validação de pasta, autorização incremental, recusa de conta trocada, arquivos de outro proprietário e encerramento de sessão. Google UserInfo e consentimento foram simulados; não comprovam acesso real.
+17 testes de conta passaram (incluídos nos 59): isolamento de respostas/configurações/cache no mesmo navegador, não atribuição automática do legado, proprietário nos backups, perfil Google verificado, validação de pasta, autorização incremental, recusa de conta trocada, arquivos de outro proprietário e encerramento de sessão. Google UserInfo e consentimento foram simulados; não comprovam acesso real.
+
+## Configuração privada entre dispositivos — 1.2.0
+
+13 testes adicionais de configuração e integração Drive passaram (incluídos nos 59). A API foi simulada: criação e busca em `appDataFolder`, navegador sem dados locais recuperando pasta/bancos/resposta/favorito, contas distintas, migração da pasta antiga após validar acesso, preferência remota sobre local antiga, pasta inválida, falha de leitura, upload interrompido, resposta perdida sem duplicação, envio antigo bloqueado após mudança remota, escolhas simultâneas, documento de outra conta e logout durante requisição. Os testes de autorização também verificam o novo escopo, a recusa da permissão sem bloquear estudo local e o reaproveitamento das permissões Drive anteriores.
+
+O build inclui `drive-settings.mjs`. A implementação não persiste tokens e mantém configurações e progresso em espaços separados. A declaração de `drive.appdata` no Google Cloud e o consentimento real dessa nova permissão não foram feitos nesta atualização. O console estava indisponível para automação; a alteração de código não modifica o estado de publicação/verificação do OAuth.
 
 ## Implementado, sem verificação em navegador
 
@@ -39,4 +45,4 @@ Os layouts possuem breakpoints de 1.200, 960 e 700 px, navegação inferior no c
 
 ## Conferência após configurar OAuth
 
-Conecte a conta proprietária em Ajustes. Responda uma questão, aguarde “Drive sincronizado” e confira o JSON criado na pasta. Em outro navegador, conecte a mesma conta e confirme a recuperação de respostas, bancos e favoritos. Depois responda em cada dispositivo, sincronize ambos e confira que o total contém as duas tentativas. Ao recarregar, conecte novamente: tokens não são persistidos.
+Declare `https://www.googleapis.com/auth/drive.appdata` em Google Auth Platform → Acesso a dados. Entre novamente e conecte sua conta em Ajustes; confirme a indicação de pasta salva na conta Google. Responda uma questão, aguarde “Drive sincronizado” e confira o JSON criado na pasta. Em outro navegador sem dados locais, entre com a mesma conta e confirme que o ID da pasta reaparece sem colar o link. Autorize o Drive se necessário e confirme a recuperação de respostas, bancos e favoritos. Depois responda em cada dispositivo, sincronize ambos e confira que o total contém as duas tentativas. Ao recarregar, conecte novamente: tokens não são persistidos.

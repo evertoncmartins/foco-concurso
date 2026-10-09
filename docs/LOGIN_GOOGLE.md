@@ -11,7 +11,7 @@ O identificador permanente é o `sub` devolvido pelo Google, não o e-mail. Resp
 Os estudantes **não precisam criar clientes OAuth próprios**. A plataforma usa um único cliente público OAuth do tipo Aplicativo da Web.
 
 1. No Google Cloud, crie/selecione o projeto do Foco e ative a Google Drive API.
-2. Configure o Google Auth Platform para público externo. Configure nome e suporte e os escopos de perfil (`openid`, `userinfo.email`, `userinfo.profile`) e Drive (`https://www.googleapis.com/auth/drive`).
+2. Configure o Google Auth Platform para público externo. Configure nome e suporte e os escopos de perfil (`openid`, `userinfo.email`, `userinfo.profile`) e Drive (`https://www.googleapis.com/auth/drive`), além de configuração privada (`https://www.googleapis.com/auth/drive.appdata`).
 3. Se a aplicação estiver em teste, adicione as contas que poderão utilizá-la como usuários de teste. Para liberar amplamente, cumpra os requisitos de publicação/verificação do Google, especialmente pelo escopo Drive.
 4. Crie um cliente OAuth do tipo Aplicativo da Web.
 5. Em Origens JavaScript autorizadas, adicione exatamente `https://foco-concursos.ecmdigital.chatgpt.site`. Para desenvolvimento, adicione `http://localhost:5173`.
@@ -29,14 +29,14 @@ A opção “Configuração do responsável” permite validar outro ID nesse na
 ## Fluxo do usuário
 
 1. Abrir Foco → Continuar com Google.
-2. Escolher sua conta e autorizar o perfil.
-3. Na primeira entrada, informar o link de uma pasta do seu **Meu Drive**, ou escolher estudar localmente por enquanto.
+2. Escolher sua conta e autorizar o perfil e a configuração privada do aplicativo no Drive.
+3. O app procura a configuração privada dessa conta. Se houver pasta salva, recupera o ID automaticamente. Se não houver, informa-se o link de uma pasta do **Meu Drive**, ou escolhe-se estudar localmente por enquanto.
 4. Autorizar o acesso ao Drive. O perfil é conferido novamente: escolher outra conta nesse passo é recusado.
-5. A aplicação valida a pasta e a permissão para adicionar arquivos, recupera o progresso desse usuário e importa novos bancos JSON disponíveis.
+5. A aplicação valida a pasta e a permissão para adicionar arquivos, salva o ID na configuração privada e recupera o progresso desse usuário. Novos bancos JSON da pasta são importados automaticamente.
 6. Estudar. O salvamento local é imediato e o Drive recebe lotes imutáveis de alterações.
 7. Sair encerra a sessão em memória e retira os dados da tela; a cópia local daquela conta continua preservada para a próxima entrada.
 
-Após recarregar, é necessário entrar novamente. Não há tokens persistidos. Se o Google já concedeu o escopo Drive e a pasta já está configurada, a autorização retornada no login é reutilizada para recuperar o histórico. Caso contrário, a autorização adicional ocorre pelo botão da pasta.
+Após recarregar, é necessário entrar novamente. Não há tokens persistidos. A configuração da pasta é recuperada com `drive.appdata`, mesmo em um navegador sem histórico local. Se o Google já concedeu o escopo Drive, a autorização retornada no login é reutilizada para recuperar o histórico. Caso contrário, a autorização adicional ocorre pelo botão da pasta.
 
 ## Separação dos dados
 
@@ -65,3 +65,11 @@ As pastas herdam suas próprias permissões do Google Drive. Recomenda-se uma pa
 Os testes automatizados verificam isolamento entre contas, validação do perfil, recusa de conta diferente, propriedade dos JSONs, cache individual, recuperação e encerramento do adaptador. Login/consentimento reais e a interface em aparelhos dependem da configuração OAuth e de verificação em navegador.
 
 Referências oficiais: [Google OAuth JS](https://developers.google.com/identity/oauth2/web/reference/js-reference), [Google UserInfo e ID estável](https://developers.google.com/identity/openid-connect/reference).
+
+## Atualização 1.2.0 — configuração entre dispositivos
+
+O login solicita `drive.appdata`, um escopo específico para a área privada de configuração de cada usuário. O acesso amplo `drive` continua incremental, somente ao conectar uma pasta. A recusa da permissão de configuração permite entrar e estudar localmente, mas impede sua recuperação automática. A conexão da pasta solicita ambas as permissões necessárias.
+
+No Google Cloud do projeto `foco-estudos-ecm`, declare o escopo `https://www.googleapis.com/auth/drive.appdata` em **Google Auth Platform → Acesso a dados → Adicionar ou remover escopos** e salve. Essa alteração de console não foi realizada nesta atualização. A pendência anterior de publicação/verificação do aplicativo Google permanece independente da publicação do site.
+
+Para migrar uma pasta já salva no navegador, entre novamente e clique **Autorizar minha pasta** em Ajustes (se a autorização retornada não permitir conexão automática). A pasta é validada antes de criar a configuração privada. Em outro dispositivo, entre com a mesma conta; não é necessário colar o link novamente. Caso o Google solicite, autorize o Drive para carregar o progresso.

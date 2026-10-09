@@ -12,6 +12,7 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 - Sessões pausáveis e retomadas após recarregar a página.
 - Progresso local automático; exportação e restauração de JSON sem substituir o histórico.
 - Sincronização Google Drive com OAuth, união de eventos e arquivos JSON imutáveis.
+- Pasta recuperada pela conta Google em outros dispositivos, via configuração privada no Drive.
 - Banco inicial com dez questões autorais sobre a Lei nº 8.112/1990.
 
 ## Executar
@@ -61,9 +62,9 @@ Entrada exclusivamente com Google. Cada conta usa um perfil independente, identi
 
 ## Google Drive
 
-O projeto implementa acesso direto às APIs oficiais do Google através de Google Identity Services. O token fica somente em memória e expira. Nenhum segredo OAuth é necessário em uma aplicação estática com esse modelo. Cada conta escolhe sua própria pasta do Meu Drive. Novas contas começam sem pasta configurada.
+O projeto implementa acesso direto às APIs oficiais do Google através de Google Identity Services. O token fica somente em memória e expira. Nenhum segredo OAuth é necessário em uma aplicação estática com esse modelo. Cada conta escolhe sua própria pasta do Meu Drive. Após validar e conectar, o ID é salvo na área privada `appDataFolder` dessa conta. Ao entrar em outro dispositivo com a mesma conta, a configuração é recuperada antes da sincronização do progresso. Novas contas sem configuração remota começam sem pasta.
 
-**Configuração da instalação:** o cliente OAuth do Foco foi criado com a origem do site publicado. Em outras hospedagens, o responsável precisa autorizar a nova origem no Google Cloud. Cada usuário entra com Google e informa sua pasta. A conexão do Drive usada por esta conversa não disponibiliza credenciais automaticamente ao site. Leia [GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md). Após abrir/recarregar, entre com Google. A autorização adicional do Drive é solicitada quando necessária; a carga remota acontece antes do primeiro envio.
+**Configuração da instalação:** o cliente OAuth do Foco foi criado com a origem do site publicado. Em outras hospedagens, o responsável precisa autorizar a nova origem no Google Cloud. Cada usuário entra com Google e informa sua pasta uma vez. O escopo adicional `https://www.googleapis.com/auth/drive.appdata` deve constar em Google Auth Platform → Acesso a dados. Usuários existentes precisam conceder essa nova permissão e conectar a pasta ao menos uma vez para migrar a configuração local. A conexão do Drive usada por esta conversa não disponibiliza credenciais automaticamente ao site. Leia [GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md). Após abrir/recarregar, entre com Google. A autorização adicional do Drive é solicitada quando necessária; a carga remota acontece antes do primeiro envio.
 
 Para prevenir sobrescritas concorrentes sem um backend central, o Drive recebe lotes JSON imutáveis `foco-progresso-*.json`, unidos por ID. É uma decisão deliberada em vez de reescrever um único arquivo compartilhado. A exportação produz o arquivo consolidado. Bancos importados e sessões também são sincronizados. Não apague lotes: eles constituem o histórico persistente.
 
