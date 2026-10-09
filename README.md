@@ -82,7 +82,7 @@ Este projeto está preparado para Sites, Vercel e GitHub Pages. A hospedagem da 
 
 O repositório deste sistema é [evertoncmartins/foco-concurso](https://github.com/evertoncmartins/foco-concurso), na branch `main`. O usuário autorizou o envio das próximas atualizações para esse destino. O checkout de Sites conserva seu versionamento administrado pela plataforma; o remoto adicional `github` aponta para o repositório do usuário.
 
-O workflow `ci.yml` executa testes, verificação de sintaxe e build a cada push em `main` e em pull requests. A publicação por GitHub Pages é opcional: o workflow `pages.yml` só é iniciado manualmente, após configurar Pages. O site ativo continua em [Foco](https://foco-concursos.ecmdigital.chatgpt.site). A configuração Vercel usa `dist/` e executa testes antes do build; ao conectar um repositório, a integração Git do Vercel realiza deploys automáticos.
+O workflow `ci.yml` executa testes, verificação de sintaxe e build a cada push em `main` e em pull requests. A publicação por GitHub Pages é opcional: o workflow `pages.yml` só é iniciado manualmente, após configurar Pages. O endereço de produção informado pelo responsável é [Foco no Vercel](https://foco-concurso-wine.vercel.app/). A publicação administrada por Sites permanece como espelho técnico. A configuração Vercel usa `dist/` e executa testes antes do build; ao conectar um repositório, a integração Git do Vercel realiza deploys automáticos.
 
 ## Segurança e limites
 

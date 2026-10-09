@@ -5,5 +5,5 @@
 - Quando houver acesso Git autenticado, utilize o remoto `github`. Não substitua o repositório administrado por Sites nem altere `.openai/hosting.json` para apontar ao GitHub.
 - Registre o mesmo código nos destinos de versionamento usados pela tarefa. Quando alterar o site, publique também pelo fluxo de Sites, mantendo o endereço e a audiência existentes.
 - Execute `npm test`, `npm run check` e `npm run build` antes de enviar alterações de código. GitHub Actions executa essas verificações automaticamente.
-- GitHub Pages é opcional e manual. O site ativo continua em `https://foco-concursos.ecmdigital.chatgpt.site`.
+- GitHub Pages é opcional e manual. O usuário informou `https://foco-concurso-wine.vercel.app/` como endereço de produção em 09/10/2026. Use esse endereço nas orientações ao usuário; preserve a publicação administrada por Sites como espelho técnico.
 - Não versione progresso pessoal, tokens ou credenciais. `dist/` é gerado pelo build e não deve ser versionado.

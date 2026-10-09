@@ -14,7 +14,7 @@ Os estudantes **não precisam criar clientes OAuth próprios**. A plataforma usa
 2. Configure o Google Auth Platform para público externo. Configure nome e suporte e os escopos de perfil (`openid`, `userinfo.email`, `userinfo.profile`) e Drive (`https://www.googleapis.com/auth/drive`), além de configuração privada (`https://www.googleapis.com/auth/drive.appdata`).
 3. Se a aplicação estiver em teste, adicione as contas que poderão utilizá-la como usuários de teste. Para liberar amplamente, cumpra os requisitos de publicação/verificação do Google, especialmente pelo escopo Drive.
 4. Crie um cliente OAuth do tipo Aplicativo da Web.
-5. Em Origens JavaScript autorizadas, adicione exatamente `https://foco-concursos.ecmdigital.chatgpt.site`. Para desenvolvimento, adicione `http://localhost:5173`.
+5. Em Origens JavaScript autorizadas, adicione exatamente `https://foco-concurso-wine.vercel.app`. Para desenvolvimento, adicione `http://localhost:5173`.
 6. Configure `googleClientId` em `public/app-config.json` com o ID terminado em `.apps.googleusercontent.com`, ou configure a variável de build `PUBLIC_GOOGLE_CLIENT_ID`.
 7. Gere e publique o build. O ID é público e não é uma senha. Não configure client secret no frontend.
 
@@ -24,9 +24,9 @@ O aplicativo Google está em **modo de teste**, com público externo e a conta d
 
 O nome salvo na tela de consentimento é **Foco Estudos Concursos**. A Google Drive API está ativada, e os escopos `openid`, `userinfo.email`, `userinfo.profile` e `https://www.googleapis.com/auth/drive` foram confirmados no console. Nenhuma conta de faturamento foi vinculada.
 
-Em **Google Auth Platform → Marca / Branding → Política de Privacidade**, utilize `https://foco-concursos.ecmdigital.chatgpt.site/privacidade.html`. A página é pública e também está vinculada à entrada e aos Ajustes. A publicação dessa página não altera o status de teste nem substitui a verificação do aplicativo OAuth e dos domínios. O contato de privacidade remete ao e-mail de suporte cadastrado no consentimento Google; mantenha esse endereço atualizado no console.
+Em **Google Auth Platform → Marca / Branding → Política de Privacidade**, utilize `https://foco-concurso-wine.vercel.app/privacidade.html`. A página é pública e também está vinculada à entrada e aos Ajustes. A publicação dessa página não altera o status de teste nem substitui a verificação do aplicativo OAuth e dos domínios. O contato de privacidade remete ao e-mail de suporte cadastrado no consentimento Google; mantenha esse endereço atualizado no console.
 
-No campo **Termos de Serviço**, utilize `https://foco-concursos.ecmdigital.chatgpt.site/termos.html`. A página pública descreve as condições de estudo, importação, acesso Google, sincronização e responsabilidades, com referência à Política de Privacidade.
+No campo **Termos de Serviço**, utilize `https://foco-concurso-wine.vercel.app/termos.html`. A página pública descreve as condições de estudo, importação, acesso Google, sincronização e responsabilidades, com referência à Política de Privacidade.
 
 A opção “Configuração do responsável” permite validar outro ID nesse navegador; ela não configura os demais visitantes. Se o ID do build estiver vazio em outra instalação, a tela indica que o login aguarda configuração e não simula uma entrada. Consentimento real e sincronização de ponta a ponta ainda precisam ser conferidos pela conta de teste.
 
@@ -76,7 +76,7 @@ A biblioteca e o cliente OAuth Google são preparados antes de habilitar “Cont
 
 O aplicativo distingue `popup_failed_to_open` (a janela não conseguiu abrir), `popup_closed` (fechamento antes de receber a resposta) e erros desconhecidos. A mensagem antiga que juntava cancelamento e bloqueio foi substituída por instruções específicas. A falha de abertura também mostra instruções do Chrome e Firefox e um link para abrir o endereço publicado diretamente em uma aba. Um novo clique pode repetir a entrada; nenhuma autorização é simulada e nenhuma falha apaga o progresso local.
 
-O site não pode garantir a abertura quando as permissões do navegador, extensões ou políticas da organização impedem a janela. No Chrome, se aparecer o ícone de pop-up bloqueado na barra de endereço, permita pop-ups e redirecionamentos somente para `https://foco-concursos.ecmdigital.chatgpt.site`, e clique novamente em “Continuar com Google”. No Firefox, adicione esse mesmo endereço à lista de exceções da abertura de janelas, em Configurações → Privacidade e Segurança → Permissões. Não é necessário liberar pop-ups para todos os sites. Se a janela abrir e fechar antes do fim, confira a mensagem mostrada na janela Google e conclua o acesso. Funcionar em janela anônima sugere uma diferença do perfil habitual, mas não identifica por si só a causa.
+O site não pode garantir a abertura quando as permissões do navegador, extensões ou políticas da organização impedem a janela. No Chrome, se aparecer o ícone de pop-up bloqueado na barra de endereço, permita pop-ups e redirecionamentos somente para a origem exibida na página (na publicação Vercel: `https://foco-concurso-wine.vercel.app`), e clique novamente em “Continuar com Google”. No Firefox, adicione esse mesmo endereço à lista de exceções da abertura de janelas, em Configurações → Privacidade e Segurança → Permissões. Não é necessário liberar pop-ups para todos os sites. Se a janela abrir e fechar antes do fim, confira a mensagem mostrada na janela Google e conclua o acesso. Funcionar em janela anônima sugere uma diferença do perfil habitual, mas não identifica por si só a causa.
 
 Referências: [Google: acionamento pelo clique no modelo de token](https://developers.google.com/identity/oauth2/web/guides/use-token-model), [Google: tipos de erro do popup](https://developers.google.com/identity/oauth2/web/reference/js-reference), [Chrome: permitir pop-ups de um site específico](https://support.google.com/chrome/answer/95472?hl=pt-BR), [Firefox: configurações e exceções de janelas](https://support.mozilla.org/pt-BR/kb/configuracoes-do-bloqueador-de-abertura-de-janelas).
 
@@ -87,3 +87,8 @@ O login solicita `drive.appdata`, um escopo específico para a área privada de 
 No Google Cloud do projeto `foco-estudos-ecm`, declare o escopo `https://www.googleapis.com/auth/drive.appdata` em **Google Auth Platform → Acesso a dados → Adicionar ou remover escopos** e salve. Essa alteração de console não foi realizada nesta atualização. A pendência anterior de publicação/verificação do aplicativo Google permanece independente da publicação do site.
 
 Para migrar uma pasta já salva no navegador, entre novamente e clique **Autorizar minha pasta** em Ajustes (se a autorização retornada não permitir conexão automática). A pasta é validada antes de criar a configuração privada. Em outro dispositivo, entre com a mesma conta; não é necessário colar o link novamente. Caso o Google solicite, autorize o Drive para carregar o progresso.
+
+
+## Endereço publicado — 1.5.7
+
+O responsável informou a publicação em `https://foco-concurso-wine.vercel.app/`. A ajuda de login utiliza a origem real da página, tanto no endereço a permitir quanto no botão para abrir o Foco em uma aba, sem fixar o domínio de Sites. No Vercel, ambos usam a origem Vercel; novas hospedagens e domínios também acompanham a página. O endereço Vercel é o padrão quando a função de visualização é usada sem contexto de navegador. O cadastro de origens OAuth continua sendo feito no Console Google para cada domínio utilizado.
