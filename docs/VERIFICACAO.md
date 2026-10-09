@@ -46,3 +46,14 @@ Os layouts possuem breakpoints de 1.200, 960 e 700 px, navegação inferior no c
 ## Conferência após configurar OAuth
 
 Declare `https://www.googleapis.com/auth/drive.appdata` em Google Auth Platform → Acesso a dados. Entre novamente e conecte sua conta em Ajustes; confirme a indicação de pasta salva na conta Google. Responda uma questão, aguarde “Drive sincronizado” e confira o JSON criado na pasta. Em outro navegador sem dados locais, entre com a mesma conta e confirme que o ID da pasta reaparece sem colar o link. Autorize o Drive se necessário e confirme a recuperação de respostas, bancos e favoritos. Depois responda em cada dispositivo, sincronize ambos e confira que o total contém as duas tentativas. Ao recarregar, conecte novamente: tokens não são persistidos.
+
+
+## Atualização visual 1.3.0 — 09/10/2026
+
+A tela de entrada foi reorganizada em uma coluna no celular, com um único título principal, botão Google de 54 px e descrição curta. No desktop, há apresentação lateral e cartão de acesso. Foram mantidos os temas claro/escuro e a autenticação existente.
+
+O início passou a usar `home-view.mjs` e `home.css`, com estilos específicos: saudação, ação para iniciar/retomar, meta diária integrada, resumo compacto, quatro modos de estudo, até três bancos e atividade dos últimos sete dias. Contagens dos atalhos respeitam bancos desativados; nenhum dado demonstrativo é apresentado como progresso real. O cabeçalho e a navegação inferior têm alvos maiores no celular e consideram a área segura do dispositivo. A tela de resolução mantém seu layout.
+
+Os 59 testes existentes passaram novamente. Verificação de sintaxe dos módulos e `git diff --check` passaram. Sete variantes de HTML foram geradas e inspecionadas por parser: início, sessão pausada, ausência de bancos, falha de conexão, banco desativado, entrada normal e entrada em carregamento. Foram conferidos títulos, IDs, rótulos acessíveis, estado dos botões e escape de conteúdo. Isso verifica o HTML gerado, não a interação ou o layout em navegador.
+
+A infraestrutura de navegador para Sites continuava indisponível. Aparência final, toque, ausência de overflow em aparelho real e popup Google não foram verificados nesta atualização. O código possui regras para celulares pequenos (até 360 px), celular/tablet (até 700 px), início em telas maiores (a partir de 701 px) e entrada em duas colunas (a partir de 901 px).
