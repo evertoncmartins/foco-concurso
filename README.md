@@ -5,7 +5,7 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 ## Funcionalidades
 
 - Tema claro com botões e destaques em azul profundo (#00001F), escuro em cinza neutro e automático; detalhes discretos em azul, violeta, âmbar e rosa nos dois temas; navegação adaptada para celulares.
-- Login com Google ou acesso como visitante. No modo visitante, dados ficam apenas em memória e são descartados ao sair/recarregar.
+- Login com Google ou acesso como visitante. O botão Google é liberado após carregar a integração, e abre a autorização diretamente no clique. Falhas de carga podem ser repetidas; fechamento e bloqueio da janela têm orientações distintas. No modo visitante, dados ficam apenas em memória e são descartados ao sair/recarregar.
 - Política de Privacidade pública, acessível sem login em `privacidade.html`, com link na entrada e em Ajustes.
 - Termos de Serviço públicos em `termos.html`, com links na entrada, em Ajustes e na Política de Privacidade.
 - Restauração inicial do Drive bloqueia o estudo até concluir, com progresso por etapas e contagem de arquivos; erros e autorização ausente têm recuperação explícita.

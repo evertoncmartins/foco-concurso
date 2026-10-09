@@ -9,6 +9,8 @@
 .entry-features span{display:flex;align-items:center;gap:6px}
 .entry-card .google-button{margin-top:29px}
 .entry-account-note,.entry-guest-note{font-size:12px;line-height:1.7;color:var(--home-muted);margin:12px auto 0;max-width:350px}
+.entry-google-status{font-size:11px;line-height:1.7;color:var(--home-muted);margin-top:10px}
+.entry-google-retry{margin-top:12px}
 .entry-divider{display:flex;align-items:center;gap:14px;color:var(--home-muted);font-size:11px;margin:22px 0 18px}
 .entry-divider:before,.entry-divider:after{content:'';height:1px;flex:1;background:var(--border)}
 .entry-guest{width:100%;min-height:50px;border-radius:12px;font-size:14px;background:transparent}
