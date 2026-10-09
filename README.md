@@ -4,7 +4,7 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 
 ## Funcionalidades
 
-- Temas claro, escuro em cinza neutro e automático; navegação adaptada para celulares.
+- Tema claro com botões e destaques em azul profundo (#00001F), escuro em cinza neutro e automático; detalhes discretos em azul, violeta, âmbar e rosa nos dois temas; navegação adaptada para celulares.
 - Login com Google ou acesso como visitante. No modo visitante, dados ficam apenas em memória e são descartados ao sair/recarregar.
 - Restauração inicial do Drive bloqueia o estudo até concluir, com progresso por etapas e contagem de arquivos; erros e autorização ausente têm recuperação explícita.
 - Menu lateral recolhível no desktop, com preferência salva por conta neste navegador.

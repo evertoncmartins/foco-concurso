@@ -82,3 +82,9 @@ A entrada mostra os recursos principais, a utilidade da conexão Google/Drive e 
 75 testes automatizados passaram. Os oito cenários adicionais verificam memória temporária e isolamento, progresso por etapa/arquivo, leitura concluída antes de avançar o contador, arquivo inválido, bloqueio do aplicativo durante recuperação, falha e repetição, autorização/fallback local explícito e respostas/tema no modo foco como visitante. A verificação do aplicativo executa seus manipuladores reais com DOM e rede simulados. A sintaxe, o build estático e os estados HTML de login/restauração também foram conferidos.
 
 Navegador real e consentimento Google real não foram usados nesta atualização. A inspeção visual de desktop/celular segue indisponível no ambiente de Sites. Os testes confirmam lógica e HTML, não aparência, animação ou consentimento real.
+
+## Cores dos temas 1.5.1 — 09/10/2026
+
+O tema claro usa #00001F em botões principais, seleções e destaques, com superfícies claras de tom frio. O tema escuro conserva fundos cinza neutros. Ícones de estudo, favoritos, revisão, sequência diária, troca de tema e detalhes de progresso recebem acentos discretos em azul, violeta, âmbar e rosa. O verde permanece apenas no feedback semântico de acertos.
+
+Foram conferidos a sintaxe dos módulos, o build estático e `git diff --check`. Os pares principais de texto/botões e os acentos sobre seus fundos foram calculados pela fórmula WCAG, com contraste mínimo de 4,5:1. Não foram criados testes novos para a alteração visual. Aparência, responsividade e animações em navegador real permanecem sem verificação, pois o recurso de navegador de Sites está indisponível neste ambiente.

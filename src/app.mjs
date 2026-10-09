@@ -26,7 +26,7 @@ const focusMode=new FocusMode({document,desktop:desktopLayout,onChange:()=>{
   $(focusMode.active?'[data-action=exit-focus]':'[data-action=toggle-focus]')?.focus({preventScroll:true});
 },onUnavailable:()=>toast('Modo foco ativado. A tela cheia não está disponível neste navegador.')});
 function saveConfig(){accountStorage?.setItem('foco:config',JSON.stringify(config));localStorage.setItem('foco:appearance',config.theme);}
-function applyTheme(){document.documentElement.dataset.theme=config.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):config.theme;document.querySelector('meta[name=theme-color]').content=document.documentElement.dataset.theme==='dark'?'#212121':'#faf9f6';}
+function applyTheme(){document.documentElement.dataset.theme=config.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):config.theme;document.querySelector('meta[name=theme-color]').content=document.documentElement.dataset.theme==='dark'?'#212121':'#f8f9fc';}
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),4500);}
 function failure(error){console.error(error);toast(error?.name==='QuotaExceededError'?'O armazenamento local está cheio. Exporte seu progresso para preservar os dados.':error.message||'Não foi possível concluir. Tente novamente.');}
 function refreshModel(){model=store.model();}

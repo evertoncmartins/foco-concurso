@@ -21,7 +21,7 @@
   .focus-mode .session-header{justify-content:flex-start;margin-bottom:14px}
   .focus-mode .session-header [data-action=pause]{display:none}
   .focus-mode .session-progress{margin-bottom:20px}
-  .focus-mode .question-card{box-shadow:0 8px 32px #233a2608}
+  .focus-mode .question-card{box-shadow:0 8px 32px #00001f08}
   .focus-mode .session-summary-bar{flex-wrap:wrap}
   html:fullscreen{background:var(--bg);overflow-y:auto}
 }
