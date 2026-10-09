@@ -2,7 +2,7 @@ import {Store} from './store.mjs';
 import {validateBank,validateEvents,derive,makeQueue,filterQuestions,breakdown,studyStreak,localDay} from './engine.mjs';
 import {DriveSync} from './drive.mjs';
 import {DriveSettings} from './drive-settings.mjs';
-import {GoogleAccount,prepareGoogle,isGoogleReady,validClientId} from './auth.mjs';
+import {GoogleAccount,prepareGoogle,isGoogleReady,validClientId,consumeGoogleReturn,googleReturnMessage} from './auth.mjs';
 import {AccountStorage,parseFolder,assertProgressOwner} from './account.mjs';
 import {loginView,folderView,loadingView} from './access-views.mjs';
 import {icon} from './icons.mjs';
@@ -123,7 +123,7 @@ document.addEventListener('click',async event=>{
     if(action==='guest'){working=true;await openGuest();return;}
     if(action==='guest-login'){await logout();return;}
     if(action==='retry-google'){await loadGoogleForLogin();return;}
-    if(action==='login'){if(!isGoogleReady()){void loadGoogleForLogin();return;}working=true;loginError='';loginErrorCode='';const authorization=auth.authorize();renderLogin();try{const result=await authorization;await openAccount(result);}catch(error){loginError=error.message;loginErrorCode=error.code||'';drive?.close();auth.signOut();guest=false;restoration=null;accountStorage=null;store=null;drive=null;renderLogin();}return;}
+    if(action==='login'){if(!auth.redirectEnabled&&!isGoogleReady()){void loadGoogleForLogin();return;}working=true;loginError='';loginErrorCode='';const authorization=auth.authorize();renderLogin();try{const result=await authorization;await openAccount(result);}catch(error){loginError=error.message;loginErrorCode=error.code||'';drive?.close();auth.signOut();guest=false;restoration=null;accountStorage=null;store=null;drive=null;renderLogin();}return;}
     if(action==='logout'){await logout();return;}
     if(action==='toggle-sidebar'){config.sidebarCollapsed=!config.sidebarCollapsed;saveConfig();render();$('[data-action=toggle-sidebar]')?.focus({preventScroll:true});return;}
     if(action==='toggle-focus'){if(view==='session'&&session&&!session.completed)await focusMode.enter();return;}
@@ -172,7 +172,7 @@ window.addEventListener('online',()=>{if(!restoration&&drive?.token&&!drive.conn
 window.addEventListener('focus',()=>{if(!restoration&&drive?.token&&!drive.busy&&!drive.connecting)drive.sync().catch(()=>{});});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(config.theme==='system'){applyTheme();render();}});
 async function loadGoogleForLogin(){
-  if(googleLoading||!validClientId(auth?.clientId))return;
+  if(googleLoading||auth?.redirectEnabled||!validClientId(auth?.clientId))return;
   googleLoading=true;googleLoadError='';loginError='';loginErrorCode='';
   if(!guest&&!auth.profile&&!restoration)renderLogin();
   try{await prepareGoogle();}catch(error){googleLoadError=error.message;}
@@ -180,8 +180,8 @@ async function loadGoogleForLogin(){
 }
 function renderLogin(){
   if(restoration){renderLoading();return;}
-  if(isGoogleReady()&&!working)try{auth.prepareAuthorization();}catch(error){googleLoadError=error.message;}
-  $('#app').innerHTML=loginView({ready:validClientId(auth?.clientId),oauthReady:isGoogleReady()&&!googleLoadError,loading:googleLoading,retryGoogle:!!googleLoadError,busy:working,error:loginError||googleLoadError,errorCode:loginError?loginErrorCode:'',siteOrigin:window.location?.origin,theme:document.documentElement.dataset.theme});document.title='Entrar · Foco';
+  if(!auth?.redirectEnabled&&isGoogleReady()&&!working)try{auth.prepareAuthorization();}catch(error){googleLoadError=error.message;}
+  $('#app').innerHTML=loginView({ready:validClientId(auth?.clientId),oauthReady:!googleLoading&&(auth?.redirectEnabled||isGoogleReady()&&!googleLoadError),redirect:auth?.redirectEnabled,loading:googleLoading,retryGoogle:!!googleLoadError,busy:working,error:loginError||googleLoadError,errorCode:loginError?loginErrorCode:'',siteOrigin:window.location?.origin,theme:document.documentElement.dataset.theme});document.title='Entrar · Foco';
   const form=$('#oauth-preview-form');if(form)form.onsubmit=e=>{e.preventDefault();const id=form.elements.namedItem('clientId').value.trim();if(!validClientId(id)){loginErrorCode='';loginError='Informe apenas o ID público de um cliente OAuth Google Web.';renderLogin();return;}localStorage.setItem('foco:oauth-preview',id);auth.clientId=id;loginError='';renderLogin();void loadGoogleForLogin();};
 }
 async function openAccount(result){
@@ -204,6 +204,11 @@ async function restoreAccount(result=restoreAuthorization){
   const folderSettings=drive.settings;
   try{
     if(!auth.canAppData){restoration={state:'permission',percent:20,detail:'Autorize o Google para localizar sua pasta e restaurar seus estudos em segurança.'};renderLoading();return;}
+    if(result?.pendingFolderId){
+      if(!auth.canDrive){restoration={state:'permission',percent:25,detail:'Autorize o Drive para conectar a pasta escolhida.'};renderLoading();return;}
+      await drive.useAuthorization(result,{folderId:parseFolder(result.pendingFolderId)});delete result.pendingFolderId;config.onboardingDone=true;
+      restoration=restoreProgress(restoration,{stage:'ready'});renderLoading();finishRestoration();return;
+    }
     const saved=await folderSettings.restore();if(saved){config.folderId=saved.folderId;config.onboardingDone=true;}
     if(config.folderId){
       if(!auth.canDrive){restoration={state:'permission',percent:25,detail:'Sua pasta foi encontrada. Autorize o acesso ao Drive para recuperar as questões e o progresso antes de continuar.'};renderLoading();return;}
@@ -263,8 +268,16 @@ async function init(){
     config={...defaults,theme:localStorage.getItem('foco:appearance')||'light'};applyTheme();
     const response=await fetch('./app-config.json',{cache:'no-store'});if(response.ok)publicConfig=await response.json();
     const legacyConfig=JSON.parse(localStorage.getItem('foco:config')||'{}');
-    auth=new GoogleAccount(publicConfig.googleClientId||localStorage.getItem('foco:oauth-preview')||legacyConfig.clientId||'');renderLogin();
-    void loadGoogleForLogin();
-  }catch(error){loginError=error.message;auth=new GoogleAccount('');renderLogin();}
+    auth=new GoogleAccount(publicConfig.googleClientId||localStorage.getItem('foco:oauth-preview')||legacyConfig.clientId||'');
+    const notice=consumeGoogleReturn();googleLoading=true;working=notice==='success';renderLogin();
+    await auth.prepareRedirect();googleLoading=false;
+    if(guest)return;
+    if(notice==='success'){
+      try{await openAccount(await auth.restoreRedirect());}
+      catch(error){loginError=error.message;drive?.close();auth.signOut();restoration=null;accountStorage=null;store=null;drive=null;}
+      finally{working=false;}
+    }else if(notice)loginError=googleReturnMessage(notice);
+    if(!auth.profile&&!restoration){renderLogin();if(!auth.redirectEnabled)void loadGoogleForLogin();}
+  }catch(error){googleLoading=false;working=false;loginError=error.message;auth=new GoogleAccount('');renderLogin();}
 }
 init();

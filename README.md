@@ -5,7 +5,7 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 ## Funcionalidades
 
 - Tema claro com botões e destaques em azul profundo (#00001F), escuro em cinza neutro e automático; detalhes discretos em azul, violeta, âmbar e rosa nos dois temas; navegação adaptada para celulares.
-- Login com Google ou acesso como visitante. A biblioteca e o cliente Google são preparados antes de liberar a entrada; a autorização abre diretamente no clique. A falha de abertura oferece instruções para Chrome e Firefox e um link para abrir o Foco em uma aba. Falhas de carga podem ser repetidas; fechamento e bloqueio da janela têm orientações distintas. No modo visitante, dados ficam apenas em memória e são descartados ao sair/recarregar.
+- Login com Google ou acesso como visitante. No Vercel, o login pode redirecionar na mesma aba e retornar automaticamente, usando código OAuth e PKCE. A ativação requer configuração do servidor e do endereço de retorno no Google. Até a ativação e em hospedagens estáticas, o acesso usa a janela Google preparada antes do clique. No modo visitante, dados ficam apenas em memória e são descartados ao sair/recarregar.
 - Política de Privacidade pública, acessível sem login em `privacidade.html`, com link na entrada e em Ajustes.
 - Termos de Serviço públicos em `termos.html`, com links na entrada, em Ajustes e na Política de Privacidade.
 - Restauração inicial do Drive bloqueia o estudo até concluir, com progresso por etapas e contagem de arquivos; erros e autorização ausente têm recuperação explícita.
@@ -48,7 +48,7 @@ scripts/                build e verificações sem dependências
 .openai/hosting.json     identidade e configuração de Sites
 ```
 
-O build copia `public/`, `src/` e `docs/` para `dist/`. O conteúdo é implantável como site estático. Não contém credenciais ou tokens.
+O build copia `public/`, `src/` e `docs/` para `dist/`. O conteúdo é implantável como site estático. Não contém credenciais ou tokens. As funções em `api/auth/` e sua implementação em `server/` são publicadas separadamente pelo Vercel e nunca entram no build público.
 
 ## Questões
 
@@ -66,11 +66,11 @@ No simulado, as escolhas são salvas como rascunho de sessão; eventos de desemp
 
 ## Login e usuários
 
-O acesso com conta usa Google. Também há modo visitante sem login: questões importadas, respostas e estatísticas ficam apenas na memória da sessão; não são migradas automaticamente ao entrar com uma conta. Cada conta usa um perfil independente, identificado pelo `sub` verificado no endpoint Google UserInfo. Preferências, progresso local e cache são separados por conta. O cliente OAuth público do projeto `foco-estudos-ecm` está configurado em `public/app-config.json`; veja [LOGIN_GOOGLE.md](docs/LOGIN_GOOGLE.md). O aplicativo Google permanece em modo de teste, com acesso às contas cadastradas na lista de usuários de teste. Os estudantes não precisam configurar clientes próprios.
+O acesso com conta usa Google. Também há modo visitante sem login: questões importadas, respostas e estatísticas ficam apenas na memória da sessão; não são migradas automaticamente ao entrar com uma conta. Cada conta usa um perfil independente, identificado pelo `sub` verificado no endpoint Google UserInfo. Preferências, progresso local e cache são separados por conta. O cliente OAuth público do projeto `foco-estudos-ecm` está configurado em `public/app-config.json`; veja [LOGIN_GOOGLE.md](docs/LOGIN_GOOGLE.md). O responsável informou ter atualizado o Google Auth; o status atual de publicação/verificação no Console não foi confirmado nesta atualização. Os estudantes não precisam configurar clientes próprios.
 
 ## Google Drive
 
-O projeto implementa acesso direto às APIs oficiais do Google através de Google Identity Services. O token fica somente em memória e expira. Nenhum segredo OAuth é necessário em uma aplicação estática com esse modelo. Cada conta escolhe sua própria pasta do Meu Drive. Após validar e conectar, o ID é salvo na área privada `appDataFolder` dessa conta. Ao entrar em outro dispositivo com a mesma conta, a configuração é recuperada antes da sincronização do progresso. Novas contas sem configuração remota começam sem pasta.
+O projeto implementa acesso direto às APIs oficiais do Google. No redirecionamento, funções Vercel trocam o código OAuth com PKCE e confirmam o perfil. Cookies HttpOnly criptografados de curta duração fazem a transição; após o retorno, o token fica em memória e expira. Não há banco de autenticação nem tokens de renovação. O segredo OAuth pertence somente ao ambiente do servidor. O modelo de janela Google permanece disponível sem esse segredo nas hospedagens estáticas. Cada conta escolhe sua própria pasta do Meu Drive. Após validar e conectar, o ID é salvo na área privada `appDataFolder` dessa conta. Ao entrar em outro dispositivo com a mesma conta, a configuração é recuperada antes da sincronização do progresso. Novas contas sem configuração remota começam sem pasta.
 
 **Configuração da instalação:** o cliente OAuth do Foco foi criado com a origem do site publicado. Em outras hospedagens, o responsável precisa autorizar a nova origem no Google Cloud. Cada usuário entra com Google e informa sua pasta uma vez. O escopo adicional `https://www.googleapis.com/auth/drive.appdata` deve constar em Google Auth Platform → Acesso a dados. Usuários existentes precisam conceder essa nova permissão e conectar a pasta ao menos uma vez para migrar a configuração local. A conexão do Drive usada por esta conversa não disponibiliza credenciais automaticamente ao site. Leia [GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md). Após abrir/recarregar, entre com Google. A autorização adicional do Drive é solicitada quando necessária; a carga remota acontece antes do primeiro envio.
 

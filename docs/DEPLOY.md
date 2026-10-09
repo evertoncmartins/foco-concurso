@@ -26,6 +26,8 @@ O workflow `.github/workflows/ci.yml` verifica cada push em `main` e pull reques
 
 `vercel.json` define build com testes e diretório `dist`. Ao importar um repositório no Vercel, use o preset Other. Cada push em `main` publica a versão de produção; branches podem gerar previews. Não há variáveis secretas para o frontend. Configure `PUBLIC_GOOGLE_CLIENT_ID` no build ou `googleClientId` em `public/app-config.json`. É um ID público compartilhado pela aplicação; autorize a origem Vercel no Google Cloud.
 
+O login na mesma aba usa quatro funções Node.js em `api/auth/`, com implementação em `server/google-redirect.mjs`. Esses arquivos são detectados pelo Vercel fora de `dist/`. O projeto continua sem banco de dados. Consulte [LOGIN_GOOGLE.md](LOGIN_GOOGLE.md#ativar-login-na-mesma-aba--160) para cadastrar o retorno e configurar o segredo somente no servidor. As publicações puramente estáticas continuam com a janela Google; previews Vercel também não ativam o redirecionamento da origem de produção.
+
 ## Sites
 
 `.openai/hosting.json` aponta para `dist/`. O código e o build são versionados pelo fluxo de Sites. A primeira versão nasceu privada. Na atualização de usuários, a tela de entrada é disponibilizada por URL para que as pessoas entrem com Google; nenhum progresso pessoal é publicado no servidor. Não há dependência de connector em tempo de execução: o acesso ao Drive utiliza OAuth próprio, concedido pelo visitante.

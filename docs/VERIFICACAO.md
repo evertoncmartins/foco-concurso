@@ -123,6 +123,13 @@ Fora da tela cheia, a sessão desktop usa a altura útil da janela, com cabeçal
 90 testes passaram. Foram acrescentados quatro cenários relevantes: preparar o cliente sem abrir autorização e usá-lo no clique; ignorar callbacks da tentativa anterior; substituir o cliente ao trocar o ID público; preservar a rolagem na mesma questão e reiniciar ao avançar. O teste de entrada verifica a preparação antecipada e a ajuda contextual. Os módulos e manipuladores reais executam com DOM/Google simulados. Sintaxe e `git diff --check` passaram. A análise estrutural do CSS confirmou regras mobile idênticas em 320×568, 390×844 e 700×900, e a delimitação da sessão em cinco tamanhos desktop. Essa análise não mede o layout renderizado. O navegador exigido pelo ambiente Sites está indisponível; aparência e login real no Chrome/Firefox permanecem sem verificação.
 
 
+## Login por redirecionamento 1.6.0 — 09/10/2026
+
+- Implementados início, callback, status e entrega temporária em funções Vercel; código OAuth com PKCE S256, validação de estado, identidade verificada, cookies criptografados HttpOnly e entrega somente em POST da mesma origem.
+- O frontend consulta a disponibilidade e usa navegação na mesma aba quando ativada. O retorno consome a autorização, remove o indicador da URL e inicia a restauração bloqueante; a autorização de uma pasta preserva sua escolha. Hospedagens estáticas e configuração incompleta mantêm o login existente.
+- 101 testes aprovados, incluindo retorno bem-sucedido, pasta escolhida, bloqueio durante restauração, entrada expirada, troca de conta, estado alterado/ausente/duplicado/expirado, cancelamento, falhas de provedor, origem inválida, PKCE e visitante escolhido durante a consulta.
+- Consentimento OAuth real não executado: requer cadastrar a URI de retorno, configurar o segredo do cliente somente no Vercel e ativar a flag. Testes usam credenciais fictícias e respostas simuladas. Navegador de QA indisponível neste ambiente.
+
 ## Endereço da ajuda de login 1.5.7 — 09/10/2026
 
 A ajuda deixa de fixar o domínio de Sites e recebe a origem da janela atual. No Vercel informado pelo responsável, mostra `https://foco-concurso-wine.vercel.app` e aponta a abertura em uma aba para esse mesmo endereço. O valor exibido e o link são escapados no HTML. A documentação de produção, privacidade e termos foi atualizada para o Vercel. Nenhuma configuração OAuth ou permissão de navegador foi alterada. Foram mantidos os 90 testes existentes, com execução das verificações e build antes da publicação.

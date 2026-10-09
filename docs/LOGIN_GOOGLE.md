@@ -20,7 +20,7 @@ Os estudantes **não precisam criar clientes OAuth próprios**. A plataforma usa
 
 Em 08/10/2026, o cliente **Foco Web** foi criado no projeto `foco-estudos-ecm`, com a origem `https://foco-concursos.ecmdigital.chatgpt.site`, e seu ID público foi configurado no build da plataforma. Não há redirecionamento cadastrado: esta implementação usa o modelo de token em popup do Google Identity Services.
 
-O aplicativo Google está em **modo de teste**, com público externo e a conta do responsável cadastrada como usuário de teste. Para testar com outras pessoas, adicione suas contas em [Público no Google Cloud](https://console.cloud.google.com/auth/audience?project=foco-estudos-ecm). O site ser acessível por URL não elimina as restrições do aplicativo OAuth. A liberação geral ainda exige cumprir o processo aplicável de publicação/verificação do Google.
+Na conferência de 08/10/2026, o aplicativo Google estava em **modo de teste**, com público externo e a conta do responsável cadastrada como usuário de teste. O responsável informou ter atualizado o Google Auth em 09/10/2026; o estado atual no Console não foi confirmado. Se ainda estiver em teste, adicione as contas em [Público no Google Cloud](https://console.cloud.google.com/auth/audience?project=foco-estudos-ecm). O site ser acessível por URL não elimina as restrições do aplicativo OAuth. A liberação geral exige cumprir o processo aplicável de publicação/verificação do Google.
 
 O nome salvo na tela de consentimento é **Foco Estudos Concursos**. A Google Drive API está ativada, e os escopos `openid`, `userinfo.email`, `userinfo.profile` e `https://www.googleapis.com/auth/drive` foram confirmados no console. Nenhuma conta de faturamento foi vinculada.
 
@@ -40,7 +40,7 @@ A opção “Configuração do responsável” permite validar outro ID nesse na
 6. Estudar. O salvamento local é imediato e o Drive recebe lotes imutáveis de alterações.
 7. Sair encerra a sessão em memória e retira os dados da tela; a cópia local daquela conta continua preservada para a próxima entrada.
 
-Após recarregar, é necessário entrar novamente. Não há tokens persistidos. A configuração da pasta é recuperada com `drive.appdata`, mesmo em um navegador sem histórico local. Se o Google já concedeu o escopo Drive, a autorização retornada no login é reutilizada para recuperar o histórico. Caso contrário, a autorização adicional ocorre pelo botão da pasta.
+Após recarregar, é necessário entrar novamente. Não há tokens no armazenamento local nem sessão permanente de servidor. O redirecionamento usa cookies temporários criptografados somente para concluir uma entrada. A configuração da pasta é recuperada com `drive.appdata`, mesmo em um navegador sem histórico local. Se o Google já concedeu o escopo Drive, a autorização retornada no login é reutilizada para recuperar o histórico. Caso contrário, a autorização adicional ocorre pelo botão da pasta.
 
 ## Separação dos dados
 
@@ -60,7 +60,7 @@ Arquivos antigos sem identificação de conta não são carregados automaticamen
 
 ## Limites e verificação
 
-O servidor publica somente a aplicação e o banco de exemplo. Não hospeda dados pessoais de usuários, sessões de servidor ou APIs próprias de progresso; a identidade e as permissões de arquivos são verificadas pelas APIs Google. Se futuramente forem adicionadas APIs ou dados pessoais no servidor, será necessária validação de identidade e autorização nesse servidor, não apenas a tela de login.
+O servidor não mantém banco de progresso nem APIs próprias de progresso. Quando o redirecionamento está ativado, as funções de autenticação no Vercel processam temporariamente código, perfil e token; verificam estado, PKCE e identidade, e usam cookies criptografados HttpOnly para concluir o retorno. A identidade e as permissões de arquivos são verificadas pelas APIs Google. O token é entregue somente em um POST da mesma origem e o cookie de entrega é apagado na resposta. Não há refresh tokens armazenados nem sessão permanente no servidor.
 
 O cache local não é criptografado. Separação por conta impede mistura no uso normal da interface; não protege contra alguém que controla fisicamente o mesmo perfil do navegador e inspeciona seu armazenamento. Use seu perfil pessoal em dispositivos compartilhados.
 
@@ -92,3 +92,21 @@ Para migrar uma pasta já salva no navegador, entre novamente e clique **Autoriz
 ## Endereço publicado — 1.5.7
 
 O responsável informou a publicação em `https://foco-concurso-wine.vercel.app/`. A ajuda de login utiliza a origem real da página, tanto no endereço a permitir quanto no botão para abrir o Foco em uma aba, sem fixar o domínio de Sites. No Vercel, ambos usam a origem Vercel; novas hospedagens e domínios também acompanham a página. O endereço Vercel é o padrão quando a função de visualização é usada sem contexto de navegador. O cadastro de origens OAuth continua sendo feito no Console Google para cada domínio utilizado.
+
+## Ativar login na mesma aba — 1.6.0
+
+O código está preparado para enviar o usuário ao Google na mesma aba e voltar automaticamente ao Foco. A ativação é independente da publicação/verificação do aplicativo Google e depende destas configurações:
+
+1. Em Google Auth Platform → Clientes → **Foco Web**, adicione a **URIs de redirecionamento autorizados** exatamente `https://foco-concurso-wine.vercel.app/api/auth/callback`. Mantenha a origem JavaScript `https://foco-concurso-wine.vercel.app` e o mesmo cliente Web já configurado no Foco.
+2. No Vercel → projeto **foco-concurso** → Settings → Environment Variables, crie `GOOGLE_CLIENT_SECRET` como variável sensível, somente em **Production**, usando o segredo desse cliente Web. Não envie esse valor em mensagens, não versione e não use prefixos públicos.
+3. Configure `GOOGLE_REDIRECT_ENABLED=true`, também em **Production**, após cadastrar a URI no Google. Faça **Redeploy** para aplicar as variáveis.
+
+O ID público já está em `public/app-config.json`. `PUBLIC_GOOGLE_CLIENT_ID` pode substituí-lo no build; o servidor usa o mesmo valor. `GOOGLE_CLIENT_ID` é uma substituição opcional somente no servidor e precisa corresponder ao ID público. `GOOGLE_AUTH_ORIGIN` é opcional e tem como padrão a origem Vercel acima; se mudar o domínio, atualize tanto essa variável quanto a URI autorizada. Não há outra chave de cookies a configurar: a criptografia é derivada do segredo do cliente e vinculada à origem e ao cliente.
+
+`GET /api/auth/status` deve retornar `enabled: true` no domínio principal depois da ativação. Sem segredo, sem a flag ou em outra origem, retorna `enabled: false` e o frontend mantém a janela Google. Não habilite a flag antes de cadastrar a URI, pois o servidor não consegue consultar essa configuração do Console.
+
+O início gera estado e PKCE S256, com cookie HttpOnly/Secure/SameSite=Lax de até 10 minutos. O retorno valida o estado, troca o código com o segredo no servidor, confere o perfil no UserInfo e recusa troca de conta ao autorizar o Drive. Um cookie criptografado de até 2 minutos entrega a autorização via POST da mesma origem e é removido imediatamente. O token fica em memória no navegador; não é colocado na URL, em `localStorage`, em arquivos JSON ou em logs próprios. Nenhum token de renovação é mantido.
+
+A autorização adicional da pasta também usa o redirecionamento. O ID da pasta escolhida e a conta esperada são preservados no cookie criptografado; ao retornar, o Foco valida a pasta e restaura os estudos antes de liberar a tela. Cancelamento, estado inválido, permissão negada ou conta diferente retornam à entrada com orientação para repetir o acesso. Os testes utilizam respostas simuladas; o consentimento Google real ainda depende da configuração acima.
+
+Referências: [Google: modelo de código e redirecionamento](https://developers.google.com/identity/oauth2/web/guides/use-code-model), [Google: fluxo OAuth para servidor](https://developers.google.com/identity/protocols/oauth2/web-server), [Vercel: funções Node.js na pasta api](https://vercel.com/docs/functions/runtimes/node-js).

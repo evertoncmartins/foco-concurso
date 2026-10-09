@@ -21,7 +21,7 @@ async function tick(){await new Promise(resolve=>setImmediate(resolve));}
 // This checks state/ordering, not visual rendering or actual Google consent.
 function runtime(options={}){
   const browserStorage=new TemporaryStorage(),nodes=new Map(),listeners={};
-  let googleReady=options.googleReady??true,authorizations=0,preparations=0;
+  let googleReady=options.googleReady??true,authorizations=0,preparations=0,restores=0;
   const node=selector=>{
     if(!nodes.has(selector)){
       const element={innerHTML:'',textContent:'',content:'',open:false,classList:{add(){},remove(){}},focus(){},close(){this.open=false;},querySelector(){return null;},scrollIntoView(){}};
@@ -46,28 +46,45 @@ function runtime(options={}){
   const matchMedia=query=>{if(!media.has(query))media.set(query,{matches:query.includes('701'),addEventListener(){}});return media.get(query);};
   const profile={sub:'111',name:'Estudante',email:'test@example.test'};
   const auth={profile,token:'fixture',expires:Date.now()+3600000,generation:0,canAppData:options.canAppData??true,canDrive:options.canDrive??true,clientId:'test.apps.googleusercontent.com',prepareAuthorization(){preparations++;},signOut(){this.profile=null;this.token=null;},async authorize(){authorizations++;if(options.authorizationError)throw options.authorizationError;this.profile=profile;this.token='fixture';this.canAppData=true;this.canDrive=true;return authorization();}};
-  function authorization(){return {profile:auth.profile,token:auth.token,expires:auth.expires,canAppData:auth.canAppData,canDrive:auth.canDrive};}
+  auth.prepareRedirect=async()=>{if(options.statusWait)await options.statusWait.promise;auth.redirectEnabled=options.redirectEnabled===true;return auth.redirectEnabled;};
+  auth.restoreRedirect=async()=>{restores++;if(options.returnError)throw options.returnError;auth.profile=profile;auth.token='fixture';return authorization();};
+  function authorization(){return {profile:auth.profile,token:auth.token,expires:auth.expires,canAppData:auth.canAppData,canDrive:auth.canDrive,...(options.pendingFolderId?{pendingFolderId:options.pendingFolderId}:{})};}
   class Settings extends DriveSettings{
     async restore(){if(options.folderWait)await options.folderWait.promise;if(options.folderError)throw options.folderError;return options.folder===null?null:{folderId:'my-folder'};}
   }
   class Drive extends DriveSync{
-    async useAuthorization(result){
+    async useAuthorization(result,{folderId}={}){
       this.connecting=true;this.token=result.token;
       try{
         this.reportProgress('history',0,2);
         if(options.historyWait)await options.historyWait.promise;
         if(options.historyError)throw options.historyError;
         await this.store.merge(options.events||[]);
+        if(folderId)this.config.folderId=folderId;
         this.reportProgress('history',2,2);this.reportProgress('banks',1,1);this.status='synced';
       }finally{this.connecting=false;}
     }
   }
-  const context=vm.createContext({...imports,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async()=>new Response(JSON.stringify(bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
+  const context=vm.createContext({...imports,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
   const target=dataset=>({dataset,disabled:false,closest(){return this;},matches(){return false;}});
-  return {auth,document,browserStorage,value,get authorizations(){return authorizations;},get preparations(){return preparations;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),start:()=>value('openAccount(authorization())')};
+  return {auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),start:()=>value('openAccount(authorization())')};
 }
+
+test('retorno Google recupera autorização e mantém bloqueio até restaurar a pasta escolhida',async()=>{
+  const historyWait=deferred(),app=runtime({init:true,notice:'success',redirectEnabled:true,googleReady:false,pendingFolderId:'chosen-folder',historyWait});app.auth.signOut();
+  const loading=app.value('init()');await tick();assert.equal(app.restores,1);assert.match(app.html(),/Preparando seus estudos/);assert.equal(app.preparations,0);assert.equal(app.authorizations,0);
+  historyWait.resolve();await loading;assert.equal(app.value('config.folderId'),'chosen-folder');assert.equal(app.value('restoration'),null);assert.equal(app.value('view'),'home');assert.equal(app.value('working'),false);
+});
+test('retorno expirado informa erro e não abre conta nem importa progresso',async()=>{
+  const app=runtime({init:true,notice:'success',redirectEnabled:true,googleReady:false,returnError:new Error('A entrada expirou.')});app.auth.signOut();await app.value('init()');
+  assert.match(app.html(),/A entrada expirou/);assert.equal(app.auth.profile,null);assert.equal(app.value('store'),null);assert.equal(app.value('working'),false);assert.equal(app.preparations,0);
+});
+test('visitante escolhido durante consulta de login não é substituído ao terminar a consulta',async()=>{
+  const statusWait=deferred(),app=runtime({init:true,redirectEnabled:true,googleReady:false,statusWait});app.auth.signOut();const initializing=app.value('init()');await tick();
+  await app.click('guest');statusWait.resolve();await initializing;assert.equal(app.value('guest'),true);assert.equal(app.auth.profile,null);assert.equal(app.restores,0);assert.equal(app.preparations,0);
+});
 
 test('login só libera Google após carregar e exige novo clique para abrir autorização',async()=>{
   const sdkWait=deferred(),app=runtime({googleReady:false,sdkWait,folder:null});app.auth.signOut();app.value('renderLogin()');
