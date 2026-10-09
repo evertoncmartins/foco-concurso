@@ -2,7 +2,7 @@ import {Store} from './store.mjs';
 import {validateBank,validateEvents,derive,makeQueue,filterQuestions,breakdown,studyStreak,localDay} from './engine.mjs';
 import {DriveSync} from './drive.mjs';
 import {DriveSettings} from './drive-settings.mjs';
-import {GoogleAccount,prepareGoogle,validClientId} from './auth.mjs';
+import {GoogleAccount,prepareGoogle,isGoogleReady,validClientId} from './auth.mjs';
 import {AccountStorage,parseFolder,assertProgressOwner} from './account.mjs';
 import {loginView,folderView,loadingView} from './access-views.mjs';
 import {icon} from './icons.mjs';
@@ -16,6 +16,7 @@ const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,Number(n)||min));
 const defaults={theme:'light',name:'Estudante',dailyGoal:10,folderId:'',onboardingDone:false,sidebarCollapsed:false};
 let guest=false,restoration=null,restoreAuthorization=null;
+let googleLoading=false,googleLoadError='';
 let store,model,drive,view='home',session=null,selected=null,working=false,config={...defaults},toastTimer,auth,accountStorage,publicConfig={},loginError='',legacyAvailable=false;
 const modes={smart:['Recomendadas','Um equilíbrio entre questões novas, erros e revisões.','spark'],random:['Aleatórias','Uma nova seleção, sem repetir questões na sessão.','shuffle'],new:['Não respondidas','Amplie o conteúdo que você já estudou.','book'],errors:['Revisar erros','Transforme as últimas respostas erradas em aprendizado.','repeat'],favorites:['Favoritas','Volte às questões que você quer ter por perto.','heart'],review:['Revisão espaçada','Questões marcadas e revisões que venceram hoje.','flag'],subject:['Por assunto','Escolha a disciplina, o assunto e o tópico.','filter'],exam:['Simulado','Responda no seu ritmo. O resultado aparece no final.','clock']};
 const syncText={local:'Salvo neste dispositivo',pending:'Envio pendente',syncing:'Sincronizando…',synced:'Drive sincronizado',expired:'Reconectar Drive',error:'Falha na sincronização'};
@@ -114,14 +115,15 @@ document.addEventListener('click',async event=>{
   const target=event.target.closest('[data-action]');if(!target||target.disabled)return;const action=target.dataset.action;
   if(action==='toggle-theme'||action==='theme'){try{config.theme=action==='theme'?target.dataset.theme:document.documentElement.dataset.theme==='dark'?'light':'dark';saveConfig();applyTheme();render();const selector=action==='theme'?`.theme-option[data-theme="${config.theme}"]`:focusMode.active?'.focus-toolbar [data-action=toggle-theme]':restoration||(!auth?.profile&&!guest)?'.entry-toolbar [data-action=toggle-theme]':'.topbar [data-action=toggle-theme]';$(selector)?.focus({preventScroll:true});}catch(error){failure(error);}return;}
   if(restoration){await handleRestorationAction(action);return;}
-  if(!auth?.profile&&!guest&&!['login','guest'].includes(action))return;
+  if(!auth?.profile&&!guest&&!['login','guest','retry-google'].includes(action))return;
   if(action==='exit-focus'){await focusMode.exit();return;}
   if(working)return;
   if(guest&&['connect-drive','disconnect-drive','sync','drive-banks','refresh-folder-banks','restore-progress','export-progress','migrate-legacy'].includes(action)){toast('Entre com Google para salvar ou recuperar seu progresso.');return;}
   try{
     if(action==='guest'){working=true;await openGuest();return;}
     if(action==='guest-login'){await logout();return;}
-    if(action==='login'){working=true;loginError='';renderLogin();try{const result=await auth.authorize();await openAccount(result);}catch(error){loginError=error.message;drive?.close();auth.signOut();guest=false;restoration=null;accountStorage=null;store=null;drive=null;renderLogin();}return;}
+    if(action==='retry-google'){await loadGoogleForLogin();return;}
+    if(action==='login'){if(!isGoogleReady()){void loadGoogleForLogin();return;}working=true;loginError='';const authorization=auth.authorize();renderLogin();try{const result=await authorization;await openAccount(result);}catch(error){loginError=error.message;drive?.close();auth.signOut();guest=false;restoration=null;accountStorage=null;store=null;drive=null;renderLogin();}return;}
     if(action==='logout'){await logout();return;}
     if(action==='toggle-sidebar'){config.sidebarCollapsed=!config.sidebarCollapsed;saveConfig();render();$('[data-action=toggle-sidebar]')?.focus({preventScroll:true});return;}
     if(action==='toggle-focus'){if(view==='session'&&session&&!session.completed)await focusMode.enter();return;}
@@ -169,10 +171,17 @@ window.addEventListener('storage',event=>{if(!restoration&&auth?.profile&&accoun
 window.addEventListener('online',()=>{if(!restoration&&drive?.token&&!drive.connecting)drive.sync().catch(()=>{});});
 window.addEventListener('focus',()=>{if(!restoration&&drive?.token&&!drive.busy&&!drive.connecting)drive.sync().catch(()=>{});});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(config.theme==='system'){applyTheme();render();}});
+async function loadGoogleForLogin(){
+  if(googleLoading||!validClientId(auth?.clientId))return;
+  googleLoading=true;googleLoadError='';loginError='';
+  if(!guest&&!auth.profile&&!restoration)renderLogin();
+  try{await prepareGoogle();}catch(error){googleLoadError=error.message;}
+  finally{googleLoading=false;if(!guest&&!auth?.profile&&!restoration)renderLogin();}
+}
 function renderLogin(){
   if(restoration){renderLoading();return;}
-  $('#app').innerHTML=loginView({ready:validClientId(auth?.clientId),busy:working,error:loginError,theme:document.documentElement.dataset.theme});document.title='Entrar · Foco';
-  const form=$('#oauth-preview-form');if(form)form.onsubmit=e=>{e.preventDefault();const id=form.elements.namedItem('clientId').value.trim();if(!validClientId(id)){loginError='Informe apenas o ID público de um cliente OAuth Google Web.';renderLogin();return;}localStorage.setItem('foco:oauth-preview',id);auth.clientId=id;loginError='';renderLogin();prepareGoogle().catch(e=>{loginError=e.message;renderLogin();});};
+  $('#app').innerHTML=loginView({ready:validClientId(auth?.clientId),oauthReady:isGoogleReady(),loading:googleLoading,retryGoogle:!!googleLoadError,busy:working,error:loginError||googleLoadError,theme:document.documentElement.dataset.theme});document.title='Entrar · Foco';
+  const form=$('#oauth-preview-form');if(form)form.onsubmit=e=>{e.preventDefault();const id=form.elements.namedItem('clientId').value.trim();if(!validClientId(id)){loginError='Informe apenas o ID público de um cliente OAuth Google Web.';renderLogin();return;}localStorage.setItem('foco:oauth-preview',id);auth.clientId=id;loginError='';renderLogin();void loadGoogleForLogin();};
 }
 async function openAccount(result){
   guest=false;restoreAuthorization=result;restoration=restoreProgress(null,{stage:'profile'});renderLoading();
@@ -254,7 +263,7 @@ async function init(){
     const response=await fetch('./app-config.json',{cache:'no-store'});if(response.ok)publicConfig=await response.json();
     const legacyConfig=JSON.parse(localStorage.getItem('foco:config')||'{}');
     auth=new GoogleAccount(publicConfig.googleClientId||localStorage.getItem('foco:oauth-preview')||legacyConfig.clientId||'');renderLogin();
-    prepareGoogle().catch(error=>{if(!guest&&!auth.profile){loginError=error.message;renderLogin();}});
+    void loadGoogleForLogin();
   }catch(error){loginError=error.message;auth=new GoogleAccount('');renderLogin();}
 }
 init();

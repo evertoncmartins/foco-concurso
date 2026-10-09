@@ -70,6 +70,16 @@ Os testes automatizados verificam isolamento entre contas, validação do perfil
 
 Referências oficiais: [Google OAuth JS](https://developers.google.com/identity/oauth2/web/reference/js-reference), [Google UserInfo e ID estável](https://developers.google.com/identity/openid-connect/reference).
 
+## Janela de login e permissões do navegador — 1.5.5
+
+A integração Google é carregada antes de habilitar “Continuar com Google”. O pedido de autorização abre a janela diretamente no clique, antes de qualquer espera assíncrona. Se o carregamento falhar ou exceder 20 segundos, a entrada informa o problema e oferece “Carregar Google novamente”; carregar novamente não abre o login automaticamente. O acesso visitante continua disponível.
+
+O aplicativo distingue `popup_failed_to_open` (a janela não conseguiu abrir), `popup_closed` (fechamento antes de receber a resposta) e erros desconhecidos. A mensagem antiga que juntava cancelamento e bloqueio foi substituída por instruções específicas. Um novo clique pode repetir a entrada; nenhuma autorização é simulada e nenhuma falha apaga o progresso local.
+
+O site não pode garantir a abertura quando as permissões do navegador, extensões ou políticas da organização impedem a janela. No Chrome, se aparecer o ícone de pop-up bloqueado na barra de endereço, permita pop-ups e redirecionamentos somente para `https://foco-concursos.ecmdigital.chatgpt.site`, e clique novamente em “Continuar com Google”. Se a janela abrir e fechar antes do fim, confira a mensagem mostrada na janela Google e conclua o acesso. Funcionar em janela anônima sugere uma diferença do perfil habitual, mas não identifica por si só a causa.
+
+Referências: [Google: acionamento pelo clique no modelo de token](https://developers.google.com/identity/oauth2/web/guides/use-token-model), [Google: tipos de erro do popup](https://developers.google.com/identity/oauth2/web/reference/js-reference), [Chrome: permitir pop-ups de um site específico](https://support.google.com/chrome/answer/95472?hl=pt-BR).
+
 ## Atualização 1.2.0 — configuração entre dispositivos
 
 O login solicita `drive.appdata`, um escopo específico para a área privada de configuração de cada usuário. O acesso amplo `drive` continua incremental, somente ao conectar uma pasta. A recusa da permissão de configuração permite entrar e estudar localmente, mas impede sua recuperação automática. A conexão da pasta solicita ambas as permissões necessárias.

@@ -1,7 +1,7 @@
 import {icon} from './icons.mjs';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const googleMark='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.5-.1-2.9-.4-4.3H24v8.2h11c-.5 2.7-2 5-4.2 6.5v5.4h6.8c4-3.7 6-9.1 6-15.8z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.8-5.3c-1.8 1.2-4 1.9-6.7 1.9-5.2 0-9.5-3.5-11.1-8.1H6v5.5A20 20 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.9 27.6a12 12 0 0 1 0-7.2v-5.5H6a20 20 0 0 0 0 18.2z"/><path fill="#EA4335" d="M24 12.3c3 0 5.6 1 7.7 3l5.8-5.8A20 20 0 0 0 6 14.9l6.9 5.5c1.6-4.6 5.9-8.1 11.1-8.1z"/></svg>';
-export function loginView({ready,busy,error,theme}){
+export function loginView({ready,oauthReady=false,loading=false,retryGoogle=false,busy,error,theme}){
   return `<main class="entry-page" id="main">
     <div class="entry-toolbar"><button class="icon-btn" data-action="toggle-theme" title="Alternar tema" aria-label="${theme==='dark'?'Ativar tema claro':'Ativar tema escuro'}">${icon(theme==='dark'?'sun':'moon',20)}</button></div>
     <div class="entry-layout"><section class="entry-card" aria-labelledby="entry-title">
@@ -9,13 +9,15 @@ export function loginView({ready,busy,error,theme}){
       <h1 id="entry-title">Seu espaço para estudar.</h1>
       <p class="entry-description">Resolva questões, entenda seus erros<br>e avance no seu ritmo.</p>
       <div class="entry-features" aria-label="Recursos de estudo"><span>${icon('book',15)} Questões comentadas</span><span>${icon('repeat',15)} Revisão e simulados</span></div>
-      <button class="google-button" data-action="login" aria-busy="${!!busy}" ${!ready||busy?'disabled':''}>${googleMark}<span>${busy?'Entrando…':'Continuar com Google'}</span></button>
+      <button class="google-button" data-action="login" aria-busy="${!!busy||loading}" ${!ready||!oauthReady||busy?'disabled':''}>${googleMark}<span>${busy?'Entrando…':loading?'Preparando Google…':'Continuar com Google'}</span></button>
+      ${ready&&loading?'<p class="entry-google-status" role="status">Aguarde um instante. O botão será liberado quando o Google estiver pronto.</p>':''}
       <p class="entry-account-note">Conecte sua pasta do Drive para salvar o progresso<br>e retomar em outros dispositivos.</p>
       <div class="entry-divider"><span>ou</span></div>
       <button class="btn entry-guest" data-action="guest" aria-describedby="guest-explanation" ${busy?'disabled':''}>Continuar sem entrar ${icon('arrow',17)}</button>
       <p id="guest-explanation" class="entry-guest-note">Acesso como visitante. Seu progresso não será salvo<br>ao sair ou recarregar a página.</p>
       <p class="entry-privacy"><a href="./privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a><a href="./termos.html" target="_blank" rel="noopener">Termos de Serviço</a></p>
       ${error?`<p class="entry-error" role="alert">${esc(error)}</p>`:''}
+      ${ready&&retryGoogle&&!loading?'<button class="btn small entry-google-retry" data-action="retry-google">Carregar Google novamente</button>':''}
       ${!ready?'<p class="entry-error" role="status">O acesso Google ainda precisa ser configurado. Você pode estudar como visitante.</p>':''}
       ${!ready?`<details class="admin-setup"><summary>Configuração do responsável</summary><form id="oauth-preview-form"><div class="field"><label for="oauth-preview">ID público OAuth Google</label><input id="oauth-preview" name="clientId" placeholder="…apps.googleusercontent.com" required><small>Configuração local para validar a integração. Para todos os usuários, configure o mesmo ID na publicação.</small></div><button class="btn small" type="submit">Configurar neste navegador</button><p class="setting-note"><a href="./docs/LOGIN_GOOGLE.md" target="_blank" rel="noopener">Guia de ativação</a></p></form></details>`:''}
     </section></div>
