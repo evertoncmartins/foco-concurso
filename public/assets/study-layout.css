@@ -1,0 +1,33 @@
+/* Desktop navigation and a quiet fullscreen question workspace. */
+.topbar-heading{display:flex;align-items:center;gap:14px;min-width:0}
+.focus-toolbar{display:none}
+@media(min-width:701px){
+  .shell.sidebar-collapsed{grid-template-columns:80px minmax(0,1fr)}
+  .sidebar-collapsed .sidebar{padding-inline:12px}
+  .sidebar-collapsed .logo{justify-content:center;margin:0 0 42px}
+  .sidebar-collapsed .logo-word,.sidebar-collapsed .logo-sub,
+  .sidebar-collapsed .nav-label,.sidebar-collapsed .nav-count,
+  .sidebar-collapsed .sidebar-note,.sidebar-collapsed .profile-info{display:none}
+  .sidebar-collapsed .nav-btn{justify-content:center;padding:12px;gap:0}
+  .sidebar-collapsed .profile{flex-direction:column;gap:12px;margin-top:24px;padding-top:20px}
+  .sidebar-collapsed .profile>.icon-btn{width:40px;height:40px}
+  .focus-toggle{color:var(--accent)}
+  .shell.focus-mode{display:block;padding-bottom:0}
+  .focus-mode>.sidebar,.focus-mode .topbar,.focus-mode>.mobile-nav{display:none}
+  .focus-mode .focus-toolbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--bg);max-width:992px;margin:0 auto;padding:18px 36px 12px}
+  .focus-caption{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:550;color:var(--accent)}
+  .focus-escape{font-size:11px;color:var(--muted)}
+  .focus-mode .content{max-width:992px;padding:18px 36px 40px}
+  .focus-mode .session-header{justify-content:flex-start;margin-bottom:14px}
+  .focus-mode .session-header [data-action=pause]{display:none}
+  .focus-mode .session-progress{margin-bottom:20px}
+  .focus-mode .question-card{box-shadow:0 8px 32px #00001f08}
+  .focus-mode .session-summary-bar{flex-wrap:wrap}
+  html:fullscreen{background:var(--bg);overflow-y:auto}
+}
+@media(min-width:701px) and (max-width:960px){
+  .topbar-heading .top-label{display:none}
+}
+@media(max-width:700px){
+  .topbar-heading,.sidebar-toggle,.topbar .focus-toggle{display:none}
+}

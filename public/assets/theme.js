@@ -1,0 +1,1 @@
+try {const value=localStorage.getItem('foco:appearance')||'light';document.documentElement.dataset.theme=value==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):value;}catch{}
