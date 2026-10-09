@@ -26,6 +26,8 @@ O nome salvo na tela de consentimento é **Foco Estudos Concursos**. A Google Dr
 
 Em **Google Auth Platform → Marca / Branding → Política de Privacidade**, utilize `https://foco-concursos.ecmdigital.chatgpt.site/privacidade.html`. A página é pública e também está vinculada à entrada e aos Ajustes. A publicação dessa página não altera o status de teste nem substitui a verificação do aplicativo OAuth e dos domínios. O contato de privacidade remete ao e-mail de suporte cadastrado no consentimento Google; mantenha esse endereço atualizado no console.
 
+No campo **Termos de Serviço**, utilize `https://foco-concursos.ecmdigital.chatgpt.site/termos.html`. A página pública descreve as condições de estudo, importação, acesso Google, sincronização e responsabilidades, com referência à Política de Privacidade.
+
 A opção “Configuração do responsável” permite validar outro ID nesse navegador; ela não configura os demais visitantes. Se o ID do build estiver vazio em outra instalação, a tela indica que o login aguarda configuração e não simula uma entrada. Consentimento real e sincronização de ponta a ponta ainda precisam ser conferidos pela conta de teste.
 
 ## Fluxo do usuário
