@@ -8,12 +8,13 @@ export class DriveSync extends EventTarget {
   reportProgress(stage,completed=0,total=0){this.restoreProgress={stage,completed,total};this.dispatchEvent(new Event('progress'));}
   setStatus(status,message=''){this.status=status;this.message=message;this.dispatchEvent(new Event('status'));}
   async prepare(){
+    if(this.account?.redirectEnabled)return;
     return prepareGoogle();
   }
   async connect(folderId){
     if(this.busy||this.connecting)throw new Error('Aguarde a conexão ou sincronização terminar.');
     const account=this.account||new GoogleAccount(this.config.clientId);
-    const result=await account.authorize(true);
+    const result=await account.authorize(true,{folderId});
     if(this.userId&&result.profile.sub!==this.userId)throw new Error('A conta Google não corresponde ao perfil conectado.');
     await this.useAuthorization(result,folderId?{folderId}:{});
   }

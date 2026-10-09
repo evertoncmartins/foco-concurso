@@ -1,7 +1,7 @@
 import {icon} from './icons.mjs';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const googleMark='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.5-.1-2.9-.4-4.3H24v8.2h11c-.5 2.7-2 5-4.2 6.5v5.4h6.8c4-3.7 6-9.1 6-15.8z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.8-5.3c-1.8 1.2-4 1.9-6.7 1.9-5.2 0-9.5-3.5-11.1-8.1H6v5.5A20 20 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.9 27.6a12 12 0 0 1 0-7.2v-5.5H6a20 20 0 0 0 0 18.2z"/><path fill="#EA4335" d="M24 12.3c3 0 5.6 1 7.7 3l5.8-5.8A20 20 0 0 0 6 14.9l6.9 5.5c1.6-4.6 5.9-8.1 11.1-8.1z"/></svg>';
-export function loginView({ready,oauthReady=false,loading=false,retryGoogle=false,busy,error,errorCode='',theme,siteOrigin='https://foco-concurso-wine.vercel.app'}){
+export function loginView({ready,oauthReady=false,loading=false,retryGoogle=false,redirect=false,busy,error,errorCode='',theme,siteOrigin='https://foco-concurso-wine.vercel.app'}){
   return `<main class="entry-page" id="main">
     <div class="entry-toolbar"><button class="icon-btn" data-action="toggle-theme" title="Alternar tema" aria-label="${theme==='dark'?'Ativar tema claro':'Ativar tema escuro'}">${icon(theme==='dark'?'sun':'moon',20)}</button></div>
     <div class="entry-layout"><section class="entry-card" aria-labelledby="entry-title">
@@ -9,7 +9,8 @@ export function loginView({ready,oauthReady=false,loading=false,retryGoogle=fals
       <h1 id="entry-title">Seu espaço para estudar.</h1>
       <p class="entry-description">Resolva questões, entenda seus erros<br>e avance no seu ritmo.</p>
       <div class="entry-features" aria-label="Recursos de estudo"><span>${icon('book',15)} Questões comentadas</span><span>${icon('repeat',15)} Revisão e simulados</span></div>
-      <button class="google-button" data-action="login" aria-busy="${!!busy||loading}" ${!ready||!oauthReady||busy?'disabled':''}>${googleMark}<span>${busy?'Entrando…':loading?'Preparando Google…':'Continuar com Google'}</span></button>
+      <button class="google-button" data-action="login" aria-busy="${!!busy||loading}" ${!ready||!oauthReady||busy?'disabled':''}>${googleMark}<span>${busy?(redirect?'Abrindo Google…':'Entrando…'):loading?'Preparando Google…':'Continuar com Google'}</span></button>
+      ${redirect?'<p class="entry-google-status">Você irá para o Google nesta aba e voltará automaticamente ao Foco.</p>':''}
       ${ready&&loading?'<p class="entry-google-status" role="status">Aguarde um instante. O botão será liberado quando o Google estiver pronto.</p>':''}
       <p class="entry-account-note">Conecte sua pasta do Drive para salvar o progresso<br>e retomar em outros dispositivos.</p>
       <div class="entry-divider"><span>ou</span></div>

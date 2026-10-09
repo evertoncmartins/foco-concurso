@@ -1,4 +1,4 @@
-import {normalizeGoogleProfile} from './account.mjs';
+import {normalizeGoogleProfile,parseFolder} from './account.mjs';
 export const IDENTITY_SCOPES='openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
 export const DRIVE_SCOPE='https://www.googleapis.com/auth/drive';
 export const APPDATA_SCOPE='https://www.googleapis.com/auth/drive.appdata';
@@ -29,9 +29,41 @@ export async function fetchGoogleProfile(token,fetcher=fetch){
   if(!response.ok)throw new Error('Não foi possível confirmar sua conta Google. Entre novamente.');
   return normalizeGoogleProfile(await response.json());
 }
+export function consumeGoogleReturn(location=globalThis.location,history=globalThis.history){
+  const url=new URL(location.href),notice=url.searchParams.get('google_auth');
+  if(!notice)return null;
+  url.searchParams.delete('google_auth');history.replaceState(history.state,'',`${url.pathname}${url.search}${url.hash}`);
+  return ['success','denied','failed','account_mismatch','permissions','invalid_request'].includes(notice)?notice:'failed';
+}
+export function googleReturnMessage(notice){
+  return ({denied:'A autorização Google foi cancelada. Clique novamente para entrar.',account_mismatch:'A conta escolhida é diferente da conta conectada. Entre com a mesma conta para conectar o Drive.',permissions:'Autorize as permissões solicitadas para restaurar sua pasta e seus estudos.',invalid_request:'A entrada expirou ou não pôde ser confirmada. Clique novamente para entrar.'})[notice]||'Não foi possível concluir a entrada no Google. Tente novamente.';
+}
 export class GoogleAccount extends EventTarget{
-  constructor(clientId){super();this.clientId=clientId;this.profile=null;this.token=null;this.expires=0;this.scopes='';this.generation=0;this.canDrive=false;this.canAppData=false;this.prepared=new Map();}
+  constructor(clientId){super();this.clientId=clientId;this.profile=null;this.token=null;this.expires=0;this.scopes='';this.generation=0;this.canDrive=false;this.canAppData=false;this.prepared=new Map();this.redirectEnabled=false;}
+  async prepareRedirect(fetcher=fetch){
+    this.redirectEnabled=false;const clientId=this.clientId;
+    try{
+      const response=await fetcher('/api/auth/status',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});
+      if(response.ok){const status=await response.json();this.redirectEnabled=status.enabled===true&&validClientId(status.clientId)&&status.clientId===clientId&&clientId===this.clientId;}
+    }catch{}
+    return this.redirectEnabled;
+  }
+  async restoreRedirect(fetcher=fetch){
+    if(!this.redirectEnabled)throw new Error('O retorno do Google ainda não está configurado neste site.');
+    const generation=this.generation;
+    const response=await fetcher('/api/auth/session',{method:'POST',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(15000)});
+    if(!response.ok)throw new Error('Não foi possível confirmar o retorno do Google. Entre novamente.');
+    const result=(await response.json()).authorization;
+    if(!result||typeof result.token!=='string'||!result.token||!Number.isFinite(result.expires)||result.expires<=Date.now()+10000)throw new Error('A entrada expirou. Clique novamente para entrar com Google.');
+    const profile=normalizeGoogleProfile(result.profile);
+    const pendingFolderId=result.pendingFolderId?parseFolder(result.pendingFolderId):undefined;
+    if(generation!==this.generation)throw new Error('A entrada foi cancelada.');
+    if(this.profile&&profile.sub!==this.profile.sub)throw new Error(googleReturnMessage('account_mismatch'));
+    this.profile=profile;this.token=result.token;this.expires=result.expires;this.scopes=result.scope||'';this.canDrive=result.canDrive===true;this.canAppData=result.canAppData===true;
+    return {profile,token:this.token,expires:this.expires,withDrive:result.withDrive===true,canDrive:this.canDrive,canAppData:this.canAppData,...(pendingFolderId?{pendingFolderId}:{})};
+  }
   prepareAuthorization(withDrive=false){
+    if(this.redirectEnabled)return;
     if(!validClientId(this.clientId)||!isGoogleReady())return;
     const previous=this.prepared.get(withDrive);
     if(previous?.clientId===this.clientId&&previous.generation===this.generation)return;
@@ -40,8 +72,13 @@ export class GoogleAccount extends EventTarget{
     request.client=google.accounts.oauth2.initTokenClient({client_id:this.clientId,scope,include_granted_scopes:true,...(this.profile?{login_hint:this.profile.sub}:{}),callback:r=>request.resolve?.(r),error_callback:error=>request.reject?.(popupError(error))});
     this.prepared.set(withDrive,request);
   }
-  async authorize(withDrive=false){
+  async authorize(withDrive=false,{folderId}={}){
     if(!validClientId(this.clientId))throw new Error('O responsável pela plataforma ainda precisa configurar o acesso Google.');
+    if(this.redirectEnabled){
+      const params=new URLSearchParams();if(withDrive){params.set('drive','1');if(folderId)params.set('folder',parseFolder(folderId));}if(this.profile)params.set('subject',this.profile.sub);
+      globalThis.location.assign(`/api/auth/start${params.size?`?${params}`:''}`);
+      return new Promise(()=>{}); // Keep the entry blocked until the same-tab navigation completes.
+    }
     const scope=`${IDENTITY_SCOPES} ${APPDATA_SCOPE}${withDrive?` ${DRIVE_SCOPE}`:''}`;
     // Prepare the library and token client on the entry page. Only the token
     // request belongs in the click; never wait or retry automatically here.
