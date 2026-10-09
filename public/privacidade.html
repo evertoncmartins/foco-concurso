@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f9fc">
+  <meta name="description" content="Como o Foco utiliza seus dados, sua conta Google e os arquivos de estudo no Google Drive.">
+  <title>Política de Privacidade — Foco Estudos Concursos</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/style.css">
+  <link rel="stylesheet" href="./assets/privacidade.css">
+  <script src="./assets/theme.js"></script>
+</head>
+<body class="privacy-page">
+  <a class="skip-link" href="#main">Ir para a política de privacidade</a>
+  <header class="privacy-header">
+    <a class="privacy-brand" href="./" aria-label="Foco, página inicial"><span class="brand-mark" aria-hidden="true">f.</span><span>foco</span></a>
+    <a class="btn small" href="./">Voltar ao Foco <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="main" class="privacy-content">
+    <div class="privacy-intro">
+      <p class="privacy-eyebrow">SEUS DADOS, COM CLAREZA</p>
+      <h1>Política de Privacidade</h1>
+      <p class="privacy-lead">Seu espaço para estudar. Entenda quais dados o Foco utiliza, onde ficam guardados e como você pode controlá-los.</p>
+      <p class="privacy-date">Última atualização: <time datetime="2026-10-09">9 de outubro de 2026</time></p>
+    </div>
+    <div class="privacy-summary" aria-label="Resumo da política">
+      <article><span class="privacy-tag blue">01</span><h2>Para seus estudos</h2><p>Os dados permitem identificar sua conta, organizar questões e acompanhar seu progresso.</p></article>
+      <article><span class="privacy-tag violet">02</span><h2>No seu controle</h2><p>O histórico fica no navegador e, quando autorizado, no seu Google Drive.</p></article>
+      <article><span class="privacy-tag amber">03</span><h2>Acesso como visitante</h2><p>Sem login, seus estudos ficam na memória da sessão e são descartados ao sair ou recarregar.</p></article>
+    </div>
+    <nav class="privacy-index" aria-label="Nesta política">
+      <a href="#dados">Dados e finalidade</a><a href="#google">Google e Drive</a><a href="#armazenamento">Armazenamento</a><a href="#controle">Seu controle</a><a href="#contato">Contato</a>
+    </nav>
+    <div class="privacy-sections">
+      <section aria-labelledby="sobre-title">
+        <h2 id="sobre-title">1. Sobre o Foco</h2>
+        <p>O Foco Estudos Concursos é uma plataforma de estudo por questões, com comentários, revisões, simulados e estatísticas. Esta política se aplica ao site e à sua integração com o Google. O responsável pelo projeto é Everton Carlos Martins.</p>
+      </section>
+      <section id="dados" aria-labelledby="dados-title">
+        <h2 id="dados-title">2. Dados utilizados e suas finalidades</h2>
+        <ul>
+          <li><strong>Conta Google:</strong> nome, endereço de e-mail e identificador da conta, fornecidos pelo Google após sua autorização. São utilizados para identificar o perfil, mostrar a conta conectada e separar seus estudos dos de outros usuários.</li>
+          <li><strong>Dados de estudo:</strong> bancos de questões importados, respostas, acertos e erros, favoritos, revisões, sessões, datas das atividades e estatísticas derivadas. São utilizados para corrigir respostas, recomendar questões, retomar sessões e acompanhar sua evolução.</li>
+          <li><strong>Preferências:</strong> nome de exibição, meta diária, aparência, estado do menu e identificação da pasta escolhida no Drive. São utilizadas para personalizar a experiência e recuperar a configuração entre dispositivos.</li>
+          <li><strong>Informações técnicas de conexão:</strong> ao carregar o site ou serviços externos, o navegador envia informações como endereço IP e dados da requisição aos respectivos provedores. O tratamento realizado por esses provedores segue suas próprias políticas.</li>
+        </ul>
+        <p>O Foco não solicita sua senha Google. O código do aplicativo não utiliza os dados de estudo para publicidade, venda de informações ou treinamento de modelos de inteligência artificial.</p>
+      </section>
+      <section id="google" aria-labelledby="google-title">
+        <h2 id="google-title">3. Login Google e acesso ao Drive</h2>
+        <p>O login utiliza o Google Identity Services. A identidade da conta é conferida com o Google, e a autorização é mantida por um token temporário na memória da sessão. O Foco não grava esse token em arquivos de progresso nem no armazenamento persistente do navegador.</p>
+        <p>A permissão de configuração do aplicativo (<code>drive.appdata</code>) permite guardar e recuperar a identificação da sua pasta na área privada de dados do Foco dentro do seu Drive.</p>
+        <p>Ao conectar uma pasta, a versão atual solicita a permissão ampla do Google Drive (<code>drive</code>). Essa permissão autoriza tecnicamente acesso a todos os arquivos do Drive. Os recursos implementados pelo Foco utilizam esse acesso para verificar a pasta escolhida, ler bancos JSON e arquivos de histórico dessa pasta e criar arquivos JSON com seu progresso. A configuração privada é tratada separadamente na área de dados do aplicativo.</p>
+        <p>O histórico inclui um identificador da conta proprietária. A restauração de progresso verifica esse identificador para evitar atribuir dados de outra conta a você. Bancos de questões em uma pasta compartilhada podem ser acessados por quem já possui permissão nessa pasta.</p>
+        <div class="privacy-note"><strong>Uso limitado dos dados Google.</strong><p>O Foco utiliza dados obtidos pelas APIs Google somente para oferecer as funções de estudo e sincronização descritas nesta política. Não vende esses dados, não os utiliza para anúncios ou avaliação de crédito e não os compartilha para treinamento de modelos de IA. O uso e a transferência de informações recebidas das APIs Google seguem a <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer">Política de Dados do Usuário dos Serviços de API do Google</a>, incluindo os requisitos de Uso Limitado.</p></div>
+      </section>
+      <section id="armazenamento" aria-labelledby="armazenamento-title">
+        <h2 id="armazenamento-title">4. Onde os dados ficam e por quanto tempo</h2>
+        <p><strong>Com login:</strong> o histórico, as preferências e o cache de sincronização ficam no armazenamento local do navegador, separados por conta. Quando você autoriza a sincronização, cópias do histórico e dos bancos ficam em arquivos JSON na pasta do seu Google Drive. A configuração da pasta também fica na área privada do aplicativo no Drive.</p>
+        <p><strong>Sem login:</strong> os dados de estudo ficam somente na memória da sessão de visitante e são descartados ao sair ou recarregar a página. A preferência de aparência pode permanecer no navegador.</p>
+        <p>A hospedagem do Foco disponibiliza o aplicativo e o banco de exemplo; o sistema não mantém um banco central de progresso dos usuários. Seus arquivos não são enviados automaticamente ao repositório do código no GitHub.</p>
+        <p>Os dados locais permanecem até serem removidos do navegador. Os arquivos do Drive permanecem até você excluí-los ou até a remoção prevista pelas configurações do Google. Sair da conta, desconectar o Drive ou revogar a autorização não apaga automaticamente essas cópias.</p>
+      </section>
+      <section aria-labelledby="compartilhamento-title">
+        <h2 id="compartilhamento-title">5. Compartilhamento e serviços externos</h2>
+        <p>As solicitações de login e sincronização são feitas pelo navegador diretamente aos serviços Google. O aplicativo também carrega fontes do Google Fonts. A hospedagem do site é fornecida pela plataforma ChatGPT Sites. Esses provedores podem tratar dados técnicos necessários ao fornecimento de seus serviços, conforme suas políticas.</p>
+        <p>O Foco não inclui ferramentas próprias de publicidade ou rastreamento analítico. O código do aplicativo não usa cookies para armazenar o progresso; utiliza armazenamento local do navegador. Os serviços Google podem empregar cookies em seus próprios fluxos de autenticação.</p>
+        <p>O Foco não altera o compartilhamento da pasta escolhida. Quem já possui acesso à pasta pode acessar os arquivos nela guardados, conforme as permissões do Drive. Prefira uma pasta privada para seu histórico. Exportações baixadas ficam sob seu controle e podem conter seu identificador e seus dados de estudo.</p>
+        <p>Consulte também a <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Política de Privacidade do Google</a> e a <a href="https://openai.com/policies/privacy-policy/" target="_blank" rel="noopener noreferrer">Política de Privacidade da OpenAI</a>.</p>
+      </section>
+      <section id="controle" aria-labelledby="controle-title">
+        <h2 id="controle-title">6. Suas escolhas, acesso e exclusão</h2>
+        <ul>
+          <li><strong>Estudar sem conectar o Google:</strong> utilize a opção de visitante na tela de entrada.</li>
+          <li><strong>Obter uma cópia:</strong> com sua conta conectada, utilize <em>Ajustes → Seu progresso → Exportar progresso</em>.</li>
+          <li><strong>Corrigir preferências:</strong> altere seu nome de exibição e sua meta em Ajustes. Dados da identidade Google devem ser corrigidos na própria conta Google.</li>
+          <li><strong>Interromper a sincronização:</strong> utilize <em>Ajustes → Google Drive → Desconectar</em>. Para revogar a permissão concedida, acesse as <a href="https://myaccount.google.com/connections" target="_blank" rel="noopener noreferrer">conexões da sua Conta Google</a> e remova o acesso do Foco.</li>
+          <li><strong>Excluir dados locais:</strong> remova os dados armazenados para este site nas configurações do navegador. Isso pode remover os estudos de todas as contas usadas nesse perfil do navegador. Repita a remoção nos outros dispositivos que possuam cópias.</li>
+          <li><strong>Excluir dados do Drive:</strong> interrompa a sincronização e remova os arquivos de histórico do Foco da pasta escolhida. A configuração privada pode ser removida nas opções de gerenciamento de aplicativos do Google Drive. A remoção local, por si só, não exclui os arquivos do Drive; uma nova sincronização pode restaurá-los.</li>
+        </ul>
+        <p>A exclusão de um banco de questões na interface preserva o histórico de respostas. Para apagar o histórico, é necessário remover suas cópias nos locais indicados acima. Exporte os dados que desejar conservar antes de removê-los.</p>
+        <p>Você também pode solicitar esclarecimentos sobre o tratamento de dados e o exercício dos direitos previstos na legislação aplicável pelo canal de contato abaixo. O Foco não dispõe de acesso administrativo aos arquivos privados do seu Drive sem uma autorização específica sua.</p>
+      </section>
+      <section aria-labelledby="seguranca-title">
+        <h2 id="seguranca-title">7. Proteção dos dados</h2>
+        <p>O site e as APIs utilizam HTTPS. O aplicativo verifica a identidade Google e a propriedade dos documentos de progresso e mantém os dados separados por conta. O armazenamento local do Foco não possui criptografia própria: uma pessoa com acesso ao mesmo perfil do navegador pode inspecioná-lo. Use seu perfil pessoal em dispositivos compartilhados e proteja sua conta Google.</p>
+        <p>Nenhuma medida elimina todos os riscos. A proteção dos arquivos no Drive depende também das permissões da pasta e das configurações da sua conta.</p>
+      </section>
+      <section id="contato" aria-labelledby="contato-title">
+        <h2 id="contato-title">8. Responsável e contato</h2>
+        <p><strong>Responsável:</strong> Everton Carlos Martins, mantenedor do Foco Estudos Concursos.</p>
+        <p>Para dúvidas ou solicitações de privacidade, utilize o <strong>e-mail de suporte apresentado na tela de autorização Google</strong> do aplicativo <em>Foco Estudos Concursos</em>. Esse é o contato de suporte definido no projeto OAuth.</p>
+        <p>Para questões técnicas gerais, o projeto está disponível em <a href="https://github.com/evertoncmartins/foco-concurso" target="_blank" rel="noopener noreferrer">evertoncmartins/foco-concurso no GitHub</a>. Não publique arquivos de progresso, dados pessoais, senhas ou tokens em discussões públicas.</p>
+      </section>
+      <section aria-labelledby="alteracoes-title">
+        <h2 id="alteracoes-title">9. Atualizações desta política</h2>
+        <p>Esta política pode ser atualizada quando as funções do Foco ou suas práticas de tratamento de dados mudarem. A versão vigente permanece disponível nesta página, com a data de atualização indicada no início. Mudanças nas permissões Google exigem o consentimento solicitado pelo próprio Google quando aplicável.</p>
+      </section>
+    </div>
+  </main>
+  <footer class="privacy-footer"><span>Foco Estudos Concursos</span><a href="./">Voltar aos estudos</a></footer>
+</body>
+</html>

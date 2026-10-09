@@ -14,6 +14,7 @@ export function loginView({ready,busy,error,theme}){
       <div class="entry-divider"><span>ou</span></div>
       <button class="btn entry-guest" data-action="guest" aria-describedby="guest-explanation" ${busy?'disabled':''}>Continuar sem entrar ${icon('arrow',17)}</button>
       <p id="guest-explanation" class="entry-guest-note">Acesso como visitante. Seu progresso não será salvo<br>ao sair ou recarregar a página.</p>
+      <p class="entry-privacy"><a href="./privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a></p>
       ${error?`<p class="entry-error" role="alert">${esc(error)}</p>`:''}
       ${!ready?'<p class="entry-error" role="status">O acesso Google ainda precisa ser configurado. Você pode estudar como visitante.</p>':''}
       ${!ready?`<details class="admin-setup"><summary>Configuração do responsável</summary><form id="oauth-preview-form"><div class="field"><label for="oauth-preview">ID público OAuth Google</label><input id="oauth-preview" name="clientId" placeholder="…apps.googleusercontent.com" required><small>Configuração local para validar a integração. Para todos os usuários, configure o mesmo ID na publicação.</small></div><button class="btn small" type="submit">Configurar neste navegador</button><p class="setting-note"><a href="./docs/LOGIN_GOOGLE.md" target="_blank" rel="noopener">Guia de ativação</a></p></form></details>`:''}

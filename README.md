@@ -6,6 +6,7 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 
 - Tema claro com botões e destaques em azul profundo (#00001F), escuro em cinza neutro e automático; detalhes discretos em azul, violeta, âmbar e rosa nos dois temas; navegação adaptada para celulares.
 - Login com Google ou acesso como visitante. No modo visitante, dados ficam apenas em memória e são descartados ao sair/recarregar.
+- Política de Privacidade pública, acessível sem login em `privacidade.html`, com link na entrada e em Ajustes.
 - Restauração inicial do Drive bloqueia o estudo até concluir, com progresso por etapas e contagem de arquivos; erros e autorização ausente têm recuperação explícita.
 - Menu lateral recolhível no desktop, com preferência salva por conta neste navegador.
 - Modo foco em tela cheia durante as questões: botão no canto superior direito; saída pelo botão ou Esc, sem perder a seleção. Se a tela cheia for recusada ou indisponível, o layout sem menus continua funcionando. Ao pausar ou concluir, a interface normal é restaurada.

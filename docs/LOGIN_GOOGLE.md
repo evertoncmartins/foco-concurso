@@ -24,6 +24,8 @@ O aplicativo Google está em **modo de teste**, com público externo e a conta d
 
 O nome salvo na tela de consentimento é **Foco Estudos Concursos**. A Google Drive API está ativada, e os escopos `openid`, `userinfo.email`, `userinfo.profile` e `https://www.googleapis.com/auth/drive` foram confirmados no console. Nenhuma conta de faturamento foi vinculada.
 
+Em **Google Auth Platform → Marca / Branding → Política de Privacidade**, utilize `https://foco-concursos.ecmdigital.chatgpt.site/privacidade.html`. A página é pública e também está vinculada à entrada e aos Ajustes. A publicação dessa página não altera o status de teste nem substitui a verificação do aplicativo OAuth e dos domínios. O contato de privacidade remete ao e-mail de suporte cadastrado no consentimento Google; mantenha esse endereço atualizado no console.
+
 A opção “Configuração do responsável” permite validar outro ID nesse navegador; ela não configura os demais visitantes. Se o ID do build estiver vazio em outra instalação, a tela indica que o login aguarda configuração e não simula uma entrada. Consentimento real e sincronização de ponta a ponta ainda precisam ser conferidos pela conta de teste.
 
 ## Fluxo do usuário

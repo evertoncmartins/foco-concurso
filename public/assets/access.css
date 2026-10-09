@@ -74,6 +74,9 @@
 .question-tools [data-flag=favorite].active{background:var(--detail-rose-soft);color:var(--detail-rose)}
 .question-tools [data-flag=review].active{background:var(--detail-amber-soft);color:var(--detail-amber)}
 @keyframes restore-spin{to{transform:rotate(360deg)}}
+.entry-privacy{font-size:11px;color:var(--muted);margin-top:23px}
+.entry-privacy a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;color:var(--muted);text-underline-offset:3px}
+.entry-privacy a:hover{color:var(--accent)}
 @media(max-width:700px){
   .entry-page{padding-inline:22px}
   .entry-layout{padding:25px 0 38px}
