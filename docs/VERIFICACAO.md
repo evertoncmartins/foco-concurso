@@ -57,3 +57,10 @@ O início passou a usar `home-view.mjs` e `home.css`, com estilos específicos: 
 Os 59 testes existentes passaram novamente. Verificação de sintaxe dos módulos e `git diff --check` passaram. Sete variantes de HTML foram geradas e inspecionadas por parser: início, sessão pausada, ausência de bancos, falha de conexão, banco desativado, entrada normal e entrada em carregamento. Foram conferidos títulos, IDs, rótulos acessíveis, estado dos botões e escape de conteúdo. Isso verifica o HTML gerado, não a interação ou o layout em navegador.
 
 A infraestrutura de navegador para Sites continuava indisponível. Aparência final, toque, ausência de overflow em aparelho real e popup Google não foram verificados nesta atualização. O código possui regras para celulares pequenos (até 360 px), celular/tablet (até 700 px), início em telas maiores (a partir de 701 px) e entrada em duas colunas (a partir de 901 px).
+
+
+## Simplificação da entrada 1.3.1 — 09/10/2026
+
+A tela de login foi reduzida à identidade Foco, uma frase de orientação e ao botão Google. A troca de tema permanece discreta no canto superior. Foram removidos a apresentação lateral, os blocos de benefícios, o ícone ilustrativo e as frases adicionais. Celular e desktop usam uma composição única centralizada. Erros, carregamento e configuração ausente continuam explícitos. A autenticação e a página após entrar permanecem as mesmas.
+
+Foram verificadas a sintaxe dos módulos e as variantes HTML de acesso normal, carregamento, erro e configuração ausente. Não foram criados novos testes para a alteração visual. A inspeção visual em navegador/aparelho real segue indisponível.
