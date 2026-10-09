@@ -181,7 +181,7 @@ async function loadGoogleForLogin(){
 function renderLogin(){
   if(restoration){renderLoading();return;}
   if(isGoogleReady()&&!working)try{auth.prepareAuthorization();}catch(error){googleLoadError=error.message;}
-  $('#app').innerHTML=loginView({ready:validClientId(auth?.clientId),oauthReady:isGoogleReady()&&!googleLoadError,loading:googleLoading,retryGoogle:!!googleLoadError,busy:working,error:loginError||googleLoadError,errorCode:loginError?loginErrorCode:'',theme:document.documentElement.dataset.theme});document.title='Entrar · Foco';
+  $('#app').innerHTML=loginView({ready:validClientId(auth?.clientId),oauthReady:isGoogleReady()&&!googleLoadError,loading:googleLoading,retryGoogle:!!googleLoadError,busy:working,error:loginError||googleLoadError,errorCode:loginError?loginErrorCode:'',siteOrigin:window.location?.origin,theme:document.documentElement.dataset.theme});document.title='Entrar · Foco';
   const form=$('#oauth-preview-form');if(form)form.onsubmit=e=>{e.preventDefault();const id=form.elements.namedItem('clientId').value.trim();if(!validClientId(id)){loginErrorCode='';loginError='Informe apenas o ID público de um cliente OAuth Google Web.';renderLogin();return;}localStorage.setItem('foco:oauth-preview',id);auth.clientId=id;loginError='';renderLogin();void loadGoogleForLogin();};
 }
 async function openAccount(result){
