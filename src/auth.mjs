@@ -30,24 +30,41 @@ export async function fetchGoogleProfile(token,fetcher=fetch){
   return normalizeGoogleProfile(await response.json());
 }
 export class GoogleAccount extends EventTarget{
-  constructor(clientId){super();this.clientId=clientId;this.profile=null;this.token=null;this.expires=0;this.scopes='';this.generation=0;this.canDrive=false;this.canAppData=false;}
+  constructor(clientId){super();this.clientId=clientId;this.profile=null;this.token=null;this.expires=0;this.scopes='';this.generation=0;this.canDrive=false;this.canAppData=false;this.prepared=new Map();}
+  prepareAuthorization(withDrive=false){
+    if(!validClientId(this.clientId)||!isGoogleReady())return;
+    const previous=this.prepared.get(withDrive);
+    if(previous?.clientId===this.clientId&&previous.generation===this.generation)return;
+    const scope=`${IDENTITY_SCOPES} ${APPDATA_SCOPE}${withDrive?` ${DRIVE_SCOPE}`:''}`;
+    const request={clientId:this.clientId,generation:this.generation,resolve:null,reject:null};
+    request.client=google.accounts.oauth2.initTokenClient({client_id:this.clientId,scope,include_granted_scopes:true,...(this.profile?{login_hint:this.profile.sub}:{}),callback:r=>request.resolve?.(r),error_callback:error=>request.reject?.(popupError(error))});
+    this.prepared.set(withDrive,request);
+  }
   async authorize(withDrive=false){
     if(!validClientId(this.clientId))throw new Error('O responsável pela plataforma ainda precisa configurar o acesso Google.');
     const scope=`${IDENTITY_SCOPES} ${APPDATA_SCOPE}${withDrive?` ${DRIVE_SCOPE}`:''}`;
-    // Loading first and opening later loses the original click in some browsers.
-    // The entry page prepares GIS; this request must run before any await.
+    // Prepare the library and token client on the entry page. Only the token
+    // request belongs in the click; never wait or retry automatically here.
     if(!isGoogleReady())throw new Error('O acesso Google ainda não está pronto. Aguarde o carregamento e clique novamente para entrar.');
     const generation=this.generation;
-    const response=await new Promise((resolve,reject)=>{
-      const required=withDrive?scope:IDENTITY_SCOPES;
-      const client=google.accounts.oauth2.initTokenClient({client_id:this.clientId,scope,include_granted_scopes:true,...(this.profile?{login_hint:this.profile.sub}:{}),callback:r=>{if(r.error||!r.access_token)return reject(new Error(r.error==='access_denied'?'A autorização Google não foi concedida. Clique novamente para entrar e autorize o acesso ao perfil.':'A entrada no Google não foi concluída. Tente novamente.'));if(!google.accounts.oauth2.hasGrantedAllScopes(r,...required.split(' ')))return reject(new Error(withDrive?'Autorize o Drive e a configuração privada para recuperar sua pasta em outros dispositivos.':'Autorize o acesso ao seu perfil Google para entrar.'));resolve(r);},error_callback:error=>reject(popupError(error))});
-      client.requestAccessToken({prompt:this.profile?'':'select_account'});
-    });
+    this.prepareAuthorization(withDrive);
+    const request=this.prepared.get(withDrive);this.prepared.delete(withDrive);
+    let response;
+    try{
+      response=await new Promise((resolve,reject)=>{
+        request.resolve=resolve;request.reject=reject;
+        try{request.client.requestAccessToken({prompt:this.profile?'':'select_account'});}catch(error){reject(error);}
+      });
+    }finally{request.resolve=request.reject=null;}
+    if(generation!==this.generation)throw new Error('A entrada foi cancelada.');
+    if(response.error||!response.access_token)throw new Error(response.error==='access_denied'?'A autorização Google não foi concedida. Clique novamente para entrar e autorize o acesso ao perfil.':'A entrada no Google não foi concluída. Tente novamente.');
+    const required=withDrive?scope:IDENTITY_SCOPES;
+    if(!google.accounts.oauth2.hasGrantedAllScopes(response,...required.split(' ')))throw new Error(withDrive?'Autorize o Drive e a configuração privada para recuperar sua pasta em outros dispositivos.':'Autorize o acesso ao seu perfil Google para entrar.');
     const profile=await fetchGoogleProfile(response.access_token);
     if(generation!==this.generation)throw new Error('A entrada foi cancelada.');
     if(this.profile&&profile.sub!==this.profile.sub)throw new Error('A conta escolhida no Drive é diferente da conta conectada. Saia para trocar de usuário.');
     this.profile=profile;this.token=response.access_token;this.expires=Date.now()+Number(response.expires_in)*1000;this.scopes=response.scope||'';this.canDrive=google.accounts.oauth2.hasGrantedAllScopes(response,DRIVE_SCOPE);this.canAppData=google.accounts.oauth2.hasGrantedAllScopes(response,APPDATA_SCOPE);
     return {profile,token:this.token,expires:this.expires,withDrive,canDrive:this.canDrive,canAppData:this.canAppData};
   }
-  signOut(){this.generation++;this.profile=null;this.token=null;this.expires=0;this.scopes='';this.canDrive=false;this.canAppData=false;}
+  signOut(){this.generation++;this.prepared.clear();this.profile=null;this.token=null;this.expires=0;this.scopes='';this.canDrive=false;this.canAppData=false;}
 }

@@ -2,6 +2,27 @@
 .topbar-heading{display:flex;align-items:center;gap:14px;min-width:0}
 .focus-toolbar{display:none}
 @media(min-width:701px){
+  /* Size the regular question workspace to the browser's usable viewport. */
+  .shell.session:not(.focus-mode){height:100dvh;min-height:0}
+  .session:not(.focus-mode) .sidebar{min-height:0;overflow:auto}
+  .session:not(.focus-mode) .workspace{display:flex;flex-direction:column;min-height:0}
+  .session:not(.focus-mode) .topbar{height:64px;flex-shrink:0;padding-inline:clamp(18px,2.5vw,44px)}
+  .session:not(.focus-mode) .content{display:flex;flex:1;flex-direction:column;min-height:0;width:100%;max-width:none;padding:clamp(12px,2dvh,24px) clamp(18px,2.5vw,44px)}
+  .session:not(.focus-mode) .guest-banner{flex-shrink:0;margin-bottom:10px;padding:6px 12px}
+  .session:not(.focus-mode) .session-container{display:flex;flex:1;flex-direction:column;min-height:0;width:100%;max-width:1160px}
+  .session:not(.focus-mode) .session-header{flex-shrink:0;margin-bottom:8px;flex-wrap:wrap}
+  .session:not(.focus-mode) .session-progress{flex-shrink:0;margin-bottom:12px}
+  .session:not(.focus-mode) .question-card{display:flex;flex:1;flex-direction:column;min-height:0;padding:clamp(16px,2dvh,28px) clamp(18px,2.2vw,36px)}
+  .session:not(.focus-mode) .question-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:3px 4px}
+  .question-body:focus-visible{outline:2px solid var(--detail-blue);outline-offset:2px;border-radius:6px}
+  .session:not(.focus-mode) .question-meta{margin:10px 0 12px;overflow-wrap:anywhere}
+  .session:not(.focus-mode) .question-statement{font-size:clamp(18px,1.35vw,24px);line-height:1.45;margin-bottom:16px;overflow-wrap:anywhere}
+  .session:not(.focus-mode) .options{gap:8px}
+  .session:not(.focus-mode) .option{min-height:48px;padding:10px 14px;font-size:14px;line-height:1.45}
+  .session:not(.focus-mode) .option>span:nth-child(2){min-width:0;overflow-wrap:anywhere}
+  .session:not(.focus-mode) .question-actions{flex-shrink:0;flex-wrap:wrap;margin-top:12px;padding-top:12px}
+  .session:not(.focus-mode) .feedback{padding:16px;margin-top:16px}
+  .session:not(.focus-mode) .session-summary-bar{flex-shrink:0;flex-wrap:wrap;gap:8px 20px;margin:10px 0 0}
   .shell.sidebar-collapsed{grid-template-columns:80px minmax(0,1fr)}
   .sidebar-collapsed .sidebar{padding-inline:12px}
   .sidebar-collapsed .logo{justify-content:center;margin:0 0 42px}
@@ -24,7 +45,8 @@
   .focus-mode .session-header [data-action=pause]{display:none}
   .focus-mode .session-progress{margin-bottom:20px}
   .focus-mode .question-card{display:flex;flex:1;flex-direction:column;min-width:0;padding:clamp(20px,2.4vmin,48px) clamp(22px,3vw,80px);box-shadow:0 8px 32px #00001f08}
-  .focus-mode .question-card>.between,.focus-mode .question-meta,.focus-mode .question-statement,.focus-mode .feedback,.focus-mode .question-actions{flex-shrink:0}
+  .focus-mode .question-body{display:contents}
+  .focus-mode .question-body>.between,.focus-mode .question-meta,.focus-mode .question-statement,.focus-mode .feedback,.focus-mode .question-actions{flex-shrink:0}
   .focus-mode .question-meta{font-size:clamp(11px,.7vw,14px)}
   .focus-mode .question-card .badge{font-size:clamp(10px,.65vw,12px)}
   .focus-mode .question-statement{max-width:85ch;font-size:clamp(21px,1.5vw,32px);line-height:1.6;margin-bottom:clamp(20px,2.8dvh,36px);overflow-wrap:anywhere}
@@ -37,6 +59,15 @@
   html:fullscreen{background:var(--bg);overflow-y:auto}
 }
 @media(min-width:701px) and (max-height:740px){
+  .session:not(.focus-mode) .sidebar-note{display:none}
+  .session:not(.focus-mode) .topbar{height:58px}
+  .session:not(.focus-mode) .content{padding-block:10px}
+  .session:not(.focus-mode) .session-progress{margin-bottom:8px}
+  .session:not(.focus-mode) .question-card{padding-block:14px}
+  .session:not(.focus-mode) .question-statement{font-size:18px;margin-bottom:12px}
+  .session:not(.focus-mode) .options{gap:6px}
+  .session:not(.focus-mode) .option{min-height:44px;padding-block:8px}
+  .session:not(.focus-mode) .question-actions{margin-top:10px;padding-top:10px}
   .focus-mode .focus-toolbar{padding-top:10px}
   .focus-mode .session-header{margin-bottom:8px}
   .focus-mode .session-progress{margin-bottom:12px}

@@ -30,6 +30,42 @@ test('Google abre a janela no mesmo clique, antes de qualquer espera assíncrona
   }finally{restore();}
 });
 
+test('preparação do cliente ocorre antes do clique e não inicia autorização',async()=>{
+  const restore=keepGlobals();let preparations=0,requests=0;
+  globalThis.google={accounts:{oauth2:{hasGrantedAllScopes:()=>true,initTokenClient:config=>{preparations++;return {requestAccessToken:()=>{requests++;grant(config);}};}}}};
+  globalThis.fetch=async()=>new Response(JSON.stringify(profile));
+  try{
+    const auth=new GoogleAccount(clientId);auth.prepareAuthorization();auth.prepareAuthorization();
+    assert.equal(preparations,1);assert.equal(requests,0);assert.equal(auth.profile,null);
+    const pending=auth.authorize();assert.equal(requests,1);assert.equal(preparations,1);
+    assert.equal((await pending).profile.sub,'111');
+  }finally{restore();}
+});
+
+test('repetição preparada ignora callbacks tardias do popup anterior',async()=>{
+  const restore=keepGlobals(),clients=[];
+  globalThis.google={accounts:{oauth2:{hasGrantedAllScopes:()=>true,initTokenClient:config=>{clients.push(config);return {requestAccessToken(){}};}}}};
+  globalThis.fetch=async()=>new Response(JSON.stringify(profile));
+  try{
+    const auth=new GoogleAccount(clientId);auth.prepareAuthorization();const first=auth.authorize();
+    clients[0].error_callback({type:'popup_failed_to_open'});await assert.rejects(first,error=>error.code==='popup_failed_to_open');
+    auth.signOut();auth.prepareAuthorization();const second=auth.authorize();
+    clients[0].error_callback({type:'popup_closed'});grant(clients[0]);assert.equal(auth.profile,null);
+    grant(clients[1]);assert.equal((await second).profile.sub,'111');
+    assert.equal(clients.length,2);
+  }finally{restore();}
+});
+
+test('troca do ID público substitui cliente preparado sem reutilizar a configuração antiga',async()=>{
+  const restore=keepGlobals(),ids=[];
+  globalThis.google={accounts:{oauth2:{hasGrantedAllScopes:()=>true,initTokenClient:config=>{ids.push(config.client_id);return {requestAccessToken:()=>grant(config)};}}}};
+  globalThis.fetch=async()=>new Response(JSON.stringify(profile));
+  try{
+    const auth=new GoogleAccount(clientId);auth.prepareAuthorization();auth.clientId='another.apps.googleusercontent.com';auth.prepareAuthorization();
+    assert.equal((await auth.authorize()).profile.sub,'111');assert.deepEqual(ids,[clientId,auth.clientId]);
+  }finally{restore();}
+});
+
 test('autorização sem biblioteca pronta exige novo clique e não abre janela após carregar',async()=>{
   const restore=keepGlobals();delete globalThis.google;const scripts=scriptDocument();
   try{

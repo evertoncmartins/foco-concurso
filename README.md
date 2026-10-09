@@ -5,12 +5,13 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 ## Funcionalidades
 
 - Tema claro com botões e destaques em azul profundo (#00001F), escuro em cinza neutro e automático; detalhes discretos em azul, violeta, âmbar e rosa nos dois temas; navegação adaptada para celulares.
-- Login com Google ou acesso como visitante. O botão Google é liberado após carregar a integração, e abre a autorização diretamente no clique. Falhas de carga podem ser repetidas; fechamento e bloqueio da janela têm orientações distintas. No modo visitante, dados ficam apenas em memória e são descartados ao sair/recarregar.
+- Login com Google ou acesso como visitante. A biblioteca e o cliente Google são preparados antes de liberar a entrada; a autorização abre diretamente no clique. A falha de abertura oferece instruções para Chrome e Firefox e um link para abrir o Foco em uma aba. Falhas de carga podem ser repetidas; fechamento e bloqueio da janela têm orientações distintas. No modo visitante, dados ficam apenas em memória e são descartados ao sair/recarregar.
 - Política de Privacidade pública, acessível sem login em `privacidade.html`, com link na entrada e em Ajustes.
 - Termos de Serviço públicos em `termos.html`, com links na entrada, em Ajustes e na Política de Privacidade.
 - Restauração inicial do Drive bloqueia o estudo até concluir, com progresso por etapas e contagem de arquivos; erros e autorização ausente têm recuperação explícita.
 - Menu lateral recolhível no desktop, com preferência salva por conta neste navegador.
 - Modo foco em tela cheia durante as questões: no desktop, ocupa toda a largura e acompanha a altura disponível, com texto e espaçamento proporcionais e rolagem para conteúdos longos; o layout mobile é preservado. Botão no canto superior direito; saída pelo botão ou Esc, sem perder a seleção. Se a tela cheia for recusada ou indisponível, o layout sem menus continua funcionando. Ao pausar ou concluir, a interface normal é restaurada.
+- Sessão desktop fora da tela cheia usa a altura útil da janela; controles permanecem visíveis e textos extensos rolam dentro do cartão. A posição é mantida na mesma questão e reinicia ao avançar.
 - Entrada compacta e início com ação principal de estudo, meta diária, atalhos e bancos; layout dedicado ao celular.
 - Importação e exportação de bancos JSON; ativação, desativação e remoção.
 - Sessões recomendadas, aleatórias, não respondidas, erros, favoritas, revisão, filtros por assunto e simulados.
