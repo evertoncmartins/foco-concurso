@@ -41,7 +41,7 @@ public/                 HTML, CSS e identidade visual
 docs/                   JSON Schema, modelo e guias
 tests/                  testes de domínio, armazenamento e integração simulada
 scripts/                build e verificações sem dependências
-.github/workflows/      testes e publicação em GitHub Pages
+.github/workflows/      verificações automáticas e publicação manual em GitHub Pages
 .openai/hosting.json     identidade e configuração de Sites
 ```
 
@@ -77,9 +77,9 @@ Para prevenir sobrescritas concorrentes sem um backend central, o Drive recebe l
 
 Este projeto está preparado para Sites, Vercel e GitHub Pages. A hospedagem da tela de login é acessível por URL, enquanto cada visitante autoriza somente seus próprios dados Google. Veja [DEPLOY.md](docs/DEPLOY.md).
 
-O repositório GitHub do usuário não foi criado nem inspecionado: a integração foi dispensada nesta solicitação. Antes de criar um repositório futuramente, procure um existente para esse projeto. O checkout Sites possui versionamento Git próprio, que não é um repositório do GitHub do usuário.
+O repositório deste sistema é [evertoncmartins/foco-concurso](https://github.com/evertoncmartins/foco-concurso), na branch `main`. O usuário autorizou o envio das próximas atualizações para esse destino. O checkout de Sites conserva seu versionamento administrado pela plataforma; o remoto adicional `github` aponta para o repositório do usuário.
 
-Um workflow incluído executa testes e build e publica no GitHub Pages a cada push em `main`, depois que o projeto estiver conectado a um repositório com Pages configurado. A configuração Vercel usa `dist/` e executa testes antes do build; ao conectar um repositório, a integração Git do Vercel realiza deploys automáticos.
+O workflow `ci.yml` executa testes, verificação de sintaxe e build a cada push em `main` e em pull requests. A publicação por GitHub Pages é opcional: o workflow `pages.yml` só é iniciado manualmente, após configurar Pages. O site ativo continua em [Foco](https://foco-concursos.ecmdigital.chatgpt.site). A configuração Vercel usa `dist/` e executa testes antes do build; ao conectar um repositório, a integração Git do Vercel realiza deploys automáticos.
 
 ## Segurança e limites
 

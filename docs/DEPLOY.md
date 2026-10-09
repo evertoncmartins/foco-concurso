@@ -2,25 +2,25 @@
 
 ## GitHub
 
-A integração GitHub foi dispensada nesta tarefa. Nenhum repositório GitHub foi criado, verificado ou recebido como destino. Antes de criar um, procure por `foco-concursos`, `QConcursos IA` ou nomes usados anteriormente na sua conta.
+O destino autorizado para este sistema é [evertoncmartins/foco-concurso](https://github.com/evertoncmartins/foco-concurso), na branch `main`. O usuário criou o repositório e autorizou o envio das próximas atualizações para ele em 09/10/2026. A visibilidade existente do repositório é preservada.
 
-Quando o destino estiver confirmado, associe este checkout ao repositório. Não substitua o remoto de Sites; use um segundo remoto chamado `github`:
+O envio pelo plugin GitHub pode registrar uma versão completa com a API de objetos Git, preservando o conteúdo remoto e verificando o commit anterior ao atualizar a branch. Quando houver acesso Git autenticado, use o remoto adicional `github`. Não substitua o repositório administrado por Sites:
 
 ```sh
-git remote add github https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
+git remote add github https://github.com/evertoncmartins/foco-concurso.git
 npm test
 npm run check
 npm run build
 git add .
-git commit -m "feat: plataforma de estudo e revisão"
+git commit -m "Atualiza o sistema Foco"
 git push github HEAD:main
 ```
 
-Use autenticação segura por CLI/OAuth ou gerenciador de credenciais; não coloque token na URL. O checkout de Sites já possui seu próprio commit e remoto administrado pela plataforma.
+Use autenticação segura pelo plugin, CLI/OAuth ou gerenciador de credenciais; não coloque token na URL. O checkout de Sites conserva seu versionamento administrado pela plataforma. Commits criados pela API do GitHub podem ter SHA diferente do commit de Sites, mesmo quando os arquivos são iguais. Confira o conteúdo da árvore e o resultado do workflow `Verify Foco`.
 
 ## GitHub Pages
 
-O workflow `.github/workflows/pages.yml` executa teste, verificação e build; faz upload de `dist/` e publica com `actions/deploy-pages`. Configure **Settings → Pages → Source → GitHub Actions**. O código usa caminhos relativos ao documento, compatíveis com Pages em subdiretório e com domínio próprio. Se o domínio mudar, atualize as origens autorizadas do Google OAuth.
+O workflow `.github/workflows/ci.yml` verifica cada push em `main` e pull request. O workflow `.github/workflows/pages.yml` é uma opção manual: executa teste, verificação e build, faz upload de `dist/` e publica com `actions/deploy-pages`. Para usá-lo, configure **Settings → Pages → Source → GitHub Actions** e execute o workflow manualmente em **Actions**. O site ativo continua hospedado em Sites. O código usa caminhos relativos ao documento, compatíveis com Pages em subdiretório e com domínio próprio. Se o domínio mudar, atualize as origens autorizadas do Google OAuth.
 
 ## Vercel
 
