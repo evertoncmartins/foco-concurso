@@ -27,7 +27,7 @@ function weekView(model,now){
   </section>`;
 }
 
-export function homeView({model,config,resume,driveConnected,driveStatus,driveMessage,now=Date.now()}){
+export function homeView({model,config,resume,driveConnected,driveStatus,driveMessage,guest=false,now=Date.now()}){
   const today=model.answers.filter(a=>localDay(a.at)===localDay(now)).length;
   const goal=Math.max(1,Number(config.dailyGoal)||10),goalPercent=Math.min(100,Math.round(today/goal*100)),streak=studyStreak(model.answers,now);
   const hour=Number(new Intl.DateTimeFormat('pt-BR',{hour:'numeric',hourCycle:'h23',timeZone:'America/Sao_Paulo'}).format(now));
@@ -41,7 +41,7 @@ export function homeView({model,config,resume,driveConnected,driveStatus,driveMe
   const choices=[
     {mode:'new',name:'Não respondidas',text:`${newCount} para explorar`,icon:'book',available:newCount},
     {mode:'errors',name:'Revisar erros',text:errorCount?`${errorCount} para refazer`:'Tudo em dia',icon:'repeat',available:errorCount},
-    {mode:'favorites',name:'Favoritas',text:favoriteCount?`${favoriteCount} salvas`:'Marque durante o estudo',icon:'heart',available:favoriteCount},
+    {mode:'favorites',name:'Favoritas',text:favoriteCount?`${favoriteCount} ${guest?'nesta sessão':'salvas'}`:'Marque durante o estudo',icon:'heart',available:favoriteCount},
     {mode:'exam',name:'Simulado',text:'Teste seus conhecimentos',icon:'clock',available:Number(hasContent)}
   ];
   return `<div class="home-page">

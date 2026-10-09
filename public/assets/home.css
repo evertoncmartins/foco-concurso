@@ -1,6 +1,6 @@
 /* Entry and dashboard: mobile first, isolated from the question screen. */
 .entry-page,.home-page{--home-muted:#65726a;--home-accent:#28563e;--home-soft:#edf4ee;--home-hero:#244c39;--home-on-hero:#f7fbf4;--home-lime:#dcecbf}
-[data-theme=dark] .entry-page,[data-theme=dark] .home-page{--home-muted:#a9b6ac;--home-accent:#c0dfb0;--home-soft:#25352b;--home-hero:#284b3a;--home-on-hero:#f7fbf4;--home-lime:#dcecbf}
+[data-theme=dark] .entry-page,[data-theme=dark] .home-page{--home-muted:#b4b4b4;--home-accent:#ececec;--home-soft:#303030;--home-hero:#2a2a2a;--home-on-hero:#ececec;--home-lime:#f1f1f1}
 .entry-page{min-height:100dvh;margin:0 auto;padding:max(22px,env(safe-area-inset-top)) 24px max(22px,env(safe-area-inset-bottom));display:flex;flex-direction:column}
 .entry-toolbar{display:flex;justify-content:flex-end;max-width:1120px;width:100%;margin:0 auto}
 .entry-toolbar .icon-btn{width:44px;height:44px;border:0;background:transparent;color:var(--home-muted);border-radius:50%}

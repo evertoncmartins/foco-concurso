@@ -5,6 +5,7 @@ export const DEFAULT_FOLDER='1BsRHtMhLBHVSpn7gqIZCjuE4JaGbitPV';
 const API='https://www.googleapis.com/drive/v3';
 export class DriveSync extends EventTarget {
   constructor(store,config,account=null,settings=null) {super();this.store=store;this.storage=store.storage;this.userId=store.storage.userId||null;this.config=config;this.account=account;this.settings=settings;this.token=null;this.expires=0;this.status='local';this.busy=false;this.connecting=false;this.timer=null;this.lastSync=null;this.folder=null;this.closed=false;this.generation=0;}
+  reportProgress(stage,completed=0,total=0){this.restoreProgress={stage,completed,total};this.dispatchEvent(new Event('progress'));}
   setStatus(status,message=''){this.status=status;this.message=message;this.dispatchEvent(new Event('status'));}
   async prepare(){
     return prepareGoogle();
@@ -20,12 +21,13 @@ export class DriveSync extends EventTarget {
     if(this.closed)throw new Error('A sessão foi encerrada.');
     if(this.userId&&result.profile?.sub!==this.userId)throw new Error('A conta Google não corresponde ao perfil conectado.');
     if(this.busy||this.connecting)throw new Error('Aguarde a conexão ou sincronização terminar.');
-    this.connecting=true;clearTimeout(this.timer);
+    this.connecting=true;clearTimeout(this.timer);this.reportProgress('folder');
     try{
     if(this.settings&&!folderId){const saved=await this.settings.restore();if(saved)this.setFolder(saved.folderId);}
     const selected=folderId||this.config.folderId;
     if(!selected)throw new Error('Informe sua pasta do Google Drive primeiro.');
     this.token=result.token;this.expires=result.expires;
+    this.reportProgress('access');
     this.folder=await this.request(`${API}/files/${encodeURIComponent(selected)}?fields=id,name,mimeType,driveId,capabilities(canAddChildren)`);
     if(this.folder.mimeType!=='application/vnd.google-apps.folder'||!this.folder.capabilities?.canAddChildren){this.disconnect();throw new Error('Escolha a conta proprietária da pasta ou uma conta com permissão para adicionar arquivos.');}
     if(this.folder.driveId){this.disconnect();throw new Error('Escolha uma pasta do seu Meu Drive. Drives compartilhados institucionais ainda não são suportados.');}
@@ -63,10 +65,13 @@ export class DriveSync extends EventTarget {
     if(this.connecting&&!duringConnect)throw new Error('Aguarde a conexão da pasta terminar.');
     if(this.busy)return;this.busy=true;this.setStatus('syncing','Unindo os históricos do Drive e deste dispositivo…');
     try{
+      this.reportProgress('history',0,1);
       const cache=this.cache(), files=(await this.list(`name contains '${this.progressPrefix()}' and mimeType = 'application/json'`)).filter(f=>f.name.startsWith(this.progressPrefix())&&(!this.userId||f.ownedByMe===true));
       // Append-only JSON journals: concurrent devices create independent files.
       // No existing progress file is ever overwritten or deleted.
-      for(const file of files){if(cache.files.includes(file.id))continue;const document=await this.readFile(file);assertProgressOwner(document,this.userId);const events=validateEvents(document);await this.store.merge(events);cache.files.push(file.id);cache.events=[...new Set([...cache.events,...events.map(e=>e.id)])];this.saveCache(cache);}
+      const unread=files.filter(file=>!cache.files.includes(file.id));let restored=0;this.reportProgress('history',0,unread.length);
+      for(const file of unread){const document=await this.readFile(file);assertProgressOwner(document,this.userId);const events=validateEvents(document);await this.store.merge(events);cache.files.push(file.id);cache.events=[...new Set([...cache.events,...events.map(e=>e.id)])];this.saveCache(cache);this.reportProgress('history',++restored,unread.length);}
+      this.reportProgress('upload');
       if(cache.pending){await this.upload(cache.pending);cache.files.push(cache.pending.id);cache.events=[...new Set([...cache.events,...cache.pending.document.events.map(e=>e.id)])];cache.pending=null;this.saveCache(cache);}
       const sent=new Set(cache.events), events=this.store.events.filter(e=>!sent.has(e.id));
       if(events.length||(files.length===0&&cache.files.length===0)){
@@ -88,8 +93,9 @@ export class DriveSync extends EventTarget {
   }
   async bankFiles(){return (await this.list("mimeType = 'application/json' or name contains '.json'" )).filter(f=>!f.name.startsWith('foco-progresso-'));}
   async importNewBanks(){
-    const files=await this.bankFiles();let imported=0,skipped=0;
-    for(const file of files){try{const bank=validateBank(await this.readFile(file));const existing=this.store.model().banks.find(b=>b.id===bank.id);if(existing){skipped++;continue;}const hadBank=this.store.events.some(e=>e.type==='bank'&&e.bank.id===bank.id);if(hadBank){skipped++;continue;}await this.store.add([{type:'bank',bank},{type:'bank-state',bankId:bank.id,value:'enabled'}]);imported++;}catch(e){if(e.status||this.closed||!this.token)throw e;skipped++;}}
+    this.reportProgress('banks',0,1);
+    const files=await this.bankFiles();let imported=0,skipped=0,processed=0;this.reportProgress('banks',0,files.length);
+    for(const file of files){try{const bank=validateBank(await this.readFile(file));const existing=this.store.model().banks.find(b=>b.id===bank.id);if(existing){skipped++;continue;}const hadBank=this.store.events.some(e=>e.type==='bank'&&e.bank.id===bank.id);if(hadBank){skipped++;continue;}await this.store.add([{type:'bank',bank},{type:'bank-state',bankId:bank.id,value:'enabled'}]);imported++;}catch(e){if(e.status||this.closed||!this.token)throw e;skipped++;}finally{this.reportProgress('banks',++processed,files.length);}}
     if(imported)await this.sync({duringConnect:this.connecting});this.bankImportSummary={imported,skipped};return this.bankImportSummary;
   }
 }

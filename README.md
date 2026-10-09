@@ -4,7 +4,9 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 
 ## Funcionalidades
 
-- Temas claro, escuro e automático; navegação adaptada para celulares.
+- Temas claro, escuro em cinza neutro e automático; navegação adaptada para celulares.
+- Login com Google ou acesso como visitante. No modo visitante, dados ficam apenas em memória e são descartados ao sair/recarregar.
+- Restauração inicial do Drive bloqueia o estudo até concluir, com progresso por etapas e contagem de arquivos; erros e autorização ausente têm recuperação explícita.
 - Menu lateral recolhível no desktop, com preferência salva por conta neste navegador.
 - Modo foco em tela cheia durante as questões: botão no canto superior direito; saída pelo botão ou Esc, sem perder a seleção. Se a tela cheia for recusada ou indisponível, o layout sem menus continua funcionando. Ao pausar ou concluir, a interface normal é restaurada.
 - Entrada compacta e início com ação principal de estudo, meta diária, atalhos e bancos; layout dedicado ao celular.
@@ -61,7 +63,7 @@ No simulado, as escolhas são salvas como rascunho de sessão; eventos de desemp
 
 ## Login e usuários
 
-Entrada exclusivamente com Google. Cada conta usa um perfil independente, identificado pelo `sub` verificado no endpoint Google UserInfo. Preferências, progresso local e cache são separados por conta. O cliente OAuth público do projeto `foco-estudos-ecm` está configurado em `public/app-config.json`; veja [LOGIN_GOOGLE.md](docs/LOGIN_GOOGLE.md). O aplicativo Google permanece em modo de teste, com acesso às contas cadastradas na lista de usuários de teste. Os estudantes não precisam configurar clientes próprios.
+O acesso com conta usa Google. Também há modo visitante sem login: questões importadas, respostas e estatísticas ficam apenas na memória da sessão; não são migradas automaticamente ao entrar com uma conta. Cada conta usa um perfil independente, identificado pelo `sub` verificado no endpoint Google UserInfo. Preferências, progresso local e cache são separados por conta. O cliente OAuth público do projeto `foco-estudos-ecm` está configurado em `public/app-config.json`; veja [LOGIN_GOOGLE.md](docs/LOGIN_GOOGLE.md). O aplicativo Google permanece em modo de teste, com acesso às contas cadastradas na lista de usuários de teste. Os estudantes não precisam configurar clientes próprios.
 
 ## Google Drive
 
