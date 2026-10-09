@@ -10,7 +10,7 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 - Termos de Serviço públicos em `termos.html`, com links na entrada, em Ajustes e na Política de Privacidade.
 - Restauração inicial do Drive bloqueia o estudo até concluir, com progresso por etapas e contagem de arquivos; erros e autorização ausente têm recuperação explícita.
 - Menu lateral recolhível no desktop, com preferência salva por conta neste navegador.
-- Modo foco em tela cheia durante as questões: botão no canto superior direito; saída pelo botão ou Esc, sem perder a seleção. Se a tela cheia for recusada ou indisponível, o layout sem menus continua funcionando. Ao pausar ou concluir, a interface normal é restaurada.
+- Modo foco em tela cheia durante as questões: no desktop, ocupa toda a largura e acompanha a altura disponível, com texto e espaçamento proporcionais e rolagem para conteúdos longos; o layout mobile é preservado. Botão no canto superior direito; saída pelo botão ou Esc, sem perder a seleção. Se a tela cheia for recusada ou indisponível, o layout sem menus continua funcionando. Ao pausar ou concluir, a interface normal é restaurada.
 - Entrada compacta e início com ação principal de estudo, meta diária, atalhos e bancos; layout dedicado ao celular.
 - Importação e exportação de bancos JSON; ativação, desativação e remoção.
 - Sessões recomendadas, aleatórias, não respondidas, erros, favoritas, revisão, filtros por assunto e simulados.
