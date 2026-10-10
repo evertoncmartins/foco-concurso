@@ -133,3 +133,13 @@ Fora da tela cheia, a sessão desktop usa a altura útil da janela, com cabeçal
 ## Endereço da ajuda de login 1.5.7 — 09/10/2026
 
 A ajuda deixa de fixar o domínio de Sites e recebe a origem da janela atual. No Vercel informado pelo responsável, mostra `https://foco-concurso-wine.vercel.app` e aponta a abertura em uma aba para esse mesmo endereço. O valor exibido e o link são escapados no HTML. A documentação de produção, privacidade e termos foi atualizada para o Vercel. Nenhuma configuração OAuth ou permissão de navegador foi alterada. Foram mantidos os 90 testes existentes, com execução das verificações e build antes da publicação.
+
+## Origem de questões de concursos — 1.6.1 — 10/10/2026
+
+O importador reconhece os metadados opcionais de instituição, ano, tag, banca, cargo, nível, tipo, fundamento legal, atualização legislativa e fonte. A origem é mostrada junto da dificuldade na sessão normal e no modo foco; adaptações recebem identificação explícita. Prova, gabarito e edital ficam no comentário após responder e no resultado do simulado.
+
+A suíte passou com 106 testes. As novas verificações cobrem a preservação da origem ao importar/exportar/restaurar, fontes e datas inválidas, tags inconsistentes, escape de texto, compatibilidade com bancos antigos e o uso do cabeçalho real da sessão nos modos normal e foco, sem exibir links para o gabarito antes da resposta. Sintaxe, build e `git diff --check` também foram conferidos antes da publicação.
+
+O banco de pesquisa entregue separadamente contém 20 adaptações de provas reais TAE: IFSP 11, IFPR 3, IFES 2, IFG 2, IFSC 1 e IFRN 1. Foi validado pelo importador real e passou pelo ciclo de exportação e restauração sem perda de metadados. As questões não foram adicionadas automaticamente ao progresso do usuário nem ao banco inicial autoral.
+
+A verificação com DOM simulado confirma conteúdo e ordem de interação, mas não mede o layout renderizado. A inspeção visual em navegador continua indisponível neste ambiente de Sites.
