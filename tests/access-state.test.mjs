@@ -12,7 +12,7 @@ import {validateBank} from '../src/engine.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress','question-origin'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -120,6 +120,15 @@ test('rolagem interna é mantida ao selecionar e trocar tema, e reinicia na pró
   await app.click('toggle-theme');assert.equal(app.document.querySelector('.question-body').scrollTop,180);
   await app.click('answer');assert.equal(app.document.querySelector('.question-body').scrollTop,180);
   await app.click('next');assert.equal(app.document.querySelector('.question-body').scrollTop,0);
+});
+
+test('sessão mostra origem junto da dificuldade no modo normal e foco, com fontes após responder',async()=>{
+  const app=runtime();app.auth.signOut();await app.click('guest');
+  await app.value(`(async()=>{const imported=structuredClone(bank);imported.id='source-fixture';imported.questions=imported.questions.slice(0,1);Object.assign(imported.questions[0],{instituicao:'IFSP',ano:2026,tag:'IFSP-2026',tipo:'Adaptada de prova oficial',fonte:{prova:'https://example.test/prova.pdf',gabarito:'https://example.test/final.pdf',questaoOriginal:12,paginaProva:7,statusGabarito:'Definitivo'}});await store.add([{type:'bank',bank:validateBank(imported)}]);refreshModel();await newSession([model.questions.find(q=>q.bankId===imported.id).key]);navigate('session');})()`);
+  assert.match(app.html(),/<span class="badge">(?:Fácil|Média|Difícil)<\/span><span class="badge origin"[^>]*>IFSP-2026<\/span>/);assert(!app.html().includes('final.pdf'));
+  await app.click('toggle-focus');assert.match(app.html(),/focus-mode/);assert.match(app.html(),/>IFSP-2026</);
+  const option=app.value('model.questions.find(q=>q.bankId==="source-fixture").correctOption');await app.click('select',{option});await app.click('answer');
+  assert.match(app.html(),/Origem da questão/);assert.match(app.html(),/https:\/\/example.test\/final.pdf/);
 });
 
 test('visitante mantém progresso na sessão e não recupera dados após nova instância',async()=>{

@@ -1,3 +1,4 @@
+import {normalizeQuestionOrigin} from './question-origin.mjs';
 export const VERSION = 1;
 export const DAY = 86400000;
 export const questionKey = (b, q) => `${b}:${q}`;
@@ -22,7 +23,7 @@ export function validateBank(raw) {
     if (!optionIds.has(q.correctOption)) throw new Error(`${label}: correctOption precisa existir nas alternativas.`);
     n.correctOption = q.correctOption;
     if (q.reference != null) { n.reference = {label: text(q.reference.label, `${label} referência`, 1000)}; if (q.reference.url) { const u = new URL(q.reference.url); if (u.protocol !== 'https:') throw new Error(`${label}: a referência deve usar HTTPS.`); n.reference.url = u.href; } }
-    return n;
+    return {...n,...normalizeQuestionOrigin(q,label)};
   });
   return bank;
 }
