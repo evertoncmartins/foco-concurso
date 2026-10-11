@@ -118,6 +118,14 @@
   .session .session-header,.session .session-progress{flex-shrink:0}
   .session .session-header{margin-bottom:8px}
   .session .session-progress{margin-bottom:10px}
+  /* This sibling reserves one line above the card, outside its only scroller. */
+  .session .mobile-question-bar{display:flex;flex-shrink:0;align-items:center;gap:8px;min-width:0;min-height:44px;margin-bottom:6px;padding-inline:2px;background:var(--bg);white-space:nowrap;font-size:11px;line-height:1.4}
+  .mobile-question-bar .question-discipline{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:550;color:var(--detail-blue)}
+  .mobile-question-bar .question-difficulty{flex-shrink:0;color:var(--muted)}
+  .mobile-question-bar .badge.origin{display:block;flex-shrink:0;max-width:28%;overflow:hidden;text-overflow:ellipsis;padding:4px 6px;border-radius:5px;font-size:10px;line-height:1.4}
+  .mobile-question-bar .question-tools{flex-shrink:0;gap:0}
+  .mobile-question-bar .question-tools .icon-btn{width:44px;height:44px}
+  .mobile-question-bar .question-tools svg{width:17px;height:17px}
   .session .question-card{display:flex;flex:1;flex-direction:column;min-height:0;overflow:hidden;padding:14px}
   .session .question-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:3px 4px 20px;margin-inline:-4px;scroll-padding-block:8px 20px}
   .session .question-body:focus-visible{outline:2px solid var(--detail-blue);outline-offset:-2px;border-radius:6px}

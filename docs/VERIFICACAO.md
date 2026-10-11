@@ -1,5 +1,11 @@
 # Relatório de verificação — 08/10/2026
 
+## Faixa compacta da questão no Mobile — 1.9.1 (11/10/2026)
+
+O cabeçalho Mobile foi movido para uma única linha entre o progresso e o cartão da questão. Exibe disciplina, dificuldade, origem no formato instituição-ano e os dois controles de favorito/revisão, sem assunto, tópico, ID ou selo Adaptada. A faixa reserva espaço no layout flex e fica fora do único contêiner rolável; não se sobrepõe à pergunta nem ao rodapé. Textos longos usam reticências, mantendo o texto completo no DOM e o título da disciplina; ícones discretos têm área de toque de 44 px. Cores seguem os temas e os estados das marcações existentes. Nenhuma regra desktop ou de safe area foi alterada.
+
+A integração verifica localização fora do cartão, ausência de metadados extras, apenas um par de controles, marcações reais sem perder a leitura, fontes e identificação de adaptação após responder, troca de questão sem origem anterior e reconstituição do painel desktop ao mudar a largura. Testes de estrutura CSS, origem, controlador e os demais fluxos são executados no pacote de publicação. Não há verificação visual em navegador ou aparelho físico: o controle de navegador exigido pelo ambiente Sites continua indisponível.
+
 ## Foco automático nas sessões Mobile — 1.9.0 (11/10/2026)
 
 Toda navegação para uma sessão em layout Mobile (até 700 px) ativa o foco automaticamente. Isso abrange iniciar, retomar, questão isolada e revisão dos erros do resultado, tanto no estudo quanto no simulado. O botão Sair recebe ícone de voltar e rótulo acessível de pausa e retorno ao início. Ele não encerra a conta, responde, pula ou conclui a sessão. A fila, respostas registradas e posição da sessão continuam disponíveis para retomar. Alternativas riscadas da mesma questão permanecem temporariamente na memória; uma seleção ainda não confirmada segue o comportamento anterior da pausa. No desktop, a entrada no foco é manual, e Sair do foco/Esc restaura a questão no layout normal.
