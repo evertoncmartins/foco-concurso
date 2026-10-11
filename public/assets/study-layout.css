@@ -102,4 +102,27 @@
 }
 @media(max-width:700px){
   .topbar-heading,.sidebar-toggle,.topbar .focus-toggle{display:none}
+  /* Reserve the footer in the viewport layout: it never overlays the scroller. */
+  .shell.session{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .session .workspace{display:flex;flex:1;flex-direction:column;min-height:0}
+  .session .topbar{position:relative;flex-shrink:0}
+  .session .content{display:flex;flex:1;flex-direction:column;min-height:0;width:100%;max-width:none;margin:0;padding:18px max(13px,env(safe-area-inset-right,0px)) 0 max(13px,env(safe-area-inset-left,0px))}
+  .session .guest-banner{flex-shrink:0}
+  .session .session-container{display:flex;flex:1;flex-direction:column;min-height:0;width:100%}
+  .session .session-header,.session .session-progress{flex-shrink:0}
+  .session .question-card{display:flex;flex:1;flex-direction:column;min-height:0;overflow:hidden}
+  .session .question-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:3px 4px 20px;margin-inline:-4px;scroll-padding-block:8px 20px}
+  .session .question-body:focus-visible{outline:2px solid var(--detail-blue);outline-offset:-2px;border-radius:6px}
+  .session .question-actions{flex-shrink:0;flex-wrap:wrap;background:var(--surface)}
+  .session .session-summary-bar{flex-shrink:0;flex-wrap:wrap;row-gap:4px;background:var(--bg)}
+}
+@media(max-width:700px) and (max-height:460px){
+  .session .topbar{height:calc(52px + env(safe-area-inset-top,0px))}
+  .session .content{padding-top:8px}
+  .session .guest-banner{margin-bottom:8px;padding-block:6px}
+  .session .session-header{margin-bottom:6px}
+  .session .session-progress{margin-bottom:8px}
+  .session .question-card{padding-block:12px}
+  .session .question-actions{margin-top:8px;padding-top:8px}
+  .session .session-summary-bar{margin-block:8px}
 }

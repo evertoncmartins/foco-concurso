@@ -12,6 +12,7 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 - Menu lateral recolhível no desktop, com preferência salva por conta neste navegador.
 - Modo foco em tela cheia durante as questões: no desktop, ocupa toda a largura e acompanha a altura disponível, com texto e espaçamento proporcionais e rolagem para conteúdos longos; o layout mobile é preservado. Botão no canto superior direito; saída pelo botão ou Esc, sem perder a seleção. Se a tela cheia for recusada ou indisponível, o layout sem menus continua funcionando. Ao pausar ou concluir, a interface normal é restaurada.
 - Sessão desktop fora da tela cheia usa a altura útil da janela; controles permanecem visíveis e textos extensos rolam dentro do cartão. A posição é mantida na mesma questão e reinicia ao avançar.
+- No Mobile, somente o conteúdo da questão possui rolagem; botões de resposta e estatísticas permanecem ancorados no rodapé, em espaço reservado sem sobreposição. A altura acompanha a área útil do navegador e respeita a safe area do iPhone. Selecionar, favoritar e alternar o tema preservam a posição de leitura.
 - Entrada compacta e início com ação principal de estudo, meta diária, atalhos e bancos; layout dedicado ao celular.
 - Importação e exportação de bancos JSON; ativação, desativação e remoção.
 - Sessões recomendadas, aleatórias, não respondidas, erros, favoritas, revisão, filtros por assunto e simulados.

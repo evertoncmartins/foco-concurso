@@ -91,6 +91,34 @@ async function studyRuntime(options={},mode='smart'){
 const cutRow=(app,option)=>app.document.querySelector(`[data-option-row="${option}"]`);
 const cutControl=(app,option)=>cutRow(app,option).querySelector('.option-cut');
 
+test('Mobile preserva leitura ao selecionar, favoritar e alternar tema, com controles fora da área rolável',async()=>{
+  const app=await studyRuntime({mobile:true});
+  await app.value(`(async()=>{const long=structuredClone(bank);long.id='long-mobile';long.questions=long.questions.slice(0,2);long.questions[0].statement='Questão longa com várias linhas.\\n'.repeat(80);long.questions[0].options.forEach(o=>o.text+=' Texto extenso de alternativa.'.repeat(12));await store.add([{type:'bank',bank:validateBank(long)}]);refreshModel();await newSession(model.questions.filter(q=>q.bankId==='long-mobile').map(q=>q.key));navigate('session');})()`);
+  const body=()=>app.document.querySelector('.question-body');body().scrollTop=920;
+  const correct=app.value('model.questions.find(q=>q.key===session.queue[0]).correctOption');
+  await app.click('select',{option:correct});assert.equal(body().scrollTop,920);
+  await app.click('toggle-theme');assert.equal(body().scrollTop,920);
+  await app.click('flag',{flag:'favorite'});assert.equal(body().scrollTop,920);
+  await app.click('toggle-cut',{option:'B'});assert.equal(body().scrollTop,920);
+  assert.match(app.html(),/Texto extenso de alternativa/);
+  // Locate the closing div of the actual nested question-body, not the first child.
+  const html=app.html(),start=html.indexOf('<div class="question-body"');let depth=0,end=0;
+  for(const match of html.slice(start).matchAll(/<\/?div\b[^>]*>/g)){
+    depth+=match[0].startsWith('</')?-1:1;
+    if(!depth){end=start+match.index+match[0].length;break;}
+  }
+  assert(end>start);assert(html.indexOf('class="question-actions"')>=end);assert(html.indexOf('class="session-summary-bar"')>=end);
+  await app.click('answer');assert.match(app.html(),/<strong>1<\/strong> acertos/);assert.match(app.html(),/<strong>0<\/strong> erros/);assert.match(app.html(),/<strong>100%<\/strong> na sessão/);assert.match(app.html(),/data-action="next"/);
+});
+
+test('Mobile reinicia a rolagem ao pular ou avançar e libera a navegação normal ao pausar',async()=>{
+  const app=await studyRuntime({mobile:true});app.document.querySelector('.question-body').scrollTop=600;
+  await app.click('skip');assert.equal(app.document.querySelector('.question-body').scrollTop,0);assert.equal(app.value('model.stats.attempts'),0);
+  app.document.querySelector('.question-body').scrollTop=400;await app.click('select',{option:'A'});assert.equal(app.document.querySelector('.question-body').scrollTop,400);
+  await app.click('answer');await app.click('next');assert.equal(app.document.querySelector('.question-body').scrollTop,0);
+  await app.click('pause');assert.equal(app.value('view'),'home');assert(!app.html().includes('class="shell session '));assert.equal(app.document.querySelector('.question-body'),null);
+});
+
 test('tesoura alterna instantaneamente sem selecionar, responder, gravar ou refazer a página',async()=>{
   const app=await studyRuntime(),before=app.value('JSON.stringify(store.events)'),renders=app.renders,question=app.document.querySelector('.question-body');
   question.scrollTop=180;
