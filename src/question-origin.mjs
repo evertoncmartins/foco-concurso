@@ -45,11 +45,11 @@ export function normalizeQuestionOrigin(question,label){
   return origin;
 }
 
-export function questionOriginBadges(question){
+export function questionOriginBadges(question,{showAdapted=true}={}){
   const tag=question.tag||(question.instituicao&&question.ano?`${question.instituicao}-${question.ano}`:question.tags?.find(value=>/^(?:IF[A-Z0-9]+|CEFET(?:-[A-Z]{2})?|UTFPR)-\d{4}$/i.test(value)));
   const title=[question.instituicao,question.ano,question.banca,question.cargo,question.nivelCargo].filter(Boolean).join(' · ')||tag;
   const adapted=/adapt/i.test(question.tipo||'');
-  return `${tag?`<span class="badge origin" title="${escape(title)}" aria-label="Origem: ${escape(tag)}">${escape(tag)}</span>`:''}${adapted?'<span class="badge" title="Texto adaptado de uma questão de prova. A fonte está no comentário.">Adaptada</span>':''}`;
+  return `${tag?`<span class="badge origin" title="${escape(title)}" aria-label="Origem: ${escape(tag)}">${escape(tag)}</span>`:''}${adapted&&showAdapted?'<span class="badge" title="Texto adaptado de uma questão de prova. A fonte está no comentário.">Adaptada</span>':''}`;
 }
 
 export function questionSourceDetails(question){

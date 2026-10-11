@@ -304,6 +304,31 @@ test('sessão mostra origem junto da dificuldade no modo normal e foco, com font
   assert.match(app.html(),/Origem da questão/);assert.match(app.html(),/https:\/\/example.test\/final.pdf/);
 });
 
+test('Mobile usa uma única faixa antes do cartão e preserva ações, origem e cabeçalho desktop',async()=>{
+  const app=await studyRuntime({mobile:true});
+  await app.value(`(async()=>{const imported=structuredClone(bank);imported.id='compact-source';imported.questions=imported.questions.slice(0,2);Object.assign(imported.questions[0],{discipline:'Direito Administrativo com um nome extenso',instituicao:'IFSP',ano:2025,tag:'IFSP-2025',tipo:'Adaptada de prova oficial',fonte:{prova:'https://example.test/prova.pdf',gabarito:'https://example.test/final.pdf'}});await store.add([{type:'bank',bank:validateBank(imported)}]);refreshModel();await newSession(model.questions.filter(q=>q.bankId===imported.id).map(q=>q.key));await navigate('session');})()`);
+  const html=app.html(),bar=html.indexOf('class="mobile-question-bar"'),card=html.indexOf('<article class="question-card">');
+  assert(html.indexOf('class="session-progress"')<bar&&bar<card);
+  assert.equal((html.match(/class="mobile-question-bar"/g)||[]).length,1);
+  assert.match(html.slice(bar,card),/Direito Administrativo com um nome extenso/);
+  assert.match(html.slice(bar,card),/question-difficulty">(?:Fácil|Média|Difícil)<\/span><span class="badge origin"[^>]*>IFSP-2025<\/span>/);
+  assert(!html.includes('class="question-meta"'));assert(!html.includes('>Adaptada<'));assert(!html.includes('final.pdf'));
+  assert.equal((html.match(/data-action="flag"/g)||[]).length,2);assert(!html.slice(card).includes('data-action="flag"'));
+  app.document.querySelector('.question-body').scrollTop=420;
+  for(const flag of ['favorite','review']){
+    await app.click('flag',{flag});assert.equal(app.document.querySelector('.question-body').scrollTop,420);
+    const current=app.html().slice(app.html().indexOf('class="mobile-question-bar"'),app.html().indexOf('<article class="question-card">'));
+    assert.match(current,new RegExp(`data-flag="${flag}"[^>]*aria-pressed="true"`));
+  }
+  await app.resize(false);assert(!app.html().includes('class="mobile-question-bar"'));assert.match(app.html(),/class="question-meta"/);assert.match(app.html(),/>Adaptada</);
+  assert(app.html().indexOf('data-action="flag"')>app.html().indexOf('class="question-body"'));
+  await app.resize(true);assert.equal((app.html().match(/data-action="flag"/g)||[]).length,2);assert(!app.html().includes('>Adaptada<'));
+  const correct=app.value('model.questions.find(q=>q.key===session.queue[0]).correctOption');await app.click('select',{option:correct});await app.click('answer');
+  assert.match(app.html(),/Adaptada de prova oficial/);assert.match(app.html(),/https:\/\/example.test\/final.pdf/);
+  await app.click('next');const next=app.html().slice(app.html().indexOf('class="mobile-question-bar"'),app.html().indexOf('<article class="question-card">'));
+  assert(!next.includes('IFSP-2025'));assert(!next.includes('badge origin'));assert(!next.includes('aria-pressed="true"'));assert.equal(app.document.querySelector('.question-body').scrollTop,0);
+});
+
 test('visitante mantém progresso na sessão e não recupera dados após nova instância',async()=>{
   const browser=new TemporaryStorage(),profile=new AccountStorage(browser,'111');
   await new Store(profile).add([{type:'flag',key:'bank:q',flag:'favorite',value:true}]);
