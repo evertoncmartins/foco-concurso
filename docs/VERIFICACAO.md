@@ -1,5 +1,11 @@
 # Relatório de verificação — 08/10/2026
 
+## Espaçamento superior no foco iOS — 1.8.1 (11/10/2026)
+
+A captura enviada mostra o contador e os controles superiores próximos à faixa do sistema. O foco Mobile recebe mais 12 px de respiro acima da barra no iOS, somados ao `safe-area-inset-top`. A correção altera somente o padding superior, dentro da consulta de largura de até 700 px e da detecção de suporte à extensão CSS do iOS `-webkit-touch-callout`. Não desativa os menus de seleção nem aplica filtros; a propriedade é usada somente na consulta de suporte. Android, desktop e rodapé mantêm suas regras anteriores. O cartão usa o espaço restante, sem deslocar ou sobrepor os controles inferiores.
+
+O teste estrutural verifica as duas restrições, o acréscimo exato de 12 px com diferentes áreas seguras e a ausência de mudanças de posição, altura ou filtro. A captura foi inspecionada, mas o resultado após a correção não foi testado em um iPhone físico. O controle de navegador exigido pelo ambiente Sites continua indisponível.
+
 ## Modo foco Mobile — 1.8.0 (11/10/2026)
 
 O botão de foco agora funciona no celular, solicita `requestFullscreen({navigationUI:'hide'})` quando suportado e mantém o layout de foco se o navegador recusar ou não oferecer a API. O documento raiz continua estável durante respostas e mudanças de questão. Girar o dispositivo não encerra o foco. O Mobile usa uma barra compacta com contador, tema e saída; cabeçalho, navegação e aviso amplo do visitante deixam de ocupar espaço. O aviso de progresso temporário permanece na barra. Pergunta, alternativas e comentários rolam internamente, enquanto ações e estatísticas permanecem no espaço reservado do rodapé, considerando as áreas seguras.
