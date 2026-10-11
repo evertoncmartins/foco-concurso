@@ -22,7 +22,7 @@ function server(){
     if(u.pathname==='/drive/v3/files'){
       if(failList)return json({},503);
       const space=u.searchParams.get('spaces'),q=u.searchParams.get('q');
-      const filtered=[...files.values()].filter(f=>space==='appDataFolder'?f.space===space&&f.owner===owner:f.space==='drive'&&q.includes(`'${f.parent}'`)&&(!q.includes('name contains')||q.includes('foco-progresso-')&&f.name.startsWith('foco-progresso-')));
+      const filtered=[...files.values()].filter(f=>!f.trashed&&(space==='appDataFolder'?f.space===space&&f.owner===owner:f.space==='drive'&&q.includes(`'${f.parent}'`)&&(!q.includes('name contains')||q.includes('foco-progresso-')&&f.name.startsWith('foco-progresso-'))));
       return json({files:filtered.map(f=>({id:f.id,name:f.name,size:JSON.stringify(f.document).length,mimeType:'application/json',modifiedTime:f.modifiedTime,ownedByMe:f.owner===owner}))});
     }
     if(u.pathname==='/upload/drive/v3/files'){
@@ -39,6 +39,20 @@ function server(){
       if(u.searchParams.get('alt')==='media'){const f=files.get(id);return f?json(f.document):json({},404);}
       if(id==='invalid')return json({id,mimeType:'text/plain',capabilities:{canAddChildren:false}});
       return json({id,name:'Minha pasta',mimeType:'application/vnd.google-apps.folder',capabilities:{canAddChildren:true}});
+    }
+    if(u.pathname.startsWith('/drive/v2/files/')){
+      const id=u.pathname.split('/').at(-1),file=files.get(id);if(!file)return json({},404);
+      const etag=`"${id}:${file.version||1}"`;
+      if((options.method||'GET')==='GET')return json({id,etag,title:file.name,fileSize:JSON.stringify(file.document).length,ownedByMe:file.owner===owner,parents:[{id:file.parent}],labels:{trashed:!!file.trashed}});
+      if(options.headers['If-Match']!==etag)return json({},412);
+      file.trashed=JSON.parse(options.body).labels.trashed;file.version=(file.version||1)+1;return json({id});
+    }
+    if(u.pathname.startsWith('/upload/drive/v2/files/')){
+      const id=u.pathname.split('/').at(-1),file=files.get(id);if(!file)return json({},404);
+      if(options.headers['If-Match']!==`"${id}:${file.version||1}"`)return json({},412);
+      const boundary=options.headers['Content-Type'].split('boundary=')[1];
+      const [meta,document]=options.body.split(`--${boundary}`).filter(x=>x.includes('Content-Type')).map(x=>JSON.parse(x.split('\r\n\r\n').slice(1).join('\r\n\r\n').trim()));
+      file.name=meta.title;file.document=document;file.version=(file.version||1)+1;return json({id});
     }
     return json({},404);
   };

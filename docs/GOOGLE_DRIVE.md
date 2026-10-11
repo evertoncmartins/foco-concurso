@@ -34,27 +34,23 @@ Se a autorização retornada no login incluir o acesso Drive já concedido, a re
 
 ## Durante o estudo
 
-Após conectar, o sistema localiza seus JSONs `foco-progresso-<sub>-*.json`, confirma a propriedade da conta e do conteúdo, carrega arquivos ainda não lidos, valida os eventos e une os históricos. Em seguida envia alterações locais. Se não houver arquivo, cria o primeiro automaticamente.
+Após conectar, o sistema localiza o arquivo `foco-progresso-<sub>-principal.json`, confirma a propriedade da conta e do conteúdo, valida os eventos e une os históricos remoto e local. Em seguida atualiza esse mesmo arquivo quando há alterações locais. Se não houver histórico, cria o principal automaticamente. A versão do arquivo fica em cache: se o conteúdo remoto não mudou e os eventos estão disponíveis localmente, o app evita baixar o JSON novamente.
 
 Cada mudança é salva localmente imediatamente. Com autorização ativa, o envio ao Drive ocorre após 6 segundos de inatividade; concluir uma sessão também dispara uma sincronização. O botão Sincronizar permite executar o processo manualmente. Ao voltar ao site ou recuperar a rede, a sincronização é tentada enquanto o token continua válido.
 
 Após recarregar/abrir o site, é necessário entrar com Google novamente. Tokens são temporários e mantidos só em memória, seguindo o modelo de tokens da Google Identity Services. Ao expirar, o site mostra “Reconectar Drive”; os dados locais continuam salvos. Não existe envio em segundo plano com o navegador fechado.
 
+## Arquivo único e migração (1.7.0)
+
+O principal contém o histórico completo de eventos, deduplicados por UUID. Na primeira conexão após a atualização, os lotes `foco-progresso-<sub>-*.json` das versões anteriores são lidos, validados e reunidos com o progresso local. Um dos arquivos existentes é atualizado e renomeado para principal, preservando seu ID. O app baixa e confere o conteúdo gravado antes de mover os demais arquivos incorporados para a lixeira. A limpeza é reversível e não esvazia a lixeira, nem afeta bancos JSON ou dados de outras contas. Uma migração interrompida pode ser retomada ao sincronizar novamente.
+
 ## Evitar perdas e sobrescritas
 
-Sem backend central, uma gravação de um único `progresso.json` poderia substituir respostas enviadas por outro computador. Para evitar isso, o Foco usa um diário composto por **lotes JSON imutáveis**. Um lote contém somente novos eventos e nunca reescreve outro lote. A união por ID produz o progresso consolidado de cada dispositivo.
+As gravações usam o ETag do recurso de arquivo da API Drive v2 em `If-Match`. Se outro dispositivo modifica o arquivo depois da leitura, o Drive recusa a gravação com 412. O Foco relê a versão atual, une os históricos e tenta novamente, com limite de seis tentativas por sincronização. A limpeza dos lotes também usa sua versão exata: um lote alterado precisa ser incorporado novamente antes de ir para a lixeira. A API v3 permanece responsável por listagem, criação e download. Não há novo banco de dados, escopo OAuth ou segredo de servidor.
 
-- Bancos, respostas, marcações e snapshots das sessões são eventos.
-- Dois dispositivos criam lotes diferentes; suas respostas são preservadas.
-- Um evento idêntico já existente não aumenta tentativas novamente.
-- Mesmo ID com conteúdos diferentes interrompe a união com mensagem explícita.
-- Antes do upload, o app solicita um ID de arquivo ao Drive e salva o lote pendente localmente. Uma repetição usa o mesmo ID. Em caso de HTTP 409, o app só aceita o arquivo após conferir conteúdo idêntico.
-- Se o upload falhar, o lote e o histórico continuam no dispositivo. O estado não exibe “sincronizado”.
-- Alterações recebidas durante um envio ficam para o lote seguinte.
-- Não remova os lotes do Drive; são o histórico permanente. A exportação gera um JSON consolidado para backup. Uma rotina automática de compactação exigiria coordenação adicional e não está incluída.
-- Evite responder à mesma sessão simultaneamente em dois dispositivos. Sessões independentes se unem normalmente; respostas diferentes com o mesmo ID de tentativa geram conflito detectado.
+Bancos, respostas, marcações e sessões continuam como eventos. Um evento idêntico já existente não aumenta tentativas novamente. Mesmo ID com conteúdos diferentes interrompe a união com mensagem explícita. Evite responder à mesma sessão simultaneamente em dois dispositivos; sessões independentes se unem normalmente. Alterações locais recebidas durante um envio são incluídas na próxima atualização do principal.
 
-O cache local guarda apenas IDs de eventos/arquivos confirmados e um lote pendente. Nunca guarda tokens. Falhas de leitura não são interpretadas como histórico vazio.
+O cache local guarda IDs de eventos/arquivos confirmados, ETags e, durante a primeira criação, um envio pendente com ID estável. Nunca guarda tokens. Falhas de leitura não são interpretadas como histórico vazio. Criações simultâneas em uma pasta vazia podem gerar dois principais temporariamente; a sincronização os reúne e mantém um único arquivo ativo. Clientes antigos ainda abertos podem gerar lotes, que a nova versão incorpora na próxima sincronização. Atualize todas as abas e dispositivos para utilizar o fluxo novo.
 
 ## Bancos diretamente do Drive
 
@@ -78,6 +74,8 @@ Em **Meus bancos → Buscar no Drive**, o app lista arquivos JSON da pasta, excl
 - [Google Identity Services — modelo de tokens](https://developers.google.com/identity/oauth2/web/guides/use-token-model)
 - [Drive API — upload multipart](https://developers.google.com/workspace/drive/api/guides/manage-uploads)
 - [Drive API — buscar arquivos](https://developers.google.com/workspace/drive/api/guides/search-files)
+- [Drive API v2 — ETag do arquivo](https://developers.google.com/workspace/drive/api/reference/rest/v2/files)
+- [Drive API v2 — atualização de conteúdo](https://developers.google.com/workspace/drive/api/reference/rest/v2/files/update)
 - [Drive API — configuração privada appDataFolder](https://developers.google.com/workspace/drive/api/guides/appdata)
 - [Drive API — generateIds](https://developers.google.com/workspace/drive/api/reference/rest/v3/files/generateIds)
 
