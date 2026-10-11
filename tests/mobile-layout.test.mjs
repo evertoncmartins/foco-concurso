@@ -39,6 +39,17 @@ test('foco Mobile remove elementos periféricos sem ocultar controles essenciais
   assert(!/\.session\.focus-mode \.(?:question-actions|session-summary-bar)\{[^}]*display:none/.test(mobile));
 });
 
+test('foco iOS acrescenta somente 12 px acima da barra, sem alterar desktop, Android ou o rodapé',()=>{
+  const override=css.match(/@supports \(-webkit-touch-callout:none\)\{\s*@media\(max-width:700px\)\{\s*\.session\.focus-mode \.focus-toolbar\{([^}]+)\}\s*\}\s*\}/);
+  assert(override,'the adjustment must stay inside the iOS feature and Mobile width guards');
+  assert.equal(override[1],'padding-top:calc(18px + env(safe-area-inset-top,0px))');
+  const mobile=mediaBlocks(css).find(b=>b.condition.trim()==='(max-width:700px)'&&b.body.includes('height:100dvh')).body;
+  assert.match(mobile,/\.session\.focus-mode \.focus-toolbar\{[^}]*padding:calc\(6px \+ env\(safe-area-inset-top,0px\)\)/);
+  // Inset stays additive in every orientation; controls keep their reserved space.
+  for(const inset of [0,20,59,62])assert.equal((18+inset)-(6+inset),12);
+  assert(!/position|transform|height|filter|question-actions|session-summary-bar/.test(override[1]));
+});
+
 test('configuração da Tela de Início tem ícones locais válidos sem interceptar login ou prometer uso offline',async()=>{
   const manifest=JSON.parse(await readFile(new URL('../public/manifest.webmanifest',import.meta.url),'utf8'));
   assert.equal(manifest.display,'standalone');assert.equal(manifest.start_url,'./');assert.equal(manifest.scope,'./');
