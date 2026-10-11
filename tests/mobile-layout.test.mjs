@@ -28,3 +28,24 @@ test('rodapé Mobile reserva espaço no viewport, considera safe area e deixa so
   assert(!/(?:^|\})\s*(?:html|body|#app)\s*\{/.test(dock.body),'do not lock other pages');
   assert(!blocks.filter(b=>b.condition.includes('min-width:701px')).some(b=>b.body.includes('safe-area-inset-bottom,0px')),'mobile docking must not change desktop rules');
 });
+
+test('foco Mobile remove elementos periféricos sem ocultar controles essenciais e respeita a safe area superior',()=>{
+  const mobile=mediaBlocks(css).find(b=>b.condition.trim()==='(max-width:700px)'&&b.body.includes('height:100dvh')).body;
+  assert.match(mobile,/\.topbar \.focus-toggle\{display:inline-flex/);
+  assert.match(mobile,/\.session\.focus-mode \.topbar,\.session\.focus-mode \.session-header,\.session\.focus-mode \.guest-banner\{display:none/);
+  assert.match(mobile,/\.session\.focus-mode \.focus-toolbar\{display:flex[^}]*safe-area-inset-top/);
+  assert.match(mobile,/\.focus-mode \.focus-mobile-progress\{display:inline/);
+  assert.match(mobile,/\.session\.focus-mode \.question-statement\{font-size:19px/);
+  assert(!/\.session\.focus-mode \.(?:question-actions|session-summary-bar)\{[^}]*display:none/.test(mobile));
+});
+
+test('configuração da Tela de Início tem ícones locais válidos sem interceptar login ou prometer uso offline',async()=>{
+  const manifest=JSON.parse(await readFile(new URL('../public/manifest.webmanifest',import.meta.url),'utf8'));
+  assert.equal(manifest.display,'standalone');assert.equal(manifest.start_url,'./');assert.equal(manifest.scope,'./');
+  const html=await readFile(new URL('../public/index.html',import.meta.url),'utf8');
+  assert.match(html,/rel="manifest" href="\.\/manifest.webmanifest"/);assert.match(html,/name="apple-mobile-web-app-capable" content="yes"/);
+  for(const icon of manifest.icons){
+    const png=await readFile(new URL(`../public/${icon.src}`,import.meta.url));assert.equal(png.subarray(1,4).toString(),'PNG');const [width,height]=icon.sizes.split('x').map(Number);assert.equal(png.readUInt32BE(16),width);assert.equal(png.readUInt32BE(20),height);
+  }
+  assert(!html.includes('serviceWorker'));
+});

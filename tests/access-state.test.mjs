@@ -24,7 +24,7 @@ function runtime(options={}){
   let googleReady=options.googleReady??true,authorizations=0,preparations=0,restores=0,renders=0;
   function element(classes=''){
     const names=new Set(classes.split(/\s+/).filter(Boolean)),attributes=new Map();
-    return {innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){},close(){this.open=false;},querySelector(){return null;},scrollIntoView(){}};
+    return {innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){},showModal(){this.open=true;},close(){this.open=false;},querySelector(){return null;},scrollIntoView(){}};
   }
   const node=selector=>{
     if(!nodes.has(selector)){
@@ -51,10 +51,11 @@ function runtime(options={}){
     if(['#app','#toast','#dialog','#main','#bank-file','#progress-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
     return null;
   },async emit(name,event){for(const fn of listeners[name]??[])await fn(event);}};
-  document.documentElement.requestFullscreen=async()=>{document.fullscreenElement=document.documentElement;await document.emit('fullscreenchange',{});};
+  document.documentElement.requestFullscreen=async requestOptions=>{document.requestOptions=requestOptions;document.fullscreenElement=document.documentElement;await document.emit('fullscreenchange',{});};
+  if(options.fullscreenUnavailable)delete document.documentElement.requestFullscreen;
   document.exitFullscreen=async()=>{document.fullscreenElement=null;await document.emit('fullscreenchange',{});};
   const media=new Map();
-  const matchMedia=query=>{if(!media.has(query))media.set(query,{matches:query.includes('701')&&!options.mobile,addEventListener(){}});return media.get(query);};
+  const matchMedia=query=>{if(!media.has(query))media.set(query,{matches:query.includes('701')&&!options.mobile||query==='(display-mode: standalone)'&&!!options.standalone,addEventListener(){}});return media.get(query);};
   const profile={sub:'111',name:'Estudante',email:'test@example.test'};
   const auth={profile,token:'fixture',expires:Date.now()+3600000,generation:0,canAppData:options.canAppData??true,canDrive:options.canDrive??true,clientId:'test.apps.googleusercontent.com',prepareAuthorization(){preparations++;},signOut(){this.profile=null;this.token=null;},async authorize(){authorizations++;if(options.authorizationError)throw options.authorizationError;this.profile=profile;this.token='fixture';this.canAppData=true;this.canDrive=true;return authorization();}};
   auth.prepareRedirect=async()=>{if(options.statusWait)await options.statusWait.promise;auth.redirectEnabled=options.redirectEnabled===true;return auth.redirectEnabled;};
@@ -90,6 +91,34 @@ async function studyRuntime(options={},mode='smart'){
 }
 const cutRow=(app,option)=>app.document.querySelector(`[data-option-row="${option}"]`);
 const cutControl=(app,option)=>cutRow(app,option).querySelector('.option-cut');
+
+test('foco Mobile mantém seleção, cortes e rolagem, pede tela cheia e funciona até concluir',async()=>{
+  const app=await studyRuntime({mobile:true});await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});app.document.querySelector('.question-body').scrollTop=400;
+  const before=app.value('JSON.stringify(store.events)');await app.click('toggle-focus');
+  assert(app.value('focusMode.active'));assert.deepEqual(app.document.requestOptions,{navigationUI:'hide'});assert.equal(app.value('selected'),'B');assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.document.querySelector('.question-body').scrollTop,400);assert.equal(app.value('JSON.stringify(store.events)'),before);
+  assert.match(app.html(),/class="focus-mobile-progress">Questão 1 de 3/);assert.match(app.html(),/Visitante · progresso temporário/);
+  await app.click('toggle-theme');assert.equal(app.document.querySelector('.question-body').scrollTop,400);assert.equal(app.value('selected'),'B');
+  await app.click('answer');await app.click('next');assert(app.value('focusMode.active'));assert.equal(app.document.fullscreenElement,app.document.documentElement);assert.equal(app.document.querySelector('.question-body').scrollTop,0);assert.match(app.html(),/>Questão 2 de 3</);
+  await app.click('skip');await app.click('select',{option:'A'});await app.click('answer');await app.click('next');
+  assert.equal(app.value('view'),'result');assert.equal(app.value('focusMode.active'),false);assert.equal(app.document.fullscreenElement,null);
+});
+
+test('Mobile sem Fullscreen API entra no foco; app instalado não exibe aviso de indisponibilidade',async()=>{
+  for(const standalone of [false,true]){
+    const app=await studyRuntime({mobile:true,fullscreenUnavailable:true,standalone});await app.click('toggle-focus');assert(app.value('focusMode.active'));assert.equal(app.document.fullscreenElement,null);
+    assert.equal(app.html().includes('data-action="fullscreen-help"'),!standalone);
+    await app.click('exit-focus');assert.equal(app.value('focusMode.active'),false);assert.equal(app.value('session.index'),0);
+  }
+});
+
+test('ajuda de tela cheia abre e fecha sem responder, sair do foco ou perder a leitura',async()=>{
+  const app=await studyRuntime({mobile:true,fullscreenUnavailable:true});await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});await app.click('toggle-focus');
+  app.document.querySelector('.question-body').scrollTop=250;const before=app.value('JSON.stringify(store.events)');
+  await app.key('Enter','fullscreen-help');assert.equal(app.value('JSON.stringify(store.events)'),before);
+  await app.click('fullscreen-help');const dialog=app.document.querySelector('#dialog');assert.equal(dialog.open,true);assert.match(dialog.innerHTML,/Adicionar à Tela de Início/);assert.match(dialog.innerHTML,/Abrir como App da Web/);assert.match(dialog.innerHTML,/não há modo offline/);
+  await app.key('Escape','close-dialog');assert(app.value('focusMode.active'));await app.key('Enter','answer');assert.equal(app.value('JSON.stringify(store.events)'),before);
+  await app.click('close-dialog');assert.equal(dialog.open,false);assert(app.value('focusMode.active'));assert.equal(app.value('selected'),'B');assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.document.querySelector('.question-body').scrollTop,250);assert.equal(app.value('session.index'),0);assert.equal(app.value('JSON.stringify(store.events)'),before);
+});
 
 test('Mobile preserva leitura ao selecionar, favoritar e alternar tema, com controles fora da área rolável',async()=>{
   const app=await studyRuntime({mobile:true});

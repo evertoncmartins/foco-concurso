@@ -1,6 +1,11 @@
 /* Desktop navigation and a quiet fullscreen question workspace. */
 .topbar-heading{display:flex;align-items:center;gap:14px;min-width:0}
 .focus-toolbar{display:none}
+.focus-install,.focus-mobile-progress,.focus-guest-label,.focus-exit-mobile{display:none}
+.fullscreen-help{font-size:13px}
+.fullscreen-help h3{margin-top:20px;font-size:14px}
+.fullscreen-help ol{padding-left:20px;margin-block:12px 18px}
+.fullscreen-help li{margin-block:8px}
 /* Separate native controls keep crossing out independent from answering. */
 .option{gap:8px;cursor:pointer}
 .option.answered{cursor:default}
@@ -101,20 +106,44 @@
   .topbar-heading .top-label{display:none}
 }
 @media(max-width:700px){
-  .topbar-heading,.sidebar-toggle,.topbar .focus-toggle{display:none}
+  .topbar-heading,.sidebar-toggle{display:none}
+  .topbar .focus-toggle{display:inline-flex;color:var(--accent)}
   /* Reserve the footer in the viewport layout: it never overlays the scroller. */
   .shell.session{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,0px)}
   .session .workspace{display:flex;flex:1;flex-direction:column;min-height:0}
-  .session .topbar{position:relative;flex-shrink:0}
-  .session .content{display:flex;flex:1;flex-direction:column;min-height:0;width:100%;max-width:none;margin:0;padding:18px max(13px,env(safe-area-inset-right,0px)) 0 max(13px,env(safe-area-inset-left,0px))}
+  .session .topbar{position:relative;flex-shrink:0;height:calc(56px + env(safe-area-inset-top,0px))}
+  .session .content{display:flex;flex:1;flex-direction:column;min-height:0;width:100%;max-width:none;margin:0;padding:10px max(13px,env(safe-area-inset-right,0px)) 0 max(13px,env(safe-area-inset-left,0px))}
   .session .guest-banner{flex-shrink:0}
   .session .session-container{display:flex;flex:1;flex-direction:column;min-height:0;width:100%}
   .session .session-header,.session .session-progress{flex-shrink:0}
-  .session .question-card{display:flex;flex:1;flex-direction:column;min-height:0;overflow:hidden}
+  .session .session-header{margin-bottom:8px}
+  .session .session-progress{margin-bottom:10px}
+  .session .question-card{display:flex;flex:1;flex-direction:column;min-height:0;overflow:hidden;padding:14px}
   .session .question-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:3px 4px 20px;margin-inline:-4px;scroll-padding-block:8px 20px}
   .session .question-body:focus-visible{outline:2px solid var(--detail-blue);outline-offset:-2px;border-radius:6px}
-  .session .question-actions{flex-shrink:0;flex-wrap:wrap;background:var(--surface)}
-  .session .session-summary-bar{flex-shrink:0;flex-wrap:wrap;row-gap:4px;background:var(--bg)}
+  .session .question-meta{margin-block:10px 14px}
+  .session .question-actions{flex-shrink:0;flex-wrap:wrap;background:var(--surface);margin-top:12px;padding-top:12px}
+  .session .session-summary-bar{flex-shrink:0;flex-wrap:wrap;row-gap:4px;background:var(--bg);margin-block:12px}
+  .session.focus-mode .topbar,.session.focus-mode .session-header,.session.focus-mode .guest-banner{display:none}
+  .session.focus-mode .focus-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;padding:calc(6px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 6px max(12px,env(safe-area-inset-left,0px));background:var(--bg)}
+  .focus-mode .focus-caption{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:11px;color:var(--muted);min-width:0}
+  .focus-mode .focus-desktop-label,.focus-mode .focus-escape{display:none}
+  .focus-mode .focus-exit-desktop{display:none}
+  .focus-mode .focus-exit-mobile{display:inline}
+  .focus-mode .focus-mobile-progress{display:inline;font-weight:550;color:var(--text)}
+  .focus-mode .focus-guest-label{display:block;flex-basis:100%;font-size:9px;line-height:1.3}
+  .focus-mode .focus-toolbar>.flex{gap:6px;flex-shrink:0}
+  .focus-mode .focus-toolbar .icon-btn{width:40px;height:40px}
+  .focus-mode .focus-install{display:inline-flex}
+  .focus-mode .focus-toolbar [data-action=exit-focus]{min-height:40px}
+  .session.focus-mode .content{padding-top:0;padding-inline:max(10px,env(safe-area-inset-left,0px)) max(10px,env(safe-area-inset-right,0px))}
+  .session.focus-mode .session-progress{margin-bottom:6px}
+  .session.focus-mode .question-card{padding:12px;border-radius:10px}
+  .session.focus-mode .question-statement{font-size:19px;line-height:1.6;margin-bottom:18px}
+  .session.focus-mode .option{font-size:14px;min-height:58px;padding:12px}
+  .session.focus-mode .question-actions{margin-top:8px;padding-top:10px}
+  .session.focus-mode .session-summary-bar{margin-block:8px}
+  #app:has(.session.focus-mode)~#toast{bottom:calc(120px + env(safe-area-inset-bottom,0px));max-width:calc(100vw - 32px);min-width:0;font-size:11px;padding:10px 14px}
 }
 @media(max-width:700px) and (max-height:460px){
   .session .topbar{height:calc(52px + env(safe-area-inset-top,0px))}
