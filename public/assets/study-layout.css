@@ -1,6 +1,25 @@
 /* Desktop navigation and a quiet fullscreen question workspace. */
 .topbar-heading{display:flex;align-items:center;gap:14px;min-width:0}
 .focus-toolbar{display:none}
+/* Separate native controls keep crossing out independent from answering. */
+.option{gap:8px;cursor:pointer}
+.option.answered{cursor:default}
+.option-select{display:flex;flex:1;align-self:stretch;align-items:center;gap:15px;min-width:0;padding:0;border:0;background:transparent;color:inherit;text-align:left;line-height:inherit;border-radius:4px}
+.option-text{min-width:0;overflow-wrap:anywhere}
+.option-cut{display:grid;place-items:center;flex-shrink:0;align-self:center;width:32px;height:32px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--muted);line-height:1}
+.option-cut:hover,.option-cut:focus-visible{background:var(--surface2);color:var(--text)}
+.option.eliminated .option-text{text-decoration:line-through;text-decoration-thickness:1px;opacity:.5}
+.option.eliminated .option-letter{opacity:.5}
+.option.eliminated:not(.answered){border-color:var(--border);background:var(--surface)}
+.option.eliminated .option-cut{color:var(--muted)}
+@media(max-width:700px),(pointer:coarse){
+  .option-cut{width:44px;height:44px}
+}
+@media(max-width:700px){
+  .option{gap:6px}
+  .option-cut{align-self:flex-start;margin-block:-8px}
+  .option-select{align-items:flex-start;gap:8px}
+}
 @media(min-width:701px){
   /* Size the regular question workspace to the browser's usable viewport. */
   .shell.session:not(.focus-mode){height:100dvh;min-height:0}
@@ -19,7 +38,7 @@
   .session:not(.focus-mode) .question-statement{font-size:clamp(18px,1.35vw,24px);line-height:1.45;margin-bottom:16px;overflow-wrap:anywhere}
   .session:not(.focus-mode) .options{gap:8px}
   .session:not(.focus-mode) .option{min-height:48px;padding:10px 14px;font-size:14px;line-height:1.45}
-  .session:not(.focus-mode) .option>span:nth-child(2){min-width:0;overflow-wrap:anywhere}
+  .session:not(.focus-mode) .option-text{min-width:0;overflow-wrap:anywhere}
   .session:not(.focus-mode) .question-actions{flex-shrink:0;flex-wrap:wrap;margin-top:12px;padding-top:12px}
   .session:not(.focus-mode) .feedback{padding:16px;margin-top:16px}
   .session:not(.focus-mode) .session-summary-bar{flex-shrink:0;flex-wrap:wrap;gap:8px 20px;margin:10px 0 0}
@@ -52,7 +71,7 @@
   .focus-mode .question-statement{max-width:85ch;font-size:clamp(21px,1.5vw,32px);line-height:1.6;margin-bottom:clamp(20px,2.8dvh,36px);overflow-wrap:anywhere}
   .focus-mode .options{flex:1;grid-auto-rows:minmax(min-content,1fr);gap:clamp(10px,1.2dvh,18px)}
   .focus-mode .option{min-height:clamp(58px,6.5dvh,96px);padding:clamp(12px,1.4dvh,24px) clamp(16px,1.5vw,32px);font-size:clamp(14px,calc(.8vw + 2px),20px)}
-  .focus-mode .option>span:nth-child(2){min-width:0;overflow-wrap:anywhere}
+  .focus-mode .option-text{min-width:0;overflow-wrap:anywhere}
   .focus-mode .option-letter{width:clamp(29px,2vw,38px);height:clamp(29px,2vw,38px);font-size:clamp(11px,.7vw,14px)}
   .focus-mode .question-actions{margin-top:clamp(20px,2.5dvh,32px);padding-top:clamp(18px,2dvh,28px);flex-wrap:wrap}
   .focus-mode .session-summary-bar{flex-shrink:0;flex-wrap:wrap;font-size:clamp(11px,.7vw,14px);margin:clamp(14px,1.8dvh,24px) 0 0}

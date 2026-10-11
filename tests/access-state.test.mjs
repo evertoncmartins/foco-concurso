@@ -21,29 +21,40 @@ async function tick(){await new Promise(resolve=>setImmediate(resolve));}
 // This checks state/ordering, not visual rendering or actual Google consent.
 function runtime(options={}){
   const browserStorage=new TemporaryStorage(),nodes=new Map(),listeners={};
-  let googleReady=options.googleReady??true,authorizations=0,preparations=0,restores=0;
+  let googleReady=options.googleReady??true,authorizations=0,preparations=0,restores=0,renders=0;
+  function element(classes=''){
+    const names=new Set(classes.split(/\s+/).filter(Boolean)),attributes=new Map();
+    return {innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){},close(){this.open=false;},querySelector(){return null;},scrollIntoView(){}};
+  }
   const node=selector=>{
     if(!nodes.has(selector)){
-      const element={innerHTML:'',textContent:'',content:'',open:false,classList:{add(){},remove(){}},focus(){},close(){this.open=false;},querySelector(){return null;},scrollIntoView(){}};
+      const el=element();
       if(selector==='#app'){
-        let html='';Object.defineProperty(element,'innerHTML',{get:()=>html,set:value=>{
-          html=value;const question=html.match(/class="question-body" data-question="([^"]+)"/);
+        let html='';Object.defineProperty(el,'innerHTML',{get:()=>html,set:value=>{
+          html=value;renders++;const question=html.match(/class="question-body" data-question="([^"]+)"/);
           if(question)nodes.set('.question-body',{dataset:{question:question[1]},scrollTop:0});else nodes.delete('.question-body');
+          for(const key of nodes.keys())if(key.startsWith('[data-option-row='))nodes.delete(key);
+          for(const [,classes,id,content] of html.matchAll(/<div class="(option [^"]*)" data-option-row="([^"]+)"[^>]*>([\s\S]*?)<\/div>/g)){
+            const row=element(classes),control=element('option-cut'),tag=content.match(/<button[^>]*class="option-cut"[^>]*>/)?.[0]||'';
+            for(const [,name,value] of tag.matchAll(/(aria-pressed|aria-label|title)="([^"]*)"/g))control.setAttribute(name,value);
+            row.querySelector=selector=>selector==='.option-cut'?control:null;
+            nodes.set(`[data-option-row="${id}"]`,row);
+          }
         }});
       }
-      nodes.set(selector,element);
+      nodes.set(selector,el);
     }
     return nodes.get(selector);
   };
   const document={documentElement:{dataset:{theme:'light'}},fullscreenElement:null,addEventListener(name,fn){(listeners[name]??=[]).push(fn);},querySelector(selector){
-    if(selector==='.question-body')return nodes.get(selector)||null;
+    if(selector==='.question-body'||selector.startsWith('[data-option-row='))return nodes.get(selector)||null;
     if(['#app','#toast','#dialog','#main','#bank-file','#progress-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
     return null;
   },async emit(name,event){for(const fn of listeners[name]??[])await fn(event);}};
   document.documentElement.requestFullscreen=async()=>{document.fullscreenElement=document.documentElement;await document.emit('fullscreenchange',{});};
   document.exitFullscreen=async()=>{document.fullscreenElement=null;await document.emit('fullscreenchange',{});};
   const media=new Map();
-  const matchMedia=query=>{if(!media.has(query))media.set(query,{matches:query.includes('701'),addEventListener(){}});return media.get(query);};
+  const matchMedia=query=>{if(!media.has(query))media.set(query,{matches:query.includes('701')&&!options.mobile,addEventListener(){}});return media.get(query);};
   const profile={sub:'111',name:'Estudante',email:'test@example.test'};
   const auth={profile,token:'fixture',expires:Date.now()+3600000,generation:0,canAppData:options.canAppData??true,canDrive:options.canDrive??true,clientId:'test.apps.googleusercontent.com',prepareAuthorization(){preparations++;},signOut(){this.profile=null;this.token=null;},async authorize(){authorizations++;if(options.authorizationError)throw options.authorizationError;this.profile=profile;this.token='fixture';this.canAppData=true;this.canDrive=true;return authorization();}};
   auth.prepareRedirect=async()=>{if(options.statusWait)await options.statusWait.promise;auth.redirectEnabled=options.redirectEnabled===true;return auth.redirectEnabled;};
@@ -69,8 +80,80 @@ function runtime(options={}){
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
   const target=dataset=>({dataset,disabled:false,closest(){return this;},matches(){return false;}});
-  return {auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),start:()=>value('openAccount(authorization())')};
+  return {auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
 }
+
+async function studyRuntime(options={},mode='smart'){
+  const app=runtime(options);app.auth.signOut();await app.click('guest');
+  await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');navigate('session');})()`);
+  return app;
+}
+const cutRow=(app,option)=>app.document.querySelector(`[data-option-row="${option}"]`);
+const cutControl=(app,option)=>cutRow(app,option).querySelector('.option-cut');
+
+test('tesoura alterna instantaneamente sem selecionar, responder, gravar ou refazer a página',async()=>{
+  const app=await studyRuntime(),before=app.value('JSON.stringify(store.events)'),renders=app.renders,question=app.document.querySelector('.question-body');
+  question.scrollTop=180;
+  assert.match(app.html(),/id="option-letter-A">A<\/span><button type="button" class="option-cut"[\s\S]*?<\/button><button type="button" class="option-select"[\s\S]*?id="option-text-A"/);
+  const optionMarkup=app.html().match(/<div class="options"[\s\S]*?<\/div><\/div>/)?.[0];
+  assert(optionMarkup);let buttonDepth=0;
+  for(const tag of optionMarkup.match(/<\/?button\b[^>]*>/g)||[]){if(tag.startsWith('</'))buttonDepth--;else{assert.equal(buttonDepth,0,'native buttons must be siblings');buttonDepth++;}}
+  assert.equal(buttonDepth,0);
+  for(const cut of [true,false,true]){
+    await app.click('toggle-cut',{option:'A'});
+    assert.equal(cutRow(app,'A').classList.contains('eliminated'),cut);
+    assert.equal(cutControl(app,'A').getAttribute('aria-pressed'),String(cut));
+    assert.equal(cutControl(app,'A').getAttribute('aria-label'),`${cut?'Restaurar':'Riscar'} alternativa A`);
+    assert.equal(app.value('selected'),null);assert.equal(app.value('JSON.stringify(session.answers)'),'{}');
+    assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.renders,renders);
+    assert.equal(app.document.querySelector('.question-body'),question);assert.equal(question.scrollTop,180);
+  }
+  assert.equal(app.value('model.stats.attempts'),0);
+});
+
+test('cortar mantém a seleção existente e a correção original; restaurar permite selecionar normalmente',async()=>{
+  const app=await studyRuntime(),correct=app.value('model.questions[0].correctOption'),wrong=app.value('model.questions[0].options.find(o=>o.id!==model.questions[0].correctOption).id');
+  await app.click('select',{option:wrong});await app.click('toggle-cut',{option:wrong});
+  assert.equal(app.value('selected'),wrong);assert.equal(app.value('model.stats.attempts'),0);
+  await app.click('toggle-cut',{option:wrong});await app.click('toggle-cut',{option:correct});await app.click('toggle-cut',{option:correct});
+  await app.click('select',{option:correct});await app.click('answer');
+  assert.equal(app.value('session.answers[session.queue[0]]'),correct);assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('model.stats.accuracy'),100);
+  assert(cutRow(app,correct).classList.contains('correct'));
+  const before=app.value('JSON.stringify(store.events)');
+  await app.click('toggle-cut',{option:correct});await app.click('toggle-cut',{option:correct});await app.click('select',{option:wrong});
+  assert.equal(app.value('session.answers[session.queue[0]]'),correct);assert.equal(app.value('selected'),correct);assert.equal(app.value('JSON.stringify(store.events)'),before);
+});
+
+test('cortes acompanham tema, foco e pausa da mesma questão e reiniciam ao avançar ou iniciar sessão',async()=>{
+  const app=await studyRuntime();await app.click('toggle-cut',{option:'A'});await app.click('toggle-cut',{option:'B'});
+  await app.click('toggle-theme');assert(cutRow(app,'A').classList.contains('eliminated'));assert(cutRow(app,'B').classList.contains('eliminated'));
+  await app.click('toggle-focus');assert.match(app.html(),/focus-mode/);assert(cutRow(app,'A').classList.contains('eliminated'));
+  await app.click('pause');await app.click('resume');assert(cutRow(app,'A').classList.contains('eliminated'));
+  await app.click('skip');assert(!cutRow(app,'A').classList.contains('eliminated'));assert(!cutRow(app,'B').classList.contains('eliminated'));
+  await app.click('toggle-cut',{option:'A'});await app.click('select',{option:'B'});await app.click('answer');await app.click('next');assert(!cutRow(app,'A').classList.contains('eliminated'));
+  await app.click('toggle-cut',{option:'A'});await app.value(`(async()=>{await newSession([model.questions[0].key]);navigate('session');})()`);assert(!cutRow(app,'A').classList.contains('eliminated'));
+});
+
+test('Enter na tesoura não confirma nem avança; atalhos de resposta continuam funcionando',async()=>{
+  const app=await studyRuntime();await app.key('B','select');assert.equal(app.value('selected'),'B');
+  const before=app.value('JSON.stringify(store.events)');
+  await app.key('Enter','toggle-cut',{option:'A'});assert.equal(app.value('JSON.stringify(store.events)'),before);
+  // Browsers dispatch the native button click after Enter or Space.
+  await app.click('toggle-cut',{option:'A'});assert(cutRow(app,'A').classList.contains('eliminated'));
+  await app.key('Enter','answer');assert.equal(app.value('model.stats.attempts'),1);
+  await app.key('Enter','toggle-cut',{option:'A'});assert.equal(app.value('session.index'),0);
+  await app.click('toggle-cut',{option:'A'});assert(!cutRow(app,'A').classList.contains('eliminated'));
+});
+
+test('tesoura funciona no mobile e no simulado sem emitir respostas antes da conclusão',async()=>{
+  const app=await studyRuntime({mobile:true},'exam');assert.equal(app.value('desktopLayout.matches'),false);
+  const before=app.value('JSON.stringify(store.events)');await app.click('toggle-cut',{option:'A'});await app.click('toggle-cut',{option:'C'});
+  assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.value('selected'),null);
+  await app.click('select',{option:'B'});assert(cutRow(app,'A').classList.contains('eliminated'));await app.click('answer');
+  assert.equal(app.value('model.stats.attempts'),0);assert.equal(app.value('session.answers[session.queue[0]]'),'B');assert(!app.html().includes('Alternativa correta:'));
+  await app.click('toggle-cut',{option:'A'});assert(!cutRow(app,'A').classList.contains('eliminated'));
+  await app.click('logout');assert.equal(app.value('cutOptions.size'),0);await app.click('guest');await app.value(`(async()=>{await newSession([model.questions[0].key]);navigate('session');})()`);assert(!cutRow(app,'C').classList.contains('eliminated'));
+});
 
 test('retorno Google recupera autorização e mantém bloqueio até restaurar a pasta escolhida',async()=>{
   const historyWait=deferred(),app=runtime({init:true,notice:'success',redirectEnabled:true,googleReady:false,pendingFolderId:'chosen-folder',historyWait});app.auth.signOut();
