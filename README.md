@@ -15,6 +15,7 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 - Entrada compacta e início com ação principal de estudo, meta diária, atalhos e bancos; layout dedicado ao celular.
 - Importação e exportação de bancos JSON; ativação, desativação e remoção.
 - Sessões recomendadas, aleatórias, não respondidas, erros, favoritas, revisão, filtros por assunto e simulados.
+- Tesoura discreta após cada letra para riscar/restaurar alternativas, no desktop e no celular. Marcação somente visual e temporária, preservada ao trocar tema ou modo foco, sem selecionar, responder ou sincronizar progresso; reinicia ao mudar de questão ou sessão.
 - Feedback com resposta selecionada, alternativa correta, comentário e referência.
 - Favoritos, revisão espaçada, estatísticas por disciplina/assunto/tópico e histórico.
 - Sessões pausáveis e retomadas após recarregar a página.
