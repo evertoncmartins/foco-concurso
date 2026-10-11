@@ -1,8 +1,8 @@
 // Keep fullscreen on a stable element: the application redraws each answer.
 export class FocusMode {
-  constructor({document,desktop,onChange=()=>{},onUnavailable=()=>{}}) {
+  constructor({document,standalone=()=>false,onChange=()=>{},onUnavailable=()=>{}}) {
     this.document=document;
-    this.desktop=desktop;
+    this.standalone=standalone;
     this.onChange=onChange;
     this.onUnavailable=onUnavailable;
     this.active=false;
@@ -15,19 +15,18 @@ export class FocusMode {
         this.active=false;this.ownsFullscreen=false;this.revision++;this.onChange();
       }
     });
-    desktop.addEventListener('change',()=>{if(!desktop.matches)this.exit();});
   }
   async enter() {
-    if(this.active||this.pending||!this.desktop.matches)return;
+    if(this.active||this.pending)return;
     const revision=++this.revision;
     this.active=true;
     this.onChange();
-    if(this.document.fullscreenElement)return;
+    if(this.document.fullscreenElement||this.standalone())return;
     const root=this.document.documentElement;
     if(!root.requestFullscreen){this.onUnavailable();return;}
     this.pending=true;
     try {
-      await root.requestFullscreen();
+      await root.requestFullscreen({navigationUI:'hide'});
       if(revision!==this.revision||!this.active){
         // The user can leave or finish a session while the browser is entering.
         if(this.document.fullscreenElement===root)await this.document.exitFullscreen();

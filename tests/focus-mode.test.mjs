@@ -10,18 +10,19 @@ class BrowserDocument extends EventTarget {
   fullscreenElement=null;
   requests=0;
   exits=0;
-  documentElement={requestFullscreen:async()=>{
+  documentElement={requestFullscreen:async options=>{
     this.requests++;
+    this.requestOptions=options;
     this.fullscreenElement=this.documentElement;
     this.dispatchEvent(new Event('fullscreenchange'));
   }};
   async exitFullscreen(){this.exits++;this.leaveFullscreen();}
   leaveFullscreen(){this.fullscreenElement=null;this.dispatchEvent(new Event('fullscreenchange'));}
 }
-function setup(){
+function setup({standalone=false}={}){
   const document=new BrowserDocument(),desktop=new Desktop(),states=[];
   let unavailable=0;
-  const focus=new FocusMode({document,desktop,onChange:()=>states.push(focus.active),onUnavailable:()=>unavailable++});
+  const focus=new FocusMode({document,standalone:()=>standalone,onChange:()=>states.push(focus.active),onUnavailable:()=>unavailable++});
   return {focus,document,desktop,states,get unavailable(){return unavailable;}};
 }
 
@@ -72,18 +73,30 @@ test('navegador sem API de tela cheia continua com modo foco funcional',async()=
   assert(!focus.active);
 });
 
-test('não ativa no celular; mudança de largura encerra foco e tela cheia',async()=>{
+test('ativa no celular e mantém foco ao girar o dispositivo ou mudar a largura',async()=>{
   const {focus,document,desktop}=setup();
   desktop.resize(false);
   await focus.enter();
-  assert(!focus.active);
-  assert.equal(document.requests,0);
+  assert(focus.active);
+  assert.equal(document.requests,1);
+  assert.deepEqual(document.requestOptions,{navigationUI:'hide'});
   desktop.resize(true);
   await focus.enter();
   desktop.resize(false);
+  assert(focus.active);
+  assert.equal(document.fullscreenElement,document.documentElement);
+  assert.equal(document.exits,0);
+  await focus.exit();
   assert(!focus.active);
   assert.equal(document.fullscreenElement,null);
   assert.equal(document.exits,1);
+});
+
+test('app da Tela de Início entra no foco sem pedir tela cheia nem mostrar erro',async()=>{
+  const result=setup({standalone:true}),{focus,document}=result;
+  delete document.documentElement.requestFullscreen;
+  await focus.enter();assert(focus.active);assert.equal(document.requests,0);assert.equal(result.unavailable,0);
+  await focus.exit();assert(!focus.active);assert.equal(document.exits,0);
 });
 
 test('pausar antes de concluir entrada assíncrona não deixa tela cheia órfã',async()=>{

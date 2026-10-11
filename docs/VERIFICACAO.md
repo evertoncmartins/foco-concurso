@@ -1,5 +1,13 @@
 # Relatório de verificação — 08/10/2026
 
+## Modo foco Mobile — 1.8.0 (11/10/2026)
+
+O botão de foco agora funciona no celular, solicita `requestFullscreen({navigationUI:'hide'})` quando suportado e mantém o layout de foco se o navegador recusar ou não oferecer a API. O documento raiz continua estável durante respostas e mudanças de questão. Girar o dispositivo não encerra o foco. O Mobile usa uma barra compacta com contador, tema e saída; cabeçalho, navegação e aviso amplo do visitante deixam de ocupar espaço. O aviso de progresso temporário permanece na barra. Pergunta, alternativas e comentários rolam internamente, enquanto ações e estatísticas permanecem no espaço reservado do rodapé, considerando as áreas seguras.
+
+Foram aprovados 38 testes direcionados dos manipuladores reais, controlador de tela cheia e estrutura CSS. Incluem entrada/saída em Mobile, opção de ocultar navegação, seleção e cortes preservados, posição de leitura, troca de tema, avanço/conclusão, indisponibilidade da API, app em modo standalone e ajuda que não responde nem altera o progresso. Os ícones PNG foram conferidos quanto a assinatura e dimensões, e o ícone de 192 px foi inspecionado visualmente.
+
+O manifesto e metadados permitem abrir pela Tela de Início em modo independente. A ajuda orienta iPhone/iPad e Android; não há service worker nem modo offline. A Apple documenta a opção Abrir como App da Web; no iPhone, a tela cheia de páginas no Safari continua dependendo do suporte do navegador. Não foram executados toque, instalação, ocultação real das barras ou login no app da Tela de Início em aparelho físico. O controle de navegador exigido pelo ambiente Sites está indisponível; os testes simulados não medem o layout renderizado.
+
 ## Arquivo único de progresso — 1.7.0 (10/10/2026)
 
 120 testes automatizados passaram. O adaptador Drive foi verificado com HTTP simulado para manter o mesmo ID em gravações sucessivas, unir dispositivos, resolver gravações e primeiras criações simultâneas, migrar lotes sem duplicar respostas, recuperar pendências antigas, retomar falhas de envio e limpeza, conferir conteúdo antes da lixeira, reler lotes modificados durante a limpeza e preservar dados locais durante falhas. Contas, proprietários e bancos de questões permanecem separados. O teste de cache comprova duas consultas e nenhum download ou upload quando o histórico não mudou; alterações locais durante o envio são sincronizadas depois.
