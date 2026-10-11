@@ -1,5 +1,9 @@
 # Relatório de verificação — 08/10/2026
 
+## Separação dos ícones da faixa Mobile — 1.9.2 (11/10/2026)
+
+O coração e a bandeira foram reduzidos de 17 para 15 px, e os botões receberam 6 px de intervalo. A área de toque permanece em 44 × 44 px; os fundos, estados de marcação, cores e ações existentes foram preservados. As duas regras se aplicam somente à faixa Mobile. O pacote de publicação executa os testes existentes, sintaxe e build; não foram criados testes que apenas repetissem esses valores de CSS. A captura enviada mostra o problema, mas a aparência final ainda não foi conferida em aparelho físico por indisponibilidade do controle de navegador do ambiente.
+
 ## Faixa compacta da questão no Mobile — 1.9.1 (11/10/2026)
 
 O cabeçalho Mobile foi movido para uma única linha entre o progresso e o cartão da questão. Exibe disciplina, dificuldade, origem no formato instituição-ano e os dois controles de favorito/revisão, sem assunto, tópico, ID ou selo Adaptada. A faixa reserva espaço no layout flex e fica fora do único contêiner rolável; não se sobrepõe à pergunta nem ao rodapé. Textos longos usam reticências, mantendo o texto completo no DOM e o título da disciplina; ícones discretos têm área de toque de 44 px. Cores seguem os temas e os estados das marcações existentes. Nenhuma regra desktop ou de safe area foi alterada.
