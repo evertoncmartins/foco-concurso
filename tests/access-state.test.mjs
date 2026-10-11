@@ -154,8 +154,13 @@ test('progresso acompanha arquivos concluídos sem regredir ao sincronizar banco
 test('Drive só avança o contador depois de ler, validar e recuperar cada arquivo',async()=>{
   const store=new Store(new TemporaryStorage()),drive=new DriveSync(store,{folderId:'folder'}),wait=deferred(),steps=[];
   drive.token='fixture';drive.expires=Date.now()+3600000;
-  drive.list=async()=>[{id:'one',name:'foco-progresso-one.json'},{id:'two',name:'foco-progresso-two.json'}];
+  let consolidated=null;
+  drive.list=async()=>consolidated?[{id:'one',name:drive.progressName()}]:[{id:'one',name:'foco-progresso-one.json'},{id:'two',name:'foco-progresso-two.json'}];
+  drive.progressMetadata=async id=>({id,title:consolidated&&id==='one'?drive.progressName():`foco-progresso-${id}.json`,etag:consolidated?'after':'before'});
+  drive.updateProgress=async(file,document)=>{consolidated=document;};
+  drive.trashProgress=async()=>{};
   drive.readFile=async file=>{
+    if(consolidated&&file.id==='one')return consolidated;
     if(file.id==='one')await wait.promise;
     return {schemaVersion:1,events:[{id:file.id,at:'2026-10-09T12:00:00.000Z',type:'flag',key:`bank:${file.id}`,flag:'favorite',value:true}]};
   };
@@ -173,6 +178,7 @@ test('arquivo inválido interrompe restauração sem contar como recuperado',asy
   const store=new Store(new TemporaryStorage()),drive=new DriveSync(store,{folderId:'folder'}),steps=[];
   drive.token='fixture';drive.expires=Date.now()+3600000;
   drive.list=async()=>[{id:'bad',name:'foco-progresso-bad.json'}];
+  drive.progressMetadata=async()=>({etag:'fixture',title:'foco-progresso-bad.json'});
   drive.readFile=async()=>({schemaVersion:99,events:[]});
   drive.addEventListener('progress',()=>steps.push({...drive.restoreProgress}));
   await assert.rejects(()=>drive.sync());

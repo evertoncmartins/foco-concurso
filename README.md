@@ -19,7 +19,7 @@ Plataforma pessoal para resolver questões e preparar concursos de Professor do 
 - Favoritos, revisão espaçada, estatísticas por disciplina/assunto/tópico e histórico.
 - Sessões pausáveis e retomadas após recarregar a página.
 - Progresso local automático; exportação e restauração de JSON sem substituir o histórico.
-- Sincronização Google Drive com OAuth, união de eventos e arquivos JSON imutáveis.
+- Sincronização Google Drive com OAuth, união de eventos e um único JSON de progresso por conta e pasta, atualizado com controle de versão e migração automática dos lotes antigos.
 - Pasta recuperada pela conta Google em outros dispositivos, via configuração privada no Drive.
 - Banco inicial com dez questões autorais sobre a Lei nº 8.112/1990.
 
@@ -74,7 +74,9 @@ O projeto implementa acesso direto às APIs oficiais do Google. No redirecioname
 
 **Configuração da instalação:** o cliente OAuth do Foco foi criado com a origem do site publicado. Em outras hospedagens, o responsável precisa autorizar a nova origem no Google Cloud. Cada usuário entra com Google e informa sua pasta uma vez. O escopo adicional `https://www.googleapis.com/auth/drive.appdata` deve constar em Google Auth Platform → Acesso a dados. Usuários existentes precisam conceder essa nova permissão e conectar a pasta ao menos uma vez para migrar a configuração local. A conexão do Drive usada por esta conversa não disponibiliza credenciais automaticamente ao site. Leia [GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md). Após abrir/recarregar, entre com Google. A autorização adicional do Drive é solicitada quando necessária; a carga remota acontece antes do primeiro envio.
 
-Para prevenir sobrescritas concorrentes sem um backend central, o Drive recebe lotes JSON imutáveis `foco-progresso-*.json`, unidos por ID. É uma decisão deliberada em vez de reescrever um único arquivo compartilhado. A exportação produz o arquivo consolidado. Bancos importados e sessões também são sincronizados. Não apague lotes: eles constituem o histórico persistente.
+A partir da versão 1.7.0, o Drive mantém `foco-progresso-<sub>-principal.json`, com todos os eventos da conta na pasta escolhida. O sistema une o histórico remoto ao local antes de atualizar o mesmo ID. Usa o ETag da API Drive v2 e `If-Match` para impedir sobrescritas concorrentes; conflitos de versão são relidos e unidos. A listagem, criação e leitura de conteúdo continuam na API v3. Uma consulta de versão evita baixar o JSON quando ele não mudou e os registros já estão neste navegador.
+
+Na primeira conexão após a atualização, os lotes antigos são validados e consolidados. Somente após conferir o conteúdo remoto, os arquivos incorporados são movidos para a lixeira do Drive, com verificação da versão de cada origem. Bancos de questões e arquivos de outras contas permanecem intactos. Uma falha mantém os dados locais e permite retomar a migração. Criações simultâneas de dois arquivos principais são reconciliadas, preservando a união dos eventos. A exportação continua disponível como cópia independente.
 
 ## Publicação e GitHub
 
@@ -89,7 +91,7 @@ O workflow `ci.yml` executa testes, verificação de sintaxe e build a cada push
 - Tokens não ficam em URL, arquivo, `localStorage` ou código versionado.
 - Dados importados são tratados como texto; HTML e URLs não HTTPS são rejeitados/escapados.
 - O Drive só é acessado após autorização explícita. O navegador não ganha acesso por receber um link público de pasta.
-- O escopo Drive é amplo porque a plataforma lê bancos existentes em uma pasta escolhida e cria novos arquivos ali. Uso pessoal requer a conta autorizada no projeto OAuth; uso público exige cumprir a política de verificação do Google. Uma evolução com Google Picker permite restringir o escopo a arquivos escolhidos.
+- O escopo Drive é amplo porque a plataforma lê bancos existentes na pasta escolhida, cria e atualiza o progresso e move lotes já incorporados para a lixeira. Uso pessoal requer a conta autorizada no projeto OAuth; uso público exige cumprir a política de verificação do Google. Uma evolução com Google Picker permite restringir o escopo a arquivos escolhidos.
 - Os arquivos criados herdam o compartilhamento da pasta. Uma pasta acessível por link pode expor o histórico a quem tiver acesso ao arquivo. Use uma pasta privada para histórico pessoal; o sistema não altera permissões do Drive.
 - Até 5.000 questões por banco, arquivo JSON até 10 MB, 100.000 eventos por documento e 10.000 arquivos por busca. O armazenamento local também depende da cota do navegador. Exportar e manter o Drive sincronizado reduz dependência do dispositivo.
 - Funciona sem conexão com o Drive. A aplicação não oferece refresh tokens nem sincronização quando fechada; autorizações expiradas precisam de nova ação de conexão.

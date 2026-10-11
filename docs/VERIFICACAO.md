@@ -1,5 +1,13 @@
 # Relatório de verificação — 08/10/2026
 
+## Arquivo único de progresso — 1.7.0 (10/10/2026)
+
+120 testes automatizados passaram. O adaptador Drive foi verificado com HTTP simulado para manter o mesmo ID em gravações sucessivas, unir dispositivos, resolver gravações e primeiras criações simultâneas, migrar lotes sem duplicar respostas, recuperar pendências antigas, retomar falhas de envio e limpeza, conferir conteúdo antes da lixeira, reler lotes modificados durante a limpeza e preservar dados locais durante falhas. Contas, proprietários e bancos de questões permanecem separados. O teste de cache comprova duas consultas e nenhum download ou upload quando o histórico não mudou; alterações locais durante o envio são sincronizadas depois.
+
+A consulta de descoberta oficial confirmou `PUT /upload/drive/v2/files/{fileId}` para upload multipart. Uma requisição OPTIONS real ao Google confirmou CORS para a origem de produção, método PUT e os cabeçalhos authorization, content-type e if-match. Sintaxe e build foram verificados. Não foi executada migração no Drive real do usuário nem teste em navegador autenticado: a migração ocorre ao conectar a pasta na versão publicada. O progresso continua sujeito aos limites documentados de 10 MB e 100.000 eventos por JSON.
+
+As seções abaixo registram verificações de versões anteriores.
+
 ## Executado
 
 59 testes automatizados passaram em Node.js na versão 1.2.0. Verificação de sintaxe de todos os módulos passou. O build estático foi gerado sem dependências de produção.

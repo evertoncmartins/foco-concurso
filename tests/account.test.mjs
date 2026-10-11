@@ -40,17 +40,18 @@ test('login reutiliza escopos Drive já concedidos para recuperar progresso sem 
   try{const auth=new GoogleAccount(clientId);const result=await auth.authorize();assert(result.canDrive);assert(result.canAppData);assert.equal(popups,1);}finally{globalThis.google=oldGoogle;globalThis.fetch=oldFetch;}
 });
 test('Drive recusa autorização de outra conta antes de ler a pasta',async()=>{const store=new Store(new AccountStorage(new MemoryStorage(),'111'));const drive=new DriveSync(store,{folderId:'folder'}, {authorize:async()=>({profile:profile('222'),token:'wrong',expires:Date.now()+10000})});await assert.rejects(()=>drive.connect(),/corresponde/);assert.equal(drive.token,null);});
-test('mesma pasta mantém prefixos, caches e lotes de progresso separados por conta',async()=>{
+test('mesma pasta mantém prefixos, caches e arquivos principais separados por conta',async()=>{
   const base=new MemoryStorage(),a=new DriveSync(new Store(new AccountStorage(base,'111')),{folderId:'same'}),b=new DriveSync(new Store(new AccountStorage(base,'222')),{folderId:'same'});
-  a.saveCache({files:['A'],events:['eA'],pending:null});b.saveCache({files:['B'],events:['eB'],pending:null});assert.equal(a.progressPrefix(),'foco-progresso-111-');assert.equal(b.progressPrefix(),'foco-progresso-222-');assert.deepEqual(a.cache().files,['A']);assert.deepEqual(b.cache().files,['B']);
+  a.saveCache({files:['A'],events:['eA'],pending:null});b.saveCache({files:['B'],events:['eB'],pending:null});assert.equal(a.progressName(),'foco-progresso-111-principal.json');assert.equal(b.progressName(),'foco-progresso-222-principal.json');assert.deepEqual(a.cache().files,['A']);assert.deepEqual(b.cache().files,['B']);
 });
 test('mesmo nome de arquivo não permite importar progresso de outro proprietário',async()=>{
   const store=new Store(new AccountStorage(new MemoryStorage(),'111')),drive=new DriveSync(store,{folderId:'same'});drive.token='fixture';drive.expires=Date.now()+3600000;
+  drive.progressMetadata=async()=>({etag:'fixture',title:'foco-progresso-111-pretend.json'});
   drive.list=async()=>[{id:'A',name:'foco-progresso-111-pretend.json',ownedByMe:true}];drive.readFile=async()=>({schemaVersion:1,owner:{provider:'google',subject:'222'},events:[flag('B')]});await assert.rejects(()=>drive.sync(),/outra conta/);assert.equal(store.events.length,0);assert.equal(drive.status,'error');
 });
 test('arquivos criados por outro usuário são ignorados mesmo com prefixo semelhante',async()=>{
   const store=new Store(new AccountStorage(new MemoryStorage(),'111')),drive=new DriveSync(store,{folderId:'same'});drive.token='fixture';drive.expires=Date.now()+3600000;
-  drive.list=async()=>[{id:'B',name:'foco-progresso-111-forged.json',ownedByMe:false},{id:'C',name:'foco-progresso-222-real.json',ownedByMe:true}];let reads=0;drive.readFile=async()=>{reads++;};drive.request=async()=>({ids:['new']});drive.upload=async()=>{};await drive.sync();assert.equal(reads,0);assert.equal(store.events.length,0);
+  let uploaded=false;drive.list=async()=>[{id:'B',name:'foco-progresso-111-forged.json',ownedByMe:false},{id:'C',name:'foco-progresso-222-real.json',ownedByMe:true},...(uploaded?[{id:'new',name:drive.progressName(),ownedByMe:true}]:[])];let reads=0;drive.readFile=async()=>{reads++;};drive.request=async()=>({ids:['new']});drive.upload=async()=>{uploaded=true;};drive.readProgress=async()=>({id:'new',name:drive.progressName(),etag:'fixture',events:[]});await drive.sync();assert.equal(reads,0);assert.equal(store.events.length,0);
 });
 test('sair encerra o adaptador e impede respostas HTTP tardias de atualizar o perfil',async()=>{const store=new Store(new AccountStorage(new MemoryStorage(),'111')),drive=new DriveSync(store,{folderId:'folder'});drive.token='fixture';drive.expires=Date.now()+3600000;drive.close();await assert.rejects(()=>drive.request('https://www.googleapis.com/drive/v3/files'));assert.equal(drive.token,null);assert(drive.closed);});
 test('importação automática não substitui nem reativa um banco existente',async()=>{
