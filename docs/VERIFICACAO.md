@@ -1,5 +1,11 @@
 # Relatório de verificação — 08/10/2026
 
+## Barra de status e respiro no foco iOS — 1.8.2 (11/10/2026)
+
+A segunda captura mostra que o acréscimo de 12 px da versão 1.8.1 não afastou suficientemente os controles da faixa embaçada. O HTML também solicitava `black-translucent`, configuração que a [documentação da Apple](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html) descreve como permitindo conteúdo sob a barra de status. Foi substituída por `default`, que solicita conteúdo abaixo da barra, sem restaurar a interface de navegação do Safari. Isso remove uma configuração que pode contribuir para a sobreposição; não comprova a causa exata do efeito no aparelho.
+
+O padding superior do foco iOS foi ampliado de 18 para 36 px, sempre somado à área segura. O acréscimo independente de CSS também se aplica caso o atalho existente ainda retenha metadados antigos. Rodapé, lógica de resposta, dados, desktop e Android não foram alterados. Um teste verifica a configuração única e não translúcida da barra; outro confere os novos limites de espaçamento. A captura foi inspecionada, mas a correção precisa de conferência no aparelho: não há QA visual iOS disponível neste ambiente. Fechar e reabrir o acesso após terminar a sessão permite recarregar a página. Não foi executada remoção/reinstalação do app, nem limpeza de armazenamento.
+
 ## Espaçamento superior no foco iOS — 1.8.1 (11/10/2026)
 
 A captura enviada mostra o contador e os controles superiores próximos à faixa do sistema. O foco Mobile recebe mais 12 px de respiro acima da barra no iOS, somados ao `safe-area-inset-top`. A correção altera somente o padding superior, dentro da consulta de largura de até 700 px e da detecção de suporte à extensão CSS do iOS `-webkit-touch-callout`. Não desativa os menus de seleção nem aplica filtros; a propriedade é usada somente na consulta de suporte. Android, desktop e rodapé mantêm suas regras anteriores. O cartão usa o espaço restante, sem deslocar ou sobrepor os controles inferiores.
