@@ -1,5 +1,13 @@
 # Relatório de verificação — 08/10/2026
 
+## Foco automático nas sessões Mobile — 1.9.0 (11/10/2026)
+
+Toda navegação para uma sessão em layout Mobile (até 700 px) ativa o foco automaticamente. Isso abrange iniciar, retomar, questão isolada e revisão dos erros do resultado, tanto no estudo quanto no simulado. O botão Sair recebe ícone de voltar e rótulo acessível de pausa e retorno ao início. Ele não encerra a conta, responde, pula ou conclui a sessão. A fila, respostas registradas e posição da sessão continuam disponíveis para retomar. Alternativas riscadas da mesma questão permanecem temporariamente na memória; uma seleção ainda não confirmada segue o comportamento anterior da pausa. No desktop, a entrada no foco é manual, e Sair do foco/Esc restaura a questão no layout normal.
+
+A saída da tela cheia pelo navegador mantém o layout de foco no Mobile enquanto a sessão está ativa. Mudar de desktop para largura Mobile durante a resolução também ativa o foco. O pedido nativo pode ser recusado por ausência de ativação do usuário ou de suporte; o layout de estudo continua em foco, sem avisos repetidos a cada retomada. A retomada durante um pedido nativo antigo ativa imediatamente o layout, sem enviar pedidos concorrentes nem deixar uma tela cheia órfã. A conclusão abre o resultado e remove o foco.
+
+Os 42 testes direcionados de integração e controlador passaram. Cobrem entrada sem clique extra, pausa/retomada com respostas em estudo e simulado, posição e cortes, saída e recusa nativas, Escape, mudanças de largura, questão isolada, revisão de erros, conclusão e pedidos antigos ainda pendentes. Os testes executam manipuladores reais com DOM/navegador simulados; aparência, toque e permissões reais não foram verificados em aparelho físico. O controle de navegador exigido pelo ambiente Sites permanece indisponível. As áreas seguras e a configuração iOS da versão 1.8.2 foram preservadas.
+
 ## Barra de status e respiro no foco iOS — 1.8.2 (11/10/2026)
 
 A segunda captura mostra que o acréscimo de 12 px da versão 1.8.1 não afastou suficientemente os controles da faixa embaçada. O HTML também solicitava `black-translucent`, configuração que a [documentação da Apple](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html) descreve como permitindo conteúdo sob a barra de status. Foi substituída por `default`, que solicita conteúdo abaixo da barra, sem restaurar a interface de navegação do Safari. Isso remove uma configuração que pode contribuir para a sobreposição; não comprova a causa exata do efeito no aparelho.

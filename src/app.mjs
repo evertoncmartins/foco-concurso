@@ -24,11 +24,16 @@ const modes={smart:['Recomendadas','Um equilíbrio entre questões novas, erros 
 const syncText={local:'Salvo neste dispositivo',pending:'Envio pendente',syncing:'Sincronizando…',synced:'Drive sincronizado',expired:'Reconectar Drive',error:'Falha na sincronização'};
 const desktopLayout=matchMedia('(min-width: 701px)');
 function isStandalone(){return matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||window.navigator?.standalone===true;}
-const focusMode=new FocusMode({document,standalone:isStandalone,onChange:()=>{
+const focusMode=new FocusMode({document,standalone:isStandalone,retainOnFullscreenExit:()=>!desktopLayout.matches&&view==='session'&&!!session&&!session.completed,onChange:()=>{
   if((!auth?.profile&&!guest)||!store||!drive)return;
   render();
   $(focusMode.active?'[data-action=exit-focus]':'[data-action=toggle-focus]')?.focus({preventScroll:true});
 },onUnavailable:()=>toast(desktopLayout.matches?'Modo foco ativado. A tela cheia não está disponível neste navegador.':'Foco ativado. Para ocultar as barras, use o acesso pela Tela de Início (ícone de ajuda).')});
+desktopLayout.addEventListener('change',()=>{
+  if(restoration||view!=='session'||!session||session.completed)return;
+  if(!desktopLayout.matches&&!focusMode.active){void focusMode.enter({automatic:true});return;}
+  render();
+});
 function saveConfig(){accountStorage?.setItem('foco:config',JSON.stringify(config));localStorage.setItem('foco:appearance',config.theme);}
 function applyTheme(){document.documentElement.dataset.theme=config.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):config.theme;document.querySelector('meta[name=theme-color]').content=document.documentElement.dataset.theme==='dark'?'#212121':'#f8f9fc';}
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),4500);}
@@ -48,10 +53,11 @@ function shell(content){
 }
 function focusToolbar(){
   const counter=session?`Questão ${session.index+1} de ${session.queue.length}`:'Modo foco';
-  return `<div class="focus-toolbar"><span class="focus-caption">${icon('target',16)}<span class="focus-desktop-label">Modo foco</span><span class="focus-mobile-progress">${counter}</span>${guest?'<span class="focus-guest-label">Visitante · progresso temporário</span>':''}</span><div class="flex"><span class="focus-escape"><kbd>Esc</kbd> para sair</span>${isStandalone()?'':`<button class="icon-btn focus-install" data-action="fullscreen-help" aria-label="Como abrir sem as barras do navegador" title="Sem as barras do navegador">${icon('info',18)}</button>`}<button class="icon-btn" data-action="toggle-theme" aria-label="${document.documentElement.dataset.theme==='dark'?'Ativar tema claro':'Ativar tema escuro'}" title="Alternar tema">${icon(document.documentElement.dataset.theme==='dark'?'sun':'moon',19)}</button><button class="btn small" data-action="exit-focus" aria-label="Sair do modo foco" title="Sair do modo foco · Esc">${icon('minimize',18)}<span class="focus-exit-desktop">Sair do foco</span><span class="focus-exit-mobile">Sair</span></button></div></div>`;
+  const mobile=!desktopLayout.matches,exitLabel=mobile?'Pausar e voltar ao início':'Sair do modo foco';
+  return `<div class="focus-toolbar"><span class="focus-caption">${icon('target',16)}<span class="focus-desktop-label">Modo foco</span><span class="focus-mobile-progress">${counter}</span>${guest?'<span class="focus-guest-label">Visitante · progresso temporário</span>':''}</span><div class="flex"><span class="focus-escape"><kbd>Esc</kbd> para sair</span>${isStandalone()?'':`<button class="icon-btn focus-install" data-action="fullscreen-help" aria-label="Como abrir sem as barras do navegador" title="Sem as barras do navegador">${icon('info',18)}</button>`}<button class="icon-btn" data-action="toggle-theme" aria-label="${document.documentElement.dataset.theme==='dark'?'Ativar tema claro':'Ativar tema escuro'}" title="Alternar tema">${icon(document.documentElement.dataset.theme==='dark'?'sun':'moon',19)}</button><button class="btn small" data-action="exit-focus" aria-label="${exitLabel}" title="${exitLabel}${mobile?'':' · Esc'}">${icon(mobile?'back':'minimize',18)}<span class="focus-exit-desktop">Sair do foco</span><span class="focus-exit-mobile">Sair</span></button></div></div>`;
 }
 function fullscreenHelp(){
-  showDialog(`<div class="dialog-title"><h2 id="dialog-title">Foco sem as barras do navegador</h2><p>A tela cheia depende do navegador. Se ele não permitir ocultar as barras, abra o Foco como app da web.</p></div><section class="fullscreen-help"><h3>iPhone / iPad</h3><ol><li>Abra o site no Safari e use o menu de compartilhar.</li><li>Escolha Adicionar à Tela de Início.</li><li>Se disponível, ative Abrir como App da Web e confirme.</li><li>Abra o Foco pelo novo ícone e ative o modo foco.</li></ol><h3>Android</h3><p>No menu do navegador, procure Instalar app ou Adicionar à tela inicial. Se disponível, abra pelo novo ícone.</p><p class="setting-note">Entre com a mesma conta Google e conecte o Drive para recuperar os estudos neste acesso. O modo visitante continua temporário. Acesso à internet necessário; não há modo offline.</p></section><div class="dialog-actions"><button class="btn primary" data-action="close-dialog">Voltar à questão</button></div>`);
+  showDialog(`<div class="dialog-title"><h2 id="dialog-title">Foco sem as barras do navegador</h2><p>A tela cheia depende do navegador. Se ele não permitir ocultar as barras, abra o Foco como app da web.</p></div><section class="fullscreen-help"><h3>iPhone / iPad</h3><ol><li>Abra o site no Safari e use o menu de compartilhar.</li><li>Escolha Adicionar à Tela de Início.</li><li>Se disponível, ative Abrir como App da Web e confirme.</li><li>Abra o Foco pelo novo ícone e inicie ou retome uma sessão. No Mobile, o modo foco é automático.</li></ol><h3>Android</h3><p>No menu do navegador, procure Instalar app ou Adicionar à tela inicial. Se disponível, abra pelo novo ícone.</p><p class="setting-note">Entre com a mesma conta Google e conecte o Drive para recuperar os estudos neste acesso. O modo visitante continua temporário. Acesso à internet necessário; não há modo offline.</p></section><div class="dialog-actions"><button class="btn primary" data-action="close-dialog">Voltar à questão</button></div>`);
 }
 function heading(title,subtitle,extra=''){return `<div class="page-heading between"><div><h1>${title}</h1><p>${subtitle}</p></div>${extra}</div>`;}
 function stat(label,value,sub,i){return `<div class="stat"><div class="stat-top"><span>${label}</span>${icon(i,16)}</div><div class="stat-number">${value}</div><div class="stat-sub">${sub}</div></div>`;}
@@ -105,7 +111,19 @@ function sessionView(){
 }
 function resultView(){const questions=session.queue.map(k=>model.questions.find(q=>q.key===k)).filter(Boolean),answered=questions.filter(q=>session.answers[q.key]),correct=answered.filter(q=>session.answers[q.key]===q.correctOption),wrong=answered.length-correct.length,skipped=questions.length-answered.length;const percentage=Math.round(correct.length/questions.length*100)||0;return `<div class="session-end"><span class="badge green">${icon('check',13)} SESSÃO CONCLUÍDA</span><h1 style="margin-top:18px">Mais um passo na sua preparação.</h1><p class="muted" style="font-size:12px;margin-top:10px">${session.mode==='exam'?'Confira o resultado e entenda cada resposta.':guest?'Seu resultado é temporário. Revise antes de sair.':'Seu progresso foi salvo. Aprender também é revisitar.'}</p><div class="result-ring"><strong>${percentage}%</strong><span>aproveitamento da sessão</span></div><div class="result-row"><div><strong style="color:var(--success)">${correct.length}</strong><span>acertos</span></div><div><strong style="color:var(--coral)">${wrong}</strong><span>erros</span></div><div><strong>${skipped}</strong><span>não respondidas</span></div></div><div class="flex wrap" style="justify-content:center"><button class="btn primary" data-action="start">Nova sessão ${icon('arrow',15)}</button>${wrong?'<button class="btn" data-action="session-errors">Revisar erros desta sessão</button>':''}<button class="btn ghost" data-action="nav" data-view="home">Voltar ao início</button></div><div class="results-list"><h2 style="font-size:18px;margin-bottom:15px">Seu estudo, questão por questão</h2>${questions.map((q,i)=>`<details class="result-item"><summary>${icon(session.answers[q.key]?session.answers[q.key]===q.correctOption?'check':'x':'clock',17)}<span>${i+1}. ${esc(q.topic)}</span><span class="badge" style="margin-left:auto">${session.answers[q.key]?session.answers[q.key]===q.correctOption?'Acerto':'Erro':'Pulada'}</span></summary><div class="result-body"><p>${esc(q.statement)}</p><p class="setting-note">Correta (${q.correctOption}): ${esc(q.options.find(o=>o.id===q.correctOption).text)}</p>${feedback(q,session.answers[q.key])}</div></details>`).join('')}</div></div>`;}
 function render(){if(restoration){renderLoading();return;}if((!auth?.profile&&!guest)||!store||!drive){renderLogin();return;}const previousBody=$('.question-body'),previousKey=previousBody?.dataset.question,previousScroll=previousBody?.scrollTop||0;refreshModel();const content=({home,study,banks,performance,revision,settings:()=>guest?guestSettings():settings(),folder:()=>folderView(auth.profile,config,!!drive.token),session:sessionView,result:resultView})[view]();$('#app').innerHTML=shell(content);document.title=`${({home:'Início',study:'Estudar',banks:'Meus bancos',performance:'Desempenho',revision:'Revisão',settings:'Ajustes',folder:'Conectar pasta',session:'Estudando',result:'Resultado'})[view]} · Foco`;const body=$('.question-body');if((!desktopLayout.matches||!focusMode.active)&&body&&body.dataset.question===previousKey)body.scrollTop=previousScroll;bindFiles();bindForms();if(view==='settings'&&!guest)drive.prepare().catch(()=>{});}
-function navigate(next){if(restoration)return;view=next;if(next!=='session')void focusMode.exit();selected=null;render();window.scrollTo(0,0);$('#main').focus({preventScroll:true});}
+function navigate(next){
+  if(restoration)return;
+  view=next;selected=null;
+  let focusChange;
+  if(next!=='session')focusChange=focusMode.exit();
+  else if(!desktopLayout.matches&&session&&!session.completed)focusChange=focusMode.enter({automatic:true});
+  render();window.scrollTo(0,0);$('#main').focus({preventScroll:true});
+  return focusChange;
+}
+async function leaveQuestionFocus(){
+  if(!desktopLayout.matches&&view==='session'){if(working)return;await navigate('home');}
+  else await focusMode.exit();
+}
 function showDialog(html){const dialog=$('#dialog');dialog.innerHTML=html;dialog.showModal();return dialog;}
 function closeDialog(){const d=$('#dialog');if(d.open)d.close();}
 function confirmDialog(title,description,label='Confirmar'){return new Promise(resolve=>{const d=showDialog(`<div class="dialog-title"><h2 id="dialog-title">${esc(title)}</h2><p>${esc(description)}</p></div><div class="dialog-actions"><button class="btn" id="confirm-cancel">Cancelar</button><button class="btn primary" id="confirm-ok">${esc(label)}</button></div>`);let settled=false;const done=value=>{if(settled)return;settled=true;d.removeEventListener('cancel',cancel);closeDialog();resolve(value);};const cancel=e=>{e.preventDefault();done(false);};$('#confirm-cancel',d).onclick=()=>done(false);$('#confirm-ok',d).onclick=()=>done(true);d.addEventListener('cancel',cancel);});}
@@ -148,7 +166,7 @@ document.addEventListener('click',async event=>{
   if(action==='toggle-theme'||action==='theme'){try{config.theme=action==='theme'?target.dataset.theme:document.documentElement.dataset.theme==='dark'?'light':'dark';saveConfig();applyTheme();render();const selector=action==='theme'?`.theme-option[data-theme="${config.theme}"]`:focusMode.active?'.focus-toolbar [data-action=toggle-theme]':restoration||(!auth?.profile&&!guest)?'.entry-toolbar [data-action=toggle-theme]':'.topbar [data-action=toggle-theme]';$(selector)?.focus({preventScroll:true});}catch(error){failure(error);}return;}
   if(restoration){await handleRestorationAction(action);return;}
   if(!auth?.profile&&!guest&&!['login','guest','retry-google'].includes(action))return;
-  if(action==='exit-focus'){await focusMode.exit();return;}
+  if(action==='exit-focus'){await leaveQuestionFocus();return;}
   if(working)return;
   if(guest&&['connect-drive','disconnect-drive','sync','drive-banks','refresh-folder-banks','restore-progress','export-progress','migrate-legacy'].includes(action)){toast('Entre com Google para salvar ou recuperar seu progresso.');return;}
   try{
@@ -173,7 +191,7 @@ document.addEventListener('click',async event=>{
     if(action==='bank-toggle'){const b=model.banks.find(b=>b.id===target.dataset.bank);await store.add([{type:'bank-state',bankId:b.id,value:b.enabled?'disabled':'enabled'}]);render();return;}
     if(action==='bank-delete'){const b=model.banks.find(b=>b.id===target.dataset.bank);if(await confirmDialog('Excluir este banco?',`“${b.name}” sairá da lista de estudos. Seu histórico será preservado. Você poderá importar o banco novamente.`, 'Excluir banco')){await store.add([{type:'bank-state',bankId:b.id,value:'deleted'}]);render();toast('Banco removido da lista.');}return;}
     if(action==='resume'){session=structuredClone(resumeSession());if(session){config.activeSession=session.id;saveConfig();navigate('session');}return;}
-    if(action==='pause'){navigate('home');return;}
+    if(action==='pause'){await navigate('home');return;}
     if(action==='toggle-cut'){toggleCut(target.dataset.option);return;}
     if(action==='select'){if(view!=='session'||!session||session.answers[session.queue[session.index]]!=null)return;selected=target.dataset.option;render();$(`.option-select[data-option="${selected}"]`)?.focus({preventScroll:true});return;}
     if(action==='single'){await newSession([target.dataset.key]);navigate('session');return;}
@@ -189,7 +207,7 @@ document.addEventListener('click',async event=>{
 });
 document.addEventListener('keydown',async event=>{
   if(restoration)return;
-  if(event.key==='Escape'&&focusMode.active&&!$('#dialog').open){event.preventDefault();await focusMode.exit();return;}
+  if(event.key==='Escape'&&focusMode.active&&!$('#dialog').open){event.preventDefault();await leaveQuestionFocus();return;}
   if(event.key==='Enter'&&event.target.closest?.('button')&&!['select','answer','next'].includes(event.target.dataset.action))return;
   if(view!=='session'||$('#dialog').open||working||event.target.matches('input,textarea,select'))return;
   const q=model.questions.find(q=>q.key===session.queue[session.index]);if(!q)return;

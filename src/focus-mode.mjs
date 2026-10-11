@@ -1,8 +1,9 @@
 // Keep fullscreen on a stable element: the application redraws each answer.
 export class FocusMode {
-  constructor({document,standalone=()=>false,onChange=()=>{},onUnavailable=()=>{}}) {
+  constructor({document,standalone=()=>false,retainOnFullscreenExit=()=>false,onChange=()=>{},onUnavailable=()=>{}}) {
     this.document=document;
     this.standalone=standalone;
+    this.retainOnFullscreenExit=retainOnFullscreenExit;
     this.onChange=onChange;
     this.onUnavailable=onUnavailable;
     this.active=false;
@@ -12,18 +13,24 @@ export class FocusMode {
     document.addEventListener('fullscreenchange',()=>{
       if(this.active&&this.pending&&document.fullscreenElement===document.documentElement)this.ownsFullscreen=true;
       if(this.active&&this.ownsFullscreen&&document.fullscreenElement!==document.documentElement){
-        this.active=false;this.ownsFullscreen=false;this.revision++;this.onChange();
+        this.active=this.retainOnFullscreenExit();this.ownsFullscreen=false;this.revision++;this.onChange();
       }
     });
   }
-  async enter() {
-    if(this.active||this.pending)return;
+  async enter({automatic=false}={}) {
+    if(this.active)return;
+    if(this.pending){
+      // A resumed Mobile session needs its focus layout even while an old
+      // native request is finishing. Do not issue a second browser request.
+      if(automatic){this.active=true;this.revision++;this.onChange();}
+      return;
+    }
     const revision=++this.revision;
     this.active=true;
     this.onChange();
     if(this.document.fullscreenElement||this.standalone())return;
     const root=this.document.documentElement;
-    if(!root.requestFullscreen){this.onUnavailable();return;}
+    if(!root.requestFullscreen){if(!automatic)this.onUnavailable();return;}
     this.pending=true;
     try {
       await root.requestFullscreen({navigationUI:'hide'});
@@ -33,7 +40,7 @@ export class FocusMode {
         return;
       }
       this.ownsFullscreen=this.document.fullscreenElement===root;
-    }catch{if(this.active&&revision===this.revision)this.onUnavailable();}
+    }catch{if(!automatic&&this.active&&revision===this.revision)this.onUnavailable();}
     finally{this.pending=false;}
   }
   async exit() {

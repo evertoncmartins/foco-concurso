@@ -51,11 +51,11 @@ function runtime(options={}){
     if(['#app','#toast','#dialog','#main','#bank-file','#progress-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
     return null;
   },async emit(name,event){for(const fn of listeners[name]??[])await fn(event);}};
-  document.documentElement.requestFullscreen=async requestOptions=>{document.requestOptions=requestOptions;document.fullscreenElement=document.documentElement;await document.emit('fullscreenchange',{});};
+  document.documentElement.requestFullscreen=async requestOptions=>{document.fullscreenRequests=(document.fullscreenRequests||0)+1;document.requestOptions=requestOptions;if(options.fullscreenError)throw new Error('Requires user activation');document.fullscreenElement=document.documentElement;await document.emit('fullscreenchange',{});};
   if(options.fullscreenUnavailable)delete document.documentElement.requestFullscreen;
   document.exitFullscreen=async()=>{document.fullscreenElement=null;await document.emit('fullscreenchange',{});};
-  const media=new Map();
-  const matchMedia=query=>{if(!media.has(query))media.set(query,{matches:query.includes('701')&&!options.mobile||query==='(display-mode: standalone)'&&!!options.standalone,addEventListener(){}});return media.get(query);};
+  const media=new Map(),mediaListeners=new Map();
+  const matchMedia=query=>{if(!media.has(query))media.set(query,{matches:query.includes('701')&&!options.mobile||query==='(display-mode: standalone)'&&!!options.standalone,addEventListener(name,callback){if(name==='change'){const callbacks=mediaListeners.get(query)||[];callbacks.push(callback);mediaListeners.set(query,callbacks);}}});return media.get(query);};
   const profile={sub:'111',name:'Estudante',email:'test@example.test'};
   const auth={profile,token:'fixture',expires:Date.now()+3600000,generation:0,canAppData:options.canAppData??true,canDrive:options.canDrive??true,clientId:'test.apps.googleusercontent.com',prepareAuthorization(){preparations++;},signOut(){this.profile=null;this.token=null;},async authorize(){authorizations++;if(options.authorizationError)throw options.authorizationError;this.profile=profile;this.token='fixture';this.canAppData=true;this.canDrive=true;return authorization();}};
   auth.prepareRedirect=async()=>{if(options.statusWait)await options.statusWait.promise;auth.redirectEnabled=options.redirectEnabled===true;return auth.redirectEnabled;};
@@ -81,20 +81,21 @@ function runtime(options={}){
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
   const target=dataset=>({dataset,disabled:false,closest(){return this;},matches(){return false;}});
-  return {auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
+  const resize=async mobile=>{const query='(min-width: 701px)',m=matchMedia(query);m.matches=!mobile;for(const callback of mediaListeners.get(query)||[])await callback({matches:m.matches});};
+  return {resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
 }
 
 async function studyRuntime(options={},mode='smart'){
   const app=runtime(options);app.auth.signOut();await app.click('guest');
-  await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');navigate('session');})()`);
+  await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');await navigate('session');})()`);
   return app;
 }
 const cutRow=(app,option)=>app.document.querySelector(`[data-option-row="${option}"]`);
 const cutControl=(app,option)=>cutRow(app,option).querySelector('.option-cut');
 
-test('foco Mobile mantém seleção, cortes e rolagem, pede tela cheia e funciona até concluir',async()=>{
-  const app=await studyRuntime({mobile:true});await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});app.document.querySelector('.question-body').scrollTop=400;
-  const before=app.value('JSON.stringify(store.events)');await app.click('toggle-focus');
+test('foco automático Mobile mantém seleção, cortes e rolagem, pede tela cheia e funciona até concluir',async()=>{
+  const app=await studyRuntime({mobile:true});assert(app.value('focusMode.active'));await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});app.document.querySelector('.question-body').scrollTop=400;
+  const before=app.value('JSON.stringify(store.events)');
   assert(app.value('focusMode.active'));assert.deepEqual(app.document.requestOptions,{navigationUI:'hide'});assert.equal(app.value('selected'),'B');assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.document.querySelector('.question-body').scrollTop,400);assert.equal(app.value('JSON.stringify(store.events)'),before);
   assert.match(app.html(),/class="focus-mobile-progress">Questão 1 de 3/);assert.match(app.html(),/Visitante · progresso temporário/);
   await app.click('toggle-theme');assert.equal(app.document.querySelector('.question-body').scrollTop,400);assert.equal(app.value('selected'),'B');
@@ -103,16 +104,48 @@ test('foco Mobile mantém seleção, cortes e rolagem, pede tela cheia e funcion
   assert.equal(app.value('view'),'result');assert.equal(app.value('focusMode.active'),false);assert.equal(app.document.fullscreenElement,null);
 });
 
-test('Mobile sem Fullscreen API entra no foco; app instalado não exibe aviso de indisponibilidade',async()=>{
+test('Mobile sem Fullscreen API entra automaticamente no foco sem alertas; Sair volta ao início',async()=>{
   for(const standalone of [false,true]){
-    const app=await studyRuntime({mobile:true,fullscreenUnavailable:true,standalone});await app.click('toggle-focus');assert(app.value('focusMode.active'));assert.equal(app.document.fullscreenElement,null);
+    const app=await studyRuntime({mobile:true,fullscreenUnavailable:true,standalone});assert(app.value('focusMode.active'));assert.equal(app.document.fullscreenElement,null);assert.equal(app.document.querySelector('#toast').textContent,'');
     assert.equal(app.html().includes('data-action="fullscreen-help"'),!standalone);
-    await app.click('exit-focus');assert.equal(app.value('focusMode.active'),false);assert.equal(app.value('session.index'),0);
+    await app.click('exit-focus');assert.equal(app.value('view'),'home');assert.equal(app.value('focusMode.active'),false);assert.equal(app.value('session.index'),0);
   }
 });
 
+test('Sair no Mobile pausa estudo e simulado; retomar preserva respostas, cortes e posição da sessão',async()=>{
+  for(const mode of ['smart','exam']){
+    const app=await studyRuntime({mobile:true,standalone:true},mode);const id=app.value('session.id'),correct=app.value('model.questions.find(q=>q.key===session.queue[0]).correctOption');
+    assert.match(app.html(),/data-action="exit-focus" aria-label="Pausar e voltar ao início"/);
+    await app.click('select',{option:correct});await app.click('answer');await app.click('toggle-cut',{option:'A'});const events=app.value('JSON.stringify(store.events)'),answers=app.value('JSON.stringify(session.answers)');
+    await app.click('exit-focus');assert.equal(app.value('view'),'home');assert(!app.value('focusMode.active'));assert.equal(app.value('session.completed'),false);assert.equal(app.value('config.activeSession'),id);assert.match(app.html(),/data-action="resume"/);assert.equal(app.value('JSON.stringify(store.events)'),events);
+    await app.click('resume');assert.equal(app.value('view'),'session');assert(app.value('focusMode.active'));assert.equal(app.value('session.id'),id);assert.equal(app.value('JSON.stringify(session.answers)'),answers);assert(cutRow(app,'A').classList.contains('eliminated'));assert.equal(app.value('JSON.stringify(store.events)'),events);
+    await app.click('next');const advanced=app.value('JSON.stringify(store.events)');assert.equal(app.value('session.index'),1);await app.click('exit-focus');await app.click('resume');assert(app.value('focusMode.active'));assert.equal(app.value('session.index'),1);assert.equal(app.value('JSON.stringify(store.events)'),advanced);
+  }
+});
+
+test('Mobile mantém foco após saída nativa e recusa da API; Escape volta ao menu sem responder',async()=>{
+  for(const fullscreenError of [false,true]){
+    const app=await studyRuntime({mobile:true,fullscreenError});await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});app.document.querySelector('.question-body').scrollTop=340;const events=app.value('JSON.stringify(store.events)');
+    await app.document.exitFullscreen();assert(app.value('focusMode.active'));assert.equal(app.value('view'),'session');assert.equal(app.value('selected'),'B');assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.document.querySelector('.question-body').scrollTop,340);assert.equal(app.document.fullscreenRequests,1);assert.equal(app.document.querySelector('#toast').textContent,'');
+    await app.key('Escape','exit-focus');assert.equal(app.value('view'),'home');assert(!app.value('focusMode.active'));assert.equal(app.document.fullscreenElement,null);assert.equal(app.value('session.completed'),false);assert.equal(app.value('JSON.stringify(store.events)'),events);
+  }
+});
+
+test('desktop conserva foco opcional; mudar para layout Mobile ativa foco e muda a ação de Sair',async()=>{
+  const app=await studyRuntime();assert(!app.value('focusMode.active'));assert.equal(app.document.fullscreenRequests||0,0);await app.click('select',{option:'B'});
+  await app.click('toggle-focus');assert(app.value('focusMode.active'));assert.match(app.html(),/data-action="exit-focus" aria-label="Sair do modo foco"/);await app.click('exit-focus');assert.equal(app.value('view'),'session');assert(!app.value('focusMode.active'));assert.equal(app.value('selected'),'B');
+  await app.resize(true);assert(app.value('focusMode.active'));assert.equal(app.value('selected'),'B');assert.match(app.html(),/aria-label="Pausar e voltar ao início"/);await app.resize(false);assert(app.value('focusMode.active'));assert.match(app.html(),/aria-label="Sair do modo foco"/);
+  await app.key('Escape','exit-focus');assert.equal(app.value('view'),'session');assert(!app.value('focusMode.active'));await app.resize(true);assert(app.value('focusMode.active'));await app.click('exit-focus');assert.equal(app.value('view'),'home');assert(!app.value('focusMode.active'));await app.resize(false);assert(!app.value('focusMode.active'));
+});
+
+test('questão isolada e revisão de erros também abrem automaticamente em foco no Mobile',async()=>{
+  const app=await studyRuntime({mobile:true});await app.click('exit-focus');const key=app.value('model.questions[0].key');await app.click('single',{key});assert(app.value('focusMode.active'));assert.equal(app.value('session.queue.length'),1);
+  const wrong=app.value('model.questions.find(q=>q.key===session.queue[0]).options.find(o=>o.id!==model.questions.find(q=>q.key===session.queue[0]).correctOption).id');await app.click('select',{option:wrong});await app.click('answer');await app.click('next');assert.equal(app.value('view'),'result');assert(!app.value('focusMode.active'));
+  await app.click('session-errors');assert(app.value('focusMode.active'));assert.equal(app.value('view'),'session');assert.equal(app.value('session.mode'),'errors');assert.equal(app.value('session.queue[0]'),key);assert.equal(app.value('session.queue.length'),1);
+});
+
 test('ajuda de tela cheia abre e fecha sem responder, sair do foco ou perder a leitura',async()=>{
-  const app=await studyRuntime({mobile:true,fullscreenUnavailable:true});await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});await app.click('toggle-focus');
+  const app=await studyRuntime({mobile:true,fullscreenUnavailable:true});await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});
   app.document.querySelector('.question-body').scrollTop=250;const before=app.value('JSON.stringify(store.events)');
   await app.key('Enter','fullscreen-help');assert.equal(app.value('JSON.stringify(store.events)'),before);
   await app.click('fullscreen-help');const dialog=app.document.querySelector('#dialog');assert.equal(dialog.open,true);assert.match(dialog.innerHTML,/Adicionar à Tela de Início/);assert.match(dialog.innerHTML,/Abrir como App da Web/);assert.match(dialog.innerHTML,/não há modo offline/);
