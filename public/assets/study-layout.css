@@ -108,6 +108,12 @@
 @media(max-width:700px){
   .topbar-heading,.sidebar-toggle{display:none}
   .topbar .focus-toggle{display:inline-flex;color:var(--accent)}
+  /* Let study cards fit equal columns without their badges widening the page. */
+  .mode-grid{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0}
+  .mode-card{min-width:0}
+  .mode-card h3,.mode-card p{overflow-wrap:anywhere}
+  .mode-card .badge{display:flex;justify-content:space-between;max-width:100%;gap:6px;white-space:normal}
+  .mode-card .badge svg{margin:0}
   /* Reserve the footer in the viewport layout: it never overlays the scroller. */
   .shell.session{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,0px)}
   .session .workspace{display:flex;flex:1;flex-direction:column;min-height:0}

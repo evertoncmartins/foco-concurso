@@ -1,5 +1,11 @@
 # Relatório de verificação — 08/10/2026
 
+## Alinhamento dos cartões Estudar no Mobile — 1.9.3 (11/10/2026)
+
+A captura mostra margem à esquerda e cartões chegando além da borda direita. A grade herdava duas colunas `1fr` com mínimo automático, enquanto os selos de disponibilidade herdavam `white-space: nowrap`; esse conjunto permite que o conteúdo mínimo alargue as colunas. No Mobile, as duas colunas agora usam `minmax(0, 1fr)`, os cartões podem encolher e os selos permitem quebra dentro da largura disponível. Títulos e descrições extensos também podem quebrar. A margem inferior genérica dos SVGs foi removida somente da seta dos selos, mantendo seu alinhamento vertical no flex. As margens existentes, as duas colunas, os ícones e o desktop foram preservados.
+
+O pacote executa os 144 testes existentes, verificação de sintaxe e build. Não foram acrescentados testes que apenas espelhassem propriedades CSS. A causa é consistente com a captura e as regras de layout; não há medição do resultado renderizado em aparelho físico porque o controle de navegador exigido pelo ambiente Sites continua indisponível.
+
 ## Separação dos ícones da faixa Mobile — 1.9.2 (11/10/2026)
 
 O coração e a bandeira foram reduzidos de 17 para 15 px, e os botões receberam 6 px de intervalo. A área de toque permanece em 44 × 44 px; os fundos, estados de marcação, cores e ações existentes foram preservados. As duas regras se aplicam somente à faixa Mobile. O pacote de publicação executa os testes existentes, sintaxe e build; não foram criados testes que apenas repetissem esses valores de CSS. A captura enviada mostra o problema, mas a aparência final ainda não foi conferida em aparelho físico por indisponibilidade do controle de navegador do ambiente.
