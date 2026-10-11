@@ -19,10 +19,10 @@ class BrowserDocument extends EventTarget {
   async exitFullscreen(){this.exits++;this.leaveFullscreen();}
   leaveFullscreen(){this.fullscreenElement=null;this.dispatchEvent(new Event('fullscreenchange'));}
 }
-function setup({standalone=false}={}){
+function setup({standalone=false,retainOnExit=false}={}){
   const document=new BrowserDocument(),desktop=new Desktop(),states=[];
   let unavailable=0;
-  const focus=new FocusMode({document,standalone:()=>standalone,onChange:()=>states.push(focus.active),onUnavailable:()=>unavailable++});
+  const focus=new FocusMode({document,standalone:()=>standalone,retainOnFullscreenExit:()=>retainOnExit,onChange:()=>states.push(focus.active),onUnavailable:()=>unavailable++});
   return {focus,document,desktop,states,get unavailable(){return unavailable;}};
 }
 
@@ -137,4 +137,27 @@ test('modo foco não encerra tela cheia que já estava ativa fora dele',async()=
   assert.equal(document.requests,0);
   assert.equal(document.exits,0);
   assert.equal(document.fullscreenElement,document.documentElement);
+});
+
+test('entrada automática mantém foco sem alertas se a API estiver ausente ou recusar',async()=>{
+  for(const missing of [true,false]){
+    const result=setup(),{focus,document}=result;
+    if(missing)delete document.documentElement.requestFullscreen;
+    else document.documentElement.requestFullscreen=async()=>{throw new Error('Requires activation');};
+    await focus.enter({automatic:true});assert(focus.active);assert.equal(result.unavailable,0);await focus.exit();assert(!focus.active);
+  }
+});
+
+test('saída nativa pode preservar o foco Mobile até a saída explícita',async()=>{
+  const {focus,document}=setup({retainOnExit:true});await focus.enter({automatic:true});document.leaveFullscreen();
+  assert(focus.active);assert.equal(focus.ownsFullscreen,false);assert.equal(document.requests,1);
+  await focus.exit();assert(!focus.active);assert.equal(document.fullscreenElement,null);
+});
+
+test('retomada automática durante pedido antigo preserva o layout e não deixa tela cheia órfã',async()=>{
+  const {focus,document}=setup({retainOnExit:true});let complete;
+  document.documentElement.requestFullscreen=()=>new Promise(resolve=>{document.requests++;complete=()=>{document.fullscreenElement=document.documentElement;document.dispatchEvent(new Event('fullscreenchange'));resolve();};});
+  const entering=focus.enter({automatic:true});await focus.exit();await focus.enter({automatic:true});assert(focus.active);assert.equal(document.requests,1);
+  complete();await entering;assert(focus.active);assert(!focus.pending);assert.equal(document.fullscreenElement,null);
+  await focus.exit();assert(!focus.active);
 });
