@@ -32,7 +32,7 @@ function runtime(options={}){
       if(selector==='#app'){
         let html='';Object.defineProperty(el,'innerHTML',{get:()=>html,set:value=>{
           html=value;renders++;const question=html.match(/class="question-body" data-question="([^"]+)"/);
-          if(question)nodes.set('.question-body',{dataset:{question:question[1]},scrollTop:0});else nodes.delete('.question-body');
+          if(question)nodes.set('.question-body',{dataset:{question:question[1]},scrollTop:0,focus(){document.focused='.question-body';}});else nodes.delete('.question-body');
           for(const key of nodes.keys())if(key.startsWith('[data-option-row='))nodes.delete(key);
           for(const [,classes,id,content] of html.matchAll(/<div class="(option [^"]*)" data-option-row="([^"]+)"[^>]*>([\s\S]*?)<\/div>/g)){
             const row=element(classes),control=element('option-cut'),tag=content.match(/<button[^>]*class="option-cut"[^>]*>/)?.[0]||'';
@@ -49,6 +49,7 @@ function runtime(options={}){
   const document={documentElement:{dataset:{theme:'light'}},fullscreenElement:null,addEventListener(name,fn){(listeners[name]??=[]).push(fn);},querySelector(selector){
     if(selector==='.question-body'||selector.startsWith('[data-option-row='))return nodes.get(selector)||null;
     if(['#app','#toast','#dialog','#main','#bank-file','#progress-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
+    if(selector==='dialog[open],[aria-modal="true"]:not([hidden])'&&options.otherModal)return element();
     return null;
   },async emit(name,event){for(const fn of listeners[name]??[])await fn(event);}};
   document.documentElement.requestFullscreen=async requestOptions=>{document.fullscreenRequests=(document.fullscreenRequests||0)+1;document.requestOptions=requestOptions;if(options.fullscreenError)throw new Error('Requires user activation');document.fullscreenElement=document.documentElement;await document.emit('fullscreenchange',{});};
@@ -82,7 +83,11 @@ function runtime(options={}){
   const value=code=>vm.runInContext(code,context);
   const target=dataset=>({dataset,disabled:false,closest(){return this;},matches(){return false;}});
   const resize=async mobile=>{const query='(min-width: 701px)',m=matchMedia(query);m.matches=!mobile;for(const callback of mediaListeners.get(query)||[])await callback({matches:m.matches});};
-  return {resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
+  const keyEvent=async overrides=>{
+    const event={key:' ',code:'Space',target:{dataset:{},closest(){return null;},matches(){return false;}},defaultPrevented:false,preventDefault(){this.defaultPrevented=true;},altKey:false,ctrlKey:false,metaKey:false,shiftKey:false,repeat:false,isComposing:false,...overrides};
+    await document.emit('keydown',event);return event;
+  };
+  return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
 }
 
 async function studyRuntime(options={},mode='smart'){
@@ -92,6 +97,51 @@ async function studyRuntime(options={},mode='smart'){
 }
 const cutRow=(app,option)=>app.document.querySelector(`[data-option-row="${option}"]`);
 const cutControl=(app,option)=>cutRow(app,option).querySelector('.option-cut');
+
+test('Espaço pula somente no Foco Desktop, sem registrar resposta; indicação e foco acompanham a sessão',async()=>{
+  for(const mode of ['smart','exam']){
+    const app=await studyRuntime({},mode);assert(!app.html().includes('focus-skip-key'));
+    assert.equal((await app.keyEvent()).defaultPrevented,false);assert.equal(app.value('session.index'),0);
+    await app.click('toggle-focus');assert.equal(app.document.focused,'.question-body');
+    assert.match(app.html(),/data-action="skip" aria-keyshortcuts="Space">Pular<kbd class="focus-skip-key">Espaço<\/kbd>/);
+    await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});app.document.querySelector('.question-body').scrollTop=260;
+    await app.click('toggle-theme');assert.equal(app.document.querySelector('.question-body').scrollTop,260);
+    const events=app.value('store.events.length');assert.equal((await app.keyEvent()).defaultPrevented,true);
+    assert.equal(app.value('session.index'),1);assert.equal(app.value('selected'),null);assert.equal(app.value('model.stats.attempts'),0);assert.equal(app.value('Object.values(session.answers).filter(Boolean).length'),0);assert.equal(app.value('session.answers[session.queue[0]]'),null);assert.equal(app.value('store.events.length'),events+1);assert.equal(app.document.querySelector('.question-body').scrollTop,0);assert.equal(app.document.focused,'.question-body');
+    assert.equal((await app.keyEvent({repeat:true})).defaultPrevented,true);assert.equal(app.value('session.index'),1);
+    await app.click('select',{option:'A'});await app.click('answer');const answered=app.value('JSON.stringify(store.events)');
+    assert(!app.html().includes('focus-skip-key'));assert.equal((await app.keyEvent()).defaultPrevented,false);assert.equal(app.value('session.index'),1);assert.equal(app.value('JSON.stringify(store.events)'),answered);
+    await app.click('next');await app.keyEvent();assert.equal(app.value('view'),'result');assert(!app.value('focusMode.active'));assert(!app.html().includes('focus-skip-key'));
+  }
+  const mobile=await studyRuntime({mobile:true});assert(!mobile.html().includes('focus-skip-key'));const events=mobile.value('JSON.stringify(store.events)');assert.equal((await mobile.keyEvent()).defaultPrevented,false);assert.equal(mobile.value('JSON.stringify(store.events)'),events);assert.equal(mobile.value('session.index'),0);
+});
+
+test('Espaço respeita campos, controles nativos/customizados, modais, composição e modificadores',async()=>{
+  const options={},app=await studyRuntime(options);await app.click('toggle-focus');const events=app.value('JSON.stringify(store.events)');
+  const control=selector=>({dataset:{},closest(selectors){return selectors.split(',').includes(selector)?this:null;},matches(){return false;}});
+  for(const selector of ['input','textarea','select','button','a[href]','summary','video','[contenteditable]:not([contenteditable="false"])','[role="checkbox"]','[role="slider"]','[role="combobox"]','[role="button"]']){
+    assert.equal((await app.keyEvent({target:control(selector)})).defaultPrevented,false,selector);assert.equal(app.value('JSON.stringify(store.events)'),events);
+  }
+  assert.equal((await app.keyEvent({target:{isContentEditable:true}})).defaultPrevented,false);
+  assert.equal((await app.keyEvent({composedPath:()=>[control('button')]})).defaultPrevented,false);
+  for(const modifier of ['altKey','ctrlKey','metaKey','shiftKey','isComposing','defaultPrevented'])await app.keyEvent({[modifier]:true});
+  assert.equal(app.value('JSON.stringify(store.events)'),events);
+  app.document.querySelector('#dialog').open=true;assert.equal((await app.keyEvent()).defaultPrevented,false);app.document.querySelector('#dialog').open=false;
+  options.otherModal=true;assert.equal((await app.keyEvent()).defaultPrevented,false);options.otherModal=false;
+  await app.value('working=true;');assert.equal((await app.keyEvent()).defaultPrevented,false);await app.value('working=false;');
+  await app.value('restoration={state:"loading"};');assert.equal((await app.keyEvent()).defaultPrevented,false);await app.value('restoration=null;');
+  assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.value('session.index'),0);
+  await app.click('exit-focus');assert.equal((await app.keyEvent()).defaultPrevented,false);assert.equal(app.value('session.index'),0);
+});
+
+test('Espaço e Alt+P não pulam duas questões quando uma gravação ainda está pendente',async()=>{
+  for(const trigger of [{},{key:'p',code:'KeyP',altKey:true}]){
+    const app=await studyRuntime();await app.click('toggle-focus');
+    await app.value('var unlockSkip;const originalAdd=store.add.bind(store);store.add=async events=>{await new Promise(resolve=>unlockSkip=resolve);return originalAdd(events);};');
+    const first=app.keyEvent(trigger);assert(app.value('working'));await app.keyEvent();assert.equal(app.value('session.index'),0);
+    app.value('unlockSkip();');await first;assert.equal(app.value('session.index'),1);assert.equal(app.value('model.stats.attempts'),0);assert(!app.value('working'));
+  }
+});
 
 test('foco automático Mobile mantém seleção, cortes e rolagem, pede tela cheia e funciona até concluir',async()=>{
   const app=await studyRuntime({mobile:true});assert(app.value('focusMode.active'));await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});app.document.querySelector('.question-body').scrollTop=400;

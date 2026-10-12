@@ -1,5 +1,13 @@
 # Relatório de verificação — 08/10/2026
 
+## Modo Foco Desktop e atalho Espaço — 1.10.0 (12/10/2026)
+
+O Foco Desktop usa a altura útil com uma coluna central de até 960 px, enunciado de 21–25 px, alternativas em linhas de altura natural e separação de 10 px. Foram removidos o cartão externo, a sombra e o esticamento das alternativas. Metadados e estatísticas têm hierarquia secundária; o aviso de visitante permanece compacto no cabeçalho. Pergunta, alternativas e explicação rolam no contêiner interno, com ações reservadas abaixo. A leitura é preservada nos redesenhos da mesma questão, e o teclado recebe o foco da questão ao entrar ou avançar. As regras de telas baixas foram adaptadas; regras Mobile e desktop normal foram preservadas.
+
+Espaço pula apenas uma questão não respondida no Foco Desktop, em estudo ou simulado. O botão mostra a tecla e informa `aria-keyshortcuts="Space"`. A operação usa a lógica existente de pular: grava a posição e a marcação nula da questão, sem emitir acerto/erro. Campos, editores, botões, links, controles ARIA, modais, componentes em shadow DOM, composição, modificadores e eventos já tratados mantêm o uso da tecla. Repetições são suprimidas, e o bloqueio de trabalho impede duas ações enquanto a gravação está pendente. Após responder, a indicação desaparece e Espaço não avança nem confirma. Os atalhos existentes permanecem.
+
+Os testes de integração exercitam os manipuladores reais, o estado e a gravação em estudo/simulado, pausa nativa, Mobile, proteção de controles e concorrência. Os testes de layout Mobile continuam cobrindo as áreas seguras e os controles reservados. Aparência, medidas renderizadas e comportamento nativo dos controles não foram conferidos em navegador real: o controle de navegador exigido pelo ambiente Sites está indisponível. O pacote de publicação executa toda a suíte, sintaxe e build antes do envio.
+
 ## Alinhamento dos cartões Estudar no Mobile — 1.9.3 (11/10/2026)
 
 A captura mostra margem à esquerda e cartões chegando além da borda direita. A grade herdava duas colunas `1fr` com mínimo automático, enquanto os selos de disponibilidade herdavam `white-space: nowrap`; esse conjunto permite que o conteúdo mínimo alargue as colunas. No Mobile, as duas colunas agora usam `minmax(0, 1fr)`, os cartões podem encolher e os selos permitem quebra dentro da largura disponível. Títulos e descrições extensos também podem quebrar. A margem inferior genérica dos SVGs foi removida somente da seta dos selos, mantendo seu alinhamento vertical no flex. As margens existentes, as duas colunas, os ícones e o desktop foram preservados.
