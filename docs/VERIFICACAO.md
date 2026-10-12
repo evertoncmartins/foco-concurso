@@ -1,5 +1,11 @@
 # Relatório de verificação — 08/10/2026
 
+## Apresentação para qualquer concurso — 1.10.1 (12/10/2026)
+
+Foram generalizados o subtítulo do menu lateral, a descrição HTML do site, a apresentação do README, a menção de independência nos Termos e o prompt reutilizável de bancos JSON. O banco inicial autoral disponível para novas contas e download não menciona uma instituição específica como público-alvo; seus IDs, enunciados, alternativas, gabaritos e fundamentos foram preservados. A plataforma continua aceitando bancos de qualquer disciplina, órgão, banca ou cargo pelo mesmo importador.
+
+Não há migração nem sobrescrita de bancos ou progresso já armazenados. Tags e metadados das provas importadas permanecem para identificar sua origem, inclusive quando pertencem a instituições anteriormente citadas na identidade do app. As referências históricas e os dados de teste continuam como registros técnicos. O pacote de publicação executa os testes existentes, sintaxe e build; a busca em `src/` e `public/` confirma a ausência das siglas na apresentação distribuída. Não houve QA visual em navegador real, pois o controle exigido pelo ambiente Sites continua indisponível.
+
 ## Modo Foco Desktop e atalho Espaço — 1.10.0 (12/10/2026)
 
 O Foco Desktop usa a altura útil com uma coluna central de até 960 px, enunciado de 21–25 px, alternativas em linhas de altura natural e separação de 10 px. Foram removidos o cartão externo, a sombra e o esticamento das alternativas. Metadados e estatísticas têm hierarquia secundária; o aviso de visitante permanece compacto no cabeçalho. Pergunta, alternativas e explicação rolam no contêiner interno, com ações reservadas abaixo. A leitura é preservada nos redesenhos da mesma questão, e o teclado recebe o foco da questão ao entrar ou avançar. As regras de telas baixas foram adaptadas; regras Mobile e desktop normal foram preservadas.
