@@ -1,6 +1,6 @@
 # Foco — Estudos para concursos
 
-Plataforma pessoal para resolver questões e preparar concursos de Professor do IFSP e FATEC. HTML5, CSS3 e JavaScript em módulos ES, sem dependências de produção e sem banco de dados tradicional.
+Plataforma para resolver questões e estudar para qualquer concurso com seus próprios bancos JSON. HTML5, CSS3 e JavaScript em módulos ES, sem dependências de produção e sem banco de dados tradicional.
 
 ## Funcionalidades
 
