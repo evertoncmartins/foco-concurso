@@ -16,7 +16,7 @@ function mediaBlocks(source){
 }
 
 test('rodapé Mobile reserva espaço no viewport, considera safe area e deixa somente a questão rolável',()=>{
-  const blocks=mediaBlocks(css),dock=blocks.find(b=>b.body.includes('height:100dvh;min-height:0;overflow:hidden'));
+  const blocks=mediaBlocks(css),dock=blocks.find(b=>b.condition.trim()==='(max-width:700px)'&&b.body.includes('height:100dvh;min-height:0;overflow:hidden'));
   assert(dock);assert.match(dock.condition,/max-width:700px/);assert(!dock.condition.includes('min-width'));
   assert.match(dock.body,/\.shell\.session\{[^}]*height:100vh;height:100dvh[^}]*padding-bottom:env\(safe-area-inset-bottom,0px\)/);
   for(const selector of ['workspace','content','session-container','question-card','question-body']){
