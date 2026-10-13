@@ -12,7 +12,7 @@ import {validateBank} from '../src/engine.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress','question-origin'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress','question-origin','profile-photo'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -24,7 +24,7 @@ function runtime(options={}){
   let googleReady=options.googleReady??true,authorizations=0,preparations=0,restores=0,renders=0;
   function element(classes=''){
     const names=new Set(classes.split(/\s+/).filter(Boolean)),attributes=new Map();
-    return {innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){},showModal(){this.open=true;},close(){this.open=false;},querySelector(){return null;},scrollIntoView(){}};
+    return {dataset:{},innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){},showModal(){this.open=true;},close(){this.open=false;},querySelector(){return null;},scrollIntoView(){}};
   }
   const node=selector=>{
     if(!nodes.has(selector)){
@@ -47,8 +47,9 @@ function runtime(options={}){
     return nodes.get(selector);
   };
   const document={documentElement:{dataset:{theme:'light'}},fullscreenElement:null,addEventListener(name,fn){(listeners[name]??=[]).push(fn);},querySelector(selector){
+    if(['.sync-label','.connection-card'].includes(selector))return node('#app').innerHTML.includes('class="'+selector.slice(1)+'"')?node(selector):null;
     if(selector==='.question-body'||selector.startsWith('[data-option-row='))return nodes.get(selector)||null;
-    if(['#app','#toast','#dialog','#main','#bank-file','#progress-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
+    if(['#app','#toast','#dialog','#main','#bank-file','#progress-file','#profile-photo-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
     if(selector==='dialog[open],[aria-modal="true"]:not([hidden])'&&options.otherModal)return element();
     return null;
   },async emit(name,event){for(const fn of listeners[name]??[])await fn(event);}};
@@ -78,13 +79,13 @@ function runtime(options={}){
       }finally{this.connecting=false;}
     }
   }
-  const context=vm.createContext({...imports,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
+  const context=vm.createContext({...imports,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
-  const target=dataset=>({dataset,disabled:false,closest(){return this;},matches(){return false;}});
+  const target=dataset=>({dataset,disabled:false,closest(selector){return selector==='[data-action]'||selector==='button'?this:null;},matches(){return false;}});
   const resize=async mobile=>{const query='(min-width: 701px)',m=matchMedia(query);m.matches=!mobile;for(const callback of mediaListeners.get(query)||[])await callback({matches:m.matches});};
   const keyEvent=async overrides=>{
-    const event={key:' ',code:'Space',target:{dataset:{},closest(){return null;},matches(){return false;}},defaultPrevented:false,preventDefault(){this.defaultPrevented=true;},altKey:false,ctrlKey:false,metaKey:false,shiftKey:false,repeat:false,isComposing:false,...overrides};
+    const event={key:' ',code:overrides?.key?'':'Space',target:{dataset:{},closest(){return null;},matches(){return false;}},defaultPrevented:false,preventDefault(){this.defaultPrevented=true;},altKey:false,ctrlKey:false,metaKey:false,shiftKey:false,repeat:false,isComposing:false,...overrides};
     await document.emit('keydown',event);return event;
   };
   return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
@@ -95,6 +96,56 @@ async function studyRuntime(options={},mode='smart'){
   await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');await navigate('session');})()`);
   return app;
 }
+
+test('F e R alternam marcações sem Alt, preservam seleção e ignoram repetição e digitação',async()=>{
+  const app=await studyRuntime();await app.keyEvent({key:'2',code:'Digit2'});assert.equal(app.value('selected'),'B');
+  for(const [key,flag] of [['f','favorite'],['r','review']]){
+    const event=await app.keyEvent({key,code:`Key${key.toUpperCase()}`});assert(event.defaultPrevented);
+    assert(app.value(`model.flags.get(session.queue[0]).${flag}`));assert.equal(app.value('selected'),'B');
+    const before=app.value('JSON.stringify(store.events)');
+    for(const modifier of ['repeat','altKey','ctrlKey','metaKey','isComposing','defaultPrevented'])await app.keyEvent({key,[modifier]:true});
+    await app.keyEvent({key,target:{isContentEditable:true}});
+    await app.keyEvent({key,target:{closest:()=>({}),matches:()=>true}});
+    assert.equal(app.value('JSON.stringify(store.events)'),before);
+    await app.keyEvent({key:key.toUpperCase()});assert(!app.value(`model.flags.get(session.queue[0]).${flag}`));
+  }
+  await app.click('nav',{view:'settings'});const before=app.value('JSON.stringify(store.events)');await app.keyEvent({key:'f'});await app.keyEvent({key:'r'});assert.equal(app.value('JSON.stringify(store.events)'),before);
+});
+
+test('atalho F reserva a letra F para favorito, alternativa F continua acessível pelo número 6',async()=>{
+  const app=await studyRuntime();await app.value('while(model.questions[0].options.length<6){const id=String.fromCharCode(65+model.questions[0].options.length);model.questions[0].options.push({id,text:"Alternativa extra"});}');
+  await app.keyEvent({key:'6',code:'Digit6'});assert.equal(app.value('selected'),'F');
+  await app.keyEvent({key:'f',code:'KeyF'});assert(app.value('model.flags.get(session.queue[0]).favorite'));assert.equal(app.value('selected'),'F');
+});
+
+test('marcação por atalho bloqueia novas ações até terminar a gravação',async()=>{
+  const app=await studyRuntime();await app.value('var unlockFlag;const originalFlagAdd=store.add.bind(store);store.add=async events=>{await new Promise(resolve=>unlockFlag=resolve);return originalFlagAdd(events);};');
+  const first=app.keyEvent({key:'f'});assert(app.value('working'));await app.keyEvent({key:'r'});await app.keyEvent();
+  app.value('unlockFlag();');await first;assert.equal(app.value('session.index'),0);assert(app.value('model.flags.get(session.queue[0]).favorite'));assert(!app.value('model.flags.get(session.queue[0]).review'));assert(!app.value('working'));
+});
+
+test('indicador do Drive acompanha sucesso e alerta sem refazer a página',async()=>{
+  const app=runtime();await app.start();await app.click('nav',{view:'settings'});const renders=app.renders;
+  for(const status of ['pending','synced','expired','error','local']){
+    app.value(`drive.setStatus('${status}','Mensagem de teste');`);
+    const label=app.document.querySelector('.sync-label'),card=app.document.querySelector('.connection-card');
+    assert.equal(label.dataset.status,status);assert.equal(card.dataset.status,status);assert.match(card.innerHTML,/Mensagem de teste/);
+    assert.match(label.innerHTML,status==='synced'?/m5 12 4 4 10-10/:/m12 3 10 18H2z/);assert.equal(app.renders,renders);
+  }
+});
+
+test('trocar foto atualiza avatar, persiste na conta e permite remover',async()=>{
+  const photo='data:image/jpeg;base64,/9j/AAAA',app=runtime({preparePhoto:async()=>photo});await app.start();await app.click('nav',{view:'settings'});
+  await app.document.querySelector('#profile-photo-file').onchange({target:{files:[{type:'image/png',size:2048}],value:'fixture'}});
+  assert.match(app.html(),/alt="Foto de Estudante"/);assert.equal(app.value('config.photo'),photo);assert.equal(JSON.parse(app.value('accountStorage.getItem("foco:config")')).photo,photo);
+  await app.start();assert.equal(app.value('config.photo'),photo);await app.click('nav',{view:'settings'});await app.click('remove-photo');assert.equal(app.value('config.photo'),'');assert(!app.html().includes('<img src="data:image/jpeg'));
+});
+
+test('falha ao preparar a foto mantém a foto e as preferências existentes',async()=>{
+  const app=runtime({preparePhoto:async()=>{throw new Error('Imagem inválida');}});await app.start();await app.click('nav',{view:'settings'});const before=app.value('JSON.stringify(config)');
+  await app.document.querySelector('#profile-photo-file').onchange({target:{files:[{type:'image/png',size:2048}],value:'fixture'}});
+  assert.equal(app.value('JSON.stringify(config)'),before);assert(!app.value('working'));
+});
 test('restauração com versões divergentes da mesma resposta chega ao início sem bloquear',async()=>{
   const first={id:'answer-shared',at:'2026-10-08T12:00:00.000Z',type:'answer',key:`${bank.id}:${bank.questions[0].id}`,sessionId:'shared',selected:'A',correctOption:'A',correct:true,discipline:'Legislação',subject:'Lei',topic:'Direitos'};
   const later={...first,at:'2026-10-08T12:01:00.000Z',selected:'B',correct:false};
@@ -105,10 +156,10 @@ test('restauração com versões divergentes da mesma resposta chega ao início 
 const cutRow=(app,option)=>app.document.querySelector(`[data-option-row="${option}"]`);
 const cutControl=(app,option)=>cutRow(app,option).querySelector('.option-cut');
 
-test('Espaço pula somente no Foco Desktop, sem registrar resposta; indicação e foco acompanham a sessão',async()=>{
+test('Espaço pula no estudo normal e no foco, sem registrar resposta',async()=>{
   for(const mode of ['smart','exam']){
     const app=await studyRuntime({},mode);assert(!app.html().includes('focus-skip-key'));
-    assert.equal((await app.keyEvent()).defaultPrevented,false);assert.equal(app.value('session.index'),0);
+    assert.match(app.html(),/data-action="skip" aria-keyshortcuts="Space"/);
     await app.click('toggle-focus');assert.equal(app.document.focused,'.question-body');
     assert.match(app.html(),/data-action="skip" aria-keyshortcuts="Space">Pular<kbd class="focus-skip-key">Espaço<\/kbd>/);
     await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});app.document.querySelector('.question-body').scrollTop=260;
@@ -120,7 +171,8 @@ test('Espaço pula somente no Foco Desktop, sem registrar resposta; indicação 
     assert(!app.html().includes('focus-skip-key'));assert.equal((await app.keyEvent()).defaultPrevented,false);assert.equal(app.value('session.index'),1);assert.equal(app.value('JSON.stringify(store.events)'),answered);
     await app.click('next');await app.keyEvent();assert.equal(app.value('view'),'result');assert(!app.value('focusMode.active'));assert(!app.html().includes('focus-skip-key'));
   }
-  const mobile=await studyRuntime({mobile:true});assert(!mobile.html().includes('focus-skip-key'));const events=mobile.value('JSON.stringify(store.events)');assert.equal((await mobile.keyEvent()).defaultPrevented,false);assert.equal(mobile.value('JSON.stringify(store.events)'),events);assert.equal(mobile.value('session.index'),0);
+  const normal=await studyRuntime();assert.equal((await normal.keyEvent()).defaultPrevented,true);assert.equal(normal.value('session.index'),1);assert.equal(normal.value('model.stats.attempts'),0);
+  const mobile=await studyRuntime({mobile:true});assert.equal((await mobile.keyEvent()).defaultPrevented,true);assert.equal(mobile.value('session.index'),1);assert.equal(mobile.value('model.stats.attempts'),0);
 });
 
 test('Espaço respeita campos, controles nativos/customizados, modais, composição e modificadores',async()=>{
@@ -138,14 +190,14 @@ test('Espaço respeita campos, controles nativos/customizados, modais, composiç
   await app.value('working=true;');assert.equal((await app.keyEvent()).defaultPrevented,false);await app.value('working=false;');
   await app.value('restoration={state:"loading"};');assert.equal((await app.keyEvent()).defaultPrevented,false);await app.value('restoration=null;');
   assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.value('session.index'),0);
-  await app.click('exit-focus');assert.equal((await app.keyEvent()).defaultPrevented,false);assert.equal(app.value('session.index'),0);
+  await app.click('exit-focus');assert.equal((await app.keyEvent()).defaultPrevented,true);assert.equal(app.value('session.index'),1);
 });
 
-test('Espaço e Alt+P não pulam duas questões quando uma gravação ainda está pendente',async()=>{
-  for(const trigger of [{},{key:'p',code:'KeyP',altKey:true}]){
-    const app=await studyRuntime();await app.click('toggle-focus');
+test('Espaço não pula duas questões quando uma gravação ainda está pendente',async()=>{
+  for(const focus of [false,true]){
+    const app=await studyRuntime();if(focus)await app.click('toggle-focus');
     await app.value('var unlockSkip;const originalAdd=store.add.bind(store);store.add=async events=>{await new Promise(resolve=>unlockSkip=resolve);return originalAdd(events);};');
-    const first=app.keyEvent(trigger);assert(app.value('working'));await app.keyEvent();assert.equal(app.value('session.index'),0);
+    const first=app.keyEvent();assert(app.value('working'));await app.keyEvent();assert.equal(app.value('session.index'),0);
     app.value('unlockSkip();');await first;assert.equal(app.value('session.index'),1);assert.equal(app.value('model.stats.attempts'),0);assert(!app.value('working'));
   }
 });
