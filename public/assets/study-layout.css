@@ -47,9 +47,11 @@
   .option.answered .option-select{pointer-events:none}
 }
 @media(min-width:701px){
-  /* Hover reveals scissors before the letter and a short dashed cutting guide. */
-  .option-cut{position:relative;order:-1}
-  .option-cut::after{content:"";position:absolute;left:calc(100% - 5px);top:50%;width:11px;border-top:1px dashed currentColor;opacity:.5;pointer-events:none}
+  /* Keep the cutting control outside the highlighted row, with no layout slot.
+     Its hit area touches the row so moving to the scissors preserves hover. */
+  .option-cut{position:absolute;left:-40px;top:50%;transform:translateY(-50%);width:40px;height:32px;z-index:1}
+  .option-cut:hover,.option-cut:focus-visible{background:transparent}
+  .option-cut::after{content:"";position:absolute;left:calc(50% + 10px);top:50%;width:8px;border-top:1px dashed currentColor;opacity:.5;pointer-events:none}
   /* Size the regular question workspace to the browser's usable viewport. */
   .shell.session:not(.focus-mode){height:100dvh;min-height:0}
   .session:not(.focus-mode) .sidebar{min-height:0;overflow:auto}
@@ -61,7 +63,7 @@
   .session:not(.focus-mode) .session-header{flex-shrink:0;margin-bottom:8px;flex-wrap:wrap}
   .session:not(.focus-mode) .session-progress{flex-shrink:0;margin-bottom:12px}
   .session:not(.focus-mode) .question-card{display:flex;flex:1;flex-direction:column;min-height:0;padding:clamp(16px,2dvh,28px) clamp(18px,2.2vw,36px)}
-  .session:not(.focus-mode) .question-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:3px 4px}
+  .session:not(.focus-mode) .question-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:3px 4px 3px 44px;margin-inline-start:-40px}
   .question-body:focus-visible{outline:2px solid var(--detail-blue);outline-offset:2px;border-radius:6px}
   .session:not(.focus-mode) .question-meta{margin:10px 0 12px;overflow-wrap:anywhere}
   .session:not(.focus-mode) .question-statement{font-size:clamp(18px,1.35vw,24px);line-height:1.45;margin-bottom:16px;overflow-wrap:anywhere}
@@ -82,7 +84,7 @@
   .sidebar-collapsed .profile{flex-direction:column;gap:12px;margin-top:24px;padding-top:20px}
   .sidebar-collapsed .profile>.icon-btn{width:40px;height:40px}
   .focus-toggle{color:var(--accent)}
-  .shell.session.focus-mode{--focus-gutter:clamp(24px,4vw,72px);display:block;height:100dvh;min-height:0;overflow:hidden;padding-bottom:0}
+  .shell.session.focus-mode{--focus-gutter:clamp(44px,4vw,72px);display:block;height:100dvh;min-height:0;overflow:hidden;padding-bottom:0}
   .focus-mode>.sidebar,.focus-mode .topbar,.focus-mode>.mobile-nav,.focus-mode .guest-banner{display:none}
   .focus-mode .workspace{display:flex;flex-direction:column;height:100%;min-height:0}
   .focus-mode .focus-toolbar{display:flex;flex-shrink:0;align-items:center;justify-content:space-between;gap:16px;background:var(--bg);width:100%;margin:0;padding:12px var(--focus-gutter);border-bottom:1px solid var(--border)}
@@ -98,7 +100,7 @@
   .focus-mode .session-progress{flex-shrink:0;margin-bottom:18px}
   .focus-mode .session-progress .progress-track{height:3px}
   .focus-mode .question-card{display:flex;flex:1;flex-direction:column;min-width:0;min-height:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
-  .focus-mode .question-body{display:block;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:3px 10px 20px;margin-inline:-10px;scroll-padding-block:16px}
+  .focus-mode .question-body{display:block;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:3px 10px 20px 50px;margin-inline:-50px -10px;scroll-padding-block:16px}
   .focus-mode .question-body>.between{gap:12px;align-items:center}
   .focus-mode .question-body>.between>.flex{gap:6px}
   .focus-mode .question-tools .icon-btn{width:32px;height:32px;background:transparent}
