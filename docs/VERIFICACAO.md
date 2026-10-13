@@ -1,5 +1,13 @@
 # Relatório de verificação — 08/10/2026
 
+## Reconciliação de eventos do Drive — 1.10.2 (13/10/2026)
+
+A comparação deixa de depender da ordem das propriedades JSON. A restauração passa a reconciliar colisões válidas por ID, mantendo uma versão ativa e todas as originais em registros de recuperação com IDs derivados de SHA-256. Respostas da mesma tentativa contam uma vez; bancos, marcações e sessões usam a versão mais recente. Empates e a ordem de chegada entre dispositivos não alteram o resultado. A exportação e o principal do Drive conservam as variantes, e a limpeza só ocorre após conferir sua cobertura.
+
+O cache passa a comparar também a assinatura do conteúdo, além do ETag e dos IDs. A gravação local confere alterações feitas durante o cálculo e desfaz registros de recuperação/substituições caso o armazenamento falhe. O login Google, os escopos e a separação por conta permanecem no fluxo existente.
+
+Os testes novos cobrem ordem JSON, normalização antiga, respostas concorrentes/repetidas, bancos e sessões divergentes, empates, três variantes, exportação e recarga, registros de recuperação adulterados, resultados inválidos, cota, outra aba, colisões dentro de um arquivo, consolidação antes da lixeira e invalidação do cache. Passaram os 164 testes, a verificação de sintaxe e o build. Os scripts de package.json foram executados com `node --run`, pois npm não está no PATH deste ambiente Windows. Os testes HTTP simulados e o controlador com DOM simulado não substituem a conferência do consentimento e da pasta real no navegador de produção.
+
 ## Apresentação para qualquer concurso — 1.10.1 (12/10/2026)
 
 Foram generalizados o subtítulo do menu lateral, a descrição HTML do site, a apresentação do README, a menção de independência nos Termos e o prompt reutilizável de bancos JSON. O banco inicial autoral disponível para novas contas e download não menciona uma instituição específica como público-alvo; seus IDs, enunciados, alternativas, gabaritos e fundamentos foram preservados. A plataforma continua aceitando bancos de qualquer disciplina, órgão, banca ou cargo pelo mesmo importador.
