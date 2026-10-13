@@ -12,7 +12,7 @@ import {validateBank} from '../src/engine.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress','question-origin','profile-photo'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress','question-origin','profile-photo','option-swipe'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -37,6 +37,7 @@ function runtime(options={}){
           for(const [,classes,id,content] of html.matchAll(/<div class="(option [^"]*)" data-option-row="([^"]+)"[^>]*>([\s\S]*?)<\/div>/g)){
             const row=element(classes),control=element('option-cut'),tag=content.match(/<button[^>]*class="option-cut"[^>]*>/)?.[0]||'';
             for(const [,name,value] of tag.matchAll(/(aria-pressed|aria-label|title)="([^"]*)"/g))control.setAttribute(name,value);
+            row.dataset.optionRow=id;row.closest=selector=>selector==='[data-option-row]'?row:null;row.getBoundingClientRect=()=>({width:300});
             row.querySelector=selector=>selector==='.option-cut'?control:null;
             nodes.set(`[data-option-row="${id}"]`,row);
           }
@@ -154,6 +155,28 @@ test('restauração com versões divergentes da mesma resposta chega ao início 
   assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('store.events.filter(event=>event.type==="event-conflict").length'),2);
 });
 const cutRow=(app,option)=>app.document.querySelector(`[data-option-row="${option}"]`);
+
+async function swipeOption(app,option,direction){
+  const row=cutRow(app,option),x=direction==='left'?100:300;
+  const event={pointerId:1,pointerType:'touch',isPrimary:true,button:0,clientX:200,clientY:100,target:row,cancelable:true,preventDefault(){}};
+  await app.document.emit('pointerdown',event);await app.document.emit('pointermove',{...event,clientX:x});await app.document.emit('pointerup',{...event,clientX:x});
+  // The native compatibility click must not select the dragged alternative.
+  await app.document.emit('click',{target:row,detail:1,preventDefault(){},stopPropagation(){}});
+}
+
+test('gestos Mobile riscam e restauram sem selecionar, responder, gravar ou mudar rolagem',async()=>{
+  const app=await studyRuntime({mobile:true});await app.click('select',{option:'B'});const before=app.value('JSON.stringify(store.events)'),renders=app.renders,body=app.document.querySelector('.question-body');body.scrollTop=180;
+  for(const direction of ['left','left','right','right']){
+    await swipeOption(app,'A',direction);assert.equal(cutRow(app,'A').classList.contains('eliminated'),direction==='left');assert.equal(app.value('selected'),'B');assert.equal(app.renders,renders);assert.equal(body.scrollTop,180);assert.equal(app.value('JSON.stringify(store.events)'),before);
+  }
+  await app.click('select',{option:'A'});assert.equal(app.value('selected'),'A');assert.match(app.html(),/Deslize para riscar/);
+});
+
+test('gestos só atuam no Mobile e mantêm gabarito e respostas após responder',async()=>{
+  const desktop=await studyRuntime();await swipeOption(desktop,'A','left');assert(!cutRow(desktop,'A').classList.contains('eliminated'));
+  const app=await studyRuntime({mobile:true});await app.click('select',{option:'B'});await app.click('answer');const before=app.value('JSON.stringify(store.events)'),answer=app.value('session.answers[session.queue[0]]');
+  await swipeOption(app,'A','left');assert(cutRow(app,'A').classList.contains('eliminated'));await swipeOption(app,'A','right');assert(!cutRow(app,'A').classList.contains('eliminated'));assert.equal(app.value('session.answers[session.queue[0]]'),answer);assert.equal(app.value('JSON.stringify(store.events)'),before);
+});
 const cutControl=(app,option)=>cutRow(app,option).querySelector('.option-cut');
 
 test('Espaço pula no estudo normal e no foco, sem registrar resposta',async()=>{
