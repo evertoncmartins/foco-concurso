@@ -47,6 +47,9 @@
   .option.answered .option-select{pointer-events:none}
 }
 @media(min-width:701px){
+  /* Hover reveals scissors before the letter and a short dashed cutting guide. */
+  .option-cut{position:relative;order:-1}
+  .option-cut::after{content:"";position:absolute;left:calc(100% - 5px);top:50%;width:11px;border-top:1px dashed currentColor;opacity:.5;pointer-events:none}
   /* Size the regular question workspace to the browser's usable viewport. */
   .shell.session:not(.focus-mode){height:100dvh;min-height:0}
   .session:not(.focus-mode) .sidebar{min-height:0;overflow:auto}
