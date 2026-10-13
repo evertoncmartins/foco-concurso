@@ -15,6 +15,15 @@ function mediaBlocks(source){
   return blocks;
 }
 
+test('tesoura Mobile permanece visível depois da letra com alvo de toque de 44 px; hover Desktop é preservado',()=>{
+  const mobile=mediaBlocks(css).find(b=>b.condition.trim()==='(max-width:700px)'&&b.body.includes('.option-cut')).body;
+  assert.match(mobile,/\.option-cut,\.option:hover \.option-cut,\.option:has\(:focus-visible\) \.option-cut\{[^}]*position:static[^}]*transform:none[^}]*width:44px;height:44px[^}]*opacity:1;pointer-events:auto/);
+  assert(!/clip-path|touch-action|user-select|swiping|option-gesture-tip/.test(mobile));
+  assert.match(css,/\.option-cut\{position:absolute;right:12px[^}]*width:32px;height:32px[^}]*opacity:0;pointer-events:none/);
+  assert.match(css,/\.option:hover \.option-cut,\.option:has\(:focus-visible\) \.option-cut\{opacity:1;pointer-events:auto\}/);
+  assert.match(css,/\.option\.eliminated \.option-text\{text-decoration:line-through[^}]*opacity:\.5/);
+});
+
 test('rodapé Mobile reserva espaço no viewport, considera safe area e deixa somente a questão rolável',()=>{
   const blocks=mediaBlocks(css),dock=blocks.find(b=>b.condition.trim()==='(max-width:700px)'&&b.body.includes('height:100dvh;min-height:0;overflow:hidden'));
   assert(dock);assert.match(dock.condition,/max-width:700px/);assert(!dock.condition.includes('min-width'));
