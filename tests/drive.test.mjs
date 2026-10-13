@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {Store} from '../src/store.mjs';
 import {DriveSync} from '../src/drive.mjs';
 import {AccountStorage} from '../src/account.mjs';
+import {coversEvents} from '../src/event-conflicts.mjs';
 
 class MemoryStorage{data=new Map();get length(){return this.data.size;}key(i){return [...this.data.keys()][i]??null;}getItem(k){return this.data.get(k)??null;}setItem(k,v){this.data.set(k,String(v));}removeItem(k){this.data.delete(k);}}
 const document=(events,subject)=>({schemaVersion:1,app:'foco-concursos',...(subject?{owner:{provider:'google',subject}}:{}),events});
@@ -111,9 +112,38 @@ test('Drive: lote alterado durante limpeza é relido e incorporado antes de ir p
 test('Drive: conteúdo gravado incompleto impede qualquer limpeza',()=>withRemote(async remote=>{
   remote.seed('a','foco-progresso-old-a.json',[flag('a')]);remote.seed('b','foco-progresso-old-b.json',[flag('b')]);remote.corruptWrite=true;const {store,drive}=syncClient();await assert.rejects(()=>drive.sync(),/preservados/);assert.equal(remote.live().length,2);assert.equal(store.events.length,2);assert(!remote.calls.some(c=>c.method==='PATCH'));
 }));
-test('Drive: arquivos inválidos, IDs conflitantes e busca incompleta impedem gravação e limpeza',()=>withRemote(async remote=>{
+test('Drive: arquivos inválidos e busca incompleta impedem gravação e limpeza',()=>withRemote(async remote=>{
   const {store,drive}=syncClient();await store.merge([flag('local')]);remote.seed('bad','foco-progresso-bad.json',[]);remote.files.get('bad').document.schemaVersion=99;await assert.rejects(()=>drive.sync(),/inválido/);assert.equal(store.events.length,1);
-  remote.files.clear();remote.seed('a','foco-progresso-a.json',[flag('local','different')]);await assert.rejects(()=>drive.sync(),/Conflito/);remote.files.clear();remote.incomplete=true;await assert.rejects(()=>drive.sync(),/incompleta/);assert(!remote.calls.some(c=>c.method!=='GET'));
+  remote.files.clear();remote.incomplete=true;await assert.rejects(()=>drive.sync(),/incompleta/);assert(!remote.calls.some(c=>c.method!=='GET'));
+}));
+
+test('Drive: colisões reais são reconciliadas, verificadas e preservadas antes da limpeza',()=>withRemote(async remote=>{
+  const a=flag('same','first'),b=flag('same','second');remote.seed('a','foco-progresso-a.json',[a]);remote.seed('b','foco-progresso-b.json',[b]);
+  const {store,drive}=syncClient();await drive.sync();
+  assert.equal(drive.status,'synced');assert.equal(remote.live().length,1);assert.equal(store.events.length,3);
+  const events=remote.live()[0][1].document.events;assert(coversEvents(events,[a,b]));assert.equal(events.filter(event=>event.type==='event-conflict').length,2);
+  remote.calls.length=0;await drive.sync();assert(!remote.calls.some(call=>call.method!=='GET'));assert.equal(store.events.length,3);
+}));
+
+test('Drive: IDs repetidos dentro de um arquivo são corrigidos no próprio principal',()=>withRemote(async remote=>{
+  const a=flag('same','first'),b=flag('same','second');remote.seed('main','foco-progresso-principal.json',[a,b]);
+  const {drive}=syncClient();await drive.sync();const file=remote.files.get('main');
+  assert.equal(drive.status,'synced');assert(file.version>1);assert.equal(file.document.events.length,3);assert(coversEvents(file.document.events,[a,b]));
+}));
+
+test('Drive: cache do mesmo ETag não esconde uma versão ativa reconciliada',()=>withRemote(async remote=>{
+  const first=flag('same','first'),latest={...flag('same','second'),at:'2026-10-09T00:00:00.000Z'};
+  const {store,drive}=syncClient();await store.merge([first]);await drive.sync();const id=remote.live()[0][0];
+  await store.merge([latest]);remote.calls.length=0;await drive.sync();
+  assert(remote.calls.some(call=>call.url.includes('alt=media')));assert(coversEvents(remote.files.get(id).document.events,[first,latest]));
+  assert.equal(remote.files.get(id).document.events.length,3);assert.equal(drive.status,'synced');
+}));
+
+test('Drive: dois dispositivos com a mesma tentativa divergente convergem sem novas cópias',()=>withRemote(async remote=>{
+  const first=flag('same','first'),latest={...flag('same','second'),at:'2026-10-09T00:00:00.000Z'},a=syncClient(),b=syncClient();
+  await a.store.merge([first]);await a.drive.sync();await b.store.merge([latest]);await b.drive.sync();await a.drive.sync();await b.drive.sync();
+  assert.equal(remote.live().length,1);assert.equal(a.store.events.length,3);assert.equal(b.store.events.length,3);
+  assert.deepEqual(a.store.events,b.store.events);assert(coversEvents(remote.live()[0][1].document.events,[first,latest]));
 }));
 test('Drive: sem versão remota nunca atualiza nem move o histórico',()=>withRemote(async remote=>{
   remote.seed('a','foco-progresso-a.json',[flag('a')]);remote.missingEtag=true;const {drive}=syncClient();await assert.rejects(()=>drive.sync(),/versão/);assert.equal(remote.live().length,1);assert(!remote.calls.some(c=>c.method!=='GET'));

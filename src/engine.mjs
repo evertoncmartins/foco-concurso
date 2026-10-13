@@ -2,6 +2,9 @@ import {normalizeQuestionOrigin} from './question-origin.mjs';
 export const VERSION = 1;
 export const DAY = 86400000;
 export const questionKey = (b, q) => `${b}:${q}`;
+// JSON object key order is not part of an event's content. Array order is.
+export const canonicalJSON = value => JSON.stringify(value,(_,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.entries(item).sort(([a],[b])=>a<b?-1:a>b?1:0)):item);
+export const sameEvent = (a,b) => canonicalJSON(a)===canonicalJSON(b);
 const text = (v, label, max = 20000) => { if (typeof v !== 'string' || !v.trim() || v.length > max) throw new Error(`${label}: informe um texto válido (até ${max} caracteres).`); return v.trim(); };
 export function validateBank(raw) {
   if (!raw || raw.schemaVersion !== 1) throw new Error('schemaVersion deve ser 1. Baixe o modelo JSON.');
@@ -31,6 +34,12 @@ export function validateEvents(document) {
   if (document?.schemaVersion !== 1 || !Array.isArray(document.events) || document.events.length > 100000) throw new Error('Arquivo de progresso inválido ou versão incompatível.');
   const events = document.events.map(e => {
     if (!e || typeof e !== 'object' || typeof e.id !== 'string' || !e.id || e.id.length > 300 || typeof e.at !== 'string' || !Number.isFinite(Date.parse(e.at)) || new Date(e.at).toISOString() !== e.at) throw new Error('Evento de progresso inválido.');
+    if (e.type === 'event-conflict') {
+      if (!/^foco-conflict-[a-f0-9]{64}$/.test(e.id) || typeof e.originalId !== 'string' || !e.event || e.event.type === 'event-conflict') throw new Error('Registro de recuperação inválido.');
+      const original=validateEvents({schemaVersion:1,events:[e.event]})[0];
+      if (original.id !== e.originalId || original.at !== e.at) throw new Error('Registro de recuperação inválido.');
+      return {...e,event:original};
+    }
     if (e.type === 'bank') return {...e, bank: validateBank(e.bank)};
     if (e.type === 'bank-state') { if (typeof e.bankId !== 'string' || !['enabled','disabled','deleted'].includes(e.value)) throw new Error('Estado de banco inválido.'); }
     else if (e.type === 'answer') {
@@ -49,7 +58,7 @@ export function validateEvents(document) {
 }
 export function mergeEvents(...collections) {
   const map = new Map();
-  for (const e of collections.flat()) { const old = map.get(e.id); if (old && JSON.stringify(old) !== JSON.stringify(e)) throw new Error('Conflito: dois eventos com o mesmo ID têm conteúdos diferentes.'); map.set(e.id, e); }
+  for (const e of collections.flat()) { const old = map.get(e.id); if (old && !sameEvent(old,e)) throw new Error('Conflito: dois eventos com o mesmo ID têm conteúdos diferentes.'); map.set(e.id, e); }
   return [...map.values()].sort((a,b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id));
 }
 export function derive(events, now = Date.now()) {

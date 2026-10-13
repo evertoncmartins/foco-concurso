@@ -13,7 +13,7 @@ import {validateBank} from '../src/engine.mjs';
 const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
 const imports={};
 for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress','question-origin'])Object.assign(imports,await import(`../src/${module}.mjs`));
-const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\n/gm,'').replace(/\ninit\(\);\s*$/,'');
+const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
 
@@ -95,6 +95,13 @@ async function studyRuntime(options={},mode='smart'){
   await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');await navigate('session');})()`);
   return app;
 }
+test('restauração com versões divergentes da mesma resposta chega ao início sem bloquear',async()=>{
+  const first={id:'answer-shared',at:'2026-10-08T12:00:00.000Z',type:'answer',key:`${bank.id}:${bank.questions[0].id}`,sessionId:'shared',selected:'A',correctOption:'A',correct:true,discipline:'Legislação',subject:'Lei',topic:'Direitos'};
+  const later={...first,at:'2026-10-08T12:01:00.000Z',selected:'B',correct:false};
+  const app=runtime({events:[first,later]});await app.start();
+  assert.equal(app.value('restoration'),null);assert.match(app.html(),/home-page/);assert.match(app.html(),/Drive sincronizado/);
+  assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('store.events.filter(event=>event.type==="event-conflict").length'),2);
+});
 const cutRow=(app,option)=>app.document.querySelector(`[data-option-row="${option}"]`);
 const cutControl=(app,option)=>cutRow(app,option).querySelector('.option-cut');
 

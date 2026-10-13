@@ -48,9 +48,21 @@ O principal contém o histórico completo de eventos, deduplicados por UUID. Na 
 
 As gravações usam o ETag do recurso de arquivo da API Drive v2 em `If-Match`. Se outro dispositivo modifica o arquivo depois da leitura, o Drive recusa a gravação com 412. O Foco relê a versão atual, une os históricos e tenta novamente, com limite de seis tentativas por sincronização. A limpeza dos lotes também usa sua versão exata: um lote alterado precisa ser incorporado novamente antes de ir para a lixeira. A API v3 permanece responsável por listagem, criação e download. Não há novo banco de dados, escopo OAuth ou segredo de servidor.
 
-Bancos, respostas, marcações e sessões continuam como eventos. Um evento idêntico já existente não aumenta tentativas novamente. Mesmo ID com conteúdos diferentes interrompe a união com mensagem explícita. Evite responder à mesma sessão simultaneamente em dois dispositivos; sessões independentes se unem normalmente. Alterações locais recebidas durante um envio são incluídas na próxima atualização do principal.
+Bancos, respostas, marcações e sessões continuam como eventos. Um evento idêntico já existente não aumenta tentativas novamente. Mesmo ID com conteúdos válidos diferentes é reconciliado automaticamente conforme a política abaixo. Sessões independentes se unem normalmente. Alterações locais recebidas durante um envio são incluídas na próxima atualização do principal.
 
-O cache local guarda IDs de eventos/arquivos confirmados, ETags e, durante a primeira criação, um envio pendente com ID estável. Nunca guarda tokens. Falhas de leitura não são interpretadas como histórico vazio. Criações simultâneas em uma pasta vazia podem gerar dois principais temporariamente; a sincronização os reúne e mantém um único arquivo ativo. Clientes antigos ainda abertos podem gerar lotes, que a nova versão incorpora na próxima sincronização. Atualize todas as abas e dispositivos para utilizar o fluxo novo.
+O cache local guarda IDs de eventos/arquivos confirmados, ETags, uma assinatura SHA-256 do conteúdo e, durante a primeira criação, um envio pendente com ID estável. A assinatura impede que uma versão local reconciliada seja confundida com o conteúdo remoto só por ter o mesmo ID. Nunca guarda tokens. Falhas de leitura não são interpretadas como histórico vazio. Criações simultâneas em uma pasta vazia podem gerar dois principais temporariamente; a sincronização os reúne e mantém um único arquivo ativo. Clientes antigos ainda abertos podem gerar lotes, que a nova versão incorpora na próxima sincronização. Atualize todas as abas e dispositivos para utilizar o fluxo novo.
+
+## Reconciliação automática — 1.10.2
+
+A restauração do Drive e a importação de backups da mesma conta usam a mesma reconciliação. A ordem das propriedades JSON é ignorada; a ordem dos itens das listas continua significativa. Dados são validados e normalizados antes da comparação.
+
+Quando existem versões diferentes de um evento válido com o mesmo ID, a resposta de uma tentativa conserva a primeira versão registrada. Bancos, estados, marcações e sessões conservam a versão mais recente. O horário é o `at` já registrado no evento; empates usam a representação ordenada do conteúdo, de forma determinística. Essa política escolhe uma versão ativa sem apresentar as duas respostas como tentativas independentes.
+
+Todas as versões originais, inclusive a ativa, são preservadas em eventos `event-conflict`, que contêm `originalId` e `event`. Os IDs desses registros usam SHA-256 do conteúdo, portanto repetir a restauração ou sincronizar em ordem diferente não produz cópias sem fim. Esses registros não entram em acertos, erros, favoritos ou sessões; continuam disponíveis no JSON exportado e no principal do Drive. Não há descarte silencioso de variantes.
+
+Os registros de recuperação são gravados localmente antes da substituição ativa. Uma falha de armazenamento desfaz tanto os novos registros quanto as substituições. Antes de mover lotes antigos para a lixeira, a conferência do principal exige a presença de cada original, como versão ativa ou registro de recuperação. Arquivos de outra conta, registros inválidos e resultados inconsistentes continuam sendo recusados. Os limites de tamanho e de eventos permanecem em vigor.
+
+Não há nova permissão Google nem alteração do cliente OAuth. Abas anteriores a esta versão devem ser recarregadas para reconhecer os registros de recuperação e usar a reconciliação automática.
 
 ## Bancos diretamente do Drive
 

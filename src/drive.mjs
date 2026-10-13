@@ -1,16 +1,14 @@
-import {validateEvents,validateBank,mergeEvents} from './engine.mjs';
+import {validateEvents,validateBank,canonicalJSON} from './engine.mjs';
 import {assertProgressOwner} from './account.mjs';
 import {GoogleAccount,prepareGoogle} from './auth.mjs';
+import {contentDigest,coversEvents} from './event-conflicts.mjs';
 export const DEFAULT_FOLDER='1BsRHtMhLBHVSpn7gqIZCjuE4JaGbitPV';
 const API='https://www.googleapis.com/drive/v3';
 // v2 exposes the file ETag in JSON. Use that resource's ETag for conditional
 // updates, never the different ETag of an alt=media download.
 const VERSIONED_API='https://www.googleapis.com/drive/v2';
 const changed=()=>Object.assign(new Error('O progresso mudou em outro dispositivo. Tentando unir os históricos novamente…'),{retrySync:true});
-const covers=(whole,part)=>{
-  const events=new Map(whole.map(e=>[e.id,JSON.stringify(e)]));
-  return part.every(e=>events.get(e.id)===JSON.stringify(e));
-};
+const covers=coversEvents;
 export class DriveSync extends EventTarget {
   constructor(store,config,account=null,settings=null) {super();this.store=store;this.storage=store.storage;this.userId=store.storage.userId||null;this.config=config;this.account=account;this.settings=settings;this.token=null;this.expires=0;this.status='local';this.busy=false;this.connecting=false;this.timer=null;this.lastSync=null;this.folder=null;this.closed=false;this.generation=0;}
   reportProgress(stage,completed=0,total=0){this.restoreProgress={stage,completed,total};this.dispatchEvent(new Event('progress'));}
@@ -81,17 +79,16 @@ export class DriveSync extends EventTarget {
   async readProgress(file,cache,{force=false}={}){
     const metadata=await this.progressMetadata(file.id),snapshot=cache.snapshots[file.id];
     this.store.load();const local=new Map(this.store.events.map(e=>[e.id,e]));let events;
-    if(!force&&snapshot?.etag===metadata.etag&&Array.isArray(snapshot.events)&&snapshot.events.every(id=>local.has(id))){
+    if(!force&&snapshot?.etag===metadata.etag&&Array.isArray(snapshot.events)&&snapshot.events.every(id=>local.has(id))&&snapshot.signature===await contentDigest(snapshot.events.map(id=>local.get(id)))){
       events=snapshot.events.map(id=>local.get(id));
     }else{
       const document=await this.readFile({...file,size:metadata.fileSize});
-      assertProgressOwner(document,this.userId);events=mergeEvents(validateEvents(document));
+      assertProgressOwner(document,this.userId);events=validateEvents(document);
       // The metadata/content requests must describe the same file revision.
       if((await this.progressMetadata(file.id)).etag!==metadata.etag)throw changed();
     }
-    mergeEvents(this.store.events,events);
-    if(events.some(e=>!local.has(e.id)))await this.store.merge(events);
-    cache.snapshots[file.id]={etag:metadata.etag,events:events.map(e=>e.id)};this.saveCache(cache);
+    if(!covers(this.store.events,events))await this.store.merge(events);
+    cache.snapshots[file.id]={etag:metadata.etag,events:events.map(e=>e.id),signature:await contentDigest(events)};this.saveCache(cache);
     return {id:file.id,name:metadata.title,etag:metadata.etag,events};
   }
   progressDocument(events){
@@ -144,7 +141,7 @@ export class DriveSync extends EventTarget {
       const remaining=(await this.list(`name contains '${this.progressPrefix()}' and mimeType = 'application/json'`)).filter(f=>f.name.startsWith(this.progressPrefix())&&(!this.userId||f.ownedByMe===true));
       if(remaining.length!==1||remaining[0].id!==principal.id)throw changed();
     }
-    cache.snapshots={[principal.id]:{etag:principal.etag,events:principal.events.map(e=>e.id)}};this.saveCache(cache);
+    cache.snapshots={[principal.id]:{etag:principal.etag,events:principal.events.map(e=>e.id),signature:await contentDigest(principal.events)}};this.saveCache(cache);
     return principal;
   }
   schedule(){if(!this.token||this.connecting)return;clearTimeout(this.timer);this.setStatus('pending','Alterações locais aguardando envio.');this.timer=setTimeout(()=>this.sync().catch(()=>{}),6000);}
@@ -171,7 +168,7 @@ export class DriveSync extends EventTarget {
     const metadata={id:batch.id,name:batch.name,mimeType:'application/json',parents:[this.config.folderId],appProperties:{app:'foco-concursos',kind:'progress',schema:'1'}};
     const body=`--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(batch.document)}\r\n--${boundary}--`;
     try{await this.request('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name',{method:'POST',headers:{'Content-Type':`multipart/related; boundary=${boundary}`},body});}
-    catch(e){if(e.status!==409)throw e;const existing=await this.readFile({id:batch.id});if(JSON.stringify(existing)!==JSON.stringify(batch.document))throw new Error('Conflito no arquivo remoto. O lote local foi preservado.');}
+    catch(e){if(e.status!==409)throw e;const existing=await this.readFile({id:batch.id});if(canonicalJSON(existing)!==canonicalJSON(batch.document))throw new Error('Conflito no arquivo remoto. O lote local foi preservado.');}
   }
   async bankFiles(){return (await this.list("mimeType = 'application/json' or name contains '.json'" )).filter(f=>!f.name.startsWith('foco-progresso-'));}
   async importNewBanks(){
