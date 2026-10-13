@@ -18,7 +18,7 @@ Plataforma para resolver questões e estudar para qualquer concurso com seus pr�
 - Entrada compacta e início com ação principal de estudo, meta diária, atalhos e bancos; layout dedicado ao celular.
 - Importação e exportação de bancos JSON; ativação, desativação e remoção.
 - Sessões recomendadas, aleatórias, não respondidas, erros, favoritas, revisão, filtros por assunto e simulados.
-- Tesoura discreta para riscar/restaurar alternativas: no Mobile, sempre visível após cada letra, com área de toque de 44 px; no Desktop, preserva a exibição por hover ou foco. O Mobile não utiliza mais gestos de arrastar. Marcação somente visual e temporária, preservada ao trocar tema ou modo foco, sem selecionar, responder ou sincronizar progresso; reinicia ao mudar de questão ou sessão.
+- Tesoura discreta após cada letra para riscar/restaurar alternativas: no Mobile, sempre visível, com área de toque de 44 px; no Desktop, aparece por hover ou foco, antes do texto e sem deslocá-lo ao aparecer. O Mobile não utiliza mais gestos de arrastar. Marcação somente visual e temporária, preservada ao trocar tema ou modo foco, sem selecionar, responder ou sincronizar progresso; reinicia ao mudar de questão ou sessão.
 - Feedback com resposta selecionada, alternativa correta, comentário e referência.
 - Favoritos, revisão espaçada, estatísticas por disciplina/assunto/tópico e histórico.
 - Sessões pausáveis e retomadas após recarregar a página.
