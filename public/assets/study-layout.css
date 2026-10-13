@@ -30,9 +30,9 @@
 /* Separate native controls keep crossing out independent from answering. */
 .option{position:relative;gap:8px;cursor:pointer}
 .option.answered{cursor:default}
-.option-select{display:flex;flex:1;align-self:stretch;align-items:center;gap:15px;min-width:0;padding:0 40px 0 0;border:0;background:transparent;color:inherit;text-align:left;line-height:inherit;border-radius:4px}
+.option-select{display:flex;flex:1;align-self:stretch;align-items:center;gap:15px;min-width:0;padding:0;border:0;background:transparent;color:inherit;text-align:left;line-height:inherit;border-radius:4px}
 .option-text{min-width:0;overflow-wrap:anywhere}
-.option-cut{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;border-radius:6px;background:var(--surface);color:var(--muted);line-height:1;opacity:0;pointer-events:none;transition:opacity .15s}
+.option-cut{position:static;flex-shrink:0;display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--muted);line-height:1;opacity:0;pointer-events:none;transition:opacity .15s}
 .option:hover .option-cut,.option:has(:focus-visible) .option-cut{opacity:1;pointer-events:auto}
 .option-cut:hover,.option-cut:focus-visible{background:var(--surface2);color:var(--text)}
 .option.eliminated .option-text{text-decoration:line-through;text-decoration-thickness:1px;opacity:.5}
