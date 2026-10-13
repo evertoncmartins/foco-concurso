@@ -40,16 +40,11 @@
 .option.eliminated:not(.answered){border-color:var(--border);background:var(--surface)}
 .option.eliminated .option-cut{color:var(--muted)}
 @media(max-width:700px){
-  .option{gap:8px;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none}
-  /* Keep an accessible keyboard action without a fixed icon on touch screens. */
-  .option-cut,.option:hover .option-cut,.option:has(:focus-visible) .option-cut{opacity:0;pointer-events:none;width:1px;height:1px;clip-path:inset(50%);overflow:hidden}
-  .option .option-cut:focus-visible{opacity:1;pointer-events:auto;width:44px;height:44px;clip-path:none}
-  .option:has(.option-cut:focus-visible) .option-select{padding-right:48px}
+  .option{gap:4px}
+  /* A small icon after the letter, inside a comfortable native touch target. */
+  .option-cut,.option:hover .option-cut,.option:has(:focus-visible) .option-cut{position:static;transform:none;flex-shrink:0;width:44px;height:44px;margin:-8px 0;background:transparent;opacity:1;pointer-events:auto}
   .option-select{align-items:flex-start;gap:0;padding-right:0}
   .option.answered .option-select{pointer-events:none}
-  .option.swiping{border-color:var(--detail-blue);background:var(--detail-blue-soft)}
-  .option.swiping::after{content:attr(data-swipe-label);position:absolute;right:12px;top:50%;transform:translateY(-50%);padding:4px 8px;border-radius:5px;background:var(--surface);color:var(--detail-blue);font-size:11px;pointer-events:none}
-  .option-gesture-tip{font-size:10px;color:var(--muted);margin-top:12px}
 }
 @media(min-width:701px){
   /* Size the regular question workspace to the browser's usable viewport. */
