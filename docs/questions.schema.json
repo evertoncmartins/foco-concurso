@@ -21,12 +21,10 @@
     },
     "name": {
       "type": "string",
-      "minLength": 1,
-      "maxLength": 200
+      "minLength": 1
     },
     "description": {
-      "type": "string",
-      "maxLength": 2000
+      "type": "string"
     },
     "questions": {
       "type": "array",
@@ -40,13 +38,11 @@
   "$defs": {
     "shortText": {
       "type": "string",
-      "minLength": 1,
-      "maxLength": 200
+      "minLength": 1
     },
     "longText": {
       "type": "string",
-      "minLength": 1,
-      "maxLength": 20000
+      "minLength": 1
     },
     "question": {
       "type": "object",
@@ -120,8 +116,7 @@
           "properties": {
             "label": {
               "type": "string",
-              "minLength": 1,
-              "maxLength": 1000
+              "minLength": 1
             },
             "url": {
               "type": "string",
@@ -141,49 +136,40 @@
           "type": "array",
           "maxItems": 30,
           "items": {
-            "type": "string",
-            "maxLength": 100
+            "type": "string"
           }
         },
         "instituicao": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 200
+          "minLength": 1
         },
         "tag": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 100
+          "minLength": 1
         },
         "banca": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 200
+          "minLength": 1
         },
         "cargo": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 300
+          "minLength": 1
         },
         "nivelCargo": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 200
+          "minLength": 1
         },
         "tipo": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 200
+          "minLength": 1
         },
         "fundamentoLegal": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 2000
+          "minLength": 1
         },
         "atualizacaoLegislativa": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 2000
+          "minLength": 1
         },
         "ano": {
           "type": "integer",
@@ -196,20 +182,17 @@
             "prova": {
               "type": "string",
               "format": "uri",
-              "pattern": "^https://",
-              "maxLength": 3000
+              "pattern": "^https://"
             },
             "gabarito": {
               "type": "string",
               "format": "uri",
-              "pattern": "^https://",
-              "maxLength": 3000
+              "pattern": "^https://"
             },
             "editalUrl": {
               "type": "string",
               "format": "uri",
-              "pattern": "^https://",
-              "maxLength": 3000
+              "pattern": "^https://"
             },
             "questaoOriginal": {
               "type": "integer",
@@ -231,13 +214,11 @@
             },
             "edital": {
               "type": "string",
-              "minLength": 1,
-              "maxLength": 200
+              "minLength": 1
             },
             "statusGabarito": {
               "type": "string",
-              "minLength": 1,
-              "maxLength": 200
+              "minLength": 1
             },
             "gabaritoOriginal": {
               "type": "string",
@@ -246,8 +227,7 @@
             "editalDocumento": {
               "type": "string",
               "format": "uri",
-              "pattern": "^https://",
-              "maxLength": 3000
+              "pattern": "^https://"
             },
             "paginaGabarito": {
               "type": "integer",
@@ -256,8 +236,7 @@
             },
             "observacao": {
               "type": "string",
-              "minLength": 1,
-              "maxLength": 1000
+              "minLength": 1
             }
           }
         }

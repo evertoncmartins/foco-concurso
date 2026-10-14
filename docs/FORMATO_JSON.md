@@ -6,20 +6,22 @@ Cada arquivo representa um banco, com `schemaVersion`, `id`, `name` e `questions
 |---|---|---|
 | `schemaVersion` | Sim | Número `1` |
 | `id` do banco | Sim | 1–120 caracteres; letras, números, `_`, `-` |
-| `name` | Sim | Nome legível, até 200 caracteres |
-| `description` | Não | Até 2.000 caracteres |
+| `name` | Sim | Nome legível, não vazio, sem limite de caracteres |
+| `description` | Não | Texto sem limite de caracteres; preservado sem cortes |
 | `questions` | Sim | Lista de 1 a 5.000 questões |
 | `questions[].id` | Sim | ID estável, único no banco; mesmas regras do ID do banco |
-| `discipline` | Sim | Disciplina, até 200 caracteres |
-| `subject` | Sim | Assunto, até 200 caracteres |
-| `topic` | Sim | Tópico/subtópico, até 200 caracteres |
-| `statement` | Sim | Enunciado em texto, até 20.000 caracteres; `\n` quebra linhas |
-| `options` | Sim | 2–8 objetos `{ "id": "A", "text": "..." }`; IDs únicos A–H |
+| `discipline` | Sim | Disciplina em texto não vazio, sem limite de caracteres |
+| `subject` | Sim | Assunto em texto não vazio, sem limite de caracteres |
+| `topic` | Sim | Tópico/subtópico em texto não vazio, sem limite de caracteres |
+| `statement` | Sim | Enunciado em texto não vazio, sem limite de caracteres; `\n` quebra linhas |
+| `options` | Sim | 2–8 objetos `{ "id": "A", "text": "..." }`; IDs únicos A–H; texto não vazio, sem limite de caracteres |
 | `correctOption` | Sim | ID de uma alternativa existente |
-| `explanation` | Sim | Comentário didático, até 20.000 caracteres |
-| `reference` | Não | `{ "label": "...", "url": "https://..." }`; URL opcional; `null` é permitido |
+| `explanation` | Sim | Comentário didático em texto não vazio, sem limite de caracteres |
+| `reference` | Não | `{ "label": "...", "url": "https://..." }`; label não vazio, sem limite de caracteres; URL opcional; `null` é permitido |
 | `difficulty` | Sim | `easy`, `medium` ou `hard` |
-| `tags` | Sim | Lista de textos, até 30 tags de 100 caracteres; pode ser `[]` |
+| `tags` | Sim | Lista de até 30 textos, sem limite de caracteres por tag; pode ser `[]` |
+
+Não há limite artificial de caracteres nos conteúdos nem limite de 10 MB nos arquivos JSON, incluindo a importação pelo Google Drive e a restauração/sincronização do progresso. Arquivos UTF-8 com BOM são aceitos. Os limites estruturais acima continuam válidos. A capacidade real depende da memória, da cota de armazenamento do navegador, da conexão e do Google Drive; arquivos muito grandes podem demorar ou exceder esses recursos. Textos obrigatórios continuam precisando ser strings não vazias; números, objetos e `null` não substituem o texto de uma alternativa.
 
 O identificador interno é `banco:questão`. Use IDs globalmente descritivos para facilitar intercâmbio. Não reutilize o mesmo ID para perguntas diferentes: o histórico permanece associado a ele. Importar um banco com ID existente exige confirmação e atualiza o conteúdo sem apagar respostas.
 
@@ -31,17 +33,17 @@ Os campos abaixo são opcionais e são preservados na importação, no progresso
 
 | Campo | Conteúdo |
 |---|---|
-| `instituicao` | Sigla do órgão ou instituição, por exemplo `INSS` (até 200 caracteres) |
+| `instituicao` | Sigla do órgão ou instituição, por exemplo `INSS` |
 | `ano` | Ano da prova, inteiro entre 1900 e 2100 |
-| `tag` | Origem visível junto da dificuldade, por exemplo `INSS-2026` (até 100 caracteres); deve corresponder a `instituicao` e `ano` quando ambos estiverem presentes |
-| `banca` | Organização responsável comprovada pela fonte (até 200 caracteres); omita se não identificada |
-| `cargo` / `nivelCargo` | Cargo (até 300 caracteres) e nível de escolaridade/classificação (até 200 caracteres) |
-| `tipo` | Por exemplo `Questão original`, `Adaptada de prova oficial` ou `Autoral` (até 200 caracteres) |
-| `fundamentoLegal` | Artigos, parágrafos e incisos (até 2.000 caracteres) |
-| `atualizacaoLegislativa` | Nota sobre regra vigente, alterações ou revogações (até 2.000 caracteres) |
+| `tag` | Origem visível junto da dificuldade, por exemplo `INSS-2026`; deve corresponder a `instituicao` e `ano` quando ambos estiverem presentes |
+| `banca` | Organização responsável comprovada pela fonte; omita se não identificada |
+| `cargo` / `nivelCargo` | Cargo e nível de escolaridade/classificação |
+| `tipo` | Por exemplo `Questão original`, `Adaptada de prova oficial` ou `Autoral` |
+| `fundamentoLegal` | Artigos, parágrafos e incisos |
+| `atualizacaoLegislativa` | Nota sobre regra vigente, alterações ou revogações |
 | `fonte` | Objeto com as referências abaixo |
 
-Em `fonte`, use `prova`, `gabarito`, `editalUrl` e `editalDocumento` para URLs HTTPS sem credenciais (até 3.000 caracteres); `questaoOriginal`, `paginaProva` e `paginaGabarito` para inteiros de 1 a 10.000 (página do PDF, começando em 1); `edital` e `statusGabarito` para textos de até 200 caracteres; `dataProva` e `consultaEm` para datas `AAAA-MM-DD`; e `gabaritoOriginal` para a letra A–H do gabarito oficial. `observacao` admite notas de até 1.000 caracteres sobre a fonte, como gabarito alterado após recurso. A data da consulta não substitui o ano da prova.
+Todos os campos textuais de origem são preservados sem limite de caracteres. Em `fonte`, use `prova`, `gabarito`, `editalUrl` e `editalDocumento` para URLs HTTPS sem credenciais; `questaoOriginal`, `paginaProva` e `paginaGabarito` para inteiros de 1 a 10.000 (página do PDF, começando em 1); `edital` e `statusGabarito` para textos não vazios; `dataProva` e `consultaEm` para datas `AAAA-MM-DD`; e `gabaritoOriginal` para a letra A–H do gabarito oficial. `observacao` admite notas sobre a fonte, como gabarito alterado após recurso. A data da consulta não substitui o ano da prova.
 
 A interface apresenta a tag junto da dificuldade, também no modo foco. Questões identificadas como adaptadas recebem o selo **Adaptada**. As referências completas e os links para prova e gabarito aparecem no comentário após responder ou no resultado do simulado. Os campos de origem aceitam qualquer órgão ou instituição. Use `tag` ou o par `instituicao` e `ano` para identificar a prova; tags informais não substituem os metadados de origem.
 

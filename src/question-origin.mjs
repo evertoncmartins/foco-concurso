@@ -1,24 +1,25 @@
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const bounded=(value,label,max)=>{
-  if(typeof value!=='string'||!value.trim()||value.length>max)throw new Error(`${label}: informe um texto válido (até ${max} caracteres).`);
+const text=(value,label)=>{
+  if(typeof value!=='string')throw new Error(`${label}: o valor deve ser um texto.`);
+  if(!value.trim())throw new Error(`${label}: informe um texto não vazio.`);
   return value.trim();
 };
 function https(value,label){
-  const url=new URL(bounded(value,label,3000));
+  const url=new URL(text(value,label));
   if(url.protocol!=='https:'||url.username||url.password)throw new Error(`${label}: use uma URL HTTPS sem credenciais.`);
   return url.href;
 }
 function date(value,label){
-  const result=bounded(value,label,10);
+  const result=text(value,label);
   if(!/^\d{4}-\d{2}-\d{2}$/.test(result)||!Number.isFinite(Date.parse(result))||new Date(result).toISOString().slice(0,10)!==result)throw new Error(`${label}: use uma data válida AAAA-MM-DD.`);
   return result;
 }
 
-// Keep a bounded, explicit provenance record through import, export and Drive sync.
+// Keep an explicit provenance record through import, export and Drive sync.
 export function normalizeQuestionOrigin(question,label){
   const origin={};
-  for(const [field,max] of Object.entries({instituicao:200,tag:100,banca:200,cargo:300,nivelCargo:200,tipo:200,fundamentoLegal:2000,atualizacaoLegislativa:2000})){
-    if(question[field]!=null)origin[field]=bounded(question[field],`${label} ${field}`,max);
+  for(const field of ['instituicao','tag','banca','cargo','nivelCargo','tipo','fundamentoLegal','atualizacaoLegislativa']){
+    if(question[field]!=null)origin[field]=text(question[field],`${label} ${field}`);
   }
   if(question.ano!=null){
     if(!Number.isInteger(question.ano)||question.ano<1900||question.ano>2100)throw new Error(`${label}: ano deve ser um número inteiro entre 1900 e 2100.`);
@@ -30,8 +31,7 @@ export function normalizeQuestionOrigin(question,label){
     if(typeof source!=='object'||Array.isArray(source))throw new Error(`${label}: fonte deve ser um objeto.`);
     origin.fonte={};
     for(const field of ['prova','gabarito','editalUrl','editalDocumento'])if(source[field]!=null)origin.fonte[field]=https(source[field],`${label} fonte ${field}`);
-    for(const field of ['edital','statusGabarito'])if(source[field]!=null)origin.fonte[field]=bounded(source[field],`${label} fonte ${field}`,200);
-    if(source.observacao!=null)origin.fonte.observacao=bounded(source.observacao,`${label} fonte observacao`,1000);
+    for(const field of ['edital','statusGabarito','observacao'])if(source[field]!=null)origin.fonte[field]=text(source[field],`${label} fonte ${field}`);
     for(const field of ['questaoOriginal','paginaProva','paginaGabarito'])if(source[field]!=null){
       if(!Number.isInteger(source[field])||source[field]<1||source[field]>10000)throw new Error(`${label}: fonte ${field} deve ser um inteiro de 1 a 10.000.`);
       origin.fonte[field]=source[field];

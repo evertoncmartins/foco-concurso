@@ -5,27 +5,32 @@ export const questionKey = (b, q) => `${b}:${q}`;
 // JSON object key order is not part of an event's content. Array order is.
 export const canonicalJSON = value => JSON.stringify(value,(_,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.entries(item).sort(([a],[b])=>a<b?-1:a>b?1:0)):item);
 export const sameEvent = (a,b) => canonicalJSON(a)===canonicalJSON(b);
-const text = (v, label, max = 20000) => { if (typeof v !== 'string' || !v.trim() || v.length > max) throw new Error(`${label}: informe um texto válido (até ${max} caracteres).`); return v.trim(); };
+const text = (v, label, max = Infinity) => {
+  if (typeof v !== 'string') throw new Error(`${label}: o valor deve ser um texto.`);
+  if (!v.trim()) throw new Error(`${label}: informe um texto não vazio.`);
+  if (v.length > max) throw new Error(`${label}: use até ${max} caracteres.`);
+  return v.trim();
+};
 export function validateBank(raw) {
   if (!raw || raw.schemaVersion !== 1) throw new Error('schemaVersion deve ser 1. Baixe o modelo JSON.');
-  const bank = {schemaVersion: 1, id: text(raw.id, 'ID do banco', 120), name: text(raw.name, 'Nome', 200), description: typeof raw.description === 'string' ? raw.description.slice(0, 2000) : '', questions: []};
+  const bank = {schemaVersion: 1, id: text(raw.id, 'ID do banco', 120), name: text(raw.name, 'Nome'), description: typeof raw.description === 'string' ? raw.description : '', questions: []};
   if (!/^[a-zA-Z0-9_-]+$/.test(bank.id)) throw new Error('ID do banco: use letras, números, _ ou -.');
   if (!Array.isArray(raw.questions) || !raw.questions.length || raw.questions.length > 5000) throw new Error('O banco deve conter de 1 a 5.000 questões.');
   const ids = new Set();
   bank.questions = raw.questions.map((q, i) => {
     const label = `Questão ${i + 1}`;
     if (!q || typeof q !== 'object') throw new Error(`${label}: objeto inválido.`);
-    const n = {id: text(q.id, `${label} ID`, 120), discipline: text(q.discipline, `${label} disciplina`, 200), subject: text(q.subject, `${label} assunto`, 200), topic: text(q.topic, `${label} tópico`, 200), statement: text(q.statement, `${label} enunciado`), explanation: text(q.explanation, `${label} comentário`), difficulty: q.difficulty, tags: q.tags};
+    const n = {id: text(q.id, `${label} ID`, 120), discipline: text(q.discipline, `${label} disciplina`), subject: text(q.subject, `${label} assunto`), topic: text(q.topic, `${label} tópico`), statement: text(q.statement, `${label} enunciado`), explanation: text(q.explanation, `${label} comentário`), difficulty: q.difficulty, tags: q.tags};
     if (!/^[a-zA-Z0-9_-]+$/.test(n.id) || ids.has(n.id)) throw new Error(`${label}: ID inválido ou repetido.`); ids.add(n.id);
     if (!['easy','medium','hard'].includes(n.difficulty)) throw new Error(`${label}: difficulty deve ser easy, medium ou hard.`);
-    if (!Array.isArray(n.tags) || n.tags.length > 30 || n.tags.some(x => typeof x !== 'string' || x.length > 100)) throw new Error(`${label}: tags deve ser uma lista de textos.`);
+    if (!Array.isArray(n.tags) || n.tags.length > 30 || n.tags.some(x => typeof x !== 'string')) throw new Error(`${label}: tags deve ser uma lista de até 30 textos.`);
     n.tags = [...new Set(n.tags)];
     if (!Array.isArray(q.options) || q.options.length < 2 || q.options.length > 8) throw new Error(`${label}: informe 2 a 8 alternativas.`);
     const optionIds = new Set();
-    n.options = q.options.map(o => { const id = text(o?.id, `${label} alternativa ID`, 1); if (!/^[A-H]$/.test(id) || optionIds.has(id)) throw new Error(`${label}: alternativas precisam de IDs únicos A–H.`); optionIds.add(id); return {id, text: text(o.text, `${label} alternativa`)}; });
+    n.options = q.options.map(o => { const id = text(o?.id, `${label} alternativa ID`, 1); if (!/^[A-H]$/.test(id) || optionIds.has(id)) throw new Error(`${label}: alternativas precisam de IDs únicos A–H.`); optionIds.add(id); return {id, text: text(o.text, `${label} alternativa ${id}`)}; });
     if (!optionIds.has(q.correctOption)) throw new Error(`${label}: correctOption precisa existir nas alternativas.`);
     n.correctOption = q.correctOption;
-    if (q.reference != null) { n.reference = {label: text(q.reference.label, `${label} referência`, 1000)}; if (q.reference.url) { const u = new URL(q.reference.url); if (u.protocol !== 'https:') throw new Error(`${label}: a referência deve usar HTTPS.`); n.reference.url = u.href; } }
+    if (q.reference != null) { n.reference = {label: text(q.reference.label, `${label} referência`)}; if (q.reference.url) { const u = new URL(q.reference.url); if (u.protocol !== 'https:') throw new Error(`${label}: a referência deve usar HTTPS.`); n.reference.url = u.href; } }
     return {...n,...normalizeQuestionOrigin(q,label)};
   });
   return bank;
@@ -45,7 +50,7 @@ export function validateEvents(document) {
     else if (e.type === 'answer') {
       if (typeof e.key !== 'string' || typeof e.sessionId !== 'string' || typeof e.correct !== 'boolean' || !/^[A-H]$/.test(e.selected) || !/^[A-H]$/.test(e.correctOption)) throw new Error('Resposta inválida.');
       if (e.correct !== (e.selected === e.correctOption)) throw new Error('Resultado inconsistente.');
-      for (const field of ['discipline','subject','topic']) text(e[field], `Resposta ${field}`, 200);
+      for (const field of ['discipline','subject','topic']) text(e[field], `Resposta ${field}`);
     } else if (e.type === 'flag') { if (typeof e.key !== 'string' || !['favorite','review'].includes(e.flag) || typeof e.value !== 'boolean') throw new Error('Marcação inválida.'); }
     else if (e.type === 'session') {
       const s = e.session;

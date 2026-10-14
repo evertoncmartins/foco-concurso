@@ -70,7 +70,7 @@ O manifesto e metadados permitem abrir pela Tela de Início em modo independente
 
 120 testes automatizados passaram. O adaptador Drive foi verificado com HTTP simulado para manter o mesmo ID em gravações sucessivas, unir dispositivos, resolver gravações e primeiras criações simultâneas, migrar lotes sem duplicar respostas, recuperar pendências antigas, retomar falhas de envio e limpeza, conferir conteúdo antes da lixeira, reler lotes modificados durante a limpeza e preservar dados locais durante falhas. Contas, proprietários e bancos de questões permanecem separados. O teste de cache comprova duas consultas e nenhum download ou upload quando o histórico não mudou; alterações locais durante o envio são sincronizadas depois.
 
-A consulta de descoberta oficial confirmou `PUT /upload/drive/v2/files/{fileId}` para upload multipart. Uma requisição OPTIONS real ao Google confirmou CORS para a origem de produção, método PUT e os cabeçalhos authorization, content-type e if-match. Sintaxe e build foram verificados. Não foi executada migração no Drive real do usuário nem teste em navegador autenticado: a migração ocorre ao conectar a pasta na versão publicada. O progresso continua sujeito aos limites documentados de 10 MB e 100.000 eventos por JSON.
+A consulta de descoberta oficial confirmou `PUT /upload/drive/v2/files/{fileId}` para upload multipart. Uma requisição OPTIONS real ao Google confirmou CORS para a origem de produção, método PUT e os cabeçalhos authorization, content-type e if-match. Sintaxe e build foram verificados. Não foi executada migração no Drive real do usuário nem teste em navegador autenticado: a migração ocorre ao conectar a pasta na versão publicada. Nessa versão, o progresso estava sujeito aos limites de 10 MB e 100.000 eventos por JSON; o limite de tamanho foi removido na versão 1.12.6, abaixo.
 
 As seções abaixo registram verificações de versões anteriores.
 
@@ -217,3 +217,15 @@ A suíte passou com 106 testes. As novas verificações cobrem a preservação d
 O banco de pesquisa entregue separadamente contém 20 adaptações de provas reais TAE: IFSP 11, IFPR 3, IFES 2, IFG 2, IFSC 1 e IFRN 1. Foi validado pelo importador real e passou pelo ciclo de exportação e restauração sem perda de metadados. As questões não foram adicionadas automaticamente ao progresso do usuário nem ao banco inicial autoral.
 
 A verificação com DOM simulado confirma conteúdo e ordem de interação, mas não mede o layout renderizado. A inspeção visual em navegador continua indisponível neste ambiente de Sites.
+
+## Importação sem limites artificiais de texto — 1.12.6
+
+Fluxo verificado: seletor de arquivo → leitura UTF-8/JSON → validação do banco → eventos e armazenamento → resolução/correção → exportação/recarga → sincronização e restauração do Drive. Não existe API própria de importação: a validação e o armazenamento ocorrem no navegador, e o adaptador do Drive utiliza a API já configurada.
+
+O antigo validador agrupava texto vazio, tipo inválido e excesso de tamanho numa mesma mensagem. Foram removidos os limites de caracteres dos conteúdos e metadados e o truncamento da descrição. As mensagens agora identificam a letra da alternativa e distinguem texto vazio de tipo inválido. O JSON Schema e a documentação seguem as mesmas regras. IDs técnicos, unicidade, alternativas A–H, gabaritos, datas, origens e URLs HTTPS continuam validados; os limites estruturais permanecem.
+
+Também foi removido o limite artificial de 10 MB na leitura local, na importação de bancos do Drive, nos metadados do progresso e na geração do documento consolidado. Arquivos UTF-8 com BOM são aceitos. Cotas do navegador e do Drive, memória e conexão continuam sendo restrições reais; falhas de armazenamento não simulam salvamento bem-sucedido.
+
+Os testes adicionais usam conteúdo sintético com campos acima dos antigos limites e um JSON maior que 12 MB. Executam os handlers reais do seletor nos layouts Mobile e Desktop em DOM simulado, selecionam e corrigem a alternativa, verificam a preservação dos textos e do histórico e exercitam importação, envio, atualização e restauração em dois clientes do Drive com HTTP simulado, mantendo um único arquivo de progresso. Cobrem também erros na questão 61, JSON malformado e segurança/limites estruturais.
+
+O arquivo JSON original do usuário não foi fornecido. Não houve importação no perfil pessoal nem escrita no Drive real do usuário; os testes não equivalem a inspeção visual em dispositivo ou navegador real.
