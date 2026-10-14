@@ -10,12 +10,34 @@ export function chooseAnswer(session,q,chosen){
   const events=[{type:'session',session:next}];if(session.mode!=='exam')events.unshift(answerEvent(session,q,chosen));
   return {session:next,events};
 }
+export function moveSession(session,direction){
+  if(session.completed)throw new Error('Esta sessão já foi concluída.');
+  if(direction!==-1&&direction!==1)throw new Error('Navegue uma questão por vez.');
+  const next=structuredClone(session),index=next.index+direction;
+  if(index<0||index>=next.queue.length)return {session:next,events:[]};
+  next.index=index;
+  return {session:next,events:[{type:'session',session:next}]};
+}
+export function completeSession(session,questions,now=new Date().toISOString()){
+  if(session.completed)throw new Error('Esta sessão já foi concluída.');
+  const next=structuredClone(session),events=[];
+  for(const key of next.queue){
+    if(!next.answers[key])next.answers[key]=null;
+    if(next.mode==='exam'){
+      const q=questions.find(q=>q.key===key);
+      if(!q)throw new Error('O banco do simulado foi removido. Recupere-o para concluir.');
+      if(next.answers[key])events.push(answerEvent(next,q,next.answers[key]));
+    }
+  }
+  next.index=next.queue.length;next.completed=true;next.completedAt=now;
+  events.push({type:'session',session:next});return {session:next,events};
+}
 export function advanceSession(session,questions,skip=false,now=new Date().toISOString()){
   if(session.completed)throw new Error('Esta sessão já foi concluída.');
   const next=structuredClone(session),key=next.queue[next.index];
   if(!skip&&!next.answers[key])throw new Error('Responda ou pule a questão antes de continuar.');
   if(skip){if(next.answers[key])throw new Error('Questão respondida não pode ser pulada.');next.answers[key]=null;}
   next.index++;const events=[];
-  if(next.index>=next.queue.length){next.completed=true;next.completedAt=now;if(next.mode==='exam')for(const key of next.queue){const q=questions.find(q=>q.key===key);if(!q)throw new Error('O banco do simulado foi removido. Recupere-o para concluir.');if(next.answers[key])events.push(answerEvent(next,q,next.answers[key]));}}
+  if(next.index>=next.queue.length)return completeSession(next,questions,now);
   events.push({type:'session',session:next});return {session:next,events};
 }

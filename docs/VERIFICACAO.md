@@ -1,5 +1,17 @@
 # Relatório de verificação — 08/10/2026
 
+## Navegação Anterior / Registrar resposta / Próxima — 1.13.0 (14/10/2026)
+
+Os controles da questão passam a ter três ações independentes: Anterior à esquerda, Registrar resposta no centro e Próxima à direita. A navegação altera apenas a posição, de uma questão por vez, sem marcar resposta nula, emitir tentativa ou concluir automaticamente. Os limites desabilitam Anterior na primeira e Próxima na última. Respostas registradas continuam disponíveis ao voltar e não podem ser registradas novamente na mesma sessão. Seleções provisórias ficam em memória durante a navegação/pausa e são limpas ao registrar, iniciar outra sessão ou trocar de conta; não equivalem a respostas e não sobrevivem à recarga.
+
+No Desktop normal e foco, ← volta e → avança; Enter somente registra a alternativa selecionada. Campos, controles que utilizam setas, componentes em shadow DOM, modais, composição, modificadores e repetição da tecla conservam seus comportamentos. As setas continuam funcionando quando o foco está em um botão comum de alternativa. Espaço deixa de executar navegação. Ajustes e as indicações na questão refletem os novos atalhos.
+
+Concluir sessão é uma ação separada na última pergunta, com possibilidade de cancelar quando ainda houver não respondidas. O simulado permite voltar às respostas registradas e mantém gabaritos/comentários ocultos até concluir; nesse momento, cada tentativa registrada é emitida uma vez e as questões sem resposta permanecem sem acerto/erro. A posição e as respostas seguem os eventos de sessão existentes, inclusive exportação, restauração e retomada de sessões antigas com perguntas puladas.
+
+O rodapé Mobile continua reservado fora da rolagem e respeita a safe area. Os três botões têm alvos de pelo menos 44 px; telas estreitas usam ícones de navegação com nomes acessíveis. O Desktop com menu aberto e largura menor também distribui as três ações dentro da largura disponível. Não foram alterados o fluxo Google OAuth, a pasta do Drive ou a estrutura dos bancos importados.
+
+Os testes executam os handlers reais em DOM simulado nos layouts Desktop e Mobile e a camada de sessão/armazenamento: ida/volta, limites, rascunhos, registro sem avanço, tentativas imutáveis, repetição e bloqueio durante gravação, falha de armazenamento, cancelar/concluir com não respondidas, simulado, atalhos e retomada. Os testes de layout anteriores continuam verificando o rodapé reservado e as áreas seguras. Não houve medição visual em navegador ou dispositivo real: o controle exigido pelo ambiente Sites está indisponível.
+
 ## Reconciliação de eventos do Drive — 1.10.2 (13/10/2026)
 
 A comparação deixa de depender da ordem das propriedades JSON. A restauração passa a reconciliar colisões válidas por ID, mantendo uma versão ativa e todas as originais em registros de recuperação com IDs derivados de SHA-256. Respostas da mesma tentativa contam uma vez; bancos, marcações e sessões usam a versão mais recente. Empates e a ordem de chegada entre dispositivos não alteram o resultado. A exportação e o principal do Drive conservam as variantes, e a limpeza só ocorre após conferir sua cobertura.

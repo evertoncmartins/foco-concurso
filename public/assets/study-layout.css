@@ -120,7 +120,7 @@
   .focus-mode .feedback{padding:18px;margin-top:20px}
   .focus-mode .question-actions{flex-shrink:0;flex-wrap:wrap;gap:12px;margin-top:12px;padding-top:16px}
   .focus-mode .question-actions .btn{min-height:44px}
-  .focus-mode .focus-skip-key{font-size:10px;font-weight:400;padding:2px 6px;color:var(--muted);background:var(--surface)}
+  .focus-mode .question-nav-key{font-size:10px;font-weight:400;padding:2px 6px;color:var(--muted);background:var(--surface)}
   .focus-mode .session-summary-bar{flex-shrink:0;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:8px 18px;font-size:11px;margin:12px 0 0}
   .focus-mode .keyboard-tip{margin-left:auto}
   html:fullscreen{background:var(--bg);overflow-y:auto}
@@ -218,4 +218,24 @@
   @media(max-width:700px){
     .session.focus-mode .focus-toolbar{padding-top:calc(36px + env(safe-area-inset-top,0px))}
   }
+}
+/* Independent controls keep answer registration in the center at every width. */
+.session .question-actions{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px}
+.question-actions [data-action=previous]{justify-self:start}
+.question-actions [data-action=answer]{justify-self:center}
+.question-actions [data-action=next]{justify-self:end}
+.session .session-summary-bar{align-items:center}
+.session-finish{font-size:11px;min-height:44px}
+@media(min-width:701px) and (max-width:1050px){
+  .session:not(.focus-mode) .question-actions{grid-template-columns:minmax(0,1fr) minmax(0,1.7fr) minmax(0,1fr);gap:6px}
+  .session:not(.focus-mode) .question-actions .btn{width:100%;min-width:0;min-height:44px;padding:10px 5px;gap:5px;font-size:12px;line-height:1.35;white-space:normal}
+}
+@media(max-width:700px){
+  .session .question-actions{grid-template-columns:minmax(44px,1fr) minmax(0,1.7fr) minmax(44px,1fr);gap:6px}
+  .session .question-actions .btn{width:100%;min-width:0;min-height:44px;padding:10px 5px;gap:5px;font-size:12px;line-height:1.35;white-space:normal}
+  .session .question-actions .btn svg{flex-shrink:0}
+}
+@media(max-width:380px){
+  .session .question-actions{grid-template-columns:44px minmax(0,1fr) 44px}
+  .question-actions .question-nav-label{display:none}
 }
