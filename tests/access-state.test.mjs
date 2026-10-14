@@ -9,6 +9,7 @@ import {Store} from '../src/store.mjs';
 import {DriveSettings} from '../src/drive-settings.mjs';
 import {DriveSync} from '../src/drive.mjs';
 import {validateBank} from '../src/engine.mjs';
+import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
 const imports={};
@@ -97,6 +98,32 @@ async function studyRuntime(options={},mode='smart'){
   await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');await navigate('session');})()`);
   return app;
 }
+
+test('importação pelo seletor Mobile e Desktop aceita UTF-8 com BOM e JSON acima de 10 MB',async()=>{
+  for(const mobile of [true,false]){
+    const app=runtime({mobile});app.auth.signOut();await app.click('guest');
+    const raw=longBank({large:true}),content='\uFEFF'+JSON.stringify(raw),file={name:'banco-longo.json',size:new Blob([content]).size,text:async()=>content};
+    assert(file.size>10*1024*1024);
+    await app.document.querySelector('#bank-file').onchange({target:{files:[file]}});
+    assert.match(app.document.querySelector('#toast').textContent,/Banco importado/);
+    const imported=app.value('model.banks.find(bank=>bank.id==="teste-textos-longos")');
+    assert.deepEqual(JSON.parse(JSON.stringify(imported.questions)),raw.questions);assert.equal(imported.description,raw.description);
+    await app.value('newSession([model.questions.find(q=>q.bankId==="teste-textos-longos").key])');
+    await app.click('nav',{view:'session'});assert(app.html().includes(raw.questions[0].options[0].text));
+    await app.click('select',{option:'A'});await app.click('answer');assert.equal(app.value('model.stats.correct'),1);
+    assert(app.html().includes(raw.questions[0].explanation));
+    const saved=JSON.parse(app.value('JSON.stringify(store.export())'));
+    assert.deepEqual(saved.events.find(e=>e.type==='bank'&&e.bank.id===raw.id).bank.questions,raw.questions);
+    assert.equal(app.value('model.stats.attempts'),1);
+  }
+});
+
+test('JSON malformado não entra no banco, e falha de leitura preserva a causa real',async()=>{
+  const app=runtime();app.auth.signOut();await app.click('guest');const before=app.value('JSON.stringify(store.events)');
+  await assert.rejects(()=>app.value('readJSON({name:"invalido.json",text:async()=>"{"})'),/invalido.json: JSON inválido/);
+  await assert.rejects(()=>app.value('readJSON({name:"falha.json",text:async()=>{throw new Error("Falha de leitura");}})'),/Falha de leitura/);
+  assert.equal(app.value('JSON.stringify(store.events)'),before);
+});
 
 test('F e R alternam marcações sem Alt, preservam seleção e ignoram repetição e digitação',async()=>{
   const app=await studyRuntime();await app.keyEvent({key:'2',code:'Digit2'});assert.equal(app.value('selected'),'B');

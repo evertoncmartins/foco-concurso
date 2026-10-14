@@ -4,6 +4,7 @@ import {Store} from '../src/store.mjs';
 import {DriveSync} from '../src/drive.mjs';
 import {AccountStorage} from '../src/account.mjs';
 import {coversEvents} from '../src/event-conflicts.mjs';
+import {longBank} from './helpers/long-bank.mjs';
 
 class MemoryStorage{data=new Map();get length(){return this.data.size;}key(i){return [...this.data.keys()][i]??null;}getItem(k){return this.data.get(k)??null;}setItem(k,v){this.data.set(k,String(v));}removeItem(k){this.data.delete(k);}}
 const document=(events,subject)=>({schemaVersion:1,app:'foco-concursos',...(subject?{owner:{provider:'google',subject}}:{}),events});
@@ -25,11 +26,11 @@ function server(){
     const u=new URL(url),method=options.method||'GET',id=u.pathname.split('/').at(-1);
     calls.push({url,method,ifMatch:options.headers?.['If-Match']});
     if(u.pathname.endsWith('generateIds'))return json({ids:[`remote-${++sequence}`]});
-    if(u.pathname==='/drive/v3/files')return json({incompleteSearch:state.incomplete,files:state.live().map(([id,file])=>({id,name:file.name,size:JSON.stringify(file.document).length,mimeType:'application/json',ownedByMe:file.ownedByMe!==false}))});
+    if(u.pathname==='/drive/v3/files')return json({incompleteSearch:state.incomplete,files:state.live().map(([id,file])=>({id,name:file.name,size:Buffer.byteLength(JSON.stringify(file.document),'utf8'),mimeType:'application/json',ownedByMe:file.ownedByMe!==false}))});
     if(u.pathname.startsWith('/drive/v3/files/')&&u.searchParams.get('alt')==='media')return files.has(id)?json(files.get(id).document):json({},404);
     if(u.pathname.startsWith('/drive/v2/files/')){
       const file=files.get(id);if(!file)return json({},404);
-      if(method==='GET')return json({id,etag:state.missingEtag?undefined:etag(id,file),title:file.name,fileSize:JSON.stringify(file.document).length,ownedByMe:file.ownedByMe!==false,parents:[{id:'test-folder'}],labels:{trashed:!!file.trashed}});
+      if(method==='GET')return json({id,etag:state.missingEtag?undefined:etag(id,file),title:file.name,fileSize:Buffer.byteLength(JSON.stringify(file.document),'utf8'),ownedByMe:file.ownedByMe!==false,parents:[{id:'test-folder'}],labels:{trashed:!!file.trashed}});
       if(method==='PATCH'){
         if(state.failTrash){state.failTrash=false;return json({},500);}
         if(state.beforeTrash)await state.beforeTrash(id,file);
@@ -59,6 +60,28 @@ function server(){
 }
 function syncClient(subject){const storage=subject?new AccountStorage(new MemoryStorage(),subject):new MemoryStorage(),store=new Store(storage),drive=new DriveSync(store,{folderId:'test-folder',clientId:''});drive.token='fixture-only';drive.expires=Date.now()+3600000;return {store,drive};}
 async function withRemote(run){const remote=server(),old=globalThis.fetch;globalThis.fetch=remote.fetch;try{await run(remote);}finally{globalThis.fetch=old;}}
+
+test('Drive: banco e progresso acima de 10 MB são importados e restaurados sem cortes',()=>withRemote(async remote=>{
+  const bank=longBank({large:true});remote.files.set('bank-long',{name:'banco-longo.json',document:bank,version:1});
+  const first=syncClient(),second=syncClient();
+  assert(new TextEncoder().encode(JSON.stringify(bank)).byteLength>10*1024*1024);
+  assert.deepEqual(await first.drive.importNewBanks(),{imported:1,skipped:0});
+  const principal=remote.live().find(([,file])=>file.name==='foco-progresso-principal.json');
+  assert(principal);assert(new TextEncoder().encode(JSON.stringify(principal[1].document)).byteLength>10*1024*1024);
+  await second.drive.sync();assert.equal(second.drive.status,'synced');
+  assert.deepEqual(second.store.model().banks[0].questions,bank.questions);
+  assert.equal(second.store.model().banks[0].description,bank.description);
+  await second.store.merge([flag('large-bank-favorite')]);await second.drive.sync();await first.drive.sync();
+  assert(first.store.model().flags.get('bank:large-bank-favorite').favorite);
+  assert.equal(remote.live().filter(([,file])=>file.name.startsWith('foco-progresso-')).length,1);
+  assert.deepEqual(first.store.model().banks[0].questions,bank.questions);
+}));
+
+test('Drive: JSON UTF-8 com BOM é lido como texto sem mudar a estrutura',async()=>{
+  const {drive}=syncClient(),original=globalThis.fetch;
+  globalThis.fetch=async()=>new Response('\uFEFF'+JSON.stringify({schemaVersion:1}),{headers:{'content-type':'application/json'}});
+  try{assert.deepEqual(await drive.readFile({id:'bom',size:12*1024*1024}),{schemaVersion:1});}finally{globalThis.fetch=original;}
+});
 
 test('Drive: primeiro envio cria principal e próximos envios atualizam o mesmo ID',()=>withRemote(async remote=>{
   const {store,drive}=syncClient();await store.merge([flag('a')]);await drive.sync();const id=remote.live()[0][0];

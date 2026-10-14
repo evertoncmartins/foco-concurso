@@ -103,7 +103,7 @@ O workflow `ci.yml` executa testes, verificação de sintaxe e build a cada push
 - O Drive só é acessado após autorização explícita. O navegador não ganha acesso por receber um link público de pasta.
 - O escopo Drive é amplo porque a plataforma lê bancos existentes na pasta escolhida, cria e atualiza o progresso e move lotes já incorporados para a lixeira. Uso pessoal requer a conta autorizada no projeto OAuth; uso público exige cumprir a política de verificação do Google. Uma evolução com Google Picker permite restringir o escopo a arquivos escolhidos.
 - Os arquivos criados herdam o compartilhamento da pasta. Uma pasta acessível por link pode expor o histórico a quem tiver acesso ao arquivo. Use uma pasta privada para histórico pessoal; o sistema não altera permissões do Drive.
-- Até 5.000 questões por banco, arquivo JSON até 10 MB, 100.000 eventos por documento e 10.000 arquivos por busca. O armazenamento local também depende da cota do navegador. Exportar e manter o Drive sincronizado reduz dependência do dispositivo.
+- Até 5.000 questões por banco, 100.000 eventos por documento e 10.000 arquivos por busca. Os conteúdos textuais não têm limite de caracteres e os arquivos JSON não têm o antigo limite de 10 MB, inclusive no Drive. IDs continuam limitados a 120 caracteres. A capacidade real depende da memória e da cota do navegador, da conexão e do Drive. Exportar e manter o Drive sincronizado reduz dependência do dispositivo.
 - Funciona sem conexão com o Drive. A aplicação não oferece refresh tokens nem sincronização quando fechada; autorizações expiradas precisam de nova ação de conexão.
 - Histórico local é separado por conta e não é criptografado. Use seu perfil pessoal do navegador.
 

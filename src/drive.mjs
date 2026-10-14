@@ -55,7 +55,7 @@ export class DriveSync extends EventTarget {
     if(this.closed)throw new Error('A sessão foi encerrada.');
     if(generation!==this.generation)throw new Error('A conexão com o Drive mudou. Os dados locais foram preservados.');
     if(!response.ok){if(response.status===401){this.token=null;this.setStatus('expired');}const error=new Error(response.status===403?'Sem permissão no Drive ou cota excedida. Verifique a conta e a configuração OAuth.':`Google Drive: falha ${response.status}. O progresso local continua salvo.`);error.status=response.status;throw error;}
-    const contentType=response.headers.get('content-type');if(contentType?.includes('application/json'))return response.json();return JSON.parse(await response.text());
+    return JSON.parse((await response.text()).replace(/^\uFEFF/,''));
   }
   async list(query){
     const result=[];let pageToken;
@@ -67,13 +67,12 @@ export class DriveSync extends EventTarget {
   saveCache(cache){this.storage.setItem(this.cacheKey(),JSON.stringify(cache));}
   progressPrefix(){return this.userId?`foco-progresso-${this.userId}-`:'foco-progresso-';}
   progressName(){return `${this.progressPrefix()}principal.json`;}
-  async readFile(file){if(Number(file.size)>10*1024*1024)throw new Error(`${file.name}: arquivo maior que 10 MB.`);return this.request(`${API}/files/${encodeURIComponent(file.id)}?alt=media`);}
+  async readFile(file){return this.request(`${API}/files/${encodeURIComponent(file.id)}?alt=media`);}
   async progressMetadata(id){
     const file=await this.request(`${VERSIONED_API}/files/${encodeURIComponent(id)}?fields=id,etag,title,fileSize,ownedByMe,labels(trashed),parents(id)`);
     if(file.labels?.trashed||!file.parents?.some(p=>p.id===this.config.folderId))throw changed();
     if(this.userId&&file.ownedByMe!==true)throw new Error('O arquivo de progresso não pertence à conta conectada.');
     if(typeof file.etag!=='string'||!file.etag)throw new Error('O Drive não forneceu a versão do arquivo. A gravação foi interrompida para preservar o histórico.');
-    if(Number(file.fileSize)>10*1024*1024)throw new Error('Arquivo de progresso maior que 10 MB. Exporte seu histórico antes de reorganizá-lo.');
     return file;
   }
   async readProgress(file,cache,{force=false}={}){
@@ -94,7 +93,6 @@ export class DriveSync extends EventTarget {
   progressDocument(events){
     const document={schemaVersion:1,app:'foco-concursos',kind:'consolidated-progress',...(this.userId?{owner:{provider:'google',subject:this.userId}}:{}),updatedAt:new Date().toISOString(),events};
     validateEvents(document);
-    if(new TextEncoder().encode(JSON.stringify(document)).byteLength>10*1024*1024)throw new Error('Histórico maior que 10 MB. Nenhum arquivo antigo foi removido. Exporte uma cópia antes de reorganizá-lo.');
     return document;
   }
   async updateProgress(file,document){
