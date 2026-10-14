@@ -229,3 +229,11 @@ Também foi removido o limite artificial de 10 MB na leitura local, na importaç
 Os testes adicionais usam conteúdo sintético com campos acima dos antigos limites e um JSON maior que 12 MB. Executam os handlers reais do seletor nos layouts Mobile e Desktop em DOM simulado, selecionam e corrigem a alternativa, verificam a preservação dos textos e do histórico e exercitam importação, envio, atualização e restauração em dois clientes do Drive com HTTP simulado, mantendo um único arquivo de progresso. Cobrem também erros na questão 61, JSON malformado e segurança/limites estruturais.
 
 O arquivo JSON original do usuário não foi fornecido. Não houve importação no perfil pessoal nem escrita no Drive real do usuário; os testes não equivalem a inspeção visual em dispositivo ou navegador real.
+
+## Alternativas numéricas e diagnóstico de conteúdo inválido — 1.12.7
+
+A nova captura mostra que a alternativa A da questão 61 não é uma string. A imagem não informa se o valor é número, objeto, lista, booleano, nulo ou se o campo está ausente. O JSON original continua necessário para identificar e corrigir exatamente seu conteúdo; não foi presumido que o valor dessa questão seja numérico.
+
+O importador agora aceita números finitos no campo `options[].text` e normaliza-os para texto, incluindo zero, sem alterar letra ou gabarito nem mutar o documento de entrada. Strings continuam sem limite de caracteres. Valores ausentes/nulos, listas, objetos, booleanos e números não finitos são recusados com diagnóstico explícito; não são criadas respostas fictícias nem textos `[object Object]`. O JSON Schema e a documentação refletem essa extensão restrita do formato. Recomenda-se texto entre aspas para preservar formatação e números muito grandes.
+
+Os testes adicionais percorrem seletor → validação → armazenamento → resolução/correção → exportação/recarga/restauração, com DOM simulado nos dois layouts, incluindo um banco de 61 questões cuja última pergunta possui alternativas numéricas. Verificam zeros, negativos, decimais, notação exponencial, preservação de strings formatadas, ausência de mutação e bloqueio de importação parcial. O adaptador Drive é exercitado com HTTP simulado, importando um banco numérico e restaurando o conteúdo normalizado em outro cliente. Não houve importação do arquivo pessoal nem escrita no Drive real.

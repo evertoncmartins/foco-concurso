@@ -14,14 +14,16 @@ Cada arquivo representa um banco, com `schemaVersion`, `id`, `name` e `questions
 | `subject` | Sim | Assunto em texto não vazio, sem limite de caracteres |
 | `topic` | Sim | Tópico/subtópico em texto não vazio, sem limite de caracteres |
 | `statement` | Sim | Enunciado em texto não vazio, sem limite de caracteres; `\n` quebra linhas |
-| `options` | Sim | 2–8 objetos `{ "id": "A", "text": "..." }`; IDs únicos A–H; texto não vazio, sem limite de caracteres |
+| `options` | Sim | 2–8 objetos `{ "id": "A", "text": "..." }`; IDs únicos A–H; texto não vazio, sem limite de caracteres; números finitos também são aceitos e convertidos em texto |
 | `correctOption` | Sim | ID de uma alternativa existente |
 | `explanation` | Sim | Comentário didático em texto não vazio, sem limite de caracteres |
 | `reference` | Não | `{ "label": "...", "url": "https://..." }`; label não vazio, sem limite de caracteres; URL opcional; `null` é permitido |
 | `difficulty` | Sim | `easy`, `medium` ou `hard` |
 | `tags` | Sim | Lista de até 30 textos, sem limite de caracteres por tag; pode ser `[]` |
 
-Não há limite artificial de caracteres nos conteúdos nem limite de 10 MB nos arquivos JSON, incluindo a importação pelo Google Drive e a restauração/sincronização do progresso. Arquivos UTF-8 com BOM são aceitos. Os limites estruturais acima continuam válidos. A capacidade real depende da memória, da cota de armazenamento do navegador, da conexão e do Google Drive; arquivos muito grandes podem demorar ou exceder esses recursos. Textos obrigatórios continuam precisando ser strings não vazias; números, objetos e `null` não substituem o texto de uma alternativa.
+Não há limite artificial de caracteres nos conteúdos nem limite de 10 MB nos arquivos JSON, incluindo a importação pelo Google Drive e a restauração/sincronização do progresso. Arquivos UTF-8 com BOM são aceitos. Os limites estruturais acima continuam válidos. A capacidade real depende da memória, da cota de armazenamento do navegador, da conexão e do Google Drive; arquivos muito grandes podem demorar ou exceder esses recursos. Textos obrigatórios continuam precisando ser strings não vazias, com a exceção numérica das alternativas descrita abaixo.
+
+Em alternativas numéricas, `{ "id": "A", "text": 42 }` é aceito e salvo/exportado como `{ "id": "A", "text": "42" }`, sem alterar ID ou gabarito. Prefira texto entre aspas para preservar formatação, zeros iniciais, separadores decimais, unidades, números muito grandes ou notação específica (por exemplo `"03"`, `"3,14"`, `"50%"`). `null`, conteúdo ausente, booleanos, listas e objetos dentro de `text` são recusados com indicação da questão e da letra. O importador não inventa respostas ausentes nem transforma objetos em `[object Object]`.
 
 O identificador interno é `banco:questão`. Use IDs globalmente descritivos para facilitar intercâmbio. Não reutilize o mesmo ID para perguntas diferentes: o histórico permanece associado a ele. Importar um banco com ID existente exige confirmação e atualiza o conteúdo sem apagar respostas.
 

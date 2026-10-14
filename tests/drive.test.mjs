@@ -83,6 +83,15 @@ test('Drive: JSON UTF-8 com BOM é lido como texto sem mudar a estrutura',async(
   try{assert.deepEqual(await drive.readFile({id:'bom',size:12*1024*1024}),{schemaVersion:1});}finally{globalThis.fetch=original;}
 });
 
+test('Drive: importa números nas alternativas e restaura a representação textual em outro cliente',()=>withRemote(async remote=>{
+  const bank=longBank();bank.questions[0].options[0].text=0;
+  remote.files.set('bank-numeric',{name:'numeros.json',document:bank,version:1});
+  const first=syncClient(),second=syncClient();assert.deepEqual(await first.drive.importNewBanks(),{imported:1,skipped:0});
+  await second.drive.sync();const question=second.store.model().questions[0];
+  assert.equal(question.options[0].text,'0');assert.equal(question.options[0].id,'A');assert.equal(question.correctOption,'A');
+  assert.equal(remote.files.get('bank-numeric').document.questions[0].options[0].text,0);
+}));
+
 test('Drive: primeiro envio cria principal e próximos envios atualizam o mesmo ID',()=>withRemote(async remote=>{
   const {store,drive}=syncClient();await store.merge([flag('a')]);await drive.sync();const id=remote.live()[0][0];
   assert.equal(remote.live()[0][1].name,'foco-progresso-principal.json');

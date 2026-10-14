@@ -93,7 +93,11 @@
                 "pattern": "^[A-H]$"
               },
               "text": {
-                "$ref": "#/$defs/longText"
+                "anyOf": [
+                  { "$ref": "#/$defs/longText" },
+                  { "type": "number" }
+                ],
+                "description": "Texto não vazio sem limite de caracteres. Números são aceitos na importação e normalizados para texto."
               }
             }
           }

@@ -24,11 +24,34 @@ test('conteúdo acima dos antigos limites é preservado na importação e no pro
 });
 
 test('alternativa inválida informa a questão e a letra, sem confundir vazio com tamanho',()=>{
-  for(const value of ['', ' \n\t',null,123,{},['texto']]){
+  for(const [value,message] of [['',/texto não vazio/],[' \n\t',/texto não vazio/],[null,/ausente ou nulo/],[undefined,/ausente ou nulo/],[{},/um objeto/],[['texto'],/uma lista/],[false,/um booleano/],[NaN,/número finito/],[Infinity,/número finito/]]){
     const raw=longBank();raw.questions=Array.from({length:61},(_,i)=>({...raw.questions[0],id:`questao-${i}`}));
     raw.questions[60]={...raw.questions[60],options:[{id:'A',text:value},{id:'B',text:'Válida'}]};
-    assert.throws(()=>validateBank(raw),error=>/Questão 61 alternativa A:/.test(error.message)&&!error.message.includes('caracteres')&&/texto não vazio|deve ser um texto/.test(error.message));
+    assert.throws(()=>validateBank(raw),error=>/Questão 61 alternativa A:/.test(error.message)&&!error.message.includes('caracteres')&&message.test(error.message));
   }
+});
+
+test('alternativas numéricas viram texto sem mudar o JSON original, ID ou gabarito',()=>{
+  for(const value of [0,-42,123,3.14,1e-7]){
+    const raw=longBank();raw.questions[0].options[0].text=value;
+    const normalized=validateBank(raw);
+    assert.equal(normalized.questions[0].options[0].text,String(value));
+    assert.equal(normalized.questions[0].options[0].id,'A');assert.equal(normalized.questions[0].correctOption,'A');
+    assert.equal(raw.questions[0].options[0].text,value);
+  }
+  for(const value of ['03','3,14','50%','9007199254740993','1.000,00']){
+    const raw=longBank();raw.questions[0].options[0].text=value;
+    assert.equal(validateBank(raw).questions[0].options[0].text,value);
+  }
+});
+
+test('alternativa numérica sobrevive a gravação, resposta, recarga e restauração',async()=>{
+  const raw=longBank();raw.questions[0].options[0].text=0;
+  const storage=new TemporaryStorage(),store=new Store(storage);await store.add([{type:'bank',bank:raw}]);
+  const question=store.model().questions[0];assert.equal(question.options[0].text,'0');
+  await store.add(chooseAnswer(createSession([question.key]),question,'A').events);
+  const restored=new Store(new TemporaryStorage());await restored.merge(validateEvents(new Store(storage).export()));
+  assert.equal(restored.model().questions[0].options[0].text,'0');assert.equal(restored.model().stats.correct,1);
 });
 
 test('retirar limites de conteúdo não remove limites estruturais ou validações de segurança',()=>{
@@ -47,4 +70,5 @@ test('JSON Schema limita apenas os IDs técnicos, não os conteúdos textuais',a
   }
   inspect(schema);
   assert.deepEqual(limits,[['/properties/id',120],['/$defs/question/properties/id',120]]);
+  assert.deepEqual(schema.$defs.question.properties.options.items.properties.text.anyOf,[{$ref:'#/$defs/longText'},{type:'number'}]);
 });
