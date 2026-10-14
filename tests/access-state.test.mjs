@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','profile-photo'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -100,6 +100,27 @@ async function studyRuntime(options={},mode='smart'){
   await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');await navigate('session');})()`);
   return app;
 }
+
+test('afirmações com parênteses ganham linhas próprias no estudo e resultado sem reescrever o banco',async()=>{
+  for(const mobile of [true,false])for(const mode of ['smart','exam']){
+    const app=runtime({mobile});app.auth.signOut();await app.click('guest');
+    const raw=structuredClone(bank);raw.id='teste-afirmativas';raw.questions=raw.questions.slice(0,1);
+    const text='Com base no ECA, analise as afirmativas, de cima para baixo: ( ) É dever do Estado assegurar ensino fundamental.\n\n( ) O acesso ao ensino obrigatório e gratuito é direito público subjetivo. ( ) Texto com <strong>marcação</strong> & caracteres especiais.';
+    raw.questions[0].statement=text;
+    await app.document.querySelector('#bank-file').onchange({target:{files:[{name:'afirmativas.json',text:async()=>JSON.stringify(raw)}]}});
+    await app.value(`(async()=>{await newSession([model.questions.find(q=>q.bankId==='teste-afirmativas').key],'${mode}');await navigate('session');})()`);
+    const formatted='Com base no ECA, analise as afirmativas, de cima para baixo:\n\n( ) É dever do Estado assegurar ensino fundamental.\n\n( ) O acesso ao ensino obrigatório e gratuito é direito público subjetivo.\n\n( ) Texto com &lt;strong&gt;marcação&lt;/strong&gt; &amp; caracteres especiais.';
+    assert(app.html().includes(`<h1 class="question-statement">${formatted}</h1>`));
+    const before=app.value('JSON.stringify(store.events)');await app.click('toggle-theme');
+    assert.equal(app.value('JSON.stringify(store.events)'),before);
+    assert.equal(app.value(`model.questions.find(q=>q.bankId==='teste-afirmativas').statement`),text);
+    await app.click('select',{option:raw.questions[0].correctOption});await app.click('answer');
+    await app.finish();assert.equal(app.value('view'),'result');assert(app.html().includes(`<p>${formatted}</p>`));
+    assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('model.stats.correct'),1);
+    const saved=JSON.parse(app.value('JSON.stringify(store.export())'));
+    assert.equal(saved.events.find(e=>e.type==='bank'&&e.bank.id===raw.id).bank.questions[0].statement,text);
+  }
+});
 
 test('comentários formatados aparecem no estudo e no resultado sem reimportação ou mudança do progresso',async()=>{
   for(const mobile of [true,false])for(const mode of ['smart','exam']){
