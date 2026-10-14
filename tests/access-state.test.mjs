@@ -125,6 +125,32 @@ test('JSON malformado não entra no banco, e falha de leitura preserva a causa r
   assert.equal(app.value('JSON.stringify(store.events)'),before);
 });
 
+test('seletor importa a questão 61 com alternativa numérica no Mobile e Desktop e mantém correção',async()=>{
+  for(const mobile of [true,false]){
+    const app=runtime({mobile});app.auth.signOut();await app.click('guest');
+    const raw=structuredClone(bank);raw.id='teste-numeros';raw.name='Banco numérico sintético';
+    raw.questions=Array.from({length:61},(_,i)=>({...structuredClone(bank.questions[0]),id:`q-${i+1}`}));
+    raw.questions[60].options=[{id:'A',text:0},{id:'B',text:42},{id:'C',text:3.14},{id:'D',text:-1}];raw.questions[60].correctOption='A';
+    const content=JSON.stringify(raw),file={name:'numeros.json',size:new Blob([content]).size,text:async()=>content};
+    await app.document.querySelector('#bank-file').onchange({target:{files:[file]}});
+    assert.match(app.document.querySelector('#toast').textContent,/Banco importado/);
+    const imported=app.value('model.banks.find(bank=>bank.id==="teste-numeros")');assert.equal(imported.questions.length,61);
+    assert.deepEqual(Array.from(imported.questions[60].options,option=>option.text),['0','42','3.14','-1']);
+    await app.value('newSession([model.questions.find(q=>q.bankId==="teste-numeros"&&q.id==="q-61").key])');
+    await app.click('nav',{view:'session'});assert.match(app.html(),/class="option-text" id="option-text-A">0<\/span>/);
+    await app.click('select',{option:'A'});await app.click('answer');assert.equal(app.value('model.stats.correct'),1);
+    assert.equal(app.value('model.stats.wrong'),0);assert.match(app.html(),/Resposta correta/);
+  }
+});
+
+test('conteúdo ausente ou estruturado não importa um banco parcial nem altera progresso existente',async()=>{
+  const app=runtime();app.auth.signOut();await app.click('guest');const before=app.value('JSON.stringify(store.export().events)');
+  for(const [value,message] of [['null',/ausente ou nulo/],['{}',/um objeto/],['[]',/uma lista/],['false',/um booleano/]]){
+    await assert.rejects(()=>app.value(`(async()=>{const raw=structuredClone(bank);raw.id='invalido';raw.questions[0].options[0].text=${value};await importBank(raw);})()`),message);
+    assert.equal(app.value('JSON.stringify(store.export().events)'),before);
+  }
+});
+
 test('F e R alternam marcações sem Alt, preservam seleção e ignoram repetição e digitação',async()=>{
   const app=await studyRuntime();await app.keyEvent({key:'2',code:'Digit2'});assert.equal(app.value('selected'),'B');
   for(const [key,flag] of [['f','favorite'],['r','review']]){

@@ -11,6 +11,13 @@ const text = (v, label, max = Infinity) => {
   if (v.length > max) throw new Error(`${label}: use até ${max} caracteres.`);
   return v.trim();
 };
+function optionText(value,label){
+  if(typeof value==='number'&&Number.isFinite(value))return String(value);
+  if(typeof value==='string')return text(value,label);
+  if(value==null)throw new Error(`${label}: o campo "text" está ausente ou nulo. Preencha o conteúdo da alternativa.`);
+  const type=Array.isArray(value)?'uma lista':typeof value==='object'?'um objeto':typeof value==='boolean'?'um booleano':'um valor inválido';
+  throw new Error(`${label}: "text" contém ${type}. Use texto entre aspas ou um número finito; não é possível recuperar a alternativa automaticamente.`);
+}
 export function validateBank(raw) {
   if (!raw || raw.schemaVersion !== 1) throw new Error('schemaVersion deve ser 1. Baixe o modelo JSON.');
   const bank = {schemaVersion: 1, id: text(raw.id, 'ID do banco', 120), name: text(raw.name, 'Nome'), description: typeof raw.description === 'string' ? raw.description : '', questions: []};
@@ -27,7 +34,7 @@ export function validateBank(raw) {
     n.tags = [...new Set(n.tags)];
     if (!Array.isArray(q.options) || q.options.length < 2 || q.options.length > 8) throw new Error(`${label}: informe 2 a 8 alternativas.`);
     const optionIds = new Set();
-    n.options = q.options.map(o => { const id = text(o?.id, `${label} alternativa ID`, 1); if (!/^[A-H]$/.test(id) || optionIds.has(id)) throw new Error(`${label}: alternativas precisam de IDs únicos A–H.`); optionIds.add(id); return {id, text: text(o.text, `${label} alternativa ${id}`)}; });
+    n.options = q.options.map(o => { const id = text(o?.id, `${label} alternativa ID`, 1); if (!/^[A-H]$/.test(id) || optionIds.has(id)) throw new Error(`${label}: alternativas precisam de IDs únicos A–H.`); optionIds.add(id); return {id, text: optionText(o.text, `${label} alternativa ${id}`)}; });
     if (!optionIds.has(q.correctOption)) throw new Error(`${label}: correctOption precisa existir nas alternativas.`);
     n.correctOption = q.correctOption;
     if (q.reference != null) { n.reference = {label: text(q.reference.label, `${label} referência`)}; if (q.reference.url) { const u = new URL(q.reference.url); if (u.protocol !== 'https:') throw new Error(`${label}: a referência deve usar HTTPS.`); n.reference.url = u.href; } }
