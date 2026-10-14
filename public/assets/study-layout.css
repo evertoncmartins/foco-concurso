@@ -219,6 +219,11 @@
     .session.focus-mode .focus-toolbar{padding-top:calc(36px + env(safe-area-inset-top,0px))}
   }
 }
+.feedback .feedback-explanation{margin-top:12px}
+.feedback .explanation-paragraph{margin:0}
+.feedback .explanation-paragraph + .explanation-paragraph{margin-top:12px}
+.feedback .explanation-letter{font-weight:700}
+
 /* Independent controls keep answer registration in the center at every width. */
 .session .question-actions{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px}
 .question-actions [data-action=previous]{justify-self:start}

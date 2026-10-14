@@ -29,6 +29,8 @@ O identificador interno é `banco:questão`. Use IDs globalmente descritivos par
 
 O [modelo-banco.json](modelo-banco.json) contém um exemplo completo. [questions.schema.json](questions.schema.json) pode ser usado em validadores JSON Schema 2020-12. A aplicação complementa a validação com unicidade dos IDs e vínculo do gabarito às opções. Metadados desconhecidos são descartados na normalização; não use HTML.
 
+No comentário, prefira identificar cada alternativa com `A: ...\n\nB: ...\n\nC: ...`, usando apenas letras das opções existentes. A interface separa essas explicações em parágrafos e destaca as letras, sem alterar o JSON nem o progresso. Comentários antigos como `C corresponde... A erra... B ignora...` também são organizados quando as letras podem ser reconhecidas com segurança. Trechos ambíguos, como `A acumulação...`, continuam como texto normal; HTML não é interpretado.
+
 ## Origem de questões de concursos
 
 Os campos abaixo são opcionais e são preservados na importação, no progresso e na sincronização. Não atribua uma origem de concurso a questões autorais. `ano` corresponde ao ano de aplicação da prova, mesmo quando o edital é do ano anterior.

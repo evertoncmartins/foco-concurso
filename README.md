@@ -19,7 +19,7 @@ Plataforma para resolver questões e estudar para qualquer concurso com seus pr�
 - Importação e exportação de bancos JSON; ativação, desativação e remoção.
 - Sessões recomendadas, aleatórias, não respondidas, erros, favoritas, revisão, filtros por assunto e simulados.
 - Tesoura discreta para riscar/restaurar alternativas: no Mobile, sempre visível após a letra, com área de toque de 44 px; no Desktop, aparece por hover ou foco no recuo externo à esquerda do bloco destacado, com um pequeno tracejado indicando o corte. O cursor pode entrar diretamente na pequena área externa do botão (40 × 32 px), mesmo com o ícone oculto, sem precisar passar antes sobre a alternativa. Não reserva espaço dentro da alternativa nem desloca sua letra ou texto. A área de rolagem inclui o botão externo; blocos e enunciado mantêm o alinhamento. O Mobile não utiliza mais gestos de arrastar. Marcação somente visual e temporária, preservada ao trocar tema ou modo foco, sem selecionar, responder ou sincronizar progresso; reinicia ao mudar de questão ou sessão.
-- Feedback com resposta selecionada, alternativa correta, comentário e referência.
+- Feedback com resposta selecionada, alternativa correta, comentário e referência. Comentários por alternativa recebem parágrafos separados e letras em negrito, no Mobile, Desktop e resultado do simulado; a apresentação também vale para bancos já importados, sem modificar seu conteúdo ou progresso. Referências ambíguas (como o artigo em “A acumulação”) permanecem como texto comum.
 - Favoritos, revisão espaçada, estatísticas por disciplina/assunto/tópico e histórico.
 - Sessões pausáveis e retomadas após recarregar a página.
 - Progresso local automático; exportação e restauração de JSON sem substituir o histórico.
