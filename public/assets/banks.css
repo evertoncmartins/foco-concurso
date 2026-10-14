@@ -1,0 +1,42 @@
+.banks-grid{align-items:start}
+.bank-card{padding:22px;min-width:0}
+.bank-heading{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:start}
+.bank-symbol{width:34px;height:38px;display:grid;place-items:center;border-radius:9px;background:var(--tint);color:var(--accent)}
+.bank-title{min-width:0}
+.bank-title h3{font-size:15px;font-weight:600;line-height:1.5;overflow-wrap:anywhere}
+.bank-title p{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5}
+.bank-heading>.badge{font-size:10px;padding:4px 8px;margin-top:3px;white-space:nowrap}
+.bank-primary-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:20px}
+.bank-primary-actions>.btn{min-height:40px}
+.bank-details-toggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:6px 0;border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;border-radius:6px}
+.bank-details-toggle:hover{color:var(--accent)}
+.bank-details-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.bank-details-chevron{flex-shrink:0;transition:transform .15s}
+.bank-details-toggle[aria-expanded=true] .bank-details-chevron{transform:rotate(180deg)}
+.bank-details-panel{border-top:1px solid var(--border);padding-top:20px;margin-top:18px}
+.bank-details-panel[hidden]{display:none}
+.bank-details-panel h4{font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px}
+.bank-card .bank-description{font-size:13px;color:var(--muted);line-height:1.8;min-height:0;margin:0;overflow-wrap:anywhere}
+.bank-description p+p{margin-top:13px}
+.bank-disciplines{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
+.bank-disciplines .pill{font-size:11px;max-width:100%;overflow-wrap:anywhere}
+.bank-management{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px}
+.bank-file-actions{display:flex;gap:8px}
+.bank-file-actions .icon-btn{width:40px;height:40px}
+@media(max-width:700px){
+  .banks-grid{gap:14px}
+  .bank-card{padding:18px}
+  .bank-heading{grid-template-columns:30px minmax(0,1fr) auto;gap:10px}
+  .bank-symbol{width:30px;height:34px}
+  .bank-symbol svg{width:18px;height:18px}
+  .bank-title h3{font-size:14px;line-height:1.5}
+  .bank-title p{font-size:11px}
+  .bank-heading>.badge{font-size:9px;padding:3px 7px}
+  .bank-primary-actions{margin-top:16px;gap:8px}
+  .bank-primary-actions>.btn,.bank-management>.btn{min-height:44px}
+  .bank-details-toggle{font-size:11px}
+  .bank-details-panel{padding-top:17px;margin-top:15px}
+  .bank-card .bank-description{font-size:13px;line-height:1.8}
+  .bank-file-actions .icon-btn{width:44px;height:44px}
+}
+@media(prefers-reduced-motion:reduce){.bank-details-chevron{transition:none}}
