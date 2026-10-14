@@ -34,6 +34,14 @@ Se a autorização retornada no login incluir o acesso Drive já concedido, a re
 
 ## Durante o estudo
 
+### Zerar progresso pessoal
+
+No final de Desempenho, **Zerar progresso** pede confirmação e inicia uma nova etapa de estudo. Respostas, estatísticas, favoritos, revisões e sessões voltam a zero; nome, conta, foto, preferências, pasta e bancos importados não são removidos. Cancelar não altera nenhum registro.
+
+O evento `progress-reset` identifica o reinício no diário da própria conta; novos registros usam seu identificador em `progressEpoch`. Eventos anteriores permanecem no diário técnico para reconciliar dispositivos e backups, mas deixam de compor qualquer progresso ou estatística. É um reinício lógico de estudos, não uma exclusão física dos arquivos pessoais.
+
+O marcador sincroniza com o mesmo arquivo principal do Drive. Backups antigos não reativam a etapa anterior e sessões antigas são descartadas. Se o envio falhar, o reinício permanece salvo localmente, com aviso de sincronização pendente. Outros dispositivos devem usar a versão atualizada do Foco para ler o novo tipo de evento.
+
 Após conectar, o sistema localiza o arquivo `foco-progresso-<sub>-principal.json`, confirma a propriedade da conta e do conteúdo, valida os eventos e une os históricos remoto e local. Em seguida atualiza esse mesmo arquivo quando há alterações locais. Se não houver histórico, cria o principal automaticamente. A versão do arquivo fica em cache: se o conteúdo remoto não mudou e os eventos estão disponíveis localmente, o app evita baixar o JSON novamente.
 
 Cada mudança é salva localmente imediatamente. Com autorização ativa, o envio ao Drive ocorre após 6 segundos de inatividade; concluir uma sessão também dispara uma sincronização. O botão Sincronizar permite executar o processo manualmente. Ao voltar ao site ou recuperar a rede, a sincronização é tentada enquanto o token continua válido.

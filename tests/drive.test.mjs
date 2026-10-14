@@ -61,6 +61,21 @@ function server(){
 function syncClient(subject){const storage=subject?new AccountStorage(new MemoryStorage(),subject):new MemoryStorage(),store=new Store(storage),drive=new DriveSync(store,{folderId:'test-folder',clientId:''});drive.token='fixture-only';drive.expires=Date.now()+3600000;return {store,drive};}
 async function withRemote(run){const remote=server(),old=globalThis.fetch;globalThis.fetch=remote.fetch;try{await run(remote);}finally{globalThis.fetch=old;}}
 
+test('Drive: reset sincroniza na mesma conta sem reativar etapa antiga nem alterar outra conta',()=>withRemote(async remote=>{
+  const first=syncClient('reset-alpha'),second=syncClient('reset-alpha'),foreign=syncClient('reset-beta');
+  await first.store.merge([flag('before')]);await first.drive.sync();await second.drive.sync();
+  await foreign.store.merge([flag('foreign')]);await foreign.drive.sync();
+  const foreignBefore=JSON.stringify(foreign.store.events),principal=remote.live().find(([,f])=>f.name==='foco-progresso-reset-alpha-principal.json')[0];
+  await first.store.resetProgress();await first.drive.sync();
+  await second.store.merge([{...flag('offline-old'),at:'2099-01-01T00:00:00.000Z'}]);await second.drive.sync();await first.drive.sync();
+  assert.equal(first.store.model().flags.size,0);assert.equal(second.store.model().flags.size,0);
+  assert.equal(first.store.model().progressEpoch,second.store.model().progressEpoch);
+  await second.store.add([{type:'flag',key:'bank:new',flag:'favorite',value:true}]);await second.drive.sync();await first.drive.sync();
+  assert.equal(first.store.model().flags.size,1);assert.equal(first.store.model().flags.get('bank:new').favorite,true);
+  assert.equal(remote.live().filter(([,f])=>f.name==='foco-progresso-reset-alpha-principal.json').length,1);
+  assert(remote.files.has(principal));await foreign.drive.sync();assert.equal(JSON.stringify(foreign.store.events),foreignBefore);
+}));
+
 test('Drive: banco e progresso acima de 10 MB são importados e restaurados sem cortes',()=>withRemote(async remote=>{
   const bank=longBank({large:true});remote.files.set('bank-long',{name:'banco-longo.json',document:bank,version:1});
   const first=syncClient(),second=syncClient();
