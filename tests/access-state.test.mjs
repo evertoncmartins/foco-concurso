@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress','question-origin','profile-photo'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','profile-photo'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -100,6 +100,28 @@ async function studyRuntime(options={},mode='smart'){
   await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');await navigate('session');})()`);
   return app;
 }
+
+test('comentários formatados aparecem no estudo e no resultado sem reimportação ou mudança do progresso',async()=>{
+  for(const mobile of [true,false])for(const mode of ['smart','exam']){
+    const app=runtime({mobile});app.auth.signOut();await app.click('guest');
+    const raw=structuredClone(bank);raw.id='teste-comentarios';raw.questions=raw.questions.slice(0,1);
+    const text='C combina requisitos. A antecipa as férias. B atribui prazo errado. D exclui uma vantagem. A acumulação depende do serviço.';
+    raw.questions[0].explanation=text;
+    await app.document.querySelector('#bank-file').onchange({target:{files:[{name:'comentarios.json',text:async()=>JSON.stringify(raw)}]}});
+    await app.value(`(async()=>{await newSession([model.questions.find(q=>q.bankId==='teste-comentarios').key],'${mode}');await navigate('session');})()`);
+    await app.click('select',{option:raw.questions[0].correctOption});await app.click('answer');
+    const formatted='<strong class="explanation-letter">A</strong> antecipa as férias.';
+    if(mode==='exam')assert(!app.html().includes(formatted));else assert(app.html().includes(formatted));
+    assert(app.value(`model.questions.find(q=>q.bankId==='teste-comentarios').explanation`)===text);
+    const before=app.value('JSON.stringify(store.events)');await app.click('toggle-theme');
+    assert.equal(app.value('JSON.stringify(store.events)'),before);
+    await app.finish();assert.equal(app.value('view'),'result');assert(app.html().includes(formatted));
+    assert(app.html().includes('A acumulação depende do serviço.'));
+    assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('model.stats.correct'),1);
+    const saved=JSON.parse(app.value('JSON.stringify(store.export())'));
+    assert.equal(saved.events.find(e=>e.type==='bank'&&e.bank.id===raw.id).bank.questions[0].explanation,text);
+  }
+});
 
 test('importação pelo seletor Mobile e Desktop aceita UTF-8 com BOM e JSON acima de 10 MB',async()=>{
   for(const mobile of [true,false]){
