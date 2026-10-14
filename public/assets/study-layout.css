@@ -48,8 +48,8 @@
 }
 @media(min-width:701px){
   /* Keep the cutting control outside the highlighted row, with no layout slot.
-     Its hit area touches the row so moving to the scissors preserves hover. */
-  .option-cut{position:absolute;left:-40px;top:50%;transform:translateY(-50%);width:40px;height:32px;z-index:1}
+     The small hit area stays active while faded, allowing direct hover outside. */
+  .option-cut{position:absolute;left:-40px;top:50%;transform:translateY(-50%);width:40px;height:32px;z-index:1;pointer-events:auto}
   .option-cut:hover,.option-cut:focus-visible{background:transparent}
   .option-cut::after{content:"";position:absolute;left:calc(50% + 10px);top:50%;width:8px;border-top:1px dashed currentColor;opacity:.5;pointer-events:none}
   /* Size the regular question workspace to the browser's usable viewport. */
