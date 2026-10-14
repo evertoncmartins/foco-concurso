@@ -25,11 +25,13 @@ function runtime(options={}){
   let googleReady=options.googleReady??true,authorizations=0,preparations=0,restores=0,renders=0;
   function element(classes=''){
     const names=new Set(classes.split(/\s+/).filter(Boolean)),attributes=new Map();
-    return {dataset:{},innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){},showModal(){this.open=true;},close(){this.open=false;},querySelector(){return null;},scrollIntoView(){}};
+    const events=new Map();
+    return {dataset:{},innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){},showModal(){this.open=true;},close(){this.open=false;},querySelector(){return null;},addEventListener(name,fn){events.set(name,fn);},removeEventListener(name){events.delete(name);},emit(name,event){events.get(name)?.(event);},scrollIntoView(){}};
   }
   const node=selector=>{
     if(!nodes.has(selector)){
       const el=element();
+      if(selector==='#dialog')el.querySelector=selector=>node(selector);
       if(selector==='#app'){
         let html='';Object.defineProperty(el,'innerHTML',{get:()=>html,set:value=>{
           html=value;renders++;const question=html.match(/class="question-body" data-question="([^"]+)"/);
@@ -90,7 +92,7 @@ function runtime(options={}){
     const event={key:' ',code:overrides?.key?'':'Space',target:{dataset:{},closest(){return null;},matches(){return false;}},defaultPrevented:false,preventDefault(){this.defaultPrevented=true;},altKey:false,ctrlKey:false,metaKey:false,shiftKey:false,repeat:false,isComposing:false,...overrides};
     await document.emit('keydown',event);return event;
   };
-  return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
+  return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),confirm:accepted=>node(accepted?'#confirm-ok':'#confirm-cancel').onclick(),finish:async()=>{const pending=document.emit('click',{target:target({action:'finish'})});await tick();if(node('#dialog').open)node('#confirm-ok').onclick();await pending;},key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
 }
 
 async function studyRuntime(options={},mode='smart'){
@@ -243,50 +245,97 @@ test('tesoura Mobile mantém gabarito e resposta registrada após responder',asy
 });
 const cutControl=(app,option)=>cutRow(app,option).querySelector('.option-cut');
 
-test('Espaço pula no estudo normal e no foco, sem registrar resposta',async()=>{
+test('setas navegam uma questão por vez no Desktop normal e foco, mantendo rascunhos e respostas',async()=>{
   for(const mode of ['smart','exam']){
-    const app=await studyRuntime({},mode);assert(!app.html().includes('focus-skip-key'));
-    assert.match(app.html(),/data-action="skip" aria-keyshortcuts="Space"/);
-    await app.click('toggle-focus');assert.equal(app.document.focused,'.question-body');
-    assert.match(app.html(),/data-action="skip" aria-keyshortcuts="Space">Pular<kbd class="focus-skip-key">Espaço<\/kbd>/);
+    const app=await studyRuntime({},mode);assert(!app.html().includes('data-action="skip"'));
+    assert.match(app.html(),/data-action="previous"[\s\S]*data-action="answer"[\s\S]*data-action="next"/);
+    await app.click('toggle-focus');assert.match(app.html(),/class="question-nav-key">←<\/kbd>/);assert.match(app.html(),/class="question-nav-key">→<\/kbd>/);
     await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});app.document.querySelector('.question-body').scrollTop=260;
-    await app.click('toggle-theme');assert.equal(app.document.querySelector('.question-body').scrollTop,260);
-    const events=app.value('store.events.length');assert.equal((await app.keyEvent()).defaultPrevented,true);
-    assert.equal(app.value('session.index'),1);assert.equal(app.value('selected'),null);assert.equal(app.value('model.stats.attempts'),0);assert.equal(app.value('Object.values(session.answers).filter(Boolean).length'),0);assert.equal(app.value('session.answers[session.queue[0]]'),null);assert.equal(app.value('store.events.length'),events+1);assert.equal(app.document.querySelector('.question-body').scrollTop,0);assert.equal(app.document.focused,'.question-body');
-    assert.equal((await app.keyEvent({repeat:true})).defaultPrevented,true);assert.equal(app.value('session.index'),1);
-    await app.click('select',{option:'A'});await app.click('answer');const answered=app.value('JSON.stringify(store.events)');
-    assert(!app.html().includes('focus-skip-key'));assert.equal((await app.keyEvent()).defaultPrevented,false);assert.equal(app.value('session.index'),1);assert.equal(app.value('JSON.stringify(store.events)'),answered);
-    await app.click('next');await app.keyEvent();assert.equal(app.value('view'),'result');assert(!app.value('focusMode.active'));assert(!app.html().includes('focus-skip-key'));
+    assert.equal((await app.keyEvent({key:'ArrowRight'})).defaultPrevented,true);assert.equal(app.value('session.index'),1);assert.equal(app.value('selected'),null);assert.equal(app.value('JSON.stringify(session.answers)'),'{}');assert.equal(app.value('model.stats.attempts'),0);
+    assert.equal((await app.keyEvent({key:'ArrowRight',repeat:true})).defaultPrevented,true);assert.equal(app.value('session.index'),1);
+    await app.keyEvent({key:'ArrowLeft'});assert.equal(app.value('session.index'),0);assert.equal(app.value('selected'),'B');
+    await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),0);const answers=app.value('JSON.stringify(session.answers)'),attempts=app.value('model.stats.attempts');
+    await app.keyEvent({key:'ArrowRight'});await app.keyEvent({key:'ArrowLeft'});await app.keyEvent({key:'Enter'});
+    assert.equal(app.value('JSON.stringify(session.answers)'),answers);assert.equal(app.value('model.stats.attempts'),attempts);
+    const events=app.value('JSON.stringify(store.events)');assert.equal((await app.keyEvent()).defaultPrevented,false);assert.equal(app.value('JSON.stringify(store.events)'),events);
   }
-  const normal=await studyRuntime();assert.equal((await normal.keyEvent()).defaultPrevented,true);assert.equal(normal.value('session.index'),1);assert.equal(normal.value('model.stats.attempts'),0);
-  const mobile=await studyRuntime({mobile:true});assert.equal((await mobile.keyEvent()).defaultPrevented,true);assert.equal(mobile.value('session.index'),1);assert.equal(mobile.value('model.stats.attempts'),0);
+  const normal=await studyRuntime();await normal.keyEvent({key:'ArrowRight'});assert.equal(normal.value('session.index'),1);
+  const mobile=await studyRuntime({mobile:true});assert.equal((await mobile.keyEvent({key:'ArrowRight'})).defaultPrevented,false);assert.equal(mobile.value('session.index'),0);
+  await mobile.click('next');await mobile.click('previous');assert.equal(mobile.value('session.index'),0);
 });
 
-test('Espaço respeita campos, controles nativos/customizados, modais, composição e modificadores',async()=>{
+test('setas respeitam campos, controles com navegação própria, modais e modificadores',async()=>{
   const options={},app=await studyRuntime(options);await app.click('toggle-focus');const events=app.value('JSON.stringify(store.events)');
   const control=selector=>({dataset:{},closest(selectors){return selectors.split(',').includes(selector)?this:null;},matches(){return false;}});
-  for(const selector of ['input','textarea','select','button','a[href]','summary','video','[contenteditable]:not([contenteditable="false"])','[role="checkbox"]','[role="slider"]','[role="combobox"]','[role="button"]']){
-    assert.equal((await app.keyEvent({target:control(selector)})).defaultPrevented,false,selector);assert.equal(app.value('JSON.stringify(store.events)'),events);
+  for(const key of ['ArrowLeft','ArrowRight']){
+    for(const selector of ['input','textarea','select','summary','video','[contenteditable]:not([contenteditable="false"])','[role="checkbox"]','[role="slider"]','[role="combobox"]','[role="grid"]','[aria-haspopup]:not([aria-haspopup="false"])']){
+      assert.equal((await app.keyEvent({key,target:control(selector)})).defaultPrevented,false,selector);assert.equal(app.value('JSON.stringify(store.events)'),events);
+    }
+    assert.equal((await app.keyEvent({key,target:{isContentEditable:true}})).defaultPrevented,false);
+    assert.equal((await app.keyEvent({key,composedPath:()=>[control('input')]})).defaultPrevented,false);
+    for(const modifier of ['altKey','ctrlKey','metaKey','shiftKey','isComposing','defaultPrevented'])await app.keyEvent({key,[modifier]:true});
+    app.document.querySelector('#dialog').open=true;assert.equal((await app.keyEvent({key})).defaultPrevented,false);app.document.querySelector('#dialog').open=false;
+    options.otherModal=true;assert.equal((await app.keyEvent({key})).defaultPrevented,false);options.otherModal=false;
+    await app.value('working=true;');assert.equal((await app.keyEvent({key})).defaultPrevented,false);await app.value('working=false;');
+    await app.value('restoration={state:"loading"};');assert.equal((await app.keyEvent({key})).defaultPrevented,false);await app.value('restoration=null;');
   }
-  assert.equal((await app.keyEvent({target:{isContentEditable:true}})).defaultPrevented,false);
-  assert.equal((await app.keyEvent({composedPath:()=>[control('button')]})).defaultPrevented,false);
-  for(const modifier of ['altKey','ctrlKey','metaKey','shiftKey','isComposing','defaultPrevented'])await app.keyEvent({[modifier]:true});
-  assert.equal(app.value('JSON.stringify(store.events)'),events);
-  app.document.querySelector('#dialog').open=true;assert.equal((await app.keyEvent()).defaultPrevented,false);app.document.querySelector('#dialog').open=false;
-  options.otherModal=true;assert.equal((await app.keyEvent()).defaultPrevented,false);options.otherModal=false;
-  await app.value('working=true;');assert.equal((await app.keyEvent()).defaultPrevented,false);await app.value('working=false;');
-  await app.value('restoration={state:"loading"};');assert.equal((await app.keyEvent()).defaultPrevented,false);await app.value('restoration=null;');
   assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.value('session.index'),0);
-  await app.click('exit-focus');assert.equal((await app.keyEvent()).defaultPrevented,true);assert.equal(app.value('session.index'),1);
+  await app.keyEvent({key:'ArrowRight',target:{dataset:{action:'select'},closest:selector=>selector==='button'?{}:null}});
+  assert.equal(app.value('session.index'),1,'focused alternative buttons do not swallow arrow navigation');
 });
 
-test('Espaço não pula duas questões quando uma gravação ainda está pendente',async()=>{
-  for(const focus of [false,true]){
-    const app=await studyRuntime();if(focus)await app.click('toggle-focus');
-    await app.value('var unlockSkip;const originalAdd=store.add.bind(store);store.add=async events=>{await new Promise(resolve=>unlockSkip=resolve);return originalAdd(events);};');
-    const first=app.keyEvent();assert(app.value('working'));await app.keyEvent();assert.equal(app.value('session.index'),0);
-    app.value('unlockSkip();');await first;assert.equal(app.value('session.index'),1);assert.equal(app.value('model.stats.attempts'),0);assert(!app.value('working'));
+test('navegação não avança duas vezes enquanto a gravação está pendente',async()=>{
+  const app=await studyRuntime();await app.value('var unlockMove;const originalAdd=store.add.bind(store);store.add=async events=>{await new Promise(resolve=>unlockMove=resolve);return originalAdd(events);};');
+  const first=app.keyEvent({key:'ArrowRight'});assert(app.value('working'));await app.keyEvent({key:'ArrowRight'});await app.click('next');assert.equal(app.value('session.index'),0);
+  app.value('unlockMove();');await first;assert.equal(app.value('session.index'),1);assert.equal(app.value('model.stats.attempts'),0);assert(!app.value('working'));
+});
+
+test('três botões mantêm registro no centro, limites de navegação e revisão sem novas tentativas',async()=>{
+  for(const mobile of [false,true]){
+    const app=await studyRuntime({mobile});
+    const controls=()=>app.html().match(/<div class="question-actions">([\s\S]*?)<\/div>/)[1];
+    assert.equal((controls().match(/<button /g)||[]).length,3);
+    assert.match(controls(),/data-action="previous"[^>]*disabled/);assert.match(controls(),/data-action="answer"[\s\S]*Registrar resposta[\s\S]*data-action="next"/);
+    const before=app.value('JSON.stringify(store.events)');await app.click('previous');assert.equal(app.value('JSON.stringify(store.events)'),before);
+    await app.click('select',{option:'B'});await app.click('next');await app.click('previous');assert.equal(app.value('selected'),'B');
+    await app.click('pause');await app.click('resume');assert.equal(app.value('selected'),'B');
+    const correct=app.value('model.questions.find(q=>q.key===session.queue[0]).correctOption');await app.click('select',{option:correct});await app.click('answer');
+    assert.equal(app.value('session.index'),0);assert.equal(app.value('model.stats.correct'),1);
+    await app.click('next');await app.click('previous');assert.match(app.html(),/Resposta correta/);
+    await app.click('answer');assert.equal(app.value('model.stats.attempts'),1);
+    await app.click('next');await app.click('next');assert.equal(app.value('session.index'),2);assert.match(controls(),/data-action="next"[^>]*disabled/);
+    const end=app.value('JSON.stringify(store.events)');await app.click('next');assert.equal(app.value('JSON.stringify(store.events)'),end);assert.equal(app.value('view'),'session');
+    assert.match(app.html(),/data-action="finish">Concluir sessão/);
   }
+});
+
+test('concluir com não respondidas permite cancelar, bloqueia setas no modal e não gera erros fictícios',async()=>{
+  const app=await studyRuntime();await app.click('next');await app.click('next');const before=app.value('JSON.stringify(store.events)');
+  const finishing=app.click('finish');await tick();assert(app.document.querySelector('#dialog').open);assert.match(app.document.querySelector('#dialog').innerHTML,/3 questões ainda não têm resposta registrada/);
+  assert.equal((await app.keyEvent({key:'ArrowLeft'})).defaultPrevented,false);assert.equal(app.value('session.index'),2);
+  app.confirm(false);await finishing;assert(!app.document.querySelector('#dialog').open);assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.value('view'),'session');
+  await app.click('previous');const key=app.value('session.queue[session.index]'),correct=app.value('model.questions.find(q=>q.key===session.queue[session.index]).correctOption');
+  await app.click('select',{option:correct});await app.click('answer');await app.click('next');await app.finish();
+  assert.equal(app.value('view'),'result');assert.equal(app.value('model.stats.correct'),1);assert.equal(app.value('model.stats.wrong'),0);assert.equal(app.value('session.answers[session.queue[0]]'),null);assert.equal(app.value(`session.answers['${key}']`),correct);
+});
+
+test('simulado conserva respostas ao voltar e só apresenta comentários e resultados ao concluir',async()=>{
+  const app=await studyRuntime({},'exam');const key=app.value('session.queue[0]');
+  await app.click('select',{option:'A'});await app.click('answer');await app.click('next');await app.click('previous');
+  assert.equal(app.value('session.answers[session.queue[0]]'),'A');assert.equal(app.value('model.stats.attempts'),0);assert(!app.html().includes('Alternativa correta:'));
+  await app.click('next');await app.click('next');await app.finish();assert.equal(app.value('view'),'result');assert.equal(app.value('model.stats.attempts'),1);assert.match(app.html(),/Alternativa correta:/);
+  const events=app.value('JSON.stringify(store.events)');await app.click('finish');assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.value(`session.answers['${key}']`),'A');
+});
+
+test('falha ao salvar navegação conserva questão, seleção, leitura e respostas',async()=>{
+  const app=await studyRuntime();await app.click('select',{option:'B'});app.document.querySelector('.question-body').scrollTop=180;
+  await app.value('failure=()=>{};store.add=async()=>{throw new Error("Falha simulada");};');const before=app.value('JSON.stringify(session)');
+  await app.click('next');assert.equal(app.value('JSON.stringify(session)'),before);assert.equal(app.value('selected'),'B');assert.equal(app.document.querySelector('.question-body').scrollTop,180);assert(!app.value('working'));
+});
+
+test('Ajustes descreve setas Desktop e Enter para registrar, sem o antigo atalho Pular',async()=>{
+  const app=runtime();await app.start();await app.click('nav',{view:'settings'});
+  assert.match(app.html(),/Registrar resposta<\/td><td><kbd>Enter/);assert.match(app.html(),/Questão anterior \(Desktop\)/);assert.match(app.html(),/Próxima questão \(Desktop\)/);assert(!app.html().includes('Pular questão'));assert(!app.html().includes('<kbd>Espaço</kbd>'));
 });
 
 test('foco automático Mobile mantém seleção, cortes e rolagem, pede tela cheia e funciona até concluir',async()=>{
@@ -296,7 +345,7 @@ test('foco automático Mobile mantém seleção, cortes e rolagem, pede tela che
   assert.match(app.html(),/class="focus-mobile-progress">Questão 1 de 3/);assert.match(app.html(),/Visitante · progresso temporário/);
   await app.click('toggle-theme');assert.equal(app.document.querySelector('.question-body').scrollTop,400);assert.equal(app.value('selected'),'B');
   await app.click('answer');await app.click('next');assert(app.value('focusMode.active'));assert.equal(app.document.fullscreenElement,app.document.documentElement);assert.equal(app.document.querySelector('.question-body').scrollTop,0);assert.match(app.html(),/>Questão 2 de 3</);
-  await app.click('skip');await app.click('select',{option:'A'});await app.click('answer');await app.click('next');
+  await app.click('next');await app.click('select',{option:'A'});await app.click('answer');await app.finish();
   assert.equal(app.value('view'),'result');assert.equal(app.value('focusMode.active'),false);assert.equal(app.document.fullscreenElement,null);
 });
 
@@ -336,7 +385,7 @@ test('desktop conserva foco opcional; mudar para layout Mobile ativa foco e muda
 
 test('questão isolada e revisão de erros também abrem automaticamente em foco no Mobile',async()=>{
   const app=await studyRuntime({mobile:true});await app.click('exit-focus');const key=app.value('model.questions[0].key');await app.click('single',{key});assert(app.value('focusMode.active'));assert.equal(app.value('session.queue.length'),1);
-  const wrong=app.value('model.questions.find(q=>q.key===session.queue[0]).options.find(o=>o.id!==model.questions.find(q=>q.key===session.queue[0]).correctOption).id');await app.click('select',{option:wrong});await app.click('answer');await app.click('next');assert.equal(app.value('view'),'result');assert(!app.value('focusMode.active'));
+  const wrong=app.value('model.questions.find(q=>q.key===session.queue[0]).options.find(o=>o.id!==model.questions.find(q=>q.key===session.queue[0]).correctOption).id');await app.click('select',{option:wrong});await app.click('answer');await app.finish();assert.equal(app.value('view'),'result');assert(!app.value('focusMode.active'));
   await app.click('session-errors');assert(app.value('focusMode.active'));assert.equal(app.value('view'),'session');assert.equal(app.value('session.mode'),'errors');assert.equal(app.value('session.queue[0]'),key);assert.equal(app.value('session.queue.length'),1);
 });
 
@@ -369,9 +418,9 @@ test('Mobile preserva leitura ao selecionar, favoritar e alternar tema, com cont
   await app.click('answer');assert.match(app.html(),/<strong>1<\/strong> acertos/);assert.match(app.html(),/<strong>0<\/strong> erros/);assert.match(app.html(),/<strong>100%<\/strong> na sessão/);assert.match(app.html(),/data-action="next"/);
 });
 
-test('Mobile reinicia a rolagem ao pular ou avançar e libera a navegação normal ao pausar',async()=>{
+test('Mobile reinicia a rolagem ao navegar e libera a navegação normal ao pausar',async()=>{
   const app=await studyRuntime({mobile:true});app.document.querySelector('.question-body').scrollTop=600;
-  await app.click('skip');assert.equal(app.document.querySelector('.question-body').scrollTop,0);assert.equal(app.value('model.stats.attempts'),0);
+  await app.click('next');assert.equal(app.document.querySelector('.question-body').scrollTop,0);assert.equal(app.value('model.stats.attempts'),0);
   app.document.querySelector('.question-body').scrollTop=400;await app.click('select',{option:'A'});assert.equal(app.document.querySelector('.question-body').scrollTop,400);
   await app.click('answer');await app.click('next');assert.equal(app.document.querySelector('.question-body').scrollTop,0);
   await app.click('pause');assert.equal(app.value('view'),'home');assert(!app.html().includes('class="shell session '));assert.equal(app.document.querySelector('.question-body'),null);
@@ -415,7 +464,7 @@ test('cortes acompanham tema, foco e pausa da mesma questão e reiniciam ao avan
   await app.click('toggle-theme');assert(cutRow(app,'A').classList.contains('eliminated'));assert(cutRow(app,'B').classList.contains('eliminated'));
   await app.click('toggle-focus');assert.match(app.html(),/focus-mode/);assert(cutRow(app,'A').classList.contains('eliminated'));
   await app.click('pause');await app.click('resume');assert(cutRow(app,'A').classList.contains('eliminated'));
-  await app.click('skip');assert(!cutRow(app,'A').classList.contains('eliminated'));assert(!cutRow(app,'B').classList.contains('eliminated'));
+  await app.click('next');assert(!cutRow(app,'A').classList.contains('eliminated'));assert(!cutRow(app,'B').classList.contains('eliminated'));
   await app.click('toggle-cut',{option:'A'});await app.click('select',{option:'B'});await app.click('answer');await app.click('next');assert(!cutRow(app,'A').classList.contains('eliminated'));
   await app.click('toggle-cut',{option:'A'});await app.value(`(async()=>{await newSession([model.questions[0].key]);navigate('session');})()`);assert(!cutRow(app,'A').classList.contains('eliminated'));
 });
