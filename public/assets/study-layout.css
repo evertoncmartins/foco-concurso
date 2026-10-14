@@ -92,7 +92,8 @@
   .focus-mode .focus-guest-label{display:inline;font-size:10px;font-weight:400;color:var(--muted);margin-left:8px}
   .focus-escape{font-size:11px;color:var(--muted)}
   .focus-mode .content{display:flex;flex:1;flex-direction:column;min-height:0;width:100%;max-width:none;margin:0;padding:18px var(--focus-gutter) 14px}
-  .focus-mode .session-container{display:flex;flex:1;flex-direction:column;min-width:0;min-height:0;width:100%;max-width:960px;margin:0 auto}
+  /* Expand with the desktop viewport while keeping balanced reading margins. */
+  .focus-mode .session-container{display:flex;flex:1;flex-direction:column;min-width:0;min-height:0;width:100%;max-width:clamp(1120px,76vw,1600px);margin:0 auto}
   .focus-mode .session-header{flex-shrink:0;justify-content:flex-start;margin-bottom:10px}
   .focus-mode .session-header [data-action=pause]{display:none}
   .focus-mode .session-header span{font-size:12px}
