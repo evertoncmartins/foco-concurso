@@ -7,3 +7,11 @@
 - Execute `npm test`, `npm run check` e `npm run build` antes de enviar alterações de código. GitHub Actions executa essas verificações automaticamente.
 - GitHub Pages é opcional e manual. O usuário informou `https://foco-concurso-wine.vercel.app/` como endereço de produção em 09/10/2026. Use esse endereço nas orientações ao usuário; preserve a publicação administrada por Sites como espelho técnico.
 - Não versione progresso pessoal, tokens ou credenciais. `dist/` é gerado pelo build e não deve ser versionado.
+
+## Cards dos bancos — padrão permanente
+
+- Exiba bancos de uma lei com título exclusivamente no formato `Lei nº número/ano`, sem siglas ou texto anterior. Exemplo: `Lei nº 8.069/1990`, nunca `ECA · Lei nº 8.069/1990`.
+- Mantenha abaixo do título o nome descritivo: `Estatuto da Criança e do Adolescente`, `Servidores públicos federais` ou o nome informado para a outra lei.
+- Aplique o mesmo padrão na tela Banco de questões e nos cards do início. Não force o nome de uma única lei em bancos mistos ou sem identificação segura, nem altere IDs, nomes originais exportados ou progresso.
+- Preserve o design minimalista, os resumos de questões/instituições/período e as ações existentes. Exiba descrição breve, assuntos e origens em Ver mais detalhes; não coloque implementação ou curadoria na interface.
+- Reutilize `bankPresentation` em `src/bank-view.mjs` para evitar divergências entre os cards.

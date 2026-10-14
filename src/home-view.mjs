@@ -1,15 +1,16 @@
 import {icon} from './icons.mjs';
 import {localDay,studyStreak,filterQuestions} from './engine.mjs';
+import {bankPresentation} from './bank-view.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const questionCount=n=>`${n} ${n===1?'questão':'questões'}`;
 
 function bankRow(bank,model){
   const answered=bank.questions.filter(q=>model.progress.has(`${bank.id}:${q.id}`)).length;
-  const disciplines=[...new Set(bank.questions.map(q=>q.discipline))].join(' · ');
+  const {title,subtitle}=bankPresentation(bank);
   return `<button class="home-bank" data-action="${bank.enabled?'start':'nav'}" ${bank.enabled?`data-bank="${esc(bank.id)}"`:'data-view="banks"'} aria-label="${bank.enabled?'Estudar':'Gerenciar'} ${esc(bank.name)}">
     <span class="home-bank-icon">${icon('book',21)}</span>
-    <span class="home-bank-copy"><strong>${esc(bank.name)}</strong><span>${esc(disciplines)}</span><small>${questionCount(bank.questions.length)} · ${bank.enabled?`${answered} resolvidas`:'Desativado'}</small></span>
+    <span class="home-bank-copy"><strong>${esc(title)}</strong><span>${esc(subtitle)}</span><small>${questionCount(bank.questions.length)} · ${bank.enabled?`${answered} resolvidas`:'Desativado'}</small></span>
     <span class="home-bank-arrow">${icon('arrow',18)}</span>
   </button>`;
 }

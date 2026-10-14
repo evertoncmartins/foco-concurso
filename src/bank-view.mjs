@@ -5,9 +5,30 @@ const plural=(n,one,many)=>n===1?one:many;
 const compare=(a,b)=>a.localeCompare(b,'pt-BR',{numeric:true,sensitivity:'base'});
 const laws=[
   {key:'8112',matches:name=>/\b8\.?112\b/u.test(name),name:'Lei nº 8.112/1990',subtitle:'Servidores públicos federais',description:'Estabelece as regras da vida funcional dos servidores públicos civis federais: ingresso, movimentação, direitos, deveres e responsabilidades no serviço público.',url:'https://www.planalto.gov.br/ccivil_03/leis/l8112compilado.htm'},
-  {key:'8069',matches:name=>/\b8\.?069\b|\bECA\b|Estatuto da Criança e do Adolescente/iu.test(name),name:'ECA · Lei nº 8.069/1990',subtitle:'Estatuto da Criança e do Adolescente',description:'Protege os direitos de crianças e adolescentes e define responsabilidades da família, da sociedade e do poder público para garantir seu desenvolvimento, sua dignidade e sua proteção integral.',url:'https://www.planalto.gov.br/ccivil_03/leis/l8069.htm'}
+  {key:'8069',matches:name=>/\b8\.?069\b|\bECA\b|Estatuto da Criança e do Adolescente/iu.test(name),name:'Lei nº 8.069/1990',subtitle:'Estatuto da Criança e do Adolescente',description:'Protege os direitos de crianças e adolescentes e define responsabilidades da família, da sociedade e do poder público para garantir seu desenvolvimento, sua dignidade e sua proteção integral.',url:'https://www.planalto.gov.br/ccivil_03/leis/l8069.htm'}
 ];
 const titles={I:'Disposições preliminares',II:'Provimento, vacância e movimentação',III:'Direitos e vantagens',IV:'Regime disciplinar',V:'Processo administrativo disciplinar',VI:'Seguridade social',VII:'Disposições gerais',VIII:'Disposições transitórias e finais'};
+
+// Share the naming convention across the bank catalog and the home cards.
+// Preserve imported names/IDs; format only a single, explicitly identified law.
+export function bankPresentation(bank){
+  const name=String(bank.name||''),matched=laws.filter(l=>l.matches(name));
+  const disciplines=[...new Set((bank.questions||[]).map(q=>q.discipline).filter(Boolean))];
+  const fallback={law:null,title:name,subtitle:disciplines.join(' · ')||'Banco de questões'};
+  const explicit=[...name.matchAll(/\bLei\s+(?:n[º°o.]?\s*)?(\d+(?:\.\d+)*)\s*\/\s*(\d{4})\b/giu)].filter(m=>!/Decreto\s*[-–—]\s*$/iu.test(name.slice(0,m.index)));
+  const normalizeNumber=n=>n.replace(/\./g,'').replace(/^0+(?=\d)/u,'').replace(/\B(?=(\d{3})+(?!\d))/gu,'.');
+  const identified=new Set(explicit.map(m=>`Lei nº ${normalizeNumber(m[1])}/${m[2]}`));
+  if(matched.length>1||identified.size>1)return fallback;
+  const law=matched.length===1?matched[0]:null;
+  const title=[...identified][0]||law?.name;
+  if(!title)return fallback;
+  if(law&&title===law.name)return {law,title,subtitle:law.subtitle};
+  const match=explicit[0],trim=v=>v.replace(/^[\s·:—–-]+|[\s·:—–-]+$/gu,'');
+  const suffix=match?trim(name.slice(match.index+match[0].length)):'';
+  const prefix=match?trim(name.slice(0,match.index)):'';
+  const useful=v=>v.length>5&&!/^(?:banco|questões|unificado|recorte|edital|títulos|capítulos|arts?\.)\b/iu.test(v);
+  return {law:null,title,subtitle:useful(suffix)?suffix:useful(prefix)?prefix:fallback.subtitle};
+}
 
 function origin(q){
   const tag=[q.tag,...(q.tags||[])].find(t=>/^[A-Z][A-Z0-9.-]*-[12]\d{3}$/.test(t||''));
@@ -38,7 +59,7 @@ function counts(map){return [...map.values()].sort((a,b)=>b.count-a.count||compa
 function add(map,label){const key=label.toLocaleUpperCase('pt-BR');const entry=map.get(key)||{label,count:0};entry.count++;map.set(key,entry);}
 
 export function bankOverviewData(bank){
-  const matched=laws.filter(l=>l.matches(bank.name)),law=matched.length===1?matched[0]:null;
+  const presentation=bankPresentation(bank),law=presentation.law;
   const institutions=new Map(),subjects=new Map(),years=[];
   let missingInstitutions=0,missingYears=0;
   for(const q of bank.questions){
@@ -50,14 +71,14 @@ export function bankOverviewData(bank){
   const firstYear=years.length?Math.min(...years):null,lastYear=years.length?Math.max(...years):null;
   const period=firstYear===null?'Não informado':firstYear===lastYear?`${firstYear}`:`${firstYear}–${lastYear}`;
   const disciplines=[...new Set(bank.questions.map(q=>q.discipline).filter(Boolean))];
-  return {law,institutions:counts(institutions),subjects:counts(subjects),disciplines,firstYear,lastYear,period,missingInstitutions,missingYears,total:bank.questions.length};
+  return {...presentation,institutions:counts(institutions),subjects:counts(subjects),disciplines,firstYear,lastYear,period,missingInstitutions,missingYears,total:bank.questions.length};
 }
 
 export function bankCardView(bank,{detailsOpen=false,index=0}={}){
   const panelId=`bank-details-${index}`,overview=bankOverviewData(bank);
   const {law,institutions,subjects,disciplines,total,period,missingInstitutions,missingYears}=overview;
   const detailLabel=detailsOpen?'Ocultar detalhes':'Ver mais detalhes';
-  const title=law?.name||bank.name,subtitle=law?.subtitle||disciplines.join(' · ')||'Banco de questões';
+  const {title,subtitle}=overview;
   const description=law?.description||`Questões ${disciplines.length?`de ${disciplines.join(' e ')}`:'para concursos públicos'} para praticar e revisar os assuntos apresentados abaixo.`;
   return `<article class="card bank-card ${bank.enabled?'':'disabled'}" aria-label="${esc(bank.name)}">
     <header class="bank-heading">
