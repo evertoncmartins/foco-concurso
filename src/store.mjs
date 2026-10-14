@@ -1,10 +1,28 @@
-import {mergeEvents,validateEvents,derive,breakdown,studyStreak,sameEvent} from './engine.mjs';
+import {mergeEvents,validateEvents,derive,breakdown,studyStreak,sameEvent,isStudyEvent,studyEpoch,currentProgressEpoch} from './engine.mjs';
 import {reconcileEvents} from './event-conflicts.mjs';
 const PREFIX='foco:v1:event:';
+const resetError=()=>Object.assign(new Error('Seu progresso foi reiniciado. Inicie uma nova sessão de estudo.'),{code:'PROGRESS_RESET'});
 export class Store extends EventTarget {
   constructor(storage=globalThis.localStorage) { super(); this.storage=storage; this.events=[]; this.load(); }
   load() { const list=[]; for(let i=0;i<this.storage.length;i++){const key=this.storage.key(i);if(key?.startsWith(PREFIX)){let e;try{e=JSON.parse(this.storage.getItem(key));}catch{throw new Error('Há dados locais corrompidos. Não serão substituídos. Exporte uma cópia antes de restaurar.');}list.push(e);}} this.events=mergeEvents(validateEvents({schemaVersion:1,events:list}));return this.events; }
-  async add(items) { this.load();let time=Math.max(Date.now(),Date.parse(this.events.at(-1)?.at||0)+1||0);const result=items.map(item=>({id:crypto.randomUUID(),at:new Date(time++).toISOString(),...item})); return this.merge(result); }
+  async add(items) {
+    this.load();const epoch=currentProgressEpoch(this.events),hasStudy=items.some(isStudyEvent),resetting=items.some(e=>e.type==='progress-reset');
+    const timeline=resetting?this.events.filter(e=>e.type==='progress-reset'):hasStudy?this.events.filter(e=>isStudyEvent(e)&&studyEpoch(e)===epoch):this.events;
+    let time=Math.max(Date.now(),Date.parse(timeline.at(-1)?.at||0)+1||0);
+    const result=items.map(item=>{
+      let event={id:crypto.randomUUID(),at:new Date(time++).toISOString(),...item};
+      if(isStudyEvent(item)){
+        const expected=Object.hasOwn(item,'progressEpoch')?item.progressEpoch:item.type==='session'?item.session?.progressEpoch??null:epoch;
+        if(expected!==epoch)throw resetError();
+        if(expected!==null||Object.hasOwn(item,'progressEpoch'))event={...event,progressEpoch:expected};
+      }
+      return event;
+    });
+    const saved=await this.merge(result);
+    if(hasStudy&&currentProgressEpoch(this.load())!==epoch)throw resetError();
+    return saved;
+  }
+  async resetProgress(){return this.add([{type:'progress-reset'}]);}
   async merge(events) {
     const incoming=validateEvents({schemaVersion:1,events});
     // Each event has its own key: different tabs never rewrite a shared document.

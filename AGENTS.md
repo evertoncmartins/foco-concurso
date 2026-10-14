@@ -15,3 +15,9 @@
 - Aplique o mesmo padrão na tela Banco de questões e nos cards do início. Não force o nome de uma única lei em bancos mistos ou sem identificação segura, nem altere IDs, nomes originais exportados ou progresso.
 - Preserve o design minimalista, os resumos de questões/instituições/período e as ações existentes. Exiba descrição breve, assuntos e origens em Ver mais detalhes; não coloque implementação ou curadoria na interface.
 - Reutilize `bankPresentation` em `src/bank-view.mjs` para evitar divergências entre os cards.
+
+## Reinício de estudos
+
+- Zerar progresso exige confirmação explícita e afeta apenas respostas, estatísticas, favoritos, revisões e sessões da conta atual. Preserve nome, conta, foto, preferências, pasta e bancos importados, incluindo seus estados de ativação.
+- Preserve o marcador `progress-reset` e a associação `progressEpoch` dos eventos de estudo. Não implemente reset apagando localStorage ou apenas retirando eventos locais: dispositivos offline e backups poderiam reativar o histórico antigo.
+- Teste cancelamento, falha de gravação/envio, outra conta, nova sessão e sincronização antes de publicar mudanças nesse fluxo.

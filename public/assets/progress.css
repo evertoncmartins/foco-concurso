@@ -1,0 +1,9 @@
+.progress-reset{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px;margin-top:28px}
+.progress-reset>div{flex:1 1 320px;min-width:0}
+.progress-reset h3{font-size:14px;margin-bottom:7px}
+.progress-reset p{max-width:650px;font-size:12px;color:var(--muted);line-height:1.8}
+.progress-reset>.btn{flex-shrink:0;min-height:44px}
+.btn.danger{color:var(--error);background:transparent;border-color:var(--border)}
+.btn.danger:hover{border-color:var(--error);background:var(--surface2)}
+.btn.danger:focus-visible{outline:2px solid var(--error);outline-offset:3px}
+@media(max-width:700px){.progress-reset{align-items:flex-start;flex-direction:column;gap:17px;margin-top:22px}.progress-reset>div{flex-basis:auto}.progress-reset>.btn{width:100%}}

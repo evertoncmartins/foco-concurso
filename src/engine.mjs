@@ -5,6 +5,9 @@ export const questionKey = (b, q) => `${b}:${q}`;
 // JSON object key order is not part of an event's content. Array order is.
 export const canonicalJSON = value => JSON.stringify(value,(_,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.entries(item).sort(([a],[b])=>a<b?-1:a>b?1:0)):item);
 export const sameEvent = (a,b) => canonicalJSON(a)===canonicalJSON(b);
+export const isStudyEvent = e => ['answer','flag','session'].includes(e.type);
+export const studyEpoch = e => Object.hasOwn(e,'progressEpoch') ? e.progressEpoch : e.type==='session' ? e.session?.progressEpoch??null : null;
+export const currentProgressEpoch = events => mergeEvents(events).findLast(e=>e.type==='progress-reset')?.id??null;
 const text = (v, label, max = Infinity) => {
   if (typeof v !== 'string') throw new Error(`${label}: o valor deve ser um texto.`);
   if (!v.trim()) throw new Error(`${label}: informe um texto não vazio.`);
@@ -46,6 +49,7 @@ export function validateEvents(document) {
   if (document?.schemaVersion !== 1 || !Array.isArray(document.events) || document.events.length > 100000) throw new Error('Arquivo de progresso inválido ou versão incompatível.');
   const events = document.events.map(e => {
     if (!e || typeof e !== 'object' || typeof e.id !== 'string' || !e.id || e.id.length > 300 || typeof e.at !== 'string' || !Number.isFinite(Date.parse(e.at)) || new Date(e.at).toISOString() !== e.at) throw new Error('Evento de progresso inválido.');
+    if (Object.hasOwn(e,'progressEpoch') && e.progressEpoch!==null && (typeof e.progressEpoch!=='string'||!e.progressEpoch||e.progressEpoch.length>300)) throw new Error('Etapa de progresso inválida.');
     if (e.type === 'event-conflict') {
       if (!/^foco-conflict-[a-f0-9]{64}$/.test(e.id) || typeof e.originalId !== 'string' || !e.event || e.event.type === 'event-conflict') throw new Error('Registro de recuperação inválido.');
       const original=validateEvents({schemaVersion:1,events:[e.event]})[0];
@@ -63,7 +67,9 @@ export function validateEvents(document) {
       const s = e.session;
       if (!s || typeof s.id !== 'string' || !Array.isArray(s.queue) || s.queue.length > 5000 || s.queue.some(k => typeof k !== 'string') || !Number.isInteger(s.index) || s.index < 0 || s.index > s.queue.length || !s.answers || typeof s.answers !== 'object' || !['smart','random','new','errors','favorites','review','subject','exam'].includes(s.mode)) throw new Error('Sessão inválida.');
       for (const v of Object.values(s.answers)) if (v !== null && !/^[A-H]$/.test(v)) throw new Error('Alternativa da sessão inválida.');
-    } else if (e.type !== 'bank') throw new Error('Tipo de evento desconhecido.');
+      if (Object.hasOwn(s,'progressEpoch') && s.progressEpoch!==null && (typeof s.progressEpoch!=='string'||!s.progressEpoch||s.progressEpoch.length>300)) throw new Error('Etapa da sessão inválida.');
+      if (Object.hasOwn(e,'progressEpoch') && e.progressEpoch!==(s.progressEpoch??null)) throw new Error('Etapa da sessão inconsistente.');
+    } else if (e.type !== 'progress-reset') throw new Error('Tipo de evento desconhecido.');
     return structuredClone(e);
   });
   return events;
@@ -75,7 +81,10 @@ export function mergeEvents(...collections) {
 }
 export function derive(events, now = Date.now()) {
   const banks = new Map(), states = new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [];
-  for (const e of mergeEvents(events)) {
+  const ordered=mergeEvents(events),progressEpoch=ordered.findLast(e=>e.type==='progress-reset')?.id??null;
+  for (const e of ordered) {
+    // Retired generations stay inactive even when an old device has a fast clock.
+    if (isStudyEvent(e)&&studyEpoch(e)!==progressEpoch) continue;
     if (e.type === 'bank') banks.set(e.bank.id, e.bank);
     if (e.type === 'bank-state') states.set(e.bankId, e.value);
     if (e.type === 'session') sessions.set(e.session.id, e.session);
@@ -91,7 +100,7 @@ export function derive(events, now = Date.now()) {
   const questions = visibleBanks.flatMap(b => b.questions.map(q => ({...q, key:questionKey(b.id,q.id), bankId:b.id, bankName:b.name, enabled:b.enabled})));
   const correct = answers.filter(e => e.correct).length;
   const stats = {attempts:answers.length, correct, wrong:answers.length-correct, accuracy:answers.length?Math.round(correct/answers.length*100):0, answered:questions.filter(q=>progress.has(q.key)).length, pending:questions.filter(q=>!progress.has(q.key)).length, errors:questions.filter(q=>progress.get(q.key)?.lastCorrect===false).length, favorites:questions.filter(q=>flags.get(q.key)?.favorite).length, review:questions.filter(q=>flags.get(q.key)?.review || (progress.has(q.key)&&Date.parse(progress.get(q.key).due)<=now)).length};
-  return {banks:visibleBanks, questions, progress, flags, answers, sessions:[...sessions.values()], stats};
+  return {banks:visibleBanks, questions, progress, flags, answers, sessions:[...sessions.values()], stats,progressEpoch};
 }
 export function filterQuestions(model, options, now = Date.now()) {
   return model.questions.filter(q => {

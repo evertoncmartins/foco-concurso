@@ -101,6 +101,48 @@ async function studyRuntime(options={},mode='smart'){
   return app;
 }
 
+test('zerar progresso exige confirmação, preserva a conta e preferências e permite começar novamente',async()=>{
+  for(const mobile of [false,true]){
+    const seed={id:'seed-bank',at:'2026-10-08T00:00:00.000Z',type:'bank',bank};
+    const app=runtime({mobile,events:[seed]});await app.start();
+    app.value('drive.token=null;config.name="Pessoa de teste";config.dailyGoal=23;saveConfig();');
+    await app.value('(async()=>{await newSession(model.questions.slice(0,2).map(q=>q.key));await navigate("session");})()');
+    await app.click('select',{option:bank.questions[0].correctOption});await app.click('answer');await app.click('flag',{flag:'favorite'});await app.click('flag',{flag:'review'});
+    await app.value('navigate("performance")');
+    assert(app.html().lastIndexOf('data-action="reset-progress"')>app.html().indexOf('Questões que merecem atenção'));
+    const snapshot=app.value('JSON.stringify(store.events)'),profile=JSON.stringify(app.auth.profile),prefs=app.value('JSON.stringify((({activeSession,...rest})=>rest)(config))');
+    let pending=app.click('reset-progress');await tick();assert(app.document.querySelector('#dialog').open);assert(app.document.querySelector('#dialog').innerHTML.includes('Sua conta')||app.document.querySelector('#dialog').innerHTML.includes('sua conta'));
+    await app.click('reset-progress');app.confirm(false);await pending;assert.equal(app.value('JSON.stringify(store.events)'),snapshot);
+    pending=app.click('reset-progress');await tick();app.confirm(true);await pending;
+    assert.equal(app.value('model.stats.attempts'),0);assert.equal(app.value('model.stats.favorites'),0);assert.equal(app.value('model.stats.review'),0);assert.equal(app.value('model.sessions.length'),0);
+    assert.equal(app.value('session'),null);assert.equal(app.value('config.activeSession'),null);assert.equal(app.value('draftSelections.size'),0);
+    assert.equal(JSON.stringify(app.auth.profile),profile);assert.equal(app.value('JSON.stringify((({activeSession,...rest})=>rest)(config))'),prefs);assert.equal(app.value('model.questions.length'),bank.questions.length);
+    await app.value('(async()=>{await newSession([model.questions[0].key]);await navigate("session");})()');
+    await app.click('select',{option:bank.questions[0].correctOption});await app.click('answer');assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('model.stats.correct'),1);
+  }
+});
+
+test('Escape cancela a confirmação de reset e não grava nenhum evento',async()=>{
+  const app=await studyRuntime();await app.click('select',{option:bank.questions[0].correctOption});await app.click('answer');await app.value('navigate("performance")');
+  const before=app.value('JSON.stringify(store.events)'),pending=app.click('reset-progress');await tick();
+  app.document.querySelector('#dialog').emit('cancel',{preventDefault(){}});await pending;
+  assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.value('working'),false);assert.equal(app.value('model.stats.attempts'),1);
+});
+
+test('reset em outro dispositivo encerra sessão aberta sem permitir recuperar as respostas antigas',async()=>{
+  const app=await studyRuntime();await app.click('select',{option:bank.questions[0].correctOption});await app.click('answer');
+  await app.value('store.merge([{id:"remote-reset",type:"progress-reset",at:"2099-01-01T00:00:00.000Z"}])');
+  app.value('render()');assert.equal(app.value('session'),null);assert.equal(app.value('view'),'performance');assert.equal(app.value('model.stats.attempts'),0);
+});
+
+test('falha de gravação no reset mantém histórico, e falha de envio mantém reset local com aviso',async()=>{
+  const app=await studyRuntime();await app.click('select',{option:bank.questions[0].correctOption});await app.click('answer');await app.value('navigate("performance")');
+  app.value('savedReset=store.resetProgress.bind(store);store.resetProgress=async()=>{throw new Error("Falha de gravação de teste")};');
+  let pending=app.click('reset-progress');await tick();app.confirm(true);await pending;assert.equal(app.value('model.stats.attempts'),1);
+  app.value('store.resetProgress=savedReset;drive.token="fixture";drive.sync=async()=>{throw new Error("offline de teste")};');
+  pending=app.click('reset-progress');await tick();app.confirm(true);await pending;assert.equal(app.value('model.stats.attempts'),0);assert(app.document.querySelector('#toast').textContent.includes('pendente'));
+});
+
 test('afirmações com parênteses ganham linhas próprias no estudo e resultado sem reescrever o banco',async()=>{
   for(const mobile of [true,false])for(const mode of ['smart','exam']){
     const app=runtime({mobile});app.auth.signOut();await app.click('guest');
