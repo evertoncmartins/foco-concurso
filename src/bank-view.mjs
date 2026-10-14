@@ -1,36 +1,83 @@
 import {icon} from './icons.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const plural=(n,one,many)=>n===1?one:many;
+const compare=(a,b)=>a.localeCompare(b,'pt-BR',{numeric:true,sensitivity:'base'});
+const laws=[
+  {key:'8112',matches:name=>/\b8\.?112\b/u.test(name),name:'Lei nº 8.112/1990',subtitle:'Servidores públicos federais',description:'Estabelece as regras da vida funcional dos servidores públicos civis federais: ingresso, movimentação, direitos, deveres e responsabilidades no serviço público.',url:'https://www.planalto.gov.br/ccivil_03/leis/l8112compilado.htm'},
+  {key:'8069',matches:name=>/\b8\.?069\b|\bECA\b|Estatuto da Criança e do Adolescente/iu.test(name),name:'ECA · Lei nº 8.069/1990',subtitle:'Estatuto da Criança e do Adolescente',description:'Protege os direitos de crianças e adolescentes e define responsabilidades da família, da sociedade e do poder público para garantir seu desenvolvimento, sua dignidade e sua proteção integral.',url:'https://www.planalto.gov.br/ccivil_03/leis/l8069.htm'}
+];
+const titles={I:'Disposições preliminares',II:'Provimento, vacância e movimentação',III:'Direitos e vantagens',IV:'Regime disciplinar',V:'Processo administrativo disciplinar',VI:'Seguridade social',VII:'Disposições gerais',VIII:'Disposições transitórias e finais'};
 
-// Imported descriptions are plain text. Break long prose at sentence boundaries,
-// preserving legal numbers, abbreviations, explicit lines and the complete text.
-export function bankDescriptionParagraphs(description){
-  const text=String(description||'Seu banco de questões para estudo e revisão.').replace(/\r\n?/g,'\n').trim();
-  return text.replace(/([.!?])([ \t]+)(?=[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ])/gu,(match,punctuation,space,index,source)=>{
-    const preceding=source.slice(Math.max(0,index-20),index+1);
-    return /\b(?:arts?|incs?|n|no|pp?|sr|sra|dr|dra|prof|profa|ex)\.$/iu.test(preceding)?match:`${punctuation}\n`;
-  }).split(/\n+/).map(p=>p.trim()).filter(Boolean);
+function origin(q){
+  const tag=[q.tag,...(q.tags||[])].find(t=>/^[A-Z][A-Z0-9.-]*-[12]\d{3}$/.test(t||''));
+  const match=tag?.match(/^(.+)-(\d{4})$/);
+  const institution=String(q.instituicao||match?.[1]||'').trim();
+  const rawYear=q.ano??match?.[2],year=rawYear==null?null:Number(rawYear);
+  return {institution:/^(?:não informad[ao]|desconhecid[ao])\b/iu.test(institution)?'':institution,year:Number.isInteger(year)&&year>=1900&&year<=2200?year:null};
+}
+function subject(q,law){
+  if(law?.key==='8112'){
+    const title=q.tags?.map(t=>t.match(/^Título (I|II|III|IV|V|VI|VII|VIII)$/u)?.[1]).find(Boolean);
+    if(titles[title])return titles[title];
+  }
+  if(law?.key==='8069'){
+    const article=q.tags?.map(t=>t.match(/^ECA\s*[—–-]\s*art\.\s*(\d+)/u)?.[1]).find(Boolean);
+    const n=Number(article);
+    if(n>=1&&n<=6)return 'Disposições preliminares';
+    if(n>=7&&n<=14)return 'Vida e saúde';
+    if(n>=15&&n<=18)return 'Liberdade, respeito e dignidade';
+    if(n>=19&&n<=24)return 'Convivência familiar e comunitária';
+    if(n>=53&&n<=58)return 'Educação, cultura, esporte e lazer';
+    if(n>=131&&n<=140)return 'Conselho Tutelar';
+  }
+  const label=String(q.subject||'').trim();
+  return (!label||/^(?:Lei (?:nº )?8\.?112\/1990|Estatuto da Criança e do Adolescente\s*[—–-]\s*Lei 8\.?069\/1990)$/iu.test(label)?q.topic:label)||'Outros assuntos';
+}
+function counts(map){return [...map.values()].sort((a,b)=>b.count-a.count||compare(a.label,b.label));}
+function add(map,label){const key=label.toLocaleUpperCase('pt-BR');const entry=map.get(key)||{label,count:0};entry.count++;map.set(key,entry);}
+
+export function bankOverviewData(bank){
+  const matched=laws.filter(l=>l.matches(bank.name)),law=matched.length===1?matched[0]:null;
+  const institutions=new Map(),subjects=new Map(),years=[];
+  let missingInstitutions=0,missingYears=0;
+  for(const q of bank.questions){
+    const metadata=origin(q);
+    if(metadata.institution)add(institutions,metadata.institution);else missingInstitutions++;
+    if(metadata.year!==null)years.push(metadata.year);else missingYears++;
+    add(subjects,subject(q,law));
+  }
+  const firstYear=years.length?Math.min(...years):null,lastYear=years.length?Math.max(...years):null;
+  const period=firstYear===null?'Não informado':firstYear===lastYear?`${firstYear}`:`${firstYear}–${lastYear}`;
+  const disciplines=[...new Set(bank.questions.map(q=>q.discipline).filter(Boolean))];
+  return {law,institutions:counts(institutions),subjects:counts(subjects),disciplines,firstYear,lastYear,period,missingInstitutions,missingYears,total:bank.questions.length};
 }
 
 export function bankCardView(bank,{detailsOpen=false,index=0}={}){
-  const panelId=`bank-details-${index}`;
-  const disciplines=[...new Set(bank.questions.map(q=>q.discipline))];
-  const subjects=new Set(bank.questions.map(q=>q.subject)).size;
+  const panelId=`bank-details-${index}`,overview=bankOverviewData(bank);
+  const {law,institutions,subjects,disciplines,total,period,missingInstitutions,missingYears}=overview;
   const detailLabel=detailsOpen?'Ocultar detalhes':'Ver mais detalhes';
-  return `<article class="card bank-card ${bank.enabled?'':'disabled'}">
+  const title=law?.name||bank.name,subtitle=law?.subtitle||disciplines.join(' · ')||'Banco de questões';
+  const description=law?.description||`Questões ${disciplines.length?`de ${disciplines.join(' e ')}`:'para concursos públicos'} para praticar e revisar os assuntos apresentados abaixo.`;
+  return `<article class="card bank-card ${bank.enabled?'':'disabled'}" aria-label="${esc(bank.name)}">
     <header class="bank-heading">
-      <span class="bank-symbol">${icon('book',20)}</span>
-      <div class="bank-title"><h3>${esc(bank.name)}</h3><p>${bank.questions.length} ${bank.questions.length===1?'questão':'questões'} · ${subjects} ${subjects===1?'assunto':'assuntos'}</p></div>
-      <span class="badge ${bank.enabled?'green':''}">${bank.enabled?'Ativo':'Desativado'}</span>
+      <div class="bank-heading-top"><span class="bank-symbol">${icon('book',20)}</span><span class="bank-status ${bank.enabled?'is-active':''}"><span aria-hidden="true"></span>${bank.enabled?'Ativo':'Desativado'}</span></div>
+      <div class="bank-title"><h3 title="${esc(bank.name)}">${esc(title)}</h3><p>${esc(subtitle)}</p></div>
     </header>
+    <dl class="bank-stats" aria-label="Resumo do conteúdo">
+      <div><dt>Questões</dt><dd>${total}</dd></div>
+      <div><dt>${plural(institutions.length,'Instituição','Instituições')}</dt><dd>${institutions.length||'—'}</dd></div>
+      <div class="bank-period"><dt>Provas</dt><dd>${period==='Não informado'?'—':esc(period)}</dd></div>
+    </dl>
     <div class="bank-primary-actions">
       <button class="btn small primary" data-action="start" data-bank="${esc(bank.id)}" ${bank.enabled?'':'disabled'}>Estudar ${icon('arrow',14)}</button>
       <button class="bank-details-toggle" data-action="bank-details" data-bank="${esc(bank.id)}" aria-expanded="${detailsOpen}" aria-controls="${panelId}" aria-label="${detailLabel} de ${esc(bank.name)}"><span class="bank-details-label">${detailLabel}</span><svg class="bank-details-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
     </div>
     <div class="bank-details-panel" id="${panelId}" ${detailsOpen?'':'hidden'}>
-      <h4>Sobre este banco</h4>
-      <div class="bank-description">${bankDescriptionParagraphs(bank.description).map(p=>`<p>${esc(p)}</p>`).join('')}</div>
-      <div class="bank-disciplines">${disciplines.map(d=>`<span class="pill">${esc(d)}</span>`).join('')}</div>
+      <section class="bank-detail-section"><h4>${law?'Sobre a lei':'Sobre o conteúdo'}</h4><p class="bank-about">${esc(description)}</p>${law?`<a class="bank-law-link" href="${law.url}" target="_blank" rel="noopener noreferrer">Ler a lei ${icon('arrow',13)}</a>`:''}</section>
+      <section class="bank-detail-section"><h4>Assuntos abordados <span>${subjects.length}</span></h4><p class="bank-section-note">Questões por assunto principal</p><ul class="bank-subject-list">${subjects.map(s=>`<li><span>${esc(s.label)}</span><strong>${s.count}<span class="bank-count-unit"> ${plural(s.count,'questão','questões')}</span></strong></li>`).join('')}</ul></section>
+      <section class="bank-detail-section"><h4>Instituições de origem <span>${institutions.length}</span></h4>${institutions.length?`<ul class="bank-institution-list">${institutions.map(i=>`<li><span>${esc(i.label)}</span><strong>${i.count}<span class="bank-count-unit"> ${plural(i.count,'questão','questões')}</span></strong></li>`).join('')}</ul>`:'<p class="bank-section-note">Instituições não informadas nas questões.</p>'}${missingInstitutions&&institutions.length?`<p class="bank-section-note">${missingInstitutions} ${plural(missingInstitutions,'questão sem instituição informada','questões sem instituição informada')}.</p>`:''}</section>
+      <div class="bank-period-note">${icon('clock',14)}<span>Período das provas: <strong>${esc(period)}</strong>${missingYears&&overview.firstYear!==null?` · ${missingYears} ${plural(missingYears,'questão sem ano informado','questões sem ano informado')}`:''}</span></div>
       <div class="bank-management">
         <button class="btn small" data-action="bank-toggle" data-bank="${esc(bank.id)}">${bank.enabled?'Desativar':'Ativar'} banco</button>
         <div class="bank-file-actions">
