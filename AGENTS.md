@@ -21,3 +21,4 @@
 - Zerar progresso exige confirmação explícita e afeta apenas respostas, estatísticas, favoritos, revisões e sessões da conta atual. Preserve nome, conta, foto, preferências, pasta e bancos importados, incluindo seus estados de ativação.
 - Preserve o marcador `progress-reset` e a associação `progressEpoch` dos eventos de estudo. Não implemente reset apagando localStorage ou apenas retirando eventos locais: dispositivos offline e backups poderiam reativar o histórico antigo.
 - Teste cancelamento, falha de gravação/envio, outra conta, nova sessão e sincronização antes de publicar mudanças nesse fluxo.
+- Após confirmar o reset, mantenha o loading exclusivo de salvamento até o envio terminar, com etapas reais e liberação em sucesso ou falha. Não aplique esse bloqueio às sincronizações comuns nem reutilize o estado de restauração do login para o reset.
