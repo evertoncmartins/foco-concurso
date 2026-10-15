@@ -80,14 +80,14 @@ export function mergeEvents(...collections) {
   return [...map.values()].sort((a,b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id));
 }
 export function derive(events, now = Date.now()) {
-  const banks = new Map(), states = new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [];
+  const banks = new Map(), states = new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], bankHistory=[], sessionUpdatedAt=new Map();
   const ordered=mergeEvents(events),progressEpoch=ordered.findLast(e=>e.type==='progress-reset')?.id??null;
   for (const e of ordered) {
     // Retired generations stay inactive even when an old device has a fast clock.
     if (isStudyEvent(e)&&studyEpoch(e)!==progressEpoch) continue;
-    if (e.type === 'bank') banks.set(e.bank.id, e.bank);
+    if (e.type === 'bank') {banks.set(e.bank.id, e.bank);bankHistory.push(e);}
     if (e.type === 'bank-state') states.set(e.bankId, e.value);
-    if (e.type === 'session') sessions.set(e.session.id, e.session);
+    if (e.type === 'session') {sessions.set(e.session.id, e.session);sessionUpdatedAt.set(e.session.id,e.at);}
     if (e.type === 'flag') { if (!flags.has(e.key)) flags.set(e.key, {}); flags.get(e.key)[e.flag] = e.value; }
     if (e.type === 'answer') {
       answers.push(e); const p = progress.get(e.key) || {attempts:0, correct:0, wrong:0, streak:0};
@@ -100,7 +100,7 @@ export function derive(events, now = Date.now()) {
   const questions = visibleBanks.flatMap(b => b.questions.map(q => ({...q, key:questionKey(b.id,q.id), bankId:b.id, bankName:b.name, enabled:b.enabled})));
   const correct = answers.filter(e => e.correct).length;
   const stats = {attempts:answers.length, correct, wrong:answers.length-correct, accuracy:answers.length?Math.round(correct/answers.length*100):0, answered:questions.filter(q=>progress.has(q.key)).length, pending:questions.filter(q=>!progress.has(q.key)).length, errors:questions.filter(q=>progress.get(q.key)?.lastCorrect===false).length, favorites:questions.filter(q=>flags.get(q.key)?.favorite).length, review:questions.filter(q=>flags.get(q.key)?.review || (progress.has(q.key)&&Date.parse(progress.get(q.key).due)<=now)).length};
-  return {banks:visibleBanks, questions, progress, flags, answers, sessions:[...sessions.values()], stats,progressEpoch};
+  return {banks:visibleBanks, questions, progress, flags, answers, sessions:[...sessions.values()], stats,progressEpoch,bankHistory,sessionUpdatedAt};
 }
 export function filterQuestions(model, options, now = Date.now()) {
   return model.questions.filter(q => {

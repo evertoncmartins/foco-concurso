@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -100,6 +100,72 @@ async function studyRuntime(options={},mode='smart'){
   await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');await navigate('session');})()`);
   return app;
 }
+
+test('Minhas sessões permite alternar bancos e retomar posições e respostas sem encerrar outras sessões',async()=>{
+  for(const mobile of [false,true]){
+    const app=await studyRuntime({mobile}),first=app.value('session.id');await app.keyEvent({key:'a'});await app.click('answer');await app.click('next');await app.click('pause');
+    await app.value('(async()=>{const second=structuredClone(bank);second.id="eca-test";second.name="Lei nº 8.069/1990";await store.add([{type:"bank",bank:validateBank(second)}]);refreshModel();await newSession(model.questions.filter(q=>q.bankId==="eca-test").slice(0,3).map(q=>q.key),"exam");await navigate("session");})()');
+    const second=app.value('session.id');await app.click('select',{option:'B'});await app.click('answer');await app.click('pause');await app.click('nav',{view:'sessions'});
+    assert.match(app.html(),/Minhas sessões/);assert(app.html().includes(`data-session="${first}"`));assert(app.html().includes(`data-session="${second}"`));
+    const events=app.value('JSON.stringify(store.events)');await app.click('session-resume',{session:first});
+    assert.equal(app.value('session.id'),first);assert.equal(app.value('session.index'),1);assert.equal(app.value('session.answers[session.queue[0]]'),'A');assert.equal(app.value('config.activeSession'),first);
+    assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.value('model.stats.attempts'),1);
+    await app.click('select',{option:'C'});await app.click('pause');await app.click('nav',{view:'sessions'});await app.click('session-resume',{session:second});
+    assert.equal(app.value('session.answers[session.queue[0]]'),'B');assert.equal(app.value('session.mode'),'exam');assert.equal(app.value('model.stats.attempts'),1);
+    await app.click('pause');await app.click('nav',{view:'sessions'});await app.click('session-resume',{session:first});assert.equal(app.value('selected'),'C');
+    assert.equal(app.value('model.sessions.filter(s=>!s.completed).length'),2);
+  }
+});
+
+test('resultado antigo é somente leitura, preserva sessão ativa e revisão usa os erros do resultado consultado',async()=>{
+  const app=await studyRuntime();const first=app.value('session.id'),wrong=app.value('model.questions.find(q=>q.key===session.queue[0]).options.find(o=>o.id!==model.questions.find(q=>q.key===session.queue[0]).correctOption).id');
+  await app.click('select',{option:wrong});await app.click('answer');await app.finish();
+  await app.value('(async()=>{await newSession(model.questions.slice(3,6).map(q=>q.key),"exam");await navigate("session");})()');
+  const active=app.value('session.id');await app.click('pause');await app.click('nav',{view:'sessions'});await app.click('sessions-tab',{status:'completed'});
+  const events=app.value('JSON.stringify(store.events)'),stats=app.value('JSON.stringify(model.stats)');
+  await app.click('session-result',{session:first});assert.equal(app.value('view'),'result');assert.equal(app.value('session.id'),active);assert.equal(app.value('config.activeSession'),active);
+  assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.value('JSON.stringify(model.stats)'),stats);assert.match(app.html(),/Resultado da sessão/);
+  await app.click('nav',{view:'home'});await app.click('resume');assert.equal(app.value('session.id'),active);
+  await app.click('pause');await app.click('nav',{view:'sessions'});await app.click('session-result',{session:first});
+  await app.click('session-errors');assert.equal(app.value('session.mode'),'errors');assert.equal(app.value('session.queue.length'),1);
+  assert.equal(app.value(`model.sessions.find(s=>s.id==='${active}').completed`),false);
+});
+
+test('simulado em andamento não libera resultado, e todos os simulados concluídos podem ser reabertos',async()=>{
+  const app=await studyRuntime({},'exam'),first=app.value('session.id');await app.click('select',{option:'A'});await app.click('answer');await app.click('pause');await app.click('nav',{view:'sessions'});
+  assert(!app.html().includes('Alternativa correta:'));assert(!app.html().includes('saved-session-stats'));
+  await app.click('session-result',{session:first});assert.equal(app.value('view'),'sessions');assert.equal(app.value('model.stats.attempts'),0);
+  await app.click('session-resume',{session:first});await app.finish();assert.equal(app.value('model.stats.attempts'),1);
+  await app.value('(async()=>{await newSession(model.questions.slice(3,5).map(q=>q.key),"exam");await navigate("session");})()');
+  const second=app.value('session.id');await app.click('select',{option:'B'});await app.click('answer');await app.finish();
+  await app.click('nav',{view:'sessions'});await app.click('sessions-tab',{status:'completed'});
+  assert(app.html().includes(`data-session="${first}"`));assert(app.html().includes(`data-session="${second}"`));
+  const events=app.value('JSON.stringify(store.events)');for(const id of [first,second,first]){await app.click('session-result',{session:id});assert.match(app.html(),/Resultado do simulado/);await app.click('nav',{view:'sessions'});}
+  assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.value('model.stats.attempts'),2);
+});
+
+test('filtros de sessões e desempenho isolam bancos sem alterar progresso ou registros',async()=>{
+  const app=await studyRuntime(),first=app.value('session.id'),correct=app.value('model.questions.find(q=>q.key===session.queue[0]).correctOption');
+  await app.click('select',{option:correct});await app.click('answer');await app.finish();
+  await app.value('(async()=>{const other=structuredClone(bank);other.id="eca-test";other.name="Lei nº 8.069/1990";await store.add([{type:"bank",bank:validateBank(other)}]);refreshModel();await newSession(model.questions.filter(q=>q.bankId==="eca-test").slice(0,2).map(q=>q.key),"exam");await navigate("session");})()');
+  const second=app.value('session.id'),wrong=app.value('model.questions.find(q=>q.key===session.queue[0]).options.find(o=>o.id!==model.questions.find(q=>q.key===session.queue[0]).correctOption).id');await app.click('select',{option:wrong});await app.click('answer');await app.finish();
+  const before=app.value('JSON.stringify(store.events)');await app.click('nav',{view:'sessions'});await app.click('sessions-tab',{status:'completed'});
+  await app.document.emit('change',{target:{dataset:{sessionFilter:'bankId'},value:bank.id}});assert(app.html().includes(`data-session="${first}"`));assert(!app.html().includes(`data-session="${second}"`));
+  await app.document.emit('change',{target:{dataset:{sessionFilter:'type'},value:'exam'}});assert.match(app.html(),/Nenhuma sessão concluída/);assert.equal(app.value('sessionFilters.page'),1);
+  await app.click('nav',{view:'performance'});await app.document.emit('change',{target:{dataset:{performanceBank:''},value:bank.id}});
+  assert.match(app.html(),/class="stat-number">100%/);assert.match(app.html(),/Tentativas no banco selecionado/);
+  await app.document.emit('change',{target:{dataset:{performanceBank:''},value:'eca-test'}});assert.match(app.html(),/class="stat-number">0%/);
+  assert.match(app.html(),/Zere o progresso de todos os bancos/);assert.equal(app.value('JSON.stringify(store.events)'),before);
+});
+
+test('reset e troca de conta limpam seleção de histórico, filtros e sessões visíveis',async()=>{
+  const app=await studyRuntime();await app.click('pause');await app.click('nav',{view:'performance'});
+  app.value('sessionFilters={status:"completed",bankId:bank.id,type:"exam",page:3};performanceBank=bank.id;');
+  const pending=app.click('reset-progress');await tick();app.confirm(true);await pending;
+  assert.equal(app.value('sessionFilters.bankId'),'');assert.equal(app.value('resultSessionId'),null);assert.equal(app.value('performanceBank'),'');
+  await app.click('nav',{view:'sessions'});assert.match(app.html(),/Nenhuma sessão em andamento/);
+  await app.click('logout');await app.click('guest');await app.click('nav',{view:'sessions'});assert.match(app.html(),/Nenhuma sessão em andamento/);assert.equal(app.value('sessionFilters.status'),'open');
+});
 
 test('falha de entrada aguarda limpeza da sessão anterior antes de liberar uma nova autorização',async()=>{
   const app=runtime();app.auth.signOut();
