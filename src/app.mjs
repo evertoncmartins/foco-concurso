@@ -266,7 +266,7 @@ document.addEventListener('click',async event=>{
     if(action==='guest'){working=true;await openGuest();return;}
     if(action==='guest-login'){await logout();return;}
     if(action==='retry-google'){await loadGoogleForLogin();return;}
-    if(action==='login'){if(!auth.redirectEnabled&&!isGoogleReady()){void loadGoogleForLogin();return;}working=true;loginError='';loginErrorCode='';const authorization=auth.authorize();renderLogin();try{const result=await authorization;await openAccount(result);}catch(error){loginError=error.message;loginErrorCode=error.code||'';drive?.close();auth.signOut();guest=false;restoration=null;accountStorage=null;store=null;drive=null;renderLogin();}return;}
+    if(action==='login'){if(!auth.redirectEnabled&&!isGoogleReady()){void loadGoogleForLogin();return;}working=true;loginError='';loginErrorCode='';const authorization=auth.authorize();renderLogin();try{const result=await authorization;await openAccount(result);}catch(error){loginError=error.message;loginErrorCode=error.code||'';drive?.close();await auth.signOut();guest=false;restoration=null;accountStorage=null;store=null;drive=null;renderLogin();}return;}
     if(action==='logout'){await logout();return;}
     if(action==='toggle-sidebar'){config.sidebarCollapsed=!config.sidebarCollapsed;saveConfig();render();$('[data-action=toggle-sidebar]')?.focus({preventScroll:true});return;}
     if(action==='toggle-focus'){if(view==='session'&&session&&!session.completed)await focusMode.enter();return;}
@@ -468,7 +468,7 @@ async function init(){
     if(guest)return;
     if(notice==='success'){
       try{await openAccount(await auth.restoreRedirect());}
-      catch(error){loginError=error.message;drive?.close();auth.signOut();restoration=null;accountStorage=null;store=null;drive=null;}
+      catch(error){loginError=error.message;drive?.close();await auth.signOut();restoration=null;accountStorage=null;store=null;drive=null;}
       finally{working=false;}
     }else if(notice)loginError=googleReturnMessage(notice);
     if(!auth.profile&&!restoration){renderLogin();if(!auth.redirectEnabled)void loadGoogleForLogin();}

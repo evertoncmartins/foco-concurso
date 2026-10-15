@@ -101,6 +101,14 @@ async function studyRuntime(options={},mode='smart'){
   return app;
 }
 
+test('falha de entrada aguarda limpeza da sessão anterior antes de liberar uma nova autorização',async()=>{
+  const app=runtime();app.auth.signOut();
+  app.value('var finishFailedLogout;openAccount=async()=>{throw new Error("Falha de entrada de teste")};auth.signOut=()=>{auth.profile=null;auth.token=null;return new Promise(resolve=>finishFailedLogout=resolve);};');
+  const pending=app.click('login');await tick();assert.equal(app.value('working'),true);
+  const count=app.authorizations;await app.click('login');assert.equal(app.authorizations,count);
+  app.value('finishFailedLogout()');await pending;assert.equal(app.value('working'),false);assert.equal(app.auth.profile,null);
+});
+
 test('zerar progresso exige confirmação, preserva a conta e preferências e permite começar novamente',async()=>{
   for(const mobile of [false,true]){
     const seed={id:'seed-bank',at:'2026-10-08T00:00:00.000Z',type:'bank',bank};
