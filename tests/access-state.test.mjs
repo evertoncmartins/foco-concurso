@@ -421,32 +421,33 @@ test('falha ao salvar navegação conserva questão, seleção, leitura e respos
 test('Ajustes descreve setas Desktop e Enter para registrar, sem o antigo atalho Pular',async()=>{
   const app=runtime();await app.start();await app.click('nav',{view:'settings'});
   assert.match(app.html(),/Registrar resposta<\/td><td><kbd>Enter/);assert.match(app.html(),/Questão anterior \(Desktop\)/);assert.match(app.html(),/Próxima questão \(Desktop\)/);assert(!app.html().includes('Pular questão'));assert(!app.html().includes('<kbd>Espaço</kbd>'));
-  assert.match(app.html(),/Riscar ou restaurar seleção \(Desktop\)<\/td><td><kbd>C/);
-  assert.match(app.html(),/Selecionar alternativa C \(Desktop\)<\/td><td><kbd>3/);
+  assert.match(app.html(),/Riscar ou restaurar seleção \(Desktop\)<\/td><td><kbd>T/);
+  assert(!app.html().includes('Selecionar alternativa C (Desktop)'));
   assert.match(app.html(),/<kbd>Enter<\/kbd> após registrar/);
 });
 
-test('C risca e restaura a seleção Desktop sem responder, trocar seleção ou gravar progresso',async()=>{
+test('T risca e restaura a seleção Desktop sem responder, trocar seleção ou gravar progresso',async()=>{
   for(const focus of [false,true])for(const mode of ['smart','exam']){
     const app=await studyRuntime({},mode);if(focus)await app.click('toggle-focus');
     const initial=app.value('JSON.stringify(store.events)');
-    await app.keyEvent({key:'c'});assert.equal(app.value('selected'),null);assert.equal(app.value('JSON.stringify(store.events)'),initial);
+    await app.keyEvent({key:'t'});assert.equal(app.value('selected'),null);assert.equal(app.value('JSON.stringify(store.events)'),initial);
     await app.keyEvent({key:'a'});assert.equal(app.value('selected'),'A');
     const renders=app.renders,body=app.document.querySelector('.question-body');body.scrollTop=240;
-    for(const expected of [true,false,true]){
-      assert.equal((await app.keyEvent({key:'c'})).defaultPrevented,true);
+    for(const [key,expected] of [['t',true],['T',false],['t',true]]){
+      assert.equal((await app.keyEvent({key})).defaultPrevented,true);
       assert.equal(cutRow(app,'A').classList.contains('eliminated'),expected);
       assert.equal(cutControl(app,'A').getAttribute('aria-pressed'),String(expected));
       assert.equal(app.value('selected'),'A');assert.equal(app.value('JSON.stringify(store.events)'),initial);
       assert.equal(app.renders,renders);assert.equal(body.scrollTop,240);
     }
-    await app.keyEvent({key:'c',repeat:true});assert(cutRow(app,'A').classList.contains('eliminated'));
-    await app.keyEvent({key:'3'});assert.equal(app.value('selected'),'C');
-    await app.keyEvent({key:'c'});assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('selected'),'C');
+    await app.keyEvent({key:'t',repeat:true});assert(cutRow(app,'A').classList.contains('eliminated'));
+    await app.keyEvent({key:'c'});assert.equal(app.value('selected'),'C');assert(!cutRow(app,'C').classList.contains('eliminated'));
+    await app.keyEvent({key:'a'});await app.keyEvent({key:'3'});assert.equal(app.value('selected'),'C');
+    await app.keyEvent({key:'t'});assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('selected'),'C');
     await app.keyEvent({key:'Enter'});const recorded=app.value('JSON.stringify(store.events)');
-    await app.keyEvent({key:'c'});assert(!cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('JSON.stringify(store.events)'),recorded);
+    await app.keyEvent({key:'t'});assert(!cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('JSON.stringify(store.events)'),recorded);
     await app.keyEvent({key:'ArrowRight'});await app.keyEvent({key:'ArrowLeft'});assert.equal(app.value('selected'),null);
-    await app.keyEvent({key:'c'});assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('session.answers[session.queue[0]]'),'C');
+    await app.keyEvent({key:'t'});assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('session.answers[session.queue[0]]'),'C');
   }
 });
 
@@ -472,13 +473,13 @@ test('Enter registra, passa o foco para Próxima e depois avança uma única que
   }
 });
 
-test('C e Enter Desktop respeitam editores, controles próprios, modais, composição e modificadores',async()=>{
+test('T e Enter Desktop respeitam editores, controles próprios, modais, composição e modificadores',async()=>{
   const options={},app=await studyRuntime(options);await app.keyEvent({key:'a'});
   const control=selector=>({dataset:{},closest(selectors){return selectors.split(',').includes(selector)?this:null;}});
   for(const answered of [false,true]){
     if(answered)await app.keyEvent({key:'Enter'});
     const events=app.value('JSON.stringify(store.events)');
-    for(const key of ['c','Enter']){
+    for(const key of ['t','Enter']){
       for(const selector of ['input','textarea','select','summary','iframe','video','[contenteditable]:not([contenteditable="false"])','[role="checkbox"]','[role="slider"]','[role="combobox"]','[role="grid"]','[aria-haspopup]:not([aria-haspopup="false"])']){
         assert.equal((await app.keyEvent({key,target:control(selector)})).defaultPrevented,false,selector);
       }
@@ -528,7 +529,8 @@ test('Mobile mantém C como alternativa, tesoura por toque e Enter apenas para r
   await app.keyEvent({key:'c'});assert(!cutRow(app,'C').classList.contains('eliminated'));
   await app.click('toggle-cut',{option:'C'});assert(cutRow(app,'C').classList.contains('eliminated'));
   await app.keyEvent({key:'Enter'});await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),0);assert.equal(app.value('model.stats.attempts'),1);
-  assert(!app.html().includes('<kbd>C</kbd>'));assert(!app.html().includes('ArrowRight Enter'));
+  await app.keyEvent({key:'t'});assert(cutRow(app,'C').classList.contains('eliminated'));
+  assert(!app.html().includes('<kbd>T</kbd>'));assert(!app.html().includes('ArrowRight Enter'));
 });
 
 test('foco automático Mobile mantém seleção, cortes e rolagem, pede tela cheia e funciona até concluir',async()=>{
