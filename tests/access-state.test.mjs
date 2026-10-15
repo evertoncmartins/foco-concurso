@@ -26,7 +26,7 @@ function runtime(options={}){
   function element(classes=''){
     const names=new Set(classes.split(/\s+/).filter(Boolean)),attributes=new Map();
     const events=new Map();
-    return {dataset:{},innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){},showModal(){this.open=true;},close(){this.open=false;},querySelector(){return null;},addEventListener(name,fn){events.set(name,fn);},removeEventListener(name){events.delete(name);},emit(name,event){events.get(name)?.(event);},scrollIntoView(){}};
+    return {dataset:{},innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){document.focused=this;},showModal(){this.open=true;},close(){this.open=false;},querySelector(){return null;},addEventListener(name,fn){events.set(name,fn);},removeEventListener(name){events.delete(name);},emit(name,event){events.get(name)?.(event);},scrollIntoView(){}};
   }
   const node=selector=>{
     if(!nodes.has(selector)){
@@ -421,6 +421,114 @@ test('falha ao salvar navegação conserva questão, seleção, leitura e respos
 test('Ajustes descreve setas Desktop e Enter para registrar, sem o antigo atalho Pular',async()=>{
   const app=runtime();await app.start();await app.click('nav',{view:'settings'});
   assert.match(app.html(),/Registrar resposta<\/td><td><kbd>Enter/);assert.match(app.html(),/Questão anterior \(Desktop\)/);assert.match(app.html(),/Próxima questão \(Desktop\)/);assert(!app.html().includes('Pular questão'));assert(!app.html().includes('<kbd>Espaço</kbd>'));
+  assert.match(app.html(),/Riscar ou restaurar seleção \(Desktop\)<\/td><td><kbd>C/);
+  assert.match(app.html(),/Selecionar alternativa C \(Desktop\)<\/td><td><kbd>3/);
+  assert.match(app.html(),/<kbd>Enter<\/kbd> após registrar/);
+});
+
+test('C risca e restaura a seleção Desktop sem responder, trocar seleção ou gravar progresso',async()=>{
+  for(const focus of [false,true])for(const mode of ['smart','exam']){
+    const app=await studyRuntime({},mode);if(focus)await app.click('toggle-focus');
+    const initial=app.value('JSON.stringify(store.events)');
+    await app.keyEvent({key:'c'});assert.equal(app.value('selected'),null);assert.equal(app.value('JSON.stringify(store.events)'),initial);
+    await app.keyEvent({key:'a'});assert.equal(app.value('selected'),'A');
+    const renders=app.renders,body=app.document.querySelector('.question-body');body.scrollTop=240;
+    for(const expected of [true,false,true]){
+      assert.equal((await app.keyEvent({key:'c'})).defaultPrevented,true);
+      assert.equal(cutRow(app,'A').classList.contains('eliminated'),expected);
+      assert.equal(cutControl(app,'A').getAttribute('aria-pressed'),String(expected));
+      assert.equal(app.value('selected'),'A');assert.equal(app.value('JSON.stringify(store.events)'),initial);
+      assert.equal(app.renders,renders);assert.equal(body.scrollTop,240);
+    }
+    await app.keyEvent({key:'c',repeat:true});assert(cutRow(app,'A').classList.contains('eliminated'));
+    await app.keyEvent({key:'3'});assert.equal(app.value('selected'),'C');
+    await app.keyEvent({key:'c'});assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('selected'),'C');
+    await app.keyEvent({key:'Enter'});const recorded=app.value('JSON.stringify(store.events)');
+    await app.keyEvent({key:'c'});assert(!cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('JSON.stringify(store.events)'),recorded);
+    await app.keyEvent({key:'ArrowRight'});await app.keyEvent({key:'ArrowLeft'});assert.equal(app.value('selected'),null);
+    await app.keyEvent({key:'c'});assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('session.answers[session.queue[0]]'),'C');
+  }
+});
+
+test('Enter registra, passa o foco para Próxima e depois avança uma única questão, preservando setas',async()=>{
+  for(const focus of [false,true])for(const mode of ['smart','exam']){
+    const app=await studyRuntime({},mode);if(focus)await app.click('toggle-focus');
+    await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),0);assert.equal(app.value('JSON.stringify(session.answers)'),'{}');
+    await app.keyEvent({key:'a'});await app.keyEvent({key:'Enter'});
+    assert.equal(app.value('session.index'),0);assert.equal(app.value('session.answers[session.queue[0]]'),'A');
+    assert.equal(app.document.focused,app.document.querySelector('[data-action=next]'));
+    assert.match(app.html(),/aria-keyshortcuts="ArrowRight Enter"/);assert.match(app.html(),/<kbd>Enter<\/kbd> próxima/);
+    const answers=app.value('JSON.stringify(session.answers)');
+    assert.equal((await app.keyEvent({key:'Enter',repeat:true})).defaultPrevented,true);assert.equal(app.value('session.index'),0);
+    await app.key('Enter','next');assert.equal(app.value('session.index'),1);assert.equal(app.value('selected'),null);
+    assert.equal(app.value('JSON.stringify(session.answers)'),answers);
+    await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),1,'Enter on an unanswered question needs a selection');
+    await app.keyEvent({key:'ArrowLeft'});assert.equal(app.value('session.index'),0);
+    await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),1);
+    await app.keyEvent({key:'ArrowRight'});assert.equal(app.value('session.index'),2);
+    await app.keyEvent({key:'b'});await app.keyEvent({key:'Enter'});const end=app.value('JSON.stringify(store.events)');
+    await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),2);assert.equal(app.value('view'),'session');
+    assert.equal(app.value('JSON.stringify(store.events)'),end);assert.equal(app.value('session.completed'),false);
+  }
+});
+
+test('C e Enter Desktop respeitam editores, controles próprios, modais, composição e modificadores',async()=>{
+  const options={},app=await studyRuntime(options);await app.keyEvent({key:'a'});
+  const control=selector=>({dataset:{},closest(selectors){return selectors.split(',').includes(selector)?this:null;}});
+  for(const answered of [false,true]){
+    if(answered)await app.keyEvent({key:'Enter'});
+    const events=app.value('JSON.stringify(store.events)');
+    for(const key of ['c','Enter']){
+      for(const selector of ['input','textarea','select','summary','iframe','video','[contenteditable]:not([contenteditable="false"])','[role="checkbox"]','[role="slider"]','[role="combobox"]','[role="grid"]','[aria-haspopup]:not([aria-haspopup="false"])']){
+        assert.equal((await app.keyEvent({key,target:control(selector)})).defaultPrevented,false,selector);
+      }
+      assert.equal((await app.keyEvent({key,target:{isContentEditable:true}})).defaultPrevented,false);
+      assert.equal((await app.keyEvent({key,composedPath:()=>[control('input')]})).defaultPrevented,false);
+      for(const modifier of ['altKey','ctrlKey','metaKey','shiftKey','isComposing','defaultPrevented'])await app.keyEvent({key,[modifier]:true});
+      app.document.querySelector('#dialog').open=true;await app.keyEvent({key});app.document.querySelector('#dialog').open=false;
+      options.otherModal=true;await app.keyEvent({key});options.otherModal=false;
+      app.value('working=true');await app.keyEvent({key});app.value('working=false');
+      app.value('restoration={state:"loading"}');await app.keyEvent({key});app.value('restoration=null');
+      assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.value('session.index'),0);
+      assert(!cutRow(app,'A').classList.contains('eliminated'));
+    }
+  }
+});
+
+test('Enter mantém a ação nativa de outros botões e trata elementos internos de Próxima uma vez',async()=>{
+  const app=await studyRuntime();await app.keyEvent({key:'a'});
+  for(const action of ['toggle-cut','previous','flag','toggle-theme','finish']){
+    const button={dataset:{action}},target={dataset:{},closest:selector=>selector==='button'?button:null};
+    assert.equal((await app.keyEvent({key:'Enter',target})).defaultPrevented,false);
+    assert.equal(app.value('JSON.stringify(session.answers)'),'{}');assert.equal(app.value('session.index'),0);
+  }
+  const button={dataset:{action:'select'}},target={dataset:{},closest:selector=>selector==='button'?button:null};
+  await app.keyEvent({key:'Enter',target});assert.equal(app.value('session.answers[session.queue[0]]'),'A');
+  const next={dataset:{action:'next'}},child={dataset:{},closest:selector=>selector==='button'?next:null};
+  assert.equal((await app.keyEvent({key:'Enter',target:child,repeat:true})).defaultPrevented,true);assert.equal(app.value('session.index'),0);
+  assert.equal((await app.keyEvent({key:'Enter',target:child})).defaultPrevented,true);assert.equal(app.value('session.index'),1);
+});
+
+test('Enter aguarda gravação, não duplica resposta nem navegação e conserva seleção se falhar',async()=>{
+  const app=await studyRuntime();await app.keyEvent({key:'a'});
+  app.value('var unlockKey;const addKey=store.add.bind(store);store.add=async events=>{await new Promise(resolve=>unlockKey=resolve);return addKey(events);};');
+  let pending=app.keyEvent({key:'Enter'});assert(app.value('working'));
+  await app.keyEvent({key:'Enter'});await app.keyEvent({key:'ArrowRight'});assert.equal(app.value('session.index'),0);
+  app.value('unlockKey()');await pending;assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('session.index'),0);
+  pending=app.keyEvent({key:'Enter'});await app.keyEvent({key:'Enter'});await app.keyEvent({key:'ArrowRight'});
+  app.value('unlockKey()');await pending;assert.equal(app.value('session.index'),1);
+  app.value('store.add=async()=>{throw new Error("Falha de teste")};failure=()=>{};');
+  await app.keyEvent({key:'b'});const before=app.value('JSON.stringify(store.events)');
+  await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),1);assert.equal(app.value('selected'),'B');
+  assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.value('working'),false);
+});
+
+test('Mobile mantém C como alternativa, tesoura por toque e Enter apenas para registrar',async()=>{
+  const app=await studyRuntime({mobile:true});await app.keyEvent({key:'c'});assert.equal(app.value('selected'),'C');
+  await app.keyEvent({key:'c'});assert(!cutRow(app,'C').classList.contains('eliminated'));
+  await app.click('toggle-cut',{option:'C'});assert(cutRow(app,'C').classList.contains('eliminated'));
+  await app.keyEvent({key:'Enter'});await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),0);assert.equal(app.value('model.stats.attempts'),1);
+  assert(!app.html().includes('<kbd>C</kbd>'));assert(!app.html().includes('ArrowRight Enter'));
 });
 
 test('foco automático Mobile mantém seleção, cortes e rolagem, pede tela cheia e funciona até concluir',async()=>{
