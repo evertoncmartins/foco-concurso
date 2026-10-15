@@ -33,4 +33,5 @@
 - Preserve todas as sessões ao iniciar ou retomar outra. A consulta de resultado concluído não deve substituir a sessão ativa, alterar respostas ou criar tentativas; revisar erros é uma nova sessão por ação explícita.
 - Resultados históricos usam o gabarito registrado e as versões de bancos já presentes no diário, sem recalcular a nota com um banco atualizado. Conteúdo ausente não deve reduzir o total original ou esconder sua indisponibilidade.
 - Nunca revele gabarito, acertos ou erros de simulados em andamento. Filtros por banco/lei e tipo apenas restringem consultas; sessões mistas pertencem a todos os bancos da fila.
+- Nos filtros de banco/lei, mostre bancos atuais e removidos apenas quando estes tenham sessões consultáveis ou respostas na etapa atual. Não liste toda importação antiga nem apague eventos para ocultar opções sem estudo.
 - Mantenha histórico e filtros isolados por conta, respeite progressEpoch e deixe explícito que Zerar progresso afeta todos os bancos, mesmo com um filtro selecionado.

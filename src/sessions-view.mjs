@@ -4,11 +4,12 @@ import {icon} from './icons.mjs';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const sessionBankIds=session=>[...new Set(session.queue.map(key=>key.includes(':')?key.slice(0,key.indexOf(':')):'').filter(Boolean))];
 export function sessionBankCatalog(model){
+  const currentIds=new Set(model.banks.map(b=>b.id)),studiedIds=new Set(model.sessions.filter(s=>!s.abandoned).flatMap(sessionBankIds));
   const banks=new Map((model.bankHistory||[]).map(e=>[e.bank.id,e.bank]));
   for(const bank of model.banks)banks.set(bank.id,bank);
-  for(const s of model.sessions)for(const id of sessionBankIds(s))if(!banks.has(id))banks.set(id,{id,name:'Banco indisponível',questions:[]});
-  for(const answer of model.answers){const id=answer.key.split(':')[0];if(!banks.has(id))banks.set(id,{id,name:'Banco indisponível',questions:[]});}
-  return [...banks.values()].map(b=>({...b,title:bankPresentation(b).title,removed:!model.banks.some(visible=>visible.id===b.id)})).sort((a,b)=>a.title.localeCompare(b.title,'pt-BR',{numeric:true}));
+  for(const answer of model.answers)studiedIds.add(answer.key.split(':')[0]);
+  for(const id of studiedIds)if(!banks.has(id))banks.set(id,{id,name:'Banco indisponível',questions:[]});
+  return [...banks.values()].filter(b=>currentIds.has(b.id)||studiedIds.has(b.id)).map(b=>({...b,title:bankPresentation(b).title,removed:!currentIds.has(b.id)})).sort((a,b)=>a.title.localeCompare(b.title,'pt-BR',{numeric:true}));
 }
 function recordings(model){
   const bySession=new Map();
