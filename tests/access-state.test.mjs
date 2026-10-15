@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {TemporaryStorage} from '../src/temporary-storage.mjs';
-import {restoreProgress} from '../src/restore-progress.mjs';
+import {restoreProgress,resetSaveProgress} from '../src/restore-progress.mjs';
 import {AccountStorage} from '../src/account.mjs';
 import {Store} from '../src/store.mjs';
 import {DriveSettings} from '../src/drive-settings.mjs';
@@ -138,9 +138,63 @@ test('reset em outro dispositivo encerra sessão aberta sem permitir recuperar a
 test('falha de gravação no reset mantém histórico, e falha de envio mantém reset local com aviso',async()=>{
   const app=await studyRuntime();await app.click('select',{option:bank.questions[0].correctOption});await app.click('answer');await app.value('navigate("performance")');
   app.value('savedReset=store.resetProgress.bind(store);store.resetProgress=async()=>{throw new Error("Falha de gravação de teste")};');
-  let pending=app.click('reset-progress');await tick();app.confirm(true);await pending;assert.equal(app.value('model.stats.attempts'),1);
+  let pending=app.click('reset-progress');await tick();app.confirm(true);await pending;assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('resetSaving'),null);assert(!app.html().includes('class="restore-page"'));
   app.value('store.resetProgress=savedReset;drive.token="fixture";drive.sync=async()=>{throw new Error("offline de teste")};');
-  pending=app.click('reset-progress');await tick();app.confirm(true);await pending;assert.equal(app.value('model.stats.attempts'),0);assert(app.document.querySelector('#toast').textContent.includes('pendente'));
+  pending=app.click('reset-progress');await tick();app.confirm(true);await pending;assert.equal(app.value('model.stats.attempts'),0);assert(app.document.querySelector('#toast').textContent.includes('pendente'));assert.equal(app.value('resetSaving'),null);assert(!app.html().includes('class="restore-page"'));
+});
+
+test('reset conectado exibe loading com etapas reais, bloqueia interação e libera automaticamente Desktop e Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const app=runtime({mobile,events:[{id:'seed-bank',type:'bank',at:'2026-10-08T00:00:00.000Z',bank}]});await app.start();
+    await app.value('(async()=>{await newSession(model.questions.slice(0,2).map(q=>q.key));await navigate("session");})()');
+    await app.click('select',{option:'A'});await app.click('answer');await app.click('nav',{view:'performance'});
+    const profile=JSON.stringify(app.auth.profile),theme=app.value('config.theme');
+    app.value('var finishResetSync;drive.sync=async()=>{drive.busy=true;drive.setStatus("syncing");try{drive.reportProgress("history",0,2);await new Promise(resolve=>finishResetSync=resolve);drive.setStatus("synced");}finally{drive.busy=false;}};');
+    let pending=app.click('reset-progress');await tick();assert.equal(app.value('resetSaving'),null);app.confirm(false);await pending;
+    assert(!app.html().includes('class="restore-page"'));assert.equal(app.value('model.stats.attempts'),1);
+    pending=app.click('reset-progress');await tick();app.confirm(true);await tick();
+    assert.match(app.html(),/Salvando seu novo começo/);assert.match(app.html(),/restore-orbit/);assert.match(app.html(),/aria-busy="true"/);
+    assert.match(app.html(),/aria-valuenow="20"/);assert.equal(app.value('restoration'),null);assert(app.value('working'));
+    assert(!app.html().includes('data-action="toggle-theme"'));assert(!app.html().includes('data-action="reset-progress"'));
+    await app.click('nav',{view:'study'});await app.click('toggle-theme');await app.click('logout');await app.click('reset-progress');
+    await app.keyEvent({key:'Enter'});await app.keyEvent({key:'ArrowRight'});await app.keyEvent({key:'t'});await app.value('navigate("study")');
+    assert.equal(app.value('view'),'performance');assert.equal(app.value('config.theme'),theme);assert.equal(JSON.stringify(app.auth.profile),profile);
+    app.value('drive.reportProgress("history",1,2)');assert.match(app.html(),/aria-valuenow="43"/);assert.match(app.html(),/1 de 2 arquivos conferidos/);
+    app.value('drive.reportProgress("history",2,2)');assert.match(app.html(),/aria-valuenow="65"/);
+    app.value('drive.reportProgress("upload")');assert.match(app.html(),/aria-valuenow="80"/);assert.match(app.html(),/Salvando e conferindo no Google Drive/);
+    app.value('drive.reportProgress("history",0,2);render()');assert.match(app.html(),/aria-valuenow="80"/);
+    app.value('finishResetSync()');await pending;
+    assert.equal(app.value('resetSaving'),null);assert.equal(app.value('working'),false);assert.equal(app.value('model.stats.attempts'),0);
+    assert.match(app.html(),/Entenda sua evolução/);assert(!app.html().includes('class="restore-page"'));assert.equal(JSON.stringify(app.auth.profile),profile);
+    app.value('drive.reportProgress("upload")');assert(!app.html().includes('class="restore-page"'),'the operation listener must be removed');
+    await app.click('nav',{view:'study'});assert.equal(app.value('view'),'study');
+  }
+});
+
+test('falha lenta de sincronização fecha o loading, mantém reinício local e libera navegação',async()=>{
+  const app=runtime();await app.start();await app.click('nav',{view:'performance'});
+  app.value('var failResetSync;drive.sync=async()=>{drive.busy=true;try{drive.reportProgress("upload");await new Promise((resolve,reject)=>failResetSync=reject);}finally{drive.busy=false;}};');
+  const pending=app.click('reset-progress');await tick();app.confirm(true);await tick();
+  assert.match(app.html(),/aria-valuenow="80"/);app.value('failResetSync(new Error("offline de teste"))');await pending;
+  assert.equal(app.value('resetSaving'),null);assert.equal(app.value('working'),false);assert(app.value('model.progressEpoch'));
+  assert(app.document.querySelector('#toast').textContent.includes('pendente'));assert(!app.html().includes('class="restore-page"'));
+  await app.click('nav',{view:'study'});assert.equal(app.value('view'),'study');
+});
+
+test('sincronização comum continua sem loading bloqueante de reinício',async()=>{
+  const app=runtime();await app.start();const html=app.html();
+  app.value('drive.reportProgress("history",0,2);drive.reportProgress("upload")');
+  assert.equal(app.html(),html);assert.equal(app.value('resetSaving'),null);
+  await app.click('nav',{view:'study'});assert.equal(app.value('view'),'study');
+});
+
+test('percentual do reinício só chega a 100 na confirmação e nunca regride em novas tentativas',()=>{
+  let state=resetSaveProgress(null);assert.equal(state.percent,10);
+  state=resetSaveProgress(state,{stage:'history',completed:0,total:2});assert.equal(state.percent,20);
+  state=resetSaveProgress(state,{stage:'history',completed:2,total:2});assert.equal(state.percent,65);
+  state=resetSaveProgress(state,{stage:'upload'});assert.equal(state.percent,80);
+  state=resetSaveProgress(state,{stage:'history',completed:0,total:2});assert.equal(state.percent,80);
+  state=resetSaveProgress(state,{stage:'ready'});assert.equal(state.percent,100);
 });
 
 test('afirmações com parênteses ganham linhas próprias no estudo e resultado sem reescrever o banco',async()=>{

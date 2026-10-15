@@ -11,7 +11,7 @@ import {bankCardView} from './bank-view.mjs';
 import {createSession,chooseAnswer,moveSession,completeSession} from './session.mjs';
 import {FocusMode} from './focus-mode.mjs';
 import {TemporaryStorage} from './temporary-storage.mjs';
-import {restoreProgress} from './restore-progress.mjs';
+import {restoreProgress,resetSaveProgress} from './restore-progress.mjs';
 import {questionOriginBadges,questionSourceDetails} from './question-origin.mjs';
 import {explanationView} from './explanation-view.mjs';
 import {formatQuestionStatement} from './statement-view.mjs';
@@ -20,7 +20,7 @@ const $=(selector,root=document)=>root.querySelector(selector);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,Number(n)||min));
 const defaults={theme:'light',name:'Estudante',photo:'',dailyGoal:10,folderId:'',onboardingDone:false,sidebarCollapsed:false};
-let guest=false,restoration=null,restoreAuthorization=null;
+let guest=false,restoration=null,restoreAuthorization=null,resetSaving=null;
 let googleLoading=false,googleLoadError='';
 let cutQuestion=null,cutOptions=new Set();
 const draftSelections=new Map();
@@ -148,9 +148,9 @@ function sessionView(){
   return `<div class="session-container"><div class="session-header"><button class="btn ghost small" data-action="pause">${icon('back',15)} Pausar e voltar</button><span class="muted">${modes[session.mode]?.[0]||'Estudo'} · <strong>Questão ${session.index+1} de ${session.queue.length}</strong></span></div><div class="session-progress">${progressBar(session.index/session.queue.length*100)}</div>${mobile?questionPanel(q,f,{mobile:true}):''}<article class="question-card"><div class="question-body" data-question="${esc(key)}" tabindex="0" role="region" aria-label="Questão e alternativas">${mobile?'':questionPanel(q,f)}<h1 class="question-statement">${esc(formatQuestionStatement(q.statement))}</h1><div class="options" role="group" aria-label="Alternativas">${q.options.map(o=>optionView(o,{answer,answered,show,correctOption:q.correctOption})).join('')}</div>${show?feedback(q,answer):exam?'<p class="setting-note" style="margin-bottom:0">Modo simulado: comentários e gabarito aparecem somente ao concluir.</p>':''}</div>${questionActions(answered,{desktopFocus,mobile})}</article><div class="session-summary-bar">${exam?`<span>${Object.values(session.answers).filter(v=>v).length} respostas registradas</span>`:`<span><strong>${stats.filter(a=>a.correct).length}</strong> acertos</span><span><strong>${stats.filter(a=>!a.correct).length}</strong> erros</span><span><strong>${stats.length?Math.round(stats.filter(a=>a.correct).length/stats.length*100):0}%</strong> na sessão</span>`}${session.index===session.queue.length-1?'<button class="text-link session-finish" data-action="finish">Concluir sessão</button>':''}<span class="keyboard-tip"><kbd>1</kbd>–<kbd>${q.options.length}</kbd> selecionar · <kbd>Enter</kbd> ${!mobile&&answered?'próxima':'registrar'}${mobile?'':' · <kbd>T</kbd> riscar/restaurar · <kbd>←</kbd> anterior · <kbd>→</kbd> próxima'}</span></div></div>`;
 }
 function resultView(){const questions=session.queue.map(k=>model.questions.find(q=>q.key===k)).filter(Boolean),answered=questions.filter(q=>session.answers[q.key]),correct=answered.filter(q=>session.answers[q.key]===q.correctOption),wrong=answered.length-correct.length,skipped=questions.length-answered.length;const percentage=Math.round(correct.length/questions.length*100)||0;return `<div class="session-end"><span class="badge green">${icon('check',13)} SESSÃO CONCLUÍDA</span><h1 style="margin-top:18px">Mais um passo na sua preparação.</h1><p class="muted" style="font-size:12px;margin-top:10px">${session.mode==='exam'?'Confira o resultado e entenda cada resposta.':guest?'Seu resultado é temporário. Revise antes de sair.':'Seu progresso foi salvo. Aprender também é revisitar.'}</p><div class="result-ring"><strong>${percentage}%</strong><span>aproveitamento da sessão</span></div><div class="result-row"><div><strong style="color:var(--success)">${correct.length}</strong><span>acertos</span></div><div><strong style="color:var(--coral)">${wrong}</strong><span>erros</span></div><div><strong>${skipped}</strong><span>não respondidas</span></div></div><div class="flex wrap" style="justify-content:center"><button class="btn primary" data-action="start">Nova sessão ${icon('arrow',15)}</button>${wrong?'<button class="btn" data-action="session-errors">Revisar erros desta sessão</button>':''}<button class="btn ghost" data-action="nav" data-view="home">Voltar ao início</button></div><div class="results-list"><h2 style="font-size:18px;margin-bottom:15px">Seu estudo, questão por questão</h2>${questions.map((q,i)=>`<details class="result-item"><summary>${icon(session.answers[q.key]?session.answers[q.key]===q.correctOption?'check':'x':'clock',17)}<span>${i+1}. ${esc(q.topic)}</span><span class="badge" style="margin-left:auto">${session.answers[q.key]?session.answers[q.key]===q.correctOption?'Acerto':'Erro':'Não respondida'}</span></summary><div class="result-body"><p>${esc(formatQuestionStatement(q.statement))}</p><p class="setting-note">Correta (${q.correctOption}): ${esc(q.options.find(o=>o.id===q.correctOption).text)}</p>${feedback(q,session.answers[q.key])}</div></details>`).join('')}</div></div>`;}
-function render(){if(restoration){renderLoading();return;}if((!auth?.profile&&!guest)||!store||!drive){renderLogin();return;}const previousBody=$('.question-body'),previousKey=previousBody?.dataset.question,previousScroll=previousBody?.scrollTop||0;refreshModel();const content=({home,study,banks,performance,revision,settings:()=>guest?guestSettings():settings(),folder:()=>folderView(auth.profile,config,!!drive.token),session:sessionView,result:resultView})[view]();$('#app').innerHTML=shell(content);document.title=`${({home:'Início',study:'Estudar',banks:'Banco de questões',performance:'Desempenho',revision:'Revisão',settings:'Ajustes',folder:'Conectar pasta',session:'Estudando',result:'Resultado'})[view]} · Foco`;const body=$('.question-body');if(body&&body.dataset.question===previousKey)body.scrollTop=previousScroll;bindFiles();bindForms();if(view==='settings'&&!guest)drive.prepare().catch(()=>{});}
+function render(){if(resetSaving){renderResetSaving();return;}if(restoration){renderLoading();return;}if((!auth?.profile&&!guest)||!store||!drive){renderLogin();return;}const previousBody=$('.question-body'),previousKey=previousBody?.dataset.question,previousScroll=previousBody?.scrollTop||0;refreshModel();const content=({home,study,banks,performance,revision,settings:()=>guest?guestSettings():settings(),folder:()=>folderView(auth.profile,config,!!drive.token),session:sessionView,result:resultView})[view]();$('#app').innerHTML=shell(content);document.title=`${({home:'Início',study:'Estudar',banks:'Banco de questões',performance:'Desempenho',revision:'Revisão',settings:'Ajustes',folder:'Conectar pasta',session:'Estudando',result:'Resultado'})[view]} · Foco`;const body=$('.question-body');if(body&&body.dataset.question===previousKey)body.scrollTop=previousScroll;bindFiles();bindForms();if(view==='settings'&&!guest)drive.prepare().catch(()=>{});}
 function navigate(next){
-  if(restoration)return;
+  if(restoration||resetSaving)return;
   view=next;selected=next==='session'?draftSelections.get(draftKey())||null:null;
   let focusChange;
   if(next!=='session')focusChange=focusMode.exit();
@@ -172,16 +172,40 @@ async function resetPersonalProgress(){
   if(working)return;
   if(drive.busy||drive.connecting){toast('Aguarde a sincronização terminar antes de zerar o progresso.');return;}
   working=true;const currentStore=store,currentDrive=drive;
+  const updateProgress=()=>{
+    if(!resetSaving||store!==currentStore||drive!==currentDrive)return;
+    resetSaving=resetSaveProgress(resetSaving,currentDrive.restoreProgress);renderResetSaving();
+  };
   try{
     const confirmed=await confirmDialog('Zerar todo o seu progresso?',`Suas respostas, estatísticas, favoritos, revisões e sessões ${guest?'temporárias':'desta conta'} serão zerados em todos os bancos. Seu nome, sua conta, suas preferências e as questões serão mantidos. Não há opção de desfazer. Com o Drive conectado, o reinício será sincronizado com os outros dispositivos.`,'Zerar meu progresso',{danger:true});
     if(!confirmed||store!==currentStore||drive!==currentDrive)return;
     if(drive.busy||drive.connecting){toast('Aguarde a sincronização terminar e tente novamente. Nenhum progresso foi zerado.');return;}
+    resetSaving=resetSaveProgress(null);renderResetSaving();$('#main')?.focus({preventScroll:true});
+    currentDrive.addEventListener('progress',updateProgress);clearTimeout(currentDrive.timer);
     await currentStore.resetProgress();
     session=null;selected=null;draftSelections.clear();resetCuts();config.activeSession=null;render();
     if(!drive.token){toast(guest?'Progresso temporário zerado. Você pode começar de novo.':'Progresso zerado neste dispositivo. Conecte o Drive para sincronizar o reinício.');return;}
-    try{if(!drive.busy&&!drive.connecting)await drive.sync();toast(drive.status==='synced'?'Progresso zerado e sincronizado. Sua conta e suas questões foram mantidas.':'Progresso zerado neste dispositivo. A sincronização com o Drive está pendente.');}
+    clearTimeout(currentDrive.timer);
+    try{
+      if(!drive.busy&&!drive.connecting)await drive.sync();
+      if(drive.status==='synced'){resetSaving=resetSaveProgress(resetSaving,{stage:'ready'});renderResetSaving();}
+      toast(drive.status==='synced'?'Progresso zerado e sincronizado. Sua conta e suas questões foram mantidas.':'Progresso zerado neste dispositivo. A sincronização com o Drive está pendente.');
+    }
     catch(error){console.error(error);toast('Progresso zerado neste dispositivo. O envio ao Drive está pendente; reconecte e sincronize.');}
-  }finally{working=false;}
+  }finally{
+    currentDrive.removeEventListener('progress',updateProgress);working=false;
+    if(resetSaving){
+      resetSaving=null;
+      if(store===currentStore&&drive===currentDrive){
+        if(currentDrive.status==='pending'&&currentDrive.token&&!currentDrive.busy&&!currentDrive.connecting)currentDrive.schedule();
+        render();$('#main')?.focus({preventScroll:true});
+      }
+    }
+  }
+}
+function renderResetSaving(){
+  $('#app').innerHTML=loadingView({...resetSaving,saving:true,theme:document.documentElement.dataset.theme,guest});
+  document.title='Salvando reinício · Foco';
 }
 function startDialog(mode='smart',bankId=''){
   if(!model.banks.some(b=>b.enabled)){toast('Importe ou ative um banco para começar.');navigate('banks');return;}
@@ -230,6 +254,7 @@ function bindForms(){
 }
 async function driveBanks(){if(!drive.token){navigate('settings');toast('Conecte o Google Drive para buscar bancos na pasta.');return;}toast('Buscando arquivos JSON na pasta…');const files=await drive.bankFiles();if(!files.length){toast('Nenhum banco JSON encontrado na pasta.');return;}const d=showDialog(`<div class="dialog-title"><h2 id="dialog-title">Bancos no Google Drive</h2><p>Escolha um arquivo para importar.</p></div><div class="stack">${files.map(f=>`<button class="btn drive-file" data-id="${esc(f.id)}">${icon('file',17)} ${esc(f.name)}</button>`).join('')}</div><div class="dialog-actions"><button class="btn" data-action="close-dialog">Fechar</button></div>`);for(const b of d.querySelectorAll('.drive-file'))b.onclick=async()=>{b.disabled=true;try{const f=files.find(f=>f.id===b.dataset.id);const raw=await drive.readFile(f);closeDialog();if(await importBank(raw)){navigate('banks');toast('Banco do Drive importado.');}}catch(e){failure(e);b.disabled=false;}};}
 document.addEventListener('click',async event=>{
+  if(resetSaving)return;
   const target=event.target.closest('[data-action]');if(!target||target.disabled)return;const action=target.dataset.action;
   if(action==='toggle-theme'||action==='theme'){try{config.theme=action==='theme'?target.dataset.theme:document.documentElement.dataset.theme==='dark'?'light':'dark';saveConfig();applyTheme();render();const selector=action==='theme'?`.theme-option[data-theme="${config.theme}"]`:focusMode.active?'.focus-toolbar [data-action=toggle-theme]':restoration||(!auth?.profile&&!guest)?'.entry-toolbar [data-action=toggle-theme]':'.topbar [data-action=toggle-theme]';$(selector)?.focus({preventScroll:true});}catch(error){failure(error);}return;}
   if(restoration){await handleRestorationAction(action);return;}
@@ -292,7 +317,7 @@ function usesQuestionNavigation(target){
   return target?.isContentEditable||!!target?.closest?.('input,textarea,select,summary,iframe,audio,video,[contenteditable]:not([contenteditable="false"]),[aria-haspopup]:not([aria-haspopup="false"]),[role="textbox"],[role="combobox"],[role="listbox"],[role="option"],[role="checkbox"],[role="radio"],[role="switch"],[role="slider"],[role="spinbutton"],[role="menu"],[role="menuitem"],[role="tab"],[role="tree"],[role="grid"]');
 }
 document.addEventListener('keydown',async event=>{
-  if(restoration)return;
+  if(restoration||resetSaving)return;
   if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
     if(!desktopLayout.matches||view!=='session'||!session||session.completed||working||$('#dialog').open||document.querySelector('dialog[open],[aria-modal="true"]:not([hidden])')||event.defaultPrevented||event.isComposing||event.altKey||event.ctrlKey||event.metaKey||event.shiftKey||usesQuestionNavigation(event.target)||event.composedPath?.().some(usesQuestionNavigation))return;
     const q=model.questions.find(q=>q.key===session.queue[session.index]);
@@ -337,8 +362,8 @@ document.addEventListener('keydown',async event=>{
   }catch(e){failure(e);}finally{working=false;}
 });
 window.addEventListener('storage',event=>{if(!restoration&&auth?.profile&&accountStorage?.ownsKey(event.key)&&event.key.includes(':foco:v1:event:')){try{store.load();refreshModel();if(view!=='session'&&!$('#dialog').open)render();}catch(e){failure(e);}}});
-window.addEventListener('online',()=>{if(!restoration&&drive?.token&&!drive.connecting)drive.sync().catch(()=>{});});
-window.addEventListener('focus',()=>{if(!restoration&&drive?.token&&!drive.busy&&!drive.connecting)drive.sync().catch(()=>{});});
+window.addEventListener('online',()=>{if(!restoration&&!resetSaving&&drive?.token&&!drive.connecting)drive.sync().catch(()=>{});});
+window.addEventListener('focus',()=>{if(!restoration&&!resetSaving&&drive?.token&&!drive.busy&&!drive.connecting)drive.sync().catch(()=>{});});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(config.theme==='system'){applyTheme();render();}});
 async function loadGoogleForLogin(){
   if(googleLoading||auth?.redirectEnabled||!validClientId(auth?.clientId))return;

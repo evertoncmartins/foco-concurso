@@ -17,3 +17,16 @@ export function restoreProgress(previous,{stage,completed=0,total=0}){
       stage==='folder'?'Recuperando a pasta vinculada à sua conta Google.':
       stage==='ready'?'Seus estudos estão prontos para continuar.':'Aguarde enquanto preparamos seus estudos.'};
 }
+
+// Percentages describe completed steps, never elapsed time or upload bytes.
+export function resetSaveProgress(previous,{stage='local',completed=0,total=0}={}){
+  const count=Math.max(0,Number(total)||0),done=Math.max(0,Number(completed)||0);
+  const steps={
+    local:[10,'Salvando o reinício neste dispositivo','Sua conta, preferências e bancos de questões serão mantidos.'],
+    history:[20+45*(count?Math.min(1,done/count):1),'Conferindo o progresso no Drive',count?`${Math.min(done,count)} de ${count} arquivos conferidos`:'Conferência dos arquivos concluída.'],
+    upload:[80,'Salvando e conferindo no Google Drive','Aguarde a confirmação do envio para continuar.'],
+    ready:[100,'Reinício sincronizado','Tudo pronto para começar seus estudos do zero.']
+  };
+  const [percent,message,detail]=steps[stage]||steps.local;
+  return {state:'loading',percent:Math.max(previous?.percent||0,Math.round(percent)),message,detail};
+}

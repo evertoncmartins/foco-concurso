@@ -42,6 +42,8 @@ O evento `progress-reset` identifica o reinício no diário da própria conta; n
 
 O marcador sincroniza com o mesmo arquivo principal do Drive. Backups antigos não reativam a etapa anterior e sessões antigas são descartadas. Se o envio falhar, o reinício permanece salvo localmente, com aviso de sincronização pendente. Outros dispositivos devem usar a versão atualizada do Foco para ler o novo tipo de evento.
 
+Após confirmar o reinício, uma tela animada informa o salvamento local, a conferência dos arquivos e o envio ao Drive. O percentual representa etapas, sem estimar tempo ou bytes: só chega a 100% após a confirmação da sincronização. A tela bloqueia os controles durante essa operação e desaparece automaticamente ao terminar. Em caso de falha, também é fechada e o aviso informa que o envio está pendente. Sincronizações comuns mantêm o comportamento habitual.
+
 Após conectar, o sistema localiza o arquivo `foco-progresso-<sub>-principal.json`, confirma a propriedade da conta e do conteúdo, valida os eventos e une os históricos remoto e local. Em seguida atualiza esse mesmo arquivo quando há alterações locais. Se não houver histórico, cria o principal automaticamente. A versão do arquivo fica em cache: se o conteúdo remoto não mudou e os eventos estão disponíveis localmente, o app evita baixar o JSON novamente.
 
 Cada mudança é salva localmente imediatamente. Com autorização ativa, o envio ao Drive ocorre após 6 segundos de inatividade; concluir uma sessão também dispara uma sincronização. O botão Sincronizar permite executar o processo manualmente. Ao voltar ao site ou recuperar a rede, a sincronização é tentada enquanto o token continua válido.

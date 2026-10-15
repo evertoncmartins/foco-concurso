@@ -25,16 +25,16 @@ export function loginView({ready,oauthReady=false,loading=false,retryGoogle=fals
     </section></div>
   </main>`;
 }
-export function loadingView({percent=10,state='loading',message,detail,theme,guest=false}){
+export function loadingView({percent=10,state='loading',message,detail,theme,guest=false,saving=false}){
   const failed=state==='error',permission=state==='permission';
   return `<main class="restore-page" id="main" tabindex="-1" aria-busy="${state==='loading'}">
-    <div class="entry-toolbar"><button class="icon-btn" data-action="toggle-theme" title="Alternar tema" aria-label="${theme==='dark'?'Ativar tema claro':'Ativar tema escuro'}">${icon(theme==='dark'?'sun':'moon',20)}</button></div>
+    ${saving?'':`<div class="entry-toolbar"><button class="icon-btn" data-action="toggle-theme" title="Alternar tema" aria-label="${theme==='dark'?'Ativar tema claro':'Ativar tema escuro'}">${icon(theme==='dark'?'sun':'moon',20)}</button></div>`}
     <section class="restore-card" aria-labelledby="restore-title">
       <div class="restore-symbol ${failed?'has-error':''}">${icon(failed?'cloud':guest?'book':'cloud',25)}${state==='loading'?'<span class="restore-orbit" aria-hidden="true"></span>':''}</div>
-      <p class="restore-eyebrow">${guest?'SEU MOMENTO DE ESTUDO':'SEUS ESTUDOS, DE VOLTA'}</p>
-      <h1 id="restore-title">${failed?'Não foi possível sincronizar.':permission?'Autorize seu Google Drive.':guest?'Preparando as questões.':'Preparando seus estudos.'}</h1>
-      <p class="restore-description">${failed||permission?esc(detail):guest?'Seu acesso temporário estará pronto em instantes.':'Estamos recuperando suas questões e seu progresso.'}</p>
-      ${state==='loading'?`<div class="restore-status" role="status" aria-live="polite"><span>${esc(message)}</span><strong>${Math.max(0,Math.min(100,percent))}%</strong></div><div class="restore-track" role="progressbar" aria-label="Restauração dos estudos, andamento por etapas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.max(0,Math.min(100,percent))}" aria-valuetext="${esc(message)}"><span style="width:${Math.max(0,Math.min(100,percent))}%"></span></div><p class="restore-detail">${esc(detail)}<span>Andamento por etapas</span></p>`:
+      <p class="restore-eyebrow">${saving?'UM NOVO COMEÇO':guest?'SEU MOMENTO DE ESTUDO':'SEUS ESTUDOS, DE VOLTA'}</p>
+      <h1 id="restore-title">${failed?'Não foi possível sincronizar.':permission?'Autorize seu Google Drive.':saving?'Salvando seu novo começo.':guest?'Preparando as questões.':'Preparando seus estudos.'}</h1>
+      <p class="restore-description">${failed||permission?esc(detail):saving?'Estamos salvando o reinício dos seus estudos. A tela será liberada automaticamente ao terminar.':guest?'Seu acesso temporário estará pronto em instantes.':'Estamos recuperando suas questões e seu progresso.'}</p>
+      ${state==='loading'?`<div class="restore-status" role="status" aria-live="polite"><span>${esc(message)}</span><strong>${Math.max(0,Math.min(100,percent))}%</strong></div><div class="restore-track" role="progressbar" aria-label="${saving?'Salvamento do reinício':'Restauração dos estudos'}, andamento por etapas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.max(0,Math.min(100,percent))}" aria-valuetext="${esc(message)}"><span style="width:${Math.max(0,Math.min(100,percent))}%"></span></div><p class="restore-detail">${esc(detail)}<span>Andamento por etapas</span></p>`:
         `<div class="restore-actions"><button class="btn primary" data-action="${permission?'restore-authorize':'restore-retry'}">${permission?'Autorizar e restaurar':'Tentar novamente'} ${icon('arrow',16)}</button><button class="btn" data-action="restore-local">Continuar apenas neste navegador</button><p>O progresso do Drive ainda não foi carregado.</p><button class="btn ghost small" data-action="restore-logout">Voltar ao login</button></div>`}
     </section>
   </main>`;
