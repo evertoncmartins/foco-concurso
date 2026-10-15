@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -100,6 +100,30 @@ async function studyRuntime(options={},mode='smart'){
   await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');await navigate('session');})()`);
   return app;
 }
+
+test('configuração de estudo atualiza bancos e filtros, bloqueia seleção vazia e inicia somente o conteúdo escolhido',async()=>{
+  for(const mobile of [false,true]){
+    const app=runtime({mobile});app.auth.signOut();await app.click('guest');
+    await app.value('(async()=>{const other=structuredClone(bank);other.id="other-bank";other.name="ECA — banco unificado — recorte do edital";for(const q of other.questions){q.discipline="Educação";q.subject="Direitos";q.topic="Escola";}await store.add([{type:"bank",bank:validateBank(other)}]);refreshModel();})()');
+    const d=app.document.querySelector('#dialog'),form=d.querySelector('#session-form');
+    for(const [name,value] of Object.entries({mode:'smart',count:'10',discipline:'',subject:'',topic:''})){form[name]=d.querySelector(`#${name}`);form[name].value=value;}
+    const checked=[{value:bank.id,checked:false},{value:'other-bank',checked:true}];form.querySelectorAll=()=>checked.filter(input=>input.checked);
+    const before=app.value('JSON.stringify(store.events)');await app.click('start',{bank:'other-bank'});
+    assert(d.open);assert(d.innerHTML.includes('<strong>Lei nº 8.069/1990</strong>'));assert(!d.innerHTML.includes('banco unificado'));
+    assert.equal(d.querySelector('#session-size').textContent,'10 questões na sessão');assert(form.discipline.innerHTML.includes('Educação'));assert(!form.discipline.innerHTML.includes('Legislação'));
+    form.discipline.value='Educação';form.emit('change',{target:{name:'discipline'}});assert(form.subject.innerHTML.includes('Direitos'));
+    form.subject.value='Direitos';form.emit('change',{target:{name:'subject'}});assert(form.topic.innerHTML.includes('Escola'));
+    checked[1].checked=false;form.emit('change',{target:{name:'banks'}});assert(d.querySelector('#session-start').disabled);assert.equal(form.discipline.value,'');assert(d.querySelector('#eligible').textContent.includes('Selecione ao menos um banco'));
+    checked[1].checked=true;form.emit('change',{target:{name:'banks'}});assert(!d.querySelector('#session-start').disabled);
+    form.count.value='0';form.count.emit('input',{});assert(d.querySelector('#session-start').disabled);
+    form.count.value='50';form.count.emit('input',{});assert.equal(d.querySelector('#session-size').textContent,'10 questões na sessão');
+    form.mode.value='subject';form.emit('change',{target:{name:'mode'}});assert(d.querySelector('#session-filters').open);
+    form.mode.value='exam';form.emit('change',{target:{name:'mode'}});assert.equal(d.querySelector('#session-start-label').textContent,'Iniciar simulado');assert(d.querySelector('#mode-description').textContent.includes('resultado aparece no final'));
+    assert.equal(app.value('JSON.stringify(store.events)'),before);
+    form.count.value='2';await form.onsubmit({preventDefault(){}});
+    assert(!d.open);assert.equal(app.value('view'),'session');assert.equal(app.value('session.mode'),'exam');assert.equal(app.value('session.queue.length'),2);assert(app.value('session.queue.every(key=>key.startsWith("other-bank:"))'));assert.equal(app.value('model.stats.attempts'),0);
+  }
+});
 
 test('Minhas sessões permite alternar bancos e retomar posições e respostas sem encerrar outras sessões',async()=>{
   for(const mobile of [false,true]){

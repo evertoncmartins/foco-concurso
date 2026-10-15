@@ -17,6 +17,7 @@ import {explanationView} from './explanation-view.mjs';
 import {formatQuestionStatement} from './statement-view.mjs';
 import {isProfilePhoto,prepareProfilePhoto,saveProfilePhoto} from './profile-photo.mjs';
 import {sessionsView,sessionSummary,sessionReport,sessionBankCatalog,performanceForBank,bankSelect,sessionDate} from './sessions-view.mjs';
+import {sessionSetupView,sessionSetupStatus} from './session-setup.mjs';
 const $=(selector,root=document)=>root.querySelector(selector);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,Number(n)||min));
@@ -237,13 +238,41 @@ function renderResetSaving(){
 }
 function startDialog(mode='smart',bankId=''){
   if(!model.banks.some(b=>b.enabled)){toast('Importe ou ative um banco para começar.');navigate('banks');return;}
-  const enabled=model.banks.filter(b=>b.enabled),disciplines=[...new Set(model.questions.filter(q=>q.enabled).map(q=>q.discipline))].sort();
-  const d=showDialog(`<form id="session-form"><div class="dialog-title"><h2 id="dialog-title">Seu próximo estudo.</h2><p>Escolha o conteúdo e a quantidade. Reserve este momento para você.</p></div><div class="form-grid"><div class="field"><label for="mode">Modo de estudo</label><select id="mode" name="mode">${Object.entries(modes).map(([k,[l]])=>`<option value="${k}" ${mode===k?'selected':''}>${l}</option>`).join('')}</select></div><div class="field"><label for="count">Quantidade de questões</label><input id="count" type="number" name="count" value="10" min="1" max="5000" required></div></div><p class="field-label">Bancos selecionados</p>${enabled.map(b=>`<label class="bank-choice"><input type="checkbox" name="banks" value="${esc(b.id)}" ${!bankId||bankId===b.id?'checked':''}><span>${esc(b.name)}</span><small>${b.questions.length} questões</small></label>`).join('')}<div style="margin-top:18px" class="form-grid"><div class="field"><label for="discipline">Disciplina</label><select id="discipline" name="discipline"><option value="">Todas</option>${disciplines.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div><div class="field"><label for="subject">Assunto</label><select id="subject" name="subject"><option value="">Todos</option></select></div><div class="field"><label for="topic">Tópico</label><select id="topic" name="topic"><option value="">Todos</option></select></div></div><p class="eligible" id="eligible"></p><div id="session-error" class="form-error" role="alert"></div><div class="dialog-actions"><button class="btn" type="button" data-action="close-dialog">Cancelar</button><button class="btn primary" type="submit">Começar ${icon('arrow',15)}</button></div></form>`);
+  const d=showDialog(sessionSetupView({banks:model.banks.filter(b=>b.enabled),modes,mode,bankId}));
   const f=$('#session-form',d);const read=()=>({mode:f.mode.value,count:clamp(f.count.value,1,5000),banks:[...f.querySelectorAll('[name=banks]:checked')].map(i=>i.value),discipline:f.discipline.value,subject:f.subject.value,topic:f.topic.value});
-  function available(){const n=filterQuestions(model,read()).length;$('#eligible',d).textContent=`${n} questões disponíveis. ${n<Number(f.count.value)?'A sessão usará todas as disponíveis.':''}`;}
-  function cascade(source){const base=model.questions.filter(q=>q.enabled&&read().banks.includes(q.bankId));if(source==='banks'||source==='discipline'){const items=[...new Set(base.filter(q=>!f.discipline.value||q.discipline===f.discipline.value).map(q=>q.subject))].sort();f.subject.innerHTML='<option value="">Todos</option>'+items.map(x=>`<option>${esc(x)}</option>`).join('');}const items=[...new Set(base.filter(q=>(!f.discipline.value||q.discipline===f.discipline.value)&&(!f.subject.value||q.subject===f.subject.value)).map(q=>q.topic))].sort();f.topic.innerHTML='<option value="">Todos</option>'+items.map(x=>`<option>${esc(x)}</option>`).join('');available();}
-  f.addEventListener('change',event=>{if(['banks','discipline','subject'].includes(event.target.name))cascade(event.target.name);else available();});f.count.addEventListener('input',available);cascade('banks');
-  f.onsubmit=async event=>{event.preventDefault();if(working)return;const options=read();const queue=makeQueue(model,options);if(!queue.length){$('#session-error',d).textContent='Nenhuma questão encontrada. Ajuste os bancos, filtros ou modo de estudo.';return;}working=true;try{await newSession(queue,options.mode);closeDialog();navigate('session');}catch(e){failure(e);}finally{working=false;}};
+  const status=()=>sessionSetupStatus(model,{...read(),count:Number(f.count.value)});
+  function available(){
+    const s=status();
+    $('#session-size',d).textContent=!s.validCount?'Defina a quantidade':s.available?`${s.count} ${s.count===1?'questão':'questões'} na sessão`:'Nenhuma questão disponível';
+    $('#eligible',d).textContent=!s.validCount?'Informe um número inteiro de 1 a 5.000.':s.available?`${s.available} ${s.available===1?'disponível':'disponíveis'} · ${s.banks} ${s.banks===1?'banco selecionado':'bancos selecionados'}`:read().banks.length?'Ajuste os filtros ou o modo de estudo.':'Selecione ao menos um banco para começar.';
+    $('#session-start',d).disabled=!s.canStart;
+    $('#session-start-label',d).textContent=f.mode.value==='exam'?'Iniciar simulado':'Começar estudo';
+    $('#mode-description',d).textContent=modes[f.mode.value]?.[1]||'';
+    $('#session-error',d).textContent='';
+  }
+  function fill(select,items,label){
+    const previous=select.value;select.innerHTML=`<option value="">${label}</option>`+items.map(item=>`<option>${esc(item)}</option>`).join('');
+    select.value=items.includes(previous)?previous:'';
+  }
+  function cascade(source){
+    const base=model.questions.filter(q=>q.enabled&&read().banks.includes(q.bankId));
+    if(source==='banks')fill(f.discipline,[...new Set(base.map(q=>q.discipline))].sort(),'Todas');
+    if(source==='banks'||source==='discipline')fill(f.subject,[...new Set(base.filter(q=>!f.discipline.value||q.discipline===f.discipline.value).map(q=>q.subject))].sort(),'Todos');
+    fill(f.topic,[...new Set(base.filter(q=>(!f.discipline.value||q.discipline===f.discipline.value)&&(!f.subject.value||q.subject===f.subject.value)).map(q=>q.topic))].sort(),'Todos');
+    available();
+  }
+  f.addEventListener('change',event=>{
+    if(['banks','discipline','subject'].includes(event.target.name))cascade(event.target.name);else available();
+    if(event.target.name==='mode'&&f.mode.value==='subject')$('#session-filters',d).open=true;
+  });
+  f.count.addEventListener('input',available);cascade('banks');
+  f.onsubmit=async event=>{
+    event.preventDefault();if(working)return;
+    if(!status().validCount){f.count.reportValidity();return;}
+    const options=read(),queue=makeQueue(model,options);
+    if(!queue.length){$('#session-error',d).textContent='Nenhuma questão encontrada. Ajuste os bancos, filtros ou modo de estudo.';return;}
+    working=true;try{await newSession(queue,options.mode);closeDialog();navigate('session');}catch(e){failure(e);}finally{working=false;}
+  };
 }
 async function newSession(queue,mode='smart'){
   const next=createSession(queue,mode,undefined,undefined,store.model().progressEpoch);await store.add([{type:'session',session:next}]);session=next;resultSessionId=null;resetCuts();config.activeSession=session.id;saveConfig();selected=null;
