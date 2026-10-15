@@ -23,6 +23,7 @@ Plataforma para resolver questões e estudar para qualquer concurso com seus pr�
 - Favoritos, revisão espaçada, estatísticas por disciplina/assunto/tópico e histórico.
 - Minhas sessões com abas Em andamento e Concluídas, filtros por banco/lei e tipo, e paginação de todo o histórico. Retome qualquer estudo ou simulado sem encerrar os demais; consulte resultados antigos sem alterar a sessão ativa ou registrar novas tentativas.
 - Desempenho geral ou filtrado por banco/lei, incluindo estatísticas, evolução semanal e agrupamentos por conteúdo.
+- Filtros de banco mostram os bancos atuais, inclusive desativados, e os removidos que ainda possuem sessões consultáveis ou respostas na etapa atual do progresso. Importações antigas sem estudo ficam ocultas, sem apagar registros.
 - Progresso local automático; exportação e restauração de JSON sem substituir o histórico.
 - Sincronização Google Drive com OAuth, união de eventos e um único JSON de progresso por conta e pasta, atualizado com controle de versão e migração automática dos lotes antigos.
 - Pasta recuperada pela conta Google em outros dispositivos, via configuração privada no Drive.

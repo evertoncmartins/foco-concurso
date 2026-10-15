@@ -37,6 +37,29 @@ test('sessão mista aparece ao filtrar qualquer um dos bancos incluídos',()=>{
   assert.equal(sessionSummary(mixed,m).title,'Lei nº 8.112/1990 · Lei nº 8.069/1990');
 });
 
+test('filtros mantêm bancos atuais e removidos com estudo, omitindo importações antigas sem histórico',()=>{
+  const active={...a,id:'current-unused'},disabled={...a,id:'current-disabled'},unused={...a,id:'removed-unused'},abandoned={...a,id:'removed-abandoned'};
+  const banks=[a,b,active,disabled,unused,abandoned],paused={...saved('paused-only',a),answers:{}},discarded={...saved('discarded',abandoned),answers:{},abandoned:true};
+  const events=banks.map(bank=>({id:`import-${bank.id}`,type:'bank',bank,at:at(0)}));
+  for(const bank of [a,b,unused,abandoned])events.push({id:`remove-${bank.id}`,type:'bank-state',bankId:bank.id,value:'deleted',at:at(5)});
+  events.push({id:'disable-current',type:'bank-state',bankId:disabled.id,value:'disabled',at:at(5)},sessionEvent(paused,6),sessionEvent(discarded,6),grade(saved('answer-only',b),b));
+  const model=derive(validateEvents({schemaVersion:1,events})),catalog=sessionBankCatalog(model);
+  assert.deepEqual(catalog.map(bank=>bank.id).sort(),[a.id,b.id,active.id,disabled.id].sort());
+  assert(catalog.find(bank=>bank.id===a.id).removed);assert(catalog.find(bank=>bank.id===b.id).removed);
+  assert(!catalog.find(bank=>bank.id===disabled.id).removed);
+  const html=sessionsView(model,{status:'open',bankId:'',type:'all'});
+  assert(!html.includes(`value="${unused.id}"`));assert(!html.includes(`value="${abandoned.id}"`));
+  assert(html.includes(`value="${a.id}"`));assert(html.includes(`value="${b.id}"`));
+  assert.equal(model.answers.length,1);assert.equal(model.sessions.length,2);assert.equal(model.bankHistory.length,banks.length);
+});
+
+test('reinício de progresso retira bancos removidos que só tinham estudo da etapa anterior',()=>{
+  const {events}=fixture();
+  const model=derive([...events,{id:'remove-old',type:'bank-state',bankId:a.id,value:'deleted',at:at(12)},{id:'new-epoch',type:'progress-reset',at:at(13)}]);
+  assert.deepEqual(sessionBankCatalog(model).map(bank=>bank.id),[b.id]);
+  assert(model.bankHistory.some(event=>event.bank.id===a.id));
+});
+
 test('histórico usa gabarito e texto da época da resposta após atualizar ou remover um banco',()=>{
   const {events,doneA}=fixture(),updated=structuredClone(a);updated.questions[0].statement='Texto novo do banco';updated.questions[0].correctOption=updated.questions[0].options.find(o=>o.id!==a.questions[0].correctOption).id;
   // The bank changes after the answer but before the final session record.
