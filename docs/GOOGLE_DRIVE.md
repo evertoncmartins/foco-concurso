@@ -34,6 +34,16 @@ Se a autorização retornada no login incluir o acesso Drive já concedido, a re
 
 ## Durante o estudo
 
+### Sessões e simulados salvos
+
+Em **Minhas sessões**, as abas **Em andamento** e **Concluídas** permitem retomar uma sessão específica ou consultar seu resultado. Iniciar um estudo de outra lei não encerra nem substitui as sessões anteriores. Filtros por banco/lei e por Estudo/Simulado, com paginação, dão acesso ao histórico completo da etapa atual de progresso. Uma sessão com vários bancos aparece no filtro de cada banco incluído.
+
+Fila, posição e respostas registradas são eventos do mesmo diário pessoal, sincronizados no arquivo principal; não é criado um arquivo de progresso por lei ou por simulado. A sincronização mantém as regras de união, controle de versão e isolamento por conta. Seleções ainda não registradas não sobrevivem à recarga; respostas registradas sobrevivem. No visitante, o histórico continua somente em memória.
+
+Consultar um resultado concluído não gera tentativas, não modifica a nota nem substitui a sessão que estava ativa. O resultado conserva o gabarito registrado e recupera o conteúdo das versões de bancos já presentes no diário. Se faltar conteúdo, a nota mantém o total original de questões e a interface avisa da indisponibilidade. Retomar uma sessão depende de suas questões estarem importadas com os mesmos IDs. Simulados em andamento não revelam acertos, erros ou gabarito.
+
+O filtro de banco/lei em **Desempenho** muda apenas a consulta de estatísticas. **Zerar progresso** continua abrangendo todos os bancos e remove sessões e simulados da etapa ativa, após confirmação.
+
 ### Zerar progresso pessoal
 
 No final de Desempenho, **Zerar progresso** pede confirmação e inicia uma nova etapa de estudo. Respostas, estatísticas, favoritos, revisões e sessões voltam a zero; nome, conta, foto, preferências, pasta e bancos importados não são removidos. Cancelar não altera nenhum registro.

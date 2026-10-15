@@ -27,3 +27,10 @@
 
 - Preserve a renovação automática do Drive na produção por POST de mesma origem, sem abrir popup ou redirecionar durante os estudos. Tokens de acesso ficam em memória; a credencial de renovação usa cookie cifrado HttpOnly/Secure, nunca JSON, localStorage, logs ou respostas públicas.
 - Verifique a mesma conta na renovação, descarte retornos após logout/desconexão e mantenha progresso local e sessão de estudo em falhas. Não prolongue artificialmente a validade fornecida pelo Google nem repita indefinidamente uma requisição recusada.
+
+## Sessões e resultados
+
+- Preserve todas as sessões ao iniciar ou retomar outra. A consulta de resultado concluído não deve substituir a sessão ativa, alterar respostas ou criar tentativas; revisar erros é uma nova sessão por ação explícita.
+- Resultados históricos usam o gabarito registrado e as versões de bancos já presentes no diário, sem recalcular a nota com um banco atualizado. Conteúdo ausente não deve reduzir o total original ou esconder sua indisponibilidade.
+- Nunca revele gabarito, acertos ou erros de simulados em andamento. Filtros por banco/lei e tipo apenas restringem consultas; sessões mistas pertencem a todos os bancos da fila.
+- Mantenha histórico e filtros isolados por conta, respeite progressEpoch e deixe explícito que Zerar progresso afeta todos os bancos, mesmo com um filtro selecionado.
