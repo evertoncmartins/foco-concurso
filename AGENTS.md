@@ -22,3 +22,8 @@
 - Preserve o marcador `progress-reset` e a associação `progressEpoch` dos eventos de estudo. Não implemente reset apagando localStorage ou apenas retirando eventos locais: dispositivos offline e backups poderiam reativar o histórico antigo.
 - Teste cancelamento, falha de gravação/envio, outra conta, nova sessão e sincronização antes de publicar mudanças nesse fluxo.
 - Após confirmar o reset, mantenha o loading exclusivo de salvamento até o envio terminar, com etapas reais e liberação em sucesso ou falha. Não aplique esse bloqueio às sincronizações comuns nem reutilize o estado de restauração do login para o reset.
+
+## Renovação Google
+
+- Preserve a renovação automática do Drive na produção por POST de mesma origem, sem abrir popup ou redirecionar durante os estudos. Tokens de acesso ficam em memória; a credencial de renovação usa cookie cifrado HttpOnly/Secure, nunca JSON, localStorage, logs ou respostas públicas.
+- Verifique a mesma conta na renovação, descarte retornos após logout/desconexão e mantenha progresso local e sessão de estudo em falhas. Não prolongue artificialmente a validade fornecida pelo Google nem repita indefinidamente uma requisição recusada.

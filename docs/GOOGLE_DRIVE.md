@@ -30,7 +30,7 @@ As escolhas de pasta são snapshots imutáveis. A maior revisão lógica prevale
 
 Uploads pendentes ficam no armazenamento local da conta com um ID pré-gerado para `appDataFolder`; repetir após falha não cria outra configuração. Se outra pessoa/dispositivo da mesma conta mudou a pasta enquanto um envio estava pendente, o envio antigo é bloqueado. Salvar novamente em Ajustes confirma uma nova escolha explícita. Não confunda essa configuração com o diário de progresso: o progresso e os bancos permanecem na pasta escolhida.
 
-Se a autorização retornada no login incluir o acesso Drive já concedido, a recuperação do progresso acontece automaticamente. Se o Google solicitar nova permissão, o app recupera a pasta e oferece **Autorizar minha pasta**. Nenhum token é persistido. Se o usuário apagar os dados do aplicativo nas configurações do Drive, precisará informar a pasta novamente; os arquivos de progresso da pasta escolhida não são removidos pelo app.
+Se a autorização retornada no login incluir o acesso Drive já concedido, a recuperação do progresso acontece automaticamente. Se o Google solicitar nova permissão, o app recupera a pasta e oferece **Autorizar minha pasta**. Tokens de acesso ficam em memória; na produção, a renovação usa um cookie cifrado HttpOnly descrito em LOGIN_GOOGLE.md. Se o usuário apagar os dados do aplicativo nas configurações do Drive, precisará informar a pasta novamente; os arquivos de progresso da pasta escolhida não são removidos pelo app.
 
 ## Durante o estudo
 
@@ -48,7 +48,7 @@ Após conectar, o sistema localiza o arquivo `foco-progresso-<sub>-principal.jso
 
 Cada mudança é salva localmente imediatamente. Com autorização ativa, o envio ao Drive ocorre após 6 segundos de inatividade; concluir uma sessão também dispara uma sincronização. O botão Sincronizar permite executar o processo manualmente. Ao voltar ao site ou recuperar a rede, a sincronização é tentada enquanto o token continua válido.
 
-Após recarregar/abrir o site, é necessário entrar com Google novamente. Tokens são temporários e mantidos só em memória, seguindo o modelo de tokens da Google Identity Services. Ao expirar, o site mostra “Reconectar Drive”; os dados locais continuam salvos. Não existe envio em segundo plano com o navegador fechado.
+Após recarregar/abrir o site, é necessário entrar com Google novamente. Durante os estudos na produção Vercel, o token temporário é renovado automaticamente pelo backend antes de expirar; uma resposta 401 permite uma única renovação e repetição da requisição. Não há popup nem redirecionamento nessa renovação, e o progresso local e a questão atual são preservados. A credencial de renovação usa cookie cifrado HttpOnly/Secure por até 30 dias, renovado ao uso; não vai para o Drive nem para localStorage. Em hospedagem estática ou quando o Google exige nova permissão, o site mostra “Reconectar Drive”; os dados locais continuam salvos. Não existe envio em segundo plano com o navegador fechado.
 
 ## Arquivo único e migração (1.7.0)
 
@@ -86,7 +86,8 @@ Em **Meus bancos → Buscar no Drive**, o app lista arquivos JSON da pasta, excl
 | `origin_mismatch` | Autorize exatamente o domínio mostrado em Ajustes |
 | Acesso bloqueado pelo Google | Configure consentimento, escopo e usuário de teste |
 | Sem permissão na pasta | Conecte a conta proprietária ou com edição |
-| Token expirado | Clique Conectar Google Drive novamente |
+| Token de acesso expirado | Na produção Vercel, a renovação acontece automaticamente durante o uso |
+| Permissão revogada ou sessão de renovação vencida | Reconecte o Google Drive; o progresso local é preservado |
 | Popup bloqueado | Permita o popup e repita pelo botão |
 | Arquivo inválido | Não renomeie arquivos arbitrários como `foco-progresso-*` |
 | Falha de rede/cota | Preserve os dados locais e sincronize novamente após resolver |

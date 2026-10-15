@@ -39,7 +39,7 @@ export function googleReturnMessage(notice){
   return ({denied:'A autorização Google foi cancelada. Clique novamente para entrar.',account_mismatch:'A conta escolhida é diferente da conta conectada. Entre com a mesma conta para conectar o Drive.',permissions:'Autorize as permissões solicitadas para restaurar sua pasta e seus estudos.',invalid_request:'A entrada expirou ou não pôde ser confirmada. Clique novamente para entrar.'})[notice]||'Não foi possível concluir a entrada no Google. Tente novamente.';
 }
 export class GoogleAccount extends EventTarget{
-  constructor(clientId){super();this.clientId=clientId;this.profile=null;this.token=null;this.expires=0;this.scopes='';this.generation=0;this.canDrive=false;this.canAppData=false;this.prepared=new Map();this.redirectEnabled=false;}
+  constructor(clientId){super();this.clientId=clientId;this.profile=null;this.token=null;this.expires=0;this.scopes='';this.generation=0;this.canDrive=false;this.canAppData=false;this.canRefresh=false;this.refreshing=null;this.prepared=new Map();this.redirectEnabled=false;}
   async prepareRedirect(fetcher=fetch){
     this.redirectEnabled=false;const clientId=this.clientId;
     try{
@@ -59,8 +59,29 @@ export class GoogleAccount extends EventTarget{
     const pendingFolderId=result.pendingFolderId?parseFolder(result.pendingFolderId):undefined;
     if(generation!==this.generation)throw new Error('A entrada foi cancelada.');
     if(this.profile&&profile.sub!==this.profile.sub)throw new Error(googleReturnMessage('account_mismatch'));
-    this.profile=profile;this.token=result.token;this.expires=result.expires;this.scopes=result.scope||'';this.canDrive=result.canDrive===true;this.canAppData=result.canAppData===true;
-    return {profile,token:this.token,expires:this.expires,withDrive:result.withDrive===true,canDrive:this.canDrive,canAppData:this.canAppData,...(pendingFolderId?{pendingFolderId}:{})};
+    this.profile=profile;this.token=result.token;this.expires=result.expires;this.scopes=result.scope||'';this.canDrive=result.canDrive===true;this.canAppData=result.canAppData===true;this.canRefresh=result.canRefresh===true;
+    return {profile,token:this.token,expires:this.expires,withDrive:result.withDrive===true,canDrive:this.canDrive,canAppData:this.canAppData,canRefresh:this.canRefresh,...(pendingFolderId?{pendingFolderId}:{})};
+  }
+  async ensureAccess({force=false,fetcher=fetch}={}){
+    if(!this.profile)throw new Error('Entre com Google para conectar o Drive.');
+    if(!force&&this.token&&this.expires>Date.now()+60000)return {profile:this.profile,token:this.token,expires:this.expires,canDrive:this.canDrive,canAppData:this.canAppData};
+    if(this.refreshing)return this.refreshing;
+    const required=()=>Object.assign(new Error('Reconecte o Google Drive para renovar a autorização. Seus estudos continuam salvos neste dispositivo.'),{code:'AUTH_REAUTH_REQUIRED'});
+    if(!this.redirectEnabled||!this.canRefresh)throw required();
+    const generation=this.generation,subject=this.profile.sub;
+    const renewal=(async()=>{
+      const response=await fetcher('/api/auth/refresh',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({subject}),cache:'no-store',signal:AbortSignal.timeout(25000)});
+      if(generation!==this.generation||this.profile?.sub!==subject)throw new Error('A conta conectada mudou. Seus dados locais foram preservados.');
+      if(!response.ok){if(response.status===401){this.canRefresh=false;throw required();}throw new Error('Não foi possível renovar o Drive agora. Seus estudos estão salvos; tentaremos novamente na próxima sincronização.');}
+      const result=(await response.json()).authorization;
+      const profile=normalizeGoogleProfile(result?.profile);
+      if(profile.sub!==subject||typeof result.token!=='string'||!result.token||!Number.isFinite(result.expires)||result.expires<=Date.now()+10000)throw required();
+      if(generation!==this.generation||this.profile?.sub!==subject)throw new Error('A conta conectada mudou. Seus dados locais foram preservados.');
+      this.token=result.token;this.expires=result.expires;this.scopes=result.scope||'';this.canDrive=result.canDrive===true;this.canAppData=result.canAppData===true;
+      return {profile:this.profile,token:this.token,expires:this.expires,canDrive:this.canDrive,canAppData:this.canAppData};
+    })();
+    this.refreshing=renewal;
+    try{return await renewal;}finally{if(this.refreshing===renewal)this.refreshing=null;}
   }
   prepareAuthorization(withDrive=false){
     if(this.redirectEnabled)return;
@@ -103,5 +124,9 @@ export class GoogleAccount extends EventTarget{
     this.profile=profile;this.token=response.access_token;this.expires=Date.now()+Number(response.expires_in)*1000;this.scopes=response.scope||'';this.canDrive=google.accounts.oauth2.hasGrantedAllScopes(response,DRIVE_SCOPE);this.canAppData=google.accounts.oauth2.hasGrantedAllScopes(response,APPDATA_SCOPE);
     return {profile,token:this.token,expires:this.expires,withDrive,canDrive:this.canDrive,canAppData:this.canAppData};
   }
-  signOut(){this.generation++;this.prepared.clear();this.profile=null;this.token=null;this.expires=0;this.scopes='';this.canDrive=false;this.canAppData=false;}
+  signOut(){
+    const pending=this.refreshing,clearSession=this.redirectEnabled;
+    this.generation++;this.prepared.clear();this.profile=null;this.token=null;this.expires=0;this.scopes='';this.canDrive=false;this.canAppData=false;this.canRefresh=false;this.refreshing=null;
+    if(clearSession)return Promise.resolve(pending).catch(()=>{}).then(()=>fetch('/api/auth/logout',{method:'POST',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)})).catch(()=>{});
+  }
 }

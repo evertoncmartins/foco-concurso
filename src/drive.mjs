@@ -48,14 +48,30 @@ export class DriveSync extends EventTarget {
   disconnect(){this.generation++;this.token=null;this.expires=0;this.folder=null;clearTimeout(this.timer);this.setStatus('local','Drive desconectado. O progresso continua salvo neste dispositivo.');}
   close(){this.closed=true;this.settings?.close();this.disconnect();}
   async request(url,options={}) {
-    if(!this.token||Date.now()>=this.expires-10000){this.token=null;this.setStatus('expired','Entre novamente no Google para sincronizar.');throw new Error('A autorização do Google expirou. O progresso local está salvo.');}
     if(this.closed)throw new Error('A sessão foi encerrada.');
-    const generation=this.generation;
-    const response=await fetch(url,{...options,cache:'no-store',signal:AbortSignal.timeout(30000),headers:{...options.headers,Authorization:`Bearer ${this.token}`}});
-    if(this.closed)throw new Error('A sessão foi encerrada.');
-    if(generation!==this.generation)throw new Error('A conexão com o Drive mudou. Os dados locais foram preservados.');
-    if(!response.ok){if(response.status===401){this.token=null;this.setStatus('expired');}const error=new Error(response.status===403?'Sem permissão no Drive ou cota excedida. Verifique a conta e a configuração OAuth.':`Google Drive: falha ${response.status}. O progresso local continua salvo.`);error.status=response.status;throw error;}
-    return JSON.parse((await response.text()).replace(/^\uFEFF/,''));
+    const generation=this.generation,subject=this.account?.profile?.sub;
+    const unchanged=()=>{
+      if(this.closed||generation!==this.generation||this.account&&this.account.profile?.sub!==subject)throw new Error('A conexão com o Drive mudou. Os dados locais foram preservados.');
+    };
+    const access=async force=>{
+      if(!this.account?.ensureAccess)return;
+      const result=await this.account.ensureAccess({force});unchanged();
+      if(this.userId&&result.profile.sub!==this.userId)throw new Error('A conta Google não corresponde ao perfil conectado.');
+      if(!result.canDrive)throw Object.assign(new Error('Reconecte o Drive para autorizar seus arquivos. Seu progresso local foi preservado.'),{code:'AUTH_REAUTH_REQUIRED'});
+      this.token=result.token;this.expires=result.expires;
+    };
+    try{
+      if(!this.token)throw Object.assign(new Error('Reconecte o Google Drive. Seu progresso local está salvo.'),{code:'AUTH_REAUTH_REQUIRED'});
+      await access(false);unchanged();
+      if(Date.now()>=this.expires-10000)throw Object.assign(new Error('A autorização do Google expirou. O progresso local está salvo.'),{code:'AUTH_REAUTH_REQUIRED'});
+      for(let attempt=0;attempt<2;attempt++){
+        const token=this.token;
+        const response=await fetch(url,{...options,cache:'no-store',signal:AbortSignal.timeout(30000),headers:{...options.headers,Authorization:`Bearer ${token}`}});unchanged();
+        if(response.status===401&&attempt===0&&this.account?.ensureAccess){await access(this.account.token===token);continue;}
+        if(!response.ok){const error=new Error(response.status===403?'Sem permissão no Drive ou cota excedida. Verifique a conta e a configuração OAuth.':`Google Drive: falha ${response.status}. O progresso local continua salvo.`);error.status=response.status;if(response.status===401)error.code='AUTH_REAUTH_REQUIRED';throw error;}
+        return JSON.parse((await response.text()).replace(/^\uFEFF/,''));
+      }
+    }catch(error){if(error.code==='AUTH_REAUTH_REQUIRED'&&generation===this.generation&&!this.closed){this.token=null;this.setStatus('expired',error.message);}throw error;}
   }
   async list(query){
     const result=[];let pageToken;
