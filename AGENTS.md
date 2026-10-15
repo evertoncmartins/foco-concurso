@@ -15,6 +15,7 @@
 - Aplique o mesmo padrão na tela Banco de questões e nos cards do início. Não force o nome de uma única lei em bancos mistos ou sem identificação segura, nem altere IDs, nomes originais exportados ou progresso.
 - Preserve o design minimalista, os resumos de questões/instituições/período e as ações existentes. Exiba descrição breve, assuntos e origens em Ver mais detalhes; não coloque implementação ou curadoria na interface.
 - Reutilize `bankPresentation` em `src/bank-view.mjs` para evitar divergências entre os cards.
+- Na configuração de uma sessão, reutilize os mesmos títulos e subtítulos dos cards. Não exponha os nomes técnicos originais no seletor de bancos nem altere IDs para padronizar a apresentação.
 
 ## Reinício de estudos
 

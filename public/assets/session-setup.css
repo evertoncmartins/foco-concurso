@@ -1,0 +1,59 @@
+dialog:has(.session-setup){width:calc(100% - 32px);max-width:680px;padding:0;max-height:calc(100dvh - 32px);overflow:hidden}
+.session-setup{display:flex;flex-direction:column;max-height:calc(100dvh - 34px);min-height:0;text-align:left}
+.session-setup-header{display:flex;justify-content:space-between;align-items:start;gap:20px;padding:28px 28px 22px;flex-shrink:0}
+.setup-eyebrow{display:block;font-size:10px;letter-spacing:1.5px;font-weight:650;color:var(--detail-blue);margin-bottom:9px}
+.session-setup-header h2{font-size:26px;font-weight:550;line-height:1.25;letter-spacing:-.6px}
+.session-setup-header p{font-size:12px;color:var(--muted);margin-top:8px}
+.setup-close{width:34px;height:34px;border:0;background:transparent;border-radius:8px}
+.session-setup-content{overflow-y:auto;overscroll-behavior:contain;min-height:0;padding:0 28px 24px;scrollbar-gutter:stable}
+.setup-controls{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:end}
+.session-setup .field{margin:0;min-width:0;gap:8px}
+.session-setup .field label{font-size:12px}
+.session-setup .field select,.session-setup .field input{font-size:13px;min-height:46px}
+.setup-mode-description{color:var(--muted);font-size:11px;line-height:1.7;margin:10px 0 24px}
+.setup-banks{margin:0;padding:0;border:0;min-width:0}
+.setup-banks legend{padding:0;font-size:13px;font-weight:600}
+.setup-section-note{font-size:11px;color:var(--muted);margin:3px 0 12px}
+.setup-bank-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.session-setup .setup-bank-choice{margin:0;padding:16px;gap:12px;align-items:start;cursor:pointer;min-width:0;border-radius:11px;background:var(--bg);transition:border-color .15s,background .15s}
+.setup-bank-choice:hover{border-color:var(--muted)}
+.setup-bank-choice:has(input:checked){background:var(--tint);border-color:var(--accent)}
+.setup-bank-choice:focus-within{outline:2px solid var(--coral);outline-offset:3px}
+.setup-bank-choice input{width:17px;height:17px;margin:3px 0 0;flex-shrink:0;cursor:pointer}
+.setup-bank-copy{display:flex;flex-direction:column;min-width:0;flex:1;overflow-wrap:anywhere;line-height:1.5}
+.setup-bank-copy strong{font-size:14px;font-weight:600}
+.setup-bank-choice:has(input:checked) strong{color:var(--accent)}
+.session-setup .setup-bank-subtitle{font-size:11px;color:var(--muted);margin-top:5px}
+.session-setup .setup-bank-copy small{font-size:10px;color:var(--detail-blue);margin:12px 0 0}
+.setup-filters{margin-top:22px;border-top:1px solid var(--border)}
+.setup-filters summary{display:flex;align-items:center;gap:9px;padding:17px 0 0;min-height:44px;cursor:pointer;list-style:none;font-size:12px;color:var(--text)}
+.setup-filters summary::-webkit-details-marker{display:none}
+.setup-optional{font-size:10px;color:var(--muted);margin-left:auto}
+.setup-chevron{color:var(--muted);transition:transform .15s}
+.setup-filters[open] .setup-chevron{transform:rotate(180deg)}
+.setup-filter-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px}
+.setup-filter-fields .field:last-child{grid-column:1/-1}
+.session-setup-footer{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-shrink:0;padding:19px 28px;border-top:1px solid var(--border);background:var(--surface)}
+.setup-summary{display:grid;gap:3px;min-width:0}
+.setup-summary strong{font-size:14px;font-weight:600;line-height:1.4}
+.setup-summary>span{font-size:10px;color:var(--muted)}
+.setup-footer-actions{display:flex;gap:9px;align-items:center;flex-shrink:0}
+.setup-footer-actions .btn{min-height:44px;white-space:nowrap}
+@media(max-width:600px){
+  dialog:has(.session-setup){width:calc(100% - 24px);max-height:calc(100dvh - 24px)}
+  .session-setup{max-height:calc(100dvh - 26px)}
+  .session-setup-header{padding:22px 20px 20px;gap:12px}
+  .session-setup-header h2{font-size:23px}
+  .session-setup-content{padding:0 20px 20px;scrollbar-gutter:auto}
+  .setup-controls{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px}
+  .session-setup .field label{font-size:11px}
+  .session-setup .field select,.session-setup .field input{padding-inline:10px;font-size:13px}
+  .setup-bank-grid{grid-template-columns:1fr;gap:10px}
+  .session-setup .setup-bank-choice{padding:14px}
+  .setup-bank-copy strong{font-size:14px}
+  .session-setup .setup-bank-copy small{margin-top:7px}
+  .setup-filter-fields{grid-template-columns:1fr;gap:14px}
+  .session-setup-footer{padding:16px 20px max(16px,env(safe-area-inset-bottom));flex-direction:column;align-items:stretch;gap:14px}
+  .setup-footer-actions{display:grid;grid-template-columns:1fr 1.6fr;gap:10px}
+}
+@media(prefers-reduced-motion:reduce){.session-setup .setup-bank-choice,.setup-chevron{transition:none}}
