@@ -9,22 +9,75 @@ const profile={sub:'111',email:'test@example.test',email_verified:true,name:'Tes
 const scope=`${IDENTITY_SCOPES} ${APPDATA_SCOPE} ${DRIVE_SCOPE}`;
 function fixture(options={}){
   let now=Date.now();const calls=[];
-  const fetcher=async(url,init)=>{calls.push({url,init});if(options.networkError)throw new Error('provider detail');return url.endsWith('/token')?Response.json({access_token:'fixture-access-token',refresh_token:'must-not-persist',expires_in:3600,scope:options.scope??scope},{status:options.tokenStatus??200}):Response.json(options.profile??profile);};
+  const fetcher=async(url,init)=>{calls.push({url,init});if(options.networkError)throw new Error('provider detail');if(url.endsWith('/token')){
+    const renewing=init.body.get('grant_type')==='refresh_token';
+    return Response.json(renewing?options.refreshResponse??{access_token:'fixture-renewed-token',expires_in:3600,scope:options.scope??scope}:{access_token:'fixture-access-token',...(options.noRefresh?{}:{refresh_token:'must-not-persist'}),expires_in:3600,scope:options.scope??scope},{status:renewing?options.refreshStatus??200:options.tokenStatus??200});
+  }return Response.json(options.profile??profile);};
   const handler=action=>createAuthHandler(action,{env:{...env,...options.env},fetcher,clock:()=>now});
   const request=(path,init={})=>new Request(`${origin}${path}`,init);
   const cookieHeader=response=>response.headers.getSetCookie().map(c=>c.split(';')[0]).filter(c=>!c.endsWith('=')).join('; ');
   const start=async(query='')=>{const response=await handler('start')(request(`/api/auth/start${query}`,{headers:{'sec-fetch-site':'same-origin'}}));return {response,cookie:cookieHeader(response),target:new URL(response.headers.get('location'))};};
   const callback=async(flow,query='code=fixture-code')=>handler('callback')(request(`/api/auth/callback?state=${flow.target.searchParams.get('state')}&${query}`,{headers:{cookie:flow.cookie}}));
   const session=async(response,headers={})=>handler('session')(request('/api/auth/session',{method:'POST',headers:{origin,cookie:cookieHeader(response),...headers}}));
-  return {calls,handler,request,start,callback,session,cookieHeader,advance(ms){now+=ms;}};
+  const refresh=(returned,subject='111',headers={})=>handler('refresh')(request('/api/auth/refresh',{method:'POST',headers:{origin,cookie:cookieHeader(returned),...headers},body:JSON.stringify({subject})}));
+  return {calls,handler,request,start,callback,session,refresh,cookieHeader,advance(ms){now+=ms;}};
 }
+
+test('acesso offline renova após uma hora com cookie cifrado de 30 dias sem expor o refresh token',async()=>{
+  const f=fixture(),flow=await f.start('?drive=1'),returned=await f.callback(flow);
+  assert.equal(flow.target.searchParams.get('access_type'),'offline');assert(flow.target.searchParams.get('prompt').includes('consent'));
+  const persistent=returned.headers.getSetCookie().find(c=>c.startsWith('__Host-foco-drive-session='));
+  assert.match(persistent,/Max-Age=2592000; HttpOnly; Secure; SameSite=Lax/);assert(!persistent.includes('must-not-persist'));
+  f.advance(61*60*1000);const response=await f.refresh(returned),auth=(await response.json()).authorization;
+  assert.equal(response.status,200);assert.equal(auth.token,'fixture-renewed-token');assert.equal(auth.profile.sub,'111');assert(auth.canRefresh);
+  assert(!JSON.stringify(auth).includes('must-not-persist'));assert(!response.headers.getSetCookie()[0].includes('must-not-persist'));
+  const refreshCall=f.calls.find(c=>c.init.body?.get('grant_type')==='refresh_token');assert.equal(refreshCall.init.body.get('refresh_token'),'must-not-persist');assert.equal(refreshCall.init.body.get('client_secret'),env.GOOGLE_CLIENT_SECRET);
+  assert.match(response.headers.get('cache-control'),/no-store/);
+});
+
+test('renovação recusa origem, conta, método, cookie adulterado e sessão vencida antes de chamar Google',async()=>{
+  const f=fixture(),returned=await f.callback(await f.start());const count=f.calls.length;
+  assert.equal((await f.refresh(returned,'222')).status,409);
+  assert.equal((await f.refresh(returned,'111',{origin:'https://evil.test'})).status,403);
+  assert.equal((await f.refresh(returned,'111',{'sec-fetch-site':'cross-site'})).status,403);
+  assert.equal((await f.handler('refresh')(f.request('/api/auth/refresh'))).status,405);
+  const cookie=f.cookieHeader(returned).replace(/(__Host-foco-drive-session=)[^;]+/,'$1invalid');
+  assert.equal((await f.refresh(returned,'111',{cookie})).status,401);
+  f.advance(31*24*60*60*1000);assert.equal((await f.refresh(returned)).status,401);assert.equal(f.calls.length,count);
+});
+
+test('revogação limpa só a sessão de renovação, enquanto falhas transitórias preservam a credencial',async()=>{
+  const options={},f=fixture(options),returned=await f.callback(await f.start());
+  options.refreshStatus=503;options.refreshResponse={error:'temporarily_unavailable'};
+  let response=await f.refresh(returned);assert.equal(response.status,503);assert.equal(response.headers.getSetCookie().length,0);
+  options.refreshStatus=400;options.refreshResponse={error:'invalid_grant',error_description:'private provider detail'};
+  response=await f.refresh(returned);assert.equal(response.status,401);assert.match(response.headers.getSetCookie()[0],/Max-Age=0/);assert(!JSON.stringify(await response.json()).includes('private provider detail'));
+});
+
+test('renovação confere identidade, preserva refresh token ausente e aceita rotação sem expor a credencial',async()=>{
+  const options={},f=fixture(options),returned=await f.callback(await f.start());
+  let renewed=await f.refresh(returned);assert.equal(renewed.status,200);
+  await f.refresh(renewed);assert.equal(f.calls.filter(c=>c.init.body?.get('grant_type')==='refresh_token').at(-1).init.body.get('refresh_token'),'must-not-persist');
+  options.refreshResponse={access_token:'next-access',expires_in:3600,scope,refresh_token:'fixture-rotated-renewal'};
+  renewed=await f.refresh(renewed);assert(!JSON.stringify(await renewed.clone().json()).includes('fixture-rotated-renewal'));
+  await f.refresh(renewed);assert.equal(f.calls.filter(c=>c.init.body?.get('grant_type')==='refresh_token').at(-1).init.body.get('refresh_token'),'fixture-rotated-renewal');
+  options.profile={...profile,sub:'222'};assert.equal((await f.refresh(renewed)).status,401);
+});
+
+test('logout elimina cookies deste navegador e exige POST da mesma origem',async()=>{
+  const f=fixture(),returned=await f.callback(await f.start());
+  let response=await f.handler('logout')(f.request('/api/auth/logout',{method:'POST',headers:{origin,cookie:f.cookieHeader(returned)}}));
+  assert.equal(response.status,200);assert.equal(response.headers.getSetCookie().length,3);assert(response.headers.getSetCookie().every(c=>c.includes('Max-Age=0')));
+  assert.equal((await f.handler('logout')(f.request('/api/auth/logout'))).status,405);
+  assert.equal((await f.handler('logout')(f.request('/api/auth/logout',{method:'POST',headers:{origin:'https://evil.test'}}))).status,403);
+});
 test('status only enables the configured production origin and exposes no secret',async()=>{
   const f=fixture();const ready=await f.handler('status')(f.request('/api/auth/status'));assert.deepEqual(await ready.json(),{enabled:true,clientId:env.GOOGLE_CLIENT_ID});assert.match(ready.headers.get('cache-control'),/no-store/);
   for(const overrides of [{GOOGLE_CLIENT_SECRET:''},{GOOGLE_REDIRECT_ENABLED:'false'},{GOOGLE_AUTH_ORIGIN:'http://localhost'}]){const disabled=fixture({env:overrides});assert.deepEqual(await (await disabled.handler('status')(disabled.request('/api/auth/status'))).json(),{enabled:false});}
   assert.deepEqual(await (await f.handler('status')(new Request('https://preview.vercel.app/api/auth/status'))).json(),{enabled:false});
 });
 test('start redirects to Google with PKCE and protected cookies, rejecting cross-site starts',async()=>{
-  const f=fixture(),flow=await f.start();assert.equal(flow.response.status,303);assert.equal(flow.target.origin,'https://accounts.google.com');assert.equal(flow.target.searchParams.get('redirect_uri'),`${origin}/api/auth/callback`);assert.equal(flow.target.searchParams.get('response_type'),'code');assert.equal(flow.target.searchParams.get('code_challenge_method'),'S256');assert.equal(flow.target.searchParams.get('access_type'),'online');assert(!flow.target.href.includes(env.GOOGLE_CLIENT_SECRET));
+  const f=fixture(),flow=await f.start();assert.equal(flow.response.status,303);assert.equal(flow.target.origin,'https://accounts.google.com');assert.equal(flow.target.searchParams.get('redirect_uri'),`${origin}/api/auth/callback`);assert.equal(flow.target.searchParams.get('response_type'),'code');assert.equal(flow.target.searchParams.get('code_challenge_method'),'S256');assert.equal(flow.target.searchParams.get('access_type'),'offline');assert(!flow.target.href.includes(env.GOOGLE_CLIENT_SECRET));
   assert.match(flow.response.headers.getSetCookie()[0],/HttpOnly; Secure; SameSite=Lax/);assert.match(flow.response.headers.getSetCookie()[0],/Max-Age=600/);assert(!flow.cookie.includes('state'));assert(!flow.cookie.includes('fixture-access-token'));
   assert.equal((await f.handler('start')(f.request('/api/auth/start',{headers:{'sec-fetch-site':'cross-site'}}))).status,403);
   assert.equal((await f.handler('start')(f.request('/api/auth/start?drive=1&folder=https://evil.test/'))).status,400);

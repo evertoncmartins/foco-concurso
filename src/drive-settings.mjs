@@ -22,14 +22,20 @@ export class DriveSettings extends EventTarget{
   close(){this.closed=true;}
   pending(){const raw=this.storage.getItem(PENDING_KEY);if(!raw)return null;const batch=JSON.parse(raw);validate(batch.document,this.subject);if(typeof batch.id!=='string'||!batch.id||!(batch.baseId===null||typeof batch.baseId==='string'))throw new Error('Configuração pendente inválida.');return batch;}
   async request(url,options={}){
-    const account=this.account,generation=account.generation,token=account.token;
+    const account=this.account,generation=account.generation;
     if(this.closed||account.profile?.sub!==this.subject)throw new Error('A sessão da configuração foi encerrada.');
-    if(!account.canAppData)throw new Error('Autorize a configuração privada do Drive para recuperar sua pasta automaticamente.');
-    if(!token||Date.now()>=account.expires-10000)throw new Error('Entre novamente com Google para sincronizar a configuração da pasta.');
-    const response=await fetch(url,{...options,cache:'no-store',signal:AbortSignal.timeout(30000),headers:{...options.headers,Authorization:`Bearer ${token}`}});
-    if(this.closed||account.generation!==generation||account.token!==token||account.profile?.sub!==this.subject)throw new Error('A conta conectada mudou. A configuração local foi preservada.');
-    if(!response.ok){const e=new Error(response.status===403?'O Google não permitiu acessar a configuração privada. Autorize novamente e confira o escopo drive.appdata.':`Configuração da pasta: falha ${response.status}. Sua escolha local foi preservada.`);e.status=response.status;throw e;}
-    return response.json();
+    const unchanged=()=>{if(this.closed||account.generation!==generation||account.profile?.sub!==this.subject)throw new Error('A conta conectada mudou. A configuração local foi preservada.');};
+    unchanged();
+    if(account.ensureAccess)await account.ensureAccess();unchanged();
+    for(let attempt=0;attempt<2;attempt++){
+      const token=account.token;
+      if(!account.canAppData)throw new Error('Autorize a configuração privada do Drive para recuperar sua pasta automaticamente.');
+      if(!token||Date.now()>=account.expires-10000)throw new Error('Entre novamente com Google para sincronizar a configuração da pasta.');
+      const response=await fetch(url,{...options,cache:'no-store',signal:AbortSignal.timeout(30000),headers:{...options.headers,Authorization:`Bearer ${token}`}});unchanged();
+      if(response.status===401&&attempt===0&&account.ensureAccess){await account.ensureAccess({force:account.token===token});unchanged();continue;}
+      if(!response.ok){const e=new Error(response.status===403?'O Google não permitiu acessar a configuração privada. Autorize novamente e confira o escopo drive.appdata.':`Configuração da pasta: falha ${response.status}. Sua escolha local foi preservada.`);e.status=response.status;throw e;}
+      return response.json();
+    }
   }
   async readLatest(){
     let pageToken;const files=[];

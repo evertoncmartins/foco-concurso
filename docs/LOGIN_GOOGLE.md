@@ -40,7 +40,7 @@ A opção “Configuração do responsável” permite validar outro ID nesse na
 6. Estudar. O salvamento local é imediato e o Drive recebe lotes imutáveis de alterações.
 7. Sair encerra a sessão em memória e retira os dados da tela; a cópia local daquela conta continua preservada para a próxima entrada.
 
-Após recarregar, é necessário entrar novamente. Não há tokens no armazenamento local nem sessão permanente de servidor. O redirecionamento usa cookies temporários criptografados somente para concluir uma entrada. A configuração da pasta é recuperada com `drive.appdata`, mesmo em um navegador sem histórico local. Se o Google já concedeu o escopo Drive, a autorização retornada no login é reutilizada para recuperar o histórico. Caso contrário, a autorização adicional ocorre pelo botão da pasta.
+Após recarregar, é necessário entrar novamente. Tokens de acesso não ficam no armazenamento local. O redirecionamento usa cookies temporários criptografados para concluir a entrada e um cookie cifrado HttpOnly/Secure de renovação por até 30 dias, renovados ao uso. Esse cookie não faz login automático após recarregar: o usuário ainda escolhe sua conta na entrada. A configuração da pasta é recuperada com `drive.appdata`, mesmo em um navegador sem histórico local. Se o Google já concedeu o escopo Drive, a autorização retornada no login é reutilizada para recuperar o histórico. Caso contrário, a autorização adicional ocorre pelo botão da pasta.
 
 ## Separação dos dados
 
@@ -60,7 +60,7 @@ Arquivos antigos sem identificação de conta não são carregados automaticamen
 
 ## Limites e verificação
 
-O servidor não mantém banco de progresso nem APIs próprias de progresso. Quando o redirecionamento está ativado, as funções de autenticação no Vercel processam temporariamente código, perfil e token; verificam estado, PKCE e identidade, e usam cookies criptografados HttpOnly para concluir o retorno. A identidade e as permissões de arquivos são verificadas pelas APIs Google. O token é entregue somente em um POST da mesma origem e o cookie de entrega é apagado na resposta. Não há refresh tokens armazenados nem sessão permanente no servidor.
+O servidor não mantém banco de progresso nem APIs próprias de progresso. Quando o redirecionamento está ativado, as funções de autenticação no Vercel processam temporariamente código, perfil e token; verificam estado, PKCE e identidade, e usam cookies criptografados HttpOnly para concluir o retorno. A identidade e as permissões de arquivos são verificadas pelas APIs Google. O token é entregue somente em um POST da mesma origem e o cookie de entrega é apagado na resposta. A credencial de renovação é processada somente no backend e fica em cookie cifrado HttpOnly/Secure por até 30 dias, renovados ao uso. Não há banco central de sessões nem credenciais nos arquivos de progresso.
 
 O cache local não é criptografado. Separação por conta impede mistura no uso normal da interface; não protege contra alguém que controla fisicamente o mesmo perfil do navegador e inspeciona seu armazenamento. Use seu perfil pessoal em dispositivos compartilhados.
 
@@ -105,8 +105,16 @@ O ID público já está em `public/app-config.json`. `PUBLIC_GOOGLE_CLIENT_ID` p
 
 `GET /api/auth/status` deve retornar `enabled: true` no domínio principal depois da ativação. Sem segredo, sem a flag ou em outra origem, retorna `enabled: false` e o frontend mantém a janela Google. Não habilite a flag antes de cadastrar a URI, pois o servidor não consegue consultar essa configuração do Console.
 
-O início gera estado e PKCE S256, com cookie HttpOnly/Secure/SameSite=Lax de até 10 minutos. O retorno valida o estado, troca o código com o segredo no servidor, confere o perfil no UserInfo e recusa troca de conta ao autorizar o Drive. Um cookie criptografado de até 2 minutos entrega a autorização via POST da mesma origem e é removido imediatamente. O token fica em memória no navegador; não é colocado na URL, em `localStorage`, em arquivos JSON ou em logs próprios. Nenhum token de renovação é mantido.
+O início gera estado e PKCE S256, com cookie HttpOnly/Secure/SameSite=Lax de até 10 minutos. O retorno valida o estado, troca o código com o segredo no servidor, confere o perfil no UserInfo e recusa troca de conta ao autorizar o Drive. Um cookie criptografado de até 2 minutos entrega a autorização via POST da mesma origem e é removido imediatamente. O token fica em memória no navegador; não é colocado na URL, em `localStorage`, em arquivos JSON ou em logs próprios. O acesso offline solicita uma credencial de renovação, mantida somente no cookie cifrado HttpOnly/Secure de até 30 dias. Ela nunca é entregue ao JavaScript. O endpoint POST /api/auth/refresh exige mesma origem e a conta esperada, confere novamente a identidade no Google e devolve somente uma autorização temporária. Sair chama POST /api/auth/logout para apagar os cookies de autenticação.
 
 A autorização adicional da pasta também usa o redirecionamento. O ID da pasta escolhida e a conta esperada são preservados no cookie criptografado; ao retornar, o Foco valida a pasta e restaura os estudos antes de liberar a tela. Cancelamento, estado inválido, permissão negada ou conta diferente retornam à entrada com orientação para repetir o acesso. Os testes utilizam respostas simuladas; o consentimento Google real ainda depende da configuração acima.
 
 Referências: [Google: modelo de código e redirecionamento](https://developers.google.com/identity/oauth2/web/guides/use-code-model), [Google: fluxo OAuth para servidor](https://developers.google.com/identity/protocols/oauth2/web-server), [Vercel: funções Node.js na pasta api](https://vercel.com/docs/functions/runtimes/node-js).
+
+## Versão 1.15.0 — estudos longos
+
+A expiração comum do token de acesso não deve interromper uma sessão de questões. Drive e configuração privada compartilham uma renovação em andamento e usam o token atual antes de cada requisição. Um 401 admite só uma renovação e repetição. Falhas de rede preservam a credencial e os dados para a próxima tentativa; invalid_grant requer reconexão manual e não encerra a sessão de estudo. Retornos tardios após sair ou desconectar não reativam a conexão.
+
+Usuários com a autorização antiga precisam entrar/conectar o Google uma vez após a atualização para conceder o acesso offline. Não é necessário criar outro cliente OAuth nem trocar origens, URIs ou segredos. O Google pode revogar ou limitar a autorização, inclusive em projetos em teste ou por políticas institucionais; não há promessa de sessão ilimitada. O fallback estático por popup mantém a renovação manual.
+
+Referências: https://developers.google.com/identity/protocols/oauth2/web-server#offline e https://developers.google.com/identity/protocols/oauth2#expiration.
