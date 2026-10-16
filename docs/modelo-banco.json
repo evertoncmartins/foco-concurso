@@ -1,37 +1,79 @@
 {
   "schemaVersion": 1,
   "id": "meu-banco",
-  "name": "Nome do meu banco",
-  "description": "Descreva o conteúdo deste banco.",
+  "name": "Meu banco de Direito Administrativo",
+  "description": "Exemplo completo: questão adaptada do IFSP sobre garantias no PAD. Substitua o conteúdo e as fontes ao criar outras questões.",
   "questions": [
     {
-      "id": "questao-001",
-      "discipline": "Nome da disciplina",
-      "subject": "Nome do assunto",
-      "topic": "Nome do tópico",
-      "statement": "Escreva aqui o enunciado da questão.",
+      "id": "ifsp-2026-analista-ti-q13",
+      "instituicao": "IFSP",
+      "ano": 2026,
+      "tag": "IFSP-2026",
+      "banca": "IFSP — Comissão Organizadora do Concurso",
+      "cargo": "Analista de Tecnologia da Informação: Desenvolvimento de Sistemas",
+      "nivelCargo": "Superior; classificação E",
+      "subject": "Regime disciplinar",
+      "topic": "PAD: defesa, comissão e revisão",
+      "difficulty": "medium",
+      "statement": "Sobre o processo administrativo disciplinar da Lei nº 8.112/1990, escolha a afirmação correta.",
       "options": [
         {
           "id": "A",
-          "text": "Texto da alternativa A."
+          "text": "Familiares do acusado até o terceiro grau podem integrar a comissão de sindicância ou inquérito."
         },
         {
           "id": "B",
-          "text": "Texto da alternativa B."
+          "text": "Mesmo com fatos novos, a revisão depende de pedido e nunca pode ocorrer de ofício."
         },
         {
           "id": "C",
-          "text": "Texto da alternativa C."
+          "text": "O acusado pode acompanhar o processo diretamente ou por procurador, apresentar testemunhas e provas e formular quesitos periciais."
         },
         {
           "id": "D",
-          "text": "Texto da alternativa D."
+          "text": "O acusado pode designar os três servidores estáveis da comissão, exigindo-se o mesmo cargo e carreira ou escolaridade equivalente."
         }
       ],
-      "correctOption": "A",
-      "explanation": "A: explique por que esta alternativa está correta.\n\nB: explique por que esta alternativa está incorreta.\n\nC: comente esta alternativa.\n\nD: comente esta alternativa.",
-      "difficulty": "easy",
-      "tags": []
+      "correctOption": "C",
+      "explanation": "O processo disciplinar exige comissão imparcial e garante ao acusado participação na produção da prova. A revisão pode ocorrer a qualquer tempo, inclusive de ofício, quando surgirem fatos novos ou circunstâncias que justifiquem rever a penalidade.",
+      "fundamentoLegal": "Lei nº 8.112/1990, arts. 149, caput e § 2º; 156; e 174, caput.",
+      "fonte": {
+        "prova": "https://concursopublico.ifsp.edu.br/sites/default/files/arquivos/caderno-questoes-analista-ti-edital-253-2025.pdf",
+        "gabarito": "https://concursopublico.ifsp.edu.br/sites/default/files/arquivos/comunicado-5-2026-conc-ifsp-gabarito-definitivo.pdf",
+        "edital": "253/2025",
+        "questaoOriginal": 13,
+        "paginaProva": 7,
+        "dataProva": "2026-01-25",
+        "gabaritoOriginal": "C",
+        "consultaEm": "2026-10-14",
+        "statusGabarito": "Definitivo",
+        "editalDocumento": "https://concursopublico.ifsp.edu.br/sites/default/files/arquivos/edital-253-2025.pdf",
+        "editalUrl": "https://concursopublico.ifsp.edu.br/editais/edital-2532025-t%C3%A9cnico-administrativos",
+        "paginaGabarito": 1,
+        "observacao": "Revisão e unificação em 14/10/2026: conteúdo delimitado aos Títulos I a V. A situação documental registrada no levantamento anterior foi preservada; esta revisão não a transforma em nova confirmação oficial."
+      },
+      "discipline": "Direito Administrativo",
+      "tipo": "Adaptada de prova oficial",
+      "tags": [
+        "IFSP-2026",
+        "Lei 8.112/1990",
+        "TAE",
+        "PAD: defesa, comissão e revisão",
+        "Lei nº 8.112/1990",
+        "Título V",
+        "Lei 8.112/1990 — art. 149"
+      ],
+      "reference": {
+        "label": "Lei nº 8.112/1990 — texto compilado oficial vigente, consultado em 14/10/2026",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l8112compilado.htm"
+      },
+      "atualizacaoLegislativa": "Gabarito mantido à luz da legislação vigente consultada em 10/10/2026.",
+      "optionExplanations": {
+        "A": "O cônjuge, o companheiro e os parentes consanguíneos ou afins do acusado, em linha reta ou colateral, até o terceiro grau, não podem integrar comissão de sindicância ou inquérito. É impedimento expresso do art. 149, § 2º.",
+        "B": "A revisão não depende sempre de pedido: pode ser requerida ou instaurada de ofício, a qualquer tempo, diante dos pressupostos legais. O art. 174, caput, admite fatos novos ou circunstâncias que justifiquem inocência ou inadequação da penalidade.",
+        "C": "O art. 156 assegura acompanhamento pessoal ou por procurador, apresentação e reinquirição de testemunhas, produção de provas e contraprovas e formulação de quesitos em perícia. A alternativa descreve garantias de defesa.",
+        "D": "Quem designa os três servidores estáveis é a autoridade competente, não o acusado. O art. 149, caput, exige do presidente cargo efetivo de nível superior ou igual, ou escolaridade igual ou superior à do indiciado; não exige a mesma carreira de todos."
+      }
     }
   ]
 }

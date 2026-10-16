@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://foco-concursos.example/schemas/questions-v1.json",
+  "$id": "https://foco-concurso-wine.vercel.app/docs/questions.schema.json",
   "title": "Foco — Banco de questões v1",
   "type": "object",
   "required": [
@@ -94,8 +94,12 @@
               },
               "text": {
                 "anyOf": [
-                  { "$ref": "#/$defs/longText" },
-                  { "type": "number" }
+                  {
+                    "$ref": "#/$defs/longText"
+                  },
+                  {
+                    "type": "number"
+                  }
                 ],
                 "description": "Texto não vazio sem limite de caracteres. Números são aceitos na importação e normalizados para texto."
               }
@@ -243,8 +247,70 @@
               "minLength": 1
             }
           }
+        },
+        "optionExplanations": {
+          "type": "object",
+          "description": "Justificativa individual por ID de alternativa. Opcional no pessoal; obrigatório no nativo. Se presente, precisa cobrir exatamente as opções existentes (regra complementada pelo importador).",
+          "minProperties": 2,
+          "maxProperties": 8,
+          "patternProperties": {
+            "^[A-H]$": {
+              "$ref": "#/$defs/longText"
+            }
+          },
+          "additionalProperties": false
         }
       }
+    },
+    "nativeQuestion": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/question"
+        },
+        {
+          "required": [
+            "optionExplanations",
+            "fundamentoLegal",
+            "reference",
+            "tipo"
+          ],
+          "properties": {
+            "reference": {
+              "type": "object",
+              "required": [
+                "label",
+                "url"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://[^/@:]+\\.(gov|leg|jus)\\.br(?:/|$)"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "nativeBank": {
+      "description": "Mesmo formato com o perfil editorial obrigatório dos bancos em public/data/question-banks/. Unicidade e correspondência dos IDs são conferidas pelo código.",
+      "allOf": [
+        {
+          "$ref": "#"
+        },
+        {
+          "properties": {
+            "questions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/nativeQuestion"
+              }
+            }
+          }
+        }
+      ]
     }
-  }
+  },
+  "description": "Padrão único schemaVersion 1. Perfil pessoal compatível; perfil nativo em #/$defs/nativeBank com feedback completo obrigatório."
 }

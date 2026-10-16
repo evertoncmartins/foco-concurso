@@ -12,7 +12,7 @@ import {createSession} from '../src/session.mjs';
 import {questionSource} from '../src/bank-source.mjs';
 import {sessionReport} from '../src/sessions-view.mjs';
 
-const bank=(number='9394',year='1996')=>({schemaVersion:1,id:`lei-${number}`,name:`Lei nº ${number}/${year}`,description:'Banco usado apenas em teste.',questions:[{id:'test-q1',discipline:'Teste',subject:'Teste',topic:'Teste',statement:'Enunciado de teste.',options:[{id:'A',text:'Primeira alternativa.'},{id:'B',text:'Segunda alternativa.'}],correctOption:'A',explanation:'Comentário de teste.',difficulty:'easy',tags:[]}]});
+const bank=(number='9394',year='1996')=>({schemaVersion:1,id:`lei-${number}`,name:`Lei nº ${number}/${year}`,description:'Banco usado apenas em teste.',questions:[{id:'test-q1',discipline:'Teste',subject:'Teste',topic:'Teste',statement:'Enunciado de teste.',options:[{id:'A',text:'Primeira alternativa.'},{id:'B',text:'Segunda alternativa.'}],correctOption:'A',explanation:'Comentário de teste.',optionExplanations:{A:'Primeira opção conforme o dispositivo de teste.',B:'Segunda opção diverge do dispositivo de teste.'},fundamentoLegal:'Lei nº 9.394/1996, art. 1º.',tipo:'Autoral',reference:{label:'Lei oficial',url:'https://www.planalto.gov.br/ccivil_03/leis/l9394.htm'},difficulty:'easy',tags:[]}]});
 async function directory(t){const root=await mkdtemp(join(tmpdir(),'foco-repository-'));t.after(()=>rm(root,{recursive:true,force:true}));return root;}
 const save=(root,value)=>writeFile(join(root,`${value.id}.json`),JSON.stringify(value));
 
@@ -34,6 +34,12 @@ test('descobre novos JSONs e remoções sem cadastrar um índice e gera revisõe
 test('padroniza o título sem aceitar displayName arbitrário nos bancos do Sistema',async t=>{
   const root=await directory(t);await save(root,{...bank(),name:'LDB — Lei 9.394/1996',subtitle:'Lei de Diretrizes e Bases da Educação Nacional',displayName:'Nome livre pessoal'});
   const published=repositoryCatalog(root).banks[0];assert.equal(published.name,'Lei nº 9.394/1996');assert.equal(published.displayName,published.name);assert.equal(published.subtitle,'Lei de Diretrizes e Bases da Educação Nacional');
+});
+test('publicação de qualquer novo banco recusa feedback incompleto e referência de terceiros',async t=>{
+  const root=await directory(t);
+  for(const change of [q=>delete q.optionExplanations,q=>q.reference.url='https://terceiro.example/lei']){
+    const raw=bank();change(raw.questions[0]);await save(root,raw);assert.throws(()=>repositoryCatalog(root),/lei-9394.json: Questão test-q1:/);
+  }
 });
 
 test('recusa arquivo, ID, lei, JSON e gabarito inconsistentes com o arquivo identificado no erro',async t=>{

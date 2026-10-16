@@ -3,7 +3,7 @@ import {readdirSync,readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {canonicalJSON} from '../src/engine.mjs';
-import {validateSystemBank} from '../src/system-banks.mjs';
+import {validateSystemBank,requireNativeFeedback} from '../src/system-banks.mjs';
 
 export const repositoryBanksDirectory=fileURLToPath(new URL('../public/data/question-banks/',import.meta.url));
 const digest=value=>createHash('sha256').update(canonicalJSON(value)).digest('hex');
@@ -19,6 +19,7 @@ export function repositoryCatalog(directory=repositoryBanksDirectory){
       const raw=JSON.parse(readFileSync(join(directory,file),'utf8').replace(/^\uFEFF/,''));
       const bank=validateSystemBank(raw);
       if(file!==`${bank.id}.json`)throw new Error(`O ID deve ser ${file.slice(0,-5)}, igual ao nome do arquivo.`);
+      requireNativeFeedback(bank);
       const content={schemaVersion:bank.schemaVersion,id:bank.id,name:bank.name,displayName:bank.displayName,subtitle:bank.subtitle,description:bank.description,questions:bank.questions,publishedAt:bank.publishedAt};
       banks.push({...bank,revision:`repo-${digest(content).slice(0,24)}`});
     }catch(error){throw new Error(`${file}: ${error.message}`,{cause:error});}

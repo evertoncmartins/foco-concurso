@@ -43,51 +43,15 @@
           <article><span class="format-source system">Sistema</span><h3>Disponíveis na plataforma</h3><p>São os bancos publicados pelo responsável pelo Foco. Você pode estudar e ativar ou desativar cada um para seu uso.</p></article>
           <article><span class="format-source personal">Pessoal</span><h3>Importados por você</h3><p>São os bancos enviados pelo importador ou pelo seu Drive. Você pode renomeá-los, atualizá-los e removê-los da sua lista.</p></article>
         </div>
-        <div class="privacy-note"><strong>Comece pelo modelo.</strong><p>Substitua os textos de orientação pelas suas questões e salve como <code>meu-banco.json</code>, em UTF-8. O modelo serve para montar seu conteúdo e só entra nos estudos se você o importar.</p></div>
+        <div class="privacy-note"><strong>Comece pelo modelo.</strong><p>Use a estrutura do exemplo para suas próprias questões e salve como <code>meu-banco.json</code>, em UTF-8. O modelo serve para montar seu conteúdo e só entra nos estudos se você o importar.</p></div>
       </section>
       <section id="exemplo" aria-labelledby="exemplo-title">
         <p class="format-section-label">VEJA A ESTRUTURA</p>
         <h2 id="exemplo-title">2. As informações têm um lugar.</h2>
-        <p>Este é um modelo completo com uma questão. Os textos são orientações para preenchimento. Troque também o gabarito e os comentários para corresponderem ao seu conteúdo.</p>
+        <p>Este é um modelo completo com uma questão. O exemplo usa uma questão adaptada de prova do IFSP, com justificativa para cada alternativa e fontes identificadas. Substitua conteúdo e referências ao criar suas próprias questões.</p>
         <div class="format-code-panel">
           <div class="format-code-header"><span><span class="format-file-icon" aria-hidden="true">{ }</span> meu-banco.json</span><button class="btn small" type="button" data-copy-target="json-example" data-copy-label="Copiar JSON">Copiar JSON</button></div>
-          <pre tabindex="0" aria-label="Modelo completo de banco JSON"><code id="json-example">{
-  <span class="json-key">&quot;schemaVersion&quot;</span>: <span class="json-number">1</span>,
-  <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;meu-banco&quot;</span>,
-  <span class="json-key">&quot;name&quot;</span>: <span class="json-string">&quot;Nome do meu banco&quot;</span>,
-  <span class="json-key">&quot;description&quot;</span>: <span class="json-string">&quot;Descreva o conteúdo deste banco.&quot;</span>,
-  <span class="json-key">&quot;questions&quot;</span>: [
-    {
-      <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;questao-001&quot;</span>,
-      <span class="json-key">&quot;discipline&quot;</span>: <span class="json-string">&quot;Nome da disciplina&quot;</span>,
-      <span class="json-key">&quot;subject&quot;</span>: <span class="json-string">&quot;Nome do assunto&quot;</span>,
-      <span class="json-key">&quot;topic&quot;</span>: <span class="json-string">&quot;Nome do tópico&quot;</span>,
-      <span class="json-key">&quot;statement&quot;</span>: <span class="json-string">&quot;Escreva aqui o enunciado da questão.&quot;</span>,
-      <span class="json-key">&quot;options&quot;</span>: [
-        {
-          <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;A&quot;</span>,
-          <span class="json-key">&quot;text&quot;</span>: <span class="json-string">&quot;Texto da alternativa A.&quot;</span>
-        },
-        {
-          <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;B&quot;</span>,
-          <span class="json-key">&quot;text&quot;</span>: <span class="json-string">&quot;Texto da alternativa B.&quot;</span>
-        },
-        {
-          <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;C&quot;</span>,
-          <span class="json-key">&quot;text&quot;</span>: <span class="json-string">&quot;Texto da alternativa C.&quot;</span>
-        },
-        {
-          <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;D&quot;</span>,
-          <span class="json-key">&quot;text&quot;</span>: <span class="json-string">&quot;Texto da alternativa D.&quot;</span>
-        }
-      ],
-      <span class="json-key">&quot;correctOption&quot;</span>: <span class="json-string">&quot;A&quot;</span>,
-      <span class="json-key">&quot;explanation&quot;</span>: <span class="json-string">&quot;A: explique por que esta alternativa está correta.\n\nB: explique por que esta alternativa está incorreta.\n\nC: comente esta alternativa.\n\nD: comente esta alternativa.&quot;</span>,
-      <span class="json-key">&quot;difficulty&quot;</span>: <span class="json-string">&quot;easy&quot;</span>,
-      <span class="json-key">&quot;tags&quot;</span>: []
-    }
-  ]
-}</code></pre>
+          <pre tabindex="0" aria-label="Modelo completo de banco JSON"><code id="json-example"><!-- FOCO_JSON_EXAMPLE --></code></pre>
         </div>
         <p class="format-copy-status" id="copy-status" role="status" aria-live="polite"></p>
         <div class="format-example-notes"><p><strong>Fora de <code>questions</code>:</strong> informações do banco.</p><p><strong>Dentro de <code>questions</code>:</strong> uma ou mais questões, separadas por vírgula.</p><p><strong>Dentro de <code>options</code>:</strong> as alternativas de cada questão.</p></div>
@@ -110,11 +74,14 @@
           <tr><th scope="row"><code>statement</code></th><td>O enunciado completo. Use <code>\n</code> dentro do texto para quebrar uma linha.</td></tr>
           <tr><th scope="row"><code>options</code></th><td>De 2 a 8 alternativas. Cada uma precisa de <code>id</code> único, de A a H, e <code>text</code> com seu conteúdo.</td></tr>
           <tr><th scope="row"><code>correctOption</code></th><td>A letra da alternativa correta. Ela precisa existir em <code>options</code>.</td></tr>
-          <tr><th scope="row"><code>explanation</code></th><td>Comentário que explica o gabarito. Para comentar cada opção, use <code>A: ...\n\nB: ...</code> e continue com as letras existentes.</td></tr>
+          <tr><th scope="row"><code>explanation</code></th><td>Explicação geral do conteúdo cobrado. A análise individual fica em <code>optionExplanations</code>. Comentários de arquivos antigos continuam aceitos.</td></tr>
+          <tr><th scope="row"><code>optionExplanations</code> <span class="format-optional">opcional no Pessoal</span></th><td>Objeto com uma justificativa para cada letra de <code>options</code>, por exemplo <code>{"A":"Explicação...","B":"Explicação..."}</code>. Se informado, deve cobrir todas as alternativas, sem letras extras. Obrigatório nos bancos do Sistema.</td></tr>
+          <tr><th scope="row"><code>fundamentoLegal</code> <span class="format-optional">opcional no Pessoal</span></th><td>Lei e dispositivos exatos: artigo, parágrafo, inciso e alínea, quando aplicáveis. Obrigatório no Sistema.</td></tr>
           <tr><th scope="row"><code>difficulty</code></th><td><code>easy</code> para fácil, <code>medium</code> para média ou <code>hard</code> para difícil.</td></tr>
           <tr><th scope="row"><code>tags</code></th><td>Uma lista de até 30 etiquetas. Use <code>[]</code> se não quiser adicionar nenhuma.</td></tr>
-          <tr><th scope="row"><code>reference</code> <span class="format-optional">opcional</span></th><td>Referência com <code>label</code> e, se houver link, <code>url</code> começando por <code>https://</code>.</td></tr>
+          <tr><th scope="row"><code>reference</code> <span class="format-optional">opcional</span></th><td>Nome da legislação ou fonte em <code>label</code> e link HTTPS em <code>url</code>. No Sistema, ambos são obrigatórios e a URL deve ser oficial (<code>.gov.br</code>, <code>.leg.br</code> ou <code>.jus.br</code>). No Pessoal, o objeto e a URL continuam opcionais.</td></tr>
         </tbody></table></div>
+        <div class="privacy-note"><strong>Um formato, com compatibilidade.</strong><p>Todos os campos sem indicação de opcional são obrigatórios. Os novos campos não são exigidos de arquivos pessoais antigos. Nos bancos do Sistema, explicação geral, justificativas de todas as alternativas, fundamento legal, referência oficial e <code>tipo</code> são obrigatórios; a publicação recusa feedback incompleto. Informe origem e ano somente quando comprovados. O schemaVersion continua sendo 1.</p></div>
         <div class="format-tips"><article><h3>Um ID, a mesma questão</h3><p>Seu histórico usa os identificadores. Ao criar outra pergunta, use um ID novo. Para mudar apenas o nome do banco, use Renomear.</p></article><article><h3>Texto com espaço para explicar</h3><p>Enunciados e comentários não são cortados por um limite de caracteres. Use texto simples e parágrafos para facilitar a leitura.</p></article></div>
         <details class="format-detail"><summary>Minha questão veio de uma prova. Como informar a origem?</summary><div><p>Você pode acrescentar <code>instituicao</code>, <code>ano</code>, <code>banca</code>, <code>cargo</code> e <code>tipo</code>. O campo <code>tag</code> identifica a instituição e o ano, como <code>INSS-2026</code>, quando essa origem estiver comprovada.</p><p>Use <code>fundamentoLegal</code> para indicar dispositivos e <code>fonte</code> para os links da prova, do gabarito e de outras referências. Em questões autorais, informe essa condição e preserve as fontes consultadas.</p><p>A <a href="./docs/FORMATO_JSON.md">referência técnica completa</a> detalha os campos opcionais. O <a href="./docs/questions.schema.json" download>JSON Schema</a> também está disponível para validação técnica.</p></div></details>
       </section>
@@ -133,12 +100,13 @@
         <p class="format-section-label">UM PONTO DE PARTIDA</p>
         <h2 id="pedir-title">5. Peça questões em outro chat.</h2>
         <p>Copie a sugestão abaixo, preencha os trechos entre colchetes e envie junto do conteúdo ou das fontes que deseja utilizar.</p>
-        <div class="format-prompt"><p id="question-prompt">Prepare um banco JSON compatível com o Foco, schemaVersion 1, sobre [tema], com [quantidade] questões, conforme [edital ou conteúdo enviado]. Use id estável, name, description e questions. Em cada questão, inclua id único, discipline, subject, topic, statement, options com id A–E e text, correctOption, explanation por alternativa, difficulty (easy, medium ou hard) e tags. Preserve fontes comprovadas e identifique questões autorais. Não invente origem de provas, referências ou gabaritos. Entregue somente JSON válido, sem comentários de código e sem Markdown.</p><button class="btn small" type="button" data-copy-target="question-prompt" data-copy-label="Copiar sugestão">Copiar sugestão</button></div>
+        <div class="format-prompt"><p id="question-prompt">Prepare um banco JSON compatível com o Foco, schemaVersion 1, sobre [tema], com [quantidade] questões, conforme [edital ou conteúdo enviado]. Use id estável, name, description e questions. Em cada questão, inclua id único, discipline, subject, topic, statement, options com id A–E e text, correctOption, explanation geral, optionExplanations com uma justificativa específica para cada letra de options, fundamentoLegal com lei e dispositivos, reference com label e URL HTTPS oficial, difficulty (easy, medium ou hard) e tags. Preserve fontes comprovadas e identifique questões autorais. Não invente origem de provas, referências ou gabaritos. Entregue somente JSON válido, sem comentários de código e sem Markdown.</p><button class="btn small" type="button" data-copy-target="question-prompt" data-copy-label="Copiar sugestão">Copiar sugestão</button></div>
         <p class="format-caption">Confira os enunciados, gabaritos e referências antes de começar a estudar. A validação do arquivo verifica a estrutura dos dados.</p>
       </section>
       <section id="duvidas" aria-labelledby="duvidas-title">
         <p class="format-section-label">QUANDO SURGIR UMA DÚVIDA</p>
         <h2 id="duvidas-title">6. Respostas rápidas.</h2>
+        <details class="format-detail"><summary>Meu JSON antigo continua funcionando?</summary><div><p>Sim. Os campos anteriores continuam aceitos. <code>optionExplanations</code>, <code>fundamentoLegal</code> e <code>reference</code> são opcionais em bancos pessoais. Quando você acrescentar <code>optionExplanations</code>, inclua justificativas para todas as alternativas. Seu banco e seu progresso não são convertidos automaticamente.</p></div></details>
         <details class="format-detail"><summary>O arquivo foi recusado. O que devo conferir?</summary><div><p>Leia a mensagem exibida pelo Foco. Confira aspas duplas, vírgulas entre os itens, IDs repetidos e campos obrigatórios. A letra de <code>correctOption</code> precisa corresponder a uma alternativa existente. JSON não aceita comentários nem vírgula depois do último item.</p><p>Salve como texto UTF-8 com extensão <code>.json</code>. Um documento do Word ou um PDF não se torna JSON apenas trocando sua extensão.</p></div></details>
         <details class="format-detail"><summary>Posso atualizar um banco que já importei?</summary><div><p>Sim. Importe a versão nova com o mesmo ID do banco e confirme a atualização. Mantenha os IDs das questões que continuam sendo as mesmas. Seu nome personalizado e o histórico de respostas são preservados.</p></div></details>
         <details class="format-detail"><summary>Posso colocar HTML ou alternativas numéricas?</summary><div><p>Use texto simples: HTML é exibido como texto, sem executar formatação. Prefira alternativas com <code>text</code> entre aspas. Números finitos também são aceitos e convertidos em texto; use aspas para preservar valores como <code>"03"</code>, <code>"3,14"</code> e <code>"50%"</code>.</p></div></details>

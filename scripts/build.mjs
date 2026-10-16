@@ -2,10 +2,16 @@ import {repositoryCatalog} from '../server/repository-banks.mjs';
 import {mkdir,cp,rm,readFile,writeFile} from 'node:fs/promises';
 import {resolve,join} from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {jsonExample} from './json-example.mjs';
+import {validateBank} from '../src/engine.mjs';
+import {requireNativeFeedback} from '../src/system-banks.mjs';
 
 export async function buildSite(root=process.cwd()){
   const path=name=>join(root,name),{manifest,banks}=repositoryCatalog(path('public/data/question-banks'));
   const config=JSON.parse(await readFile(path('public/app-config.json'),'utf8'));
+  let guide;
+  try{guide=await readFile(path('public/formato-json.html'),'utf8');}catch(error){if(error.code!=='ENOENT')throw error;}
+  if(guide){const model=JSON.parse(await readFile(path('docs/modelo-banco.json'),'utf8'));requireNativeFeedback(validateBank(model));guide=jsonExample(guide,model);}
   if(process.env.PUBLIC_GOOGLE_CLIENT_ID)config.googleClientId=process.env.PUBLIC_GOOGLE_CLIENT_ID;
   if(config.googleClientId&&!/^[\w-]+\.apps\.googleusercontent\.com$/.test(config.googleClientId))throw new Error('PUBLIC_GOOGLE_CLIENT_ID inválido. Use apenas o ID público de cliente OAuth Web.');
   // Validate every bank before replacing the previous build.
@@ -14,6 +20,7 @@ export async function buildSite(root=process.cwd()){
   await writeFile(path('dist/data/question-banks/index.json'),JSON.stringify(manifest,null,2)+'\n');
   for(const bank of banks)await writeFile(path(`dist/data/question-banks/${bank.id}.json`),JSON.stringify(bank,null,2)+'\n');
   await writeFile(path('dist/app-config.json'),JSON.stringify(config,null,2));
+  if(guide)await writeFile(path('dist/formato-json.html'),guide);
   console.log(`Build público pronto: ${banks.length} bancos do sistema reconhecidos automaticamente.`);
   return manifest;
 }
