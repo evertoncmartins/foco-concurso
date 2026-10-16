@@ -69,12 +69,12 @@ export function createAuthHandler(action,{env=process.env,fetcher=globalThis.fet
       if(!sameOrigin(request,config))return response({error:'invalid_origin'},403);
       return response({signedOut:true},200,[cookie(SESSION,'',0),cookie(HANDOFF,'',0),cookie(FLOW,'',0)]);
     }
-    if(action==='refresh'){
+    if(action==='refresh'||action==='resume'){
       if(request.method!=='POST')return response({error:'method_not_allowed'},405);
       if(!sameOrigin(request,config))return response({error:'invalid_origin'},403);
-      let subject;
-      try{const text=await request.text();if(text.length>512)throw new Error();subject=JSON.parse(text).subject;}catch{return response({error:'invalid_request'},400);}
-      if(!persisted||!validRefresh(persisted.refreshToken))return response({error:'reauthorization_required'},401,[cookie(SESSION,'',0)]);
+      let subject=persisted?.subject;
+      if(action==='refresh')try{const text=await request.text();if(text.length>512)throw new Error();subject=JSON.parse(text).subject;}catch{return response({error:'invalid_request'},400);}
+      if(!persisted||!validRefresh(persisted.refreshToken))return action==='resume'?response({authorization:null},200,[cookie(SESSION,'',0)]):response({error:'reauthorization_required'},401,[cookie(SESSION,'',0)]);
       if(subject!==persisted.subject)return response({error:'account_mismatch'},409);
       const denied=()=>response({error:'reauthorization_required'},401,[cookie(SESSION,'',0)]);
       try{

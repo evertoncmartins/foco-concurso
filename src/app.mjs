@@ -2,7 +2,7 @@ import {Store} from './store.mjs';
 import {validateBank,validateEvents,derive,makeQueue,filterQuestions,breakdown,studyStreak,localDay} from './engine.mjs';
 import {DriveSync} from './drive.mjs';
 import {DriveSettings} from './drive-settings.mjs';
-import {GoogleAccount,prepareGoogle,isGoogleReady,validClientId,consumeGoogleReturn,googleReturnMessage} from './auth.mjs';
+import {GoogleAccount,prepareGoogle,isGoogleReady,validClientId,consumeGoogleReturn,consumeHomeReturn,googleReturnMessage} from './auth.mjs';
 import {AccountStorage,parseFolder,assertProgressOwner} from './account.mjs';
 import {loginView,folderView,loadingView} from './access-views.mjs';
 import {icon} from './icons.mjs';
@@ -25,7 +25,7 @@ const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,Number(n)||min));
 const defaults={theme:'light',name:'Estudante',photo:'',dailyGoal:10,folderId:'',onboardingDone:false,sidebarCollapsed:false};
 let guest=false,restoration=null,restoreAuthorization=null,resetSaving=null;
-let googleLoading=false,googleLoadError='';
+let googleLoading=false,googleLoadError='',returningHome=false;
 let cutQuestion=null,cutOptions=new Set();
 const draftSelections=new Map();
 const expandedBankDetails=new Set();
@@ -518,7 +518,7 @@ function renderLoading(){
   document.title=guest?'Preparando questões · Foco':'Restaurando estudos · Foco';
 }
 function finishRestoration(){
-  restoration=null;session=null;selected=null;draftSelections.clear();resetCuts();view=config.onboardingDone||config.folderId?'home':'folder';saveConfig();render();window.scrollTo(0,0);$('#main')?.focus({preventScroll:true});
+  restoration=null;session=null;selected=null;draftSelections.clear();resetCuts();view=returningHome||config.onboardingDone||config.folderId?'home':'folder';returningHome=false;saveConfig();render();window.scrollTo(0,0);$('#main')?.focus({preventScroll:true});
 }
 async function handleRestorationAction(action){
   if(restoration.state==='loading'||working)return;
@@ -562,14 +562,24 @@ async function init(){
     const response=await fetch('./app-config.json',{cache:'no-store'});if(response.ok)publicConfig=await response.json();
     const legacyConfig=JSON.parse(localStorage.getItem('foco:config')||'{}');
     auth=new GoogleAccount(publicConfig.googleClientId||localStorage.getItem('foco:oauth-preview')||legacyConfig.clientId||'');
-    const notice=consumeGoogleReturn();googleLoading=true;working=notice==='success';renderLogin();
+    const notice=consumeGoogleReturn();returningHome=consumeHomeReturn();googleLoading=true;working=notice==='success'||returningHome;renderLogin();
     await auth.prepareRedirect();googleLoading=false;
     if(guest)return;
     if(notice==='success'){
       try{await openAccount(await auth.restoreRedirect());}
       catch(error){loginError=error.message;drive?.close();await auth.signOut();restoration=null;accountStorage=null;store=null;drive=null;}
       finally{working=false;}
-    }else if(notice)loginError=googleReturnMessage(notice);
+    }else if(notice){loginError=googleReturnMessage(notice);working=false;}
+    else if(returningHome){
+      const generation=auth.generation;
+      restoration=restoreProgress(null,{stage:'access'});renderLoading();
+      try{
+        const result=await auth.restoreSession();
+        if(guest||generation!==auth.generation)return;
+        if(result)await openAccount(result);else restoration=null;
+      }catch(error){if(guest||generation!==auth.generation)return;restoration=null;loginError=error.message;}
+      finally{working=false;}
+    }
     if(!auth.profile&&!restoration){renderLogin();if(!auth.redirectEnabled)void loadGoogleForLogin();}
   }catch(error){googleLoading=false;working=false;loginError=error.message;auth=new GoogleAccount('');renderLogin();}
 }
