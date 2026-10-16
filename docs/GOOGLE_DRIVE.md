@@ -113,3 +113,7 @@ Em **Meus bancos → Buscar no Drive**, o app lista arquivos JSON da pasta, excl
 - [Drive API — generateIds](https://developers.google.com/workspace/drive/api/reference/rest/v3/files/generateIds)
 
 Consentimento real e escrita do **site** precisam ser verificados após o cliente OAuth global estar configurado. Testes HTTP simulados e acesso do assistente à pasta não substituem essa verificação.
+
+## Bancos do sistema — 1.17.0
+
+Os bancos nativos são carregados do projeto e do catálogo público da plataforma, sem login ou Drive. Os seus bancos importados continuam pessoais. Renomeações usam eventos de metadados com IDs estáveis, sem renomear arquivos físicos. Questões, sessões e respostas identificam a origem Sistema/Pessoal. Versões históricas dos bancos nativos utilizados podem integrar o diário para conservar sessões e resultados; essas cópias não alteram o catálogo global. A sincronização usa o mesmo arquivo principal por conta. Consulte [BANCOS_SISTEMA.md](BANCOS_SISTEMA.md).

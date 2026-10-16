@@ -3,7 +3,7 @@ import {reconcileEvents} from './event-conflicts.mjs';
 const PREFIX='foco:v1:event:';
 const resetError=()=>Object.assign(new Error('Seu progresso foi reiniciado. Inicie uma nova sessão de estudo.'),{code:'PROGRESS_RESET'});
 export class Store extends EventTarget {
-  constructor(storage=globalThis.localStorage) { super(); this.storage=storage; this.events=[]; this.load(); }
+  constructor(storage=globalThis.localStorage) { super(); this.storage=storage; this.events=[];this.systemBanks=[];this.load(); }
   load() { const list=[]; for(let i=0;i<this.storage.length;i++){const key=this.storage.key(i);if(key?.startsWith(PREFIX)){let e;try{e=JSON.parse(this.storage.getItem(key));}catch{throw new Error('Há dados locais corrompidos. Não serão substituídos. Exporte uma cópia antes de restaurar.');}list.push(e);}} this.events=mergeEvents(validateEvents({schemaVersion:1,events:list}));return this.events; }
   async add(items) {
     this.load();const epoch=currentProgressEpoch(this.events),hasStudy=items.some(isStudyEvent),resetting=items.some(e=>e.type==='progress-reset');
@@ -43,6 +43,7 @@ export class Store extends EventTarget {
     }
     throw new Error('O histórico está mudando em outra aba. Aguarde um instante e tente novamente; seus dados foram preservados.');
   }
-  model(){return derive(this.events);}
+  setSystemBanks(banks){this.systemBanks=structuredClone(banks);return this.model();}
+  model(){return derive(this.events,Date.now(),this.systemBanks);}
   export(){const model=this.model();return {schemaVersion:1,app:'foco-concursos',...(this.storage.userId?{owner:{provider:'google',subject:this.storage.userId}}:{}),exportedAt:new Date().toISOString(),events:this.events,summary:model.stats,performance:{questions:Object.fromEntries(model.progress),flags:Object.fromEntries(model.flags),byDiscipline:breakdown(model.answers,'discipline'),bySubject:breakdown(model.answers,'subject'),byTopic:breakdown(model.answers,'topic'),studyStreak:studyStreak(model.answers),recentAnswers:model.answers.slice(-20),sessions:model.sessions}};}
 }

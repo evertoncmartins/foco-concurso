@@ -1,3 +1,4 @@
+import {preparePersonalBank,personalBankId} from './bank-source.mjs';
 import {validateEvents,validateBank,canonicalJSON} from './engine.mjs';
 import {assertProgressOwner} from './account.mjs';
 import {GoogleAccount,prepareGoogle} from './auth.mjs';
@@ -188,7 +189,7 @@ export class DriveSync extends EventTarget {
   async importNewBanks(){
     this.reportProgress('banks',0,1);
     const files=await this.bankFiles();let imported=0,skipped=0,processed=0;this.reportProgress('banks',0,files.length);
-    for(const file of files){try{const bank=validateBank(await this.readFile(file));const existing=this.store.model().banks.find(b=>b.id===bank.id);if(existing){skipped++;continue;}const hadBank=this.store.events.some(e=>e.type==='bank'&&e.bank.id===bank.id);if(hadBank){skipped++;continue;}await this.store.add([{type:'bank',bank},{type:'bank-state',bankId:bank.id,value:'enabled'}]);imported++;}catch(e){if(e.status||this.closed||!this.token)throw e;skipped++;}finally{this.reportProgress('banks',++processed,files.length);}}
+    for(const file of files){try{const bank=preparePersonalBank(validateBank(await this.readFile(file)));const existing=this.store.model().banks.find(b=>b.id===bank.id);if(existing){skipped++;continue;}const hadBank=this.store.events.some(e=>e.type==='bank'&&personalBankId(e.bank.id)===bank.id);if(hadBank){skipped++;continue;}await this.store.add([{type:'bank',bank},{type:'bank-state',bankId:bank.id,value:'enabled'}]);imported++;}catch(e){if(e.status||this.closed||!this.token)throw e;skipped++;}finally{this.reportProgress('banks',++processed,files.length);}}
     if(imported)await this.sync({duringConnect:this.connecting});this.bankImportSummary={imported,skipped};return this.bankImportSummary;
   }
 }

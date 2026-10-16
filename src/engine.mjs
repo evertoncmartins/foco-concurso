@@ -1,4 +1,6 @@
 import {normalizeQuestionOrigin} from './question-origin.mjs';
+import {bankPresentation} from './bank-names.mjs';
+import {personalBankId,sourceType} from './bank-source.mjs';
 export const VERSION = 1;
 export const DAY = 86400000;
 export const questionKey = (b, q) => `${b}:${q}`;
@@ -24,6 +26,8 @@ function optionText(value,label){
 export function validateBank(raw) {
   if (!raw || raw.schemaVersion !== 1) throw new Error('schemaVersion deve ser 1. Baixe o modelo JSON.');
   const bank = {schemaVersion: 1, id: text(raw.id, 'ID do banco', 120), name: text(raw.name, 'Nome'), description: typeof raw.description === 'string' ? raw.description : '', questions: []};
+  if(raw.displayName!=null)bank.displayName=text(raw.displayName,'Nome de exibição');
+  if(typeof raw.subtitle==='string')bank.subtitle=raw.subtitle;
   if (!/^[a-zA-Z0-9_-]+$/.test(bank.id)) throw new Error('ID do banco: use letras, números, _ ou -.');
   if (!Array.isArray(raw.questions) || !raw.questions.length || raw.questions.length > 5000) throw new Error('O banco deve conter de 1 a 5.000 questões.');
   const ids = new Set();
@@ -57,11 +61,15 @@ export function validateEvents(document) {
       return {...e,event:original};
     }
     if (e.type === 'bank') return {...e, bank: validateBank(e.bank)};
-    if (e.type === 'bank-state') { if (typeof e.bankId !== 'string' || !['enabled','disabled','deleted'].includes(e.value)) throw new Error('Estado de banco inválido.'); }
+    if(e.type==='system-bank-snapshot'){const bank=validateBank(e.bank);if(!/^lei-[1-9]\d*$/.test(bank.id)||typeof e.revision!=='string'||!e.revision)throw new Error('Versão histórica de banco inválida.');return {...e,bank:{...bank,revision:e.revision,sourceType:'system'}};}
+    if (e.type === 'bank-state'||e.type==='system-bank-state') { if (typeof e.bankId !== 'string' || !(e.type==='system-bank-state'?['enabled','disabled']:['enabled','disabled','deleted']).includes(e.value)) throw new Error('Estado de banco inválido.'); }
+    else if(e.type==='bank-metadata'){text(e.bankId,'Banco');text(e.displayName,'Nome de exibição');}
     else if (e.type === 'answer') {
       if (typeof e.key !== 'string' || typeof e.sessionId !== 'string' || typeof e.correct !== 'boolean' || !/^[A-H]$/.test(e.selected) || !/^[A-H]$/.test(e.correctOption)) throw new Error('Resposta inválida.');
       if (e.correct !== (e.selected === e.correctOption)) throw new Error('Resultado inconsistente.');
       for (const field of ['discipline','subject','topic']) text(e[field], `Resposta ${field}`);
+      if(e.sourceType!=null&&!['personal','system'].includes(e.sourceType))throw new Error('Origem da resposta inválida.');
+      if(e.questionSnapshot!=null)validateBank({schemaVersion:1,id:'snapshot',name:'Snapshot',questions:[e.questionSnapshot]});
     } else if (e.type === 'flag') { if (typeof e.key !== 'string' || !['favorite','review'].includes(e.flag) || typeof e.value !== 'boolean') throw new Error('Marcação inválida.'); }
     else if (e.type === 'session') {
       const s = e.session;
@@ -79,28 +87,38 @@ export function mergeEvents(...collections) {
   for (const e of collections.flat()) { const old = map.get(e.id); if (old && !sameEvent(old,e)) throw new Error('Conflito: dois eventos com o mesmo ID têm conteúdos diferentes.'); map.set(e.id, e); }
   return [...map.values()].sort((a,b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id));
 }
-export function derive(events, now = Date.now()) {
-  const banks = new Map(), states = new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], bankHistory=[], sessionUpdatedAt=new Map();
+export function derive(events, now = Date.now(), systemBanks=[]) {
+  const banks = new Map(), states = new Map(), metadata=new Map(), systemStates=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], bankHistory=[], sessionUpdatedAt=new Map();
   const ordered=mergeEvents(events),progressEpoch=ordered.findLast(e=>e.type==='progress-reset')?.id??null;
+  const aliases=new Map(ordered.filter(e=>e.type==='bank'&&personalBankId(e.bank.id)!==e.bank.id).map(e=>[e.bank.id,personalBankId(e.bank.id)]));
+  const keyAlias=(key,origin)=>origin==='system'?key:aliases.has(key.split(':')[0])?`${aliases.get(key.split(':')[0])}${key.slice(key.indexOf(':'))}`:key;
   for (const e of ordered) {
     // Retired generations stay inactive even when an old device has a fast clock.
     if (isStudyEvent(e)&&studyEpoch(e)!==progressEpoch) continue;
-    if (e.type === 'bank') {banks.set(e.bank.id, e.bank);bankHistory.push(e);}
-    if (e.type === 'bank-state') states.set(e.bankId, e.value);
-    if (e.type === 'session') {sessions.set(e.session.id, e.session);sessionUpdatedAt.set(e.session.id,e.at);}
-    if (e.type === 'flag') { if (!flags.has(e.key)) flags.set(e.key, {}); flags.get(e.key)[e.flag] = e.value; }
+    if (e.type === 'bank') {const id=aliases.get(e.bank.id)||e.bank.id,bank={...e.bank,id,bankId:id,sourceType:'personal',editable:true,removable:true};banks.set(id,bank);bankHistory.push({...e,bank});}
+    if(e.type==='system-bank-snapshot')bankHistory.push({...e,bank:{...e.bank,bankId:e.bank.id,sourceType:'system'}});
+    if (e.type === 'bank-state') states.set(aliases.get(e.bankId)||e.bankId, e.value);
+    if(e.type==='system-bank-state')systemStates.set(e.bankId,e.value);
+    if(e.type==='bank-metadata')metadata.set(aliases.get(e.bankId)||e.bankId,e.displayName);
+    if (e.type === 'session') {const s=structuredClone(e.session),sources=s.questionSources||{};s.queue=s.queue.map(k=>keyAlias(k,sources[k]?.sourceType));s.answers=Object.fromEntries(Object.entries(s.answers).map(([k,v])=>[keyAlias(k,sources[k]?.sourceType),v]));if(s.questionSources)s.questionSources=Object.fromEntries(Object.entries(sources).map(([k,v])=>[keyAlias(k,v.sourceType),v]));sessions.set(s.id,s);sessionUpdatedAt.set(s.id,e.at);}
+    if (e.type === 'flag') {const key=keyAlias(e.key,e.sourceType);if (!flags.has(key)) flags.set(key, {}); flags.get(key)[e.flag] = e.value; }
     if (e.type === 'answer') {
-      answers.push(e); const p = progress.get(e.key) || {attempts:0, correct:0, wrong:0, streak:0};
+      const key=keyAlias(e.key,e.sourceType);answers.push({...e,key,bankId:key.split(':')[0],sourceType:sourceType(e)}); const p = progress.get(key) || {attempts:0, correct:0, wrong:0, streak:0};
       p.attempts++; p.correct += +e.correct; p.wrong += +!e.correct; p.streak = e.correct ? p.streak + 1 : 0; p.lastCorrect = e.correct; p.lastAt = e.at;
       p.due = new Date(Date.parse(e.at) + DAY * (e.correct ? [1,3,7,14,30,60][Math.min(p.streak-1,5)] : 1)).toISOString();
-      progress.set(e.key, p);
+      progress.set(key, p);
     }
   }
-  const visibleBanks = [...banks.values()].filter(b => states.get(b.id) !== 'deleted').map(b => ({...b, enabled: states.get(b.id) !== 'disabled'}));
-  const questions = visibleBanks.flatMap(b => b.questions.map(q => ({...q, key:questionKey(b.id,q.id), bankId:b.id, bankName:b.name, enabled:b.enabled})));
+  const personal=[...banks.values()].filter(b => states.get(b.id) !== 'deleted').map(b=>({...b,displayName:metadata.get(b.id)||bankPresentation(b).title,enabled:states.get(b.id)!=='disabled'}));
+  for(const event of bankHistory){const custom=metadata.get(event.bank.id);if(custom)event.bank={...event.bank,displayName:custom};}
+  const native=systemBanks.map(b=>({...b,bankId:b.id,sourceType:'system',editable:false,removable:false,enabled:systemStates.get(b.id)!=='disabled'}));
+  const visibleBanks=[...native,...personal];
+  const questions = visibleBanks.flatMap(b => b.questions.map(q => ({...q, key:questionKey(b.id,q.id), bankId:b.id, bankName:b.displayName||b.name, displayName:b.displayName||b.name,sourceType:b.sourceType,bankRevision:b.revision||null,enabled:b.enabled})));
+  const available=new Set(questions.map(q=>q.key)),needed=new Set([...sessions.values()].filter(s=>!s.completed&&!s.abandoned).flatMap(s=>s.queue));
+  for(const e of [...bankHistory].reverse())if(e.type==='system-bank-snapshot')for(const q of e.bank.questions){const key=questionKey(e.bank.id,q.id);if(needed.has(key)&&!available.has(key)){questions.push({...q,key,bankId:e.bank.id,bankName:e.bank.displayName||e.bank.name,displayName:e.bank.displayName||e.bank.name,sourceType:'system',bankRevision:e.revision,enabled:false});available.add(key);}}
   const correct = answers.filter(e => e.correct).length;
   const stats = {attempts:answers.length, correct, wrong:answers.length-correct, accuracy:answers.length?Math.round(correct/answers.length*100):0, answered:questions.filter(q=>progress.has(q.key)).length, pending:questions.filter(q=>!progress.has(q.key)).length, errors:questions.filter(q=>progress.get(q.key)?.lastCorrect===false).length, favorites:questions.filter(q=>flags.get(q.key)?.favorite).length, review:questions.filter(q=>flags.get(q.key)?.review || (progress.has(q.key)&&Date.parse(progress.get(q.key).due)<=now)).length};
-  return {banks:visibleBanks, questions, progress, flags, answers, sessions:[...sessions.values()], stats,progressEpoch,bankHistory,sessionUpdatedAt};
+  return {banks:visibleBanks,systemBanks:native,personalBanks:personal,questions,progress,flags,answers,sessions:[...sessions.values()],stats,progressEpoch,bankHistory,sessionUpdatedAt};
 }
 export function filterQuestions(model, options, now = Date.now()) {
   return model.questions.filter(q => {

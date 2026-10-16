@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "version": "2026-10-16.1",
+  "banks": [
+    {
+      "id": "lei-8112",
+      "file": "lei-8112.json"
+    },
+    {
+      "id": "lei-8069",
+      "file": "lei-8069.json"
+    }
+  ]
+}
