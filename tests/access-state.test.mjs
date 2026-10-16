@@ -60,6 +60,13 @@ function runtime(options={}){
   document.documentElement.requestFullscreen=async requestOptions=>{document.fullscreenRequests=(document.fullscreenRequests||0)+1;document.requestOptions=requestOptions;if(options.fullscreenError)throw new Error('Requires user activation');document.fullscreenElement=document.documentElement;await document.emit('fullscreenchange',{});};
   if(options.fullscreenUnavailable)delete document.documentElement.requestFullscreen;
   document.exitFullscreen=async()=>{document.fullscreenElement=null;await document.emit('fullscreenchange',{});};
+  const windowEvents={},window={location:{origin:'https://foco-concurso-wine.vercel.app',href:'https://foco-concurso-wine.vercel.app/'},addEventListener(name,fn){(windowEvents[name]??=[]).push(fn);},scrollTo(){}};
+  const history=[null];let historyPosition=0;
+  window.history={get state(){return history[historyPosition];},pushState(state){history.splice(++historyPosition);history.push(state);},replaceState(state){history[historyPosition]=state;},go(delta){queueMicrotask(()=>{historyPosition+=delta;for(const fn of windowEvents.popstate??[])fn({state:history[historyPosition]});});}};
+  if(options.realDocuments){
+    document.body={style:{overflow:'auto'},append(){}};
+    document.createElement=tag=>{const node=element();node.style={};node.append=()=>{};node.remove=()=>{};if(tag==='iframe')node.contentWindow={location:{replace:url=>{node.src=url;}}};return node;};
+  }
   const media=new Map(),mediaListeners=new Map();
   const matchMedia=query=>{if(!media.has(query))media.set(query,{matches:query.includes('701')&&!options.mobile||query==='(display-mode: standalone)'&&!!options.standalone,addEventListener(name,callback){if(name==='change'){const callbacks=mediaListeners.get(query)||[];callbacks.push(callback);mediaListeners.set(query,callbacks);}}});return media.get(query);};
   const profile={sub:'111',name:'Estudante',email:'test@example.test'};
@@ -85,7 +92,8 @@ function runtime(options={}){
   }
   class FixtureStore extends Store{constructor(storage){super(storage);if(!this.events.length&&!options.systemBanks){this.storage.setItem('foco:v1:event:builtin-lei-8112-v1',JSON.stringify({id:'builtin-lei-8112-v1',at:'2026-10-08T00:00:00.000Z',type:'bank',bank}));this.load();}}}
   class FixtureCatalog{constructor(){this.banks=options.systemBanks||[];}async load(){return this.banks;}}
-  const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,PublicDocuments:class{constructor(options){this.options=options;}open(){this.context=this.options.getContext();}return(){return this.options.onReturn(this.context);}},GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
+  const Documents=options.realDocuments?class extends imports.PublicDocuments{constructor(settings){super({...settings,document,window});}}:class{constructor(options){this.options=options;}open(){this.context=this.options.getContext();}return(){return this.options.onReturn(this.context);}};
+  const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,PublicDocuments:Documents,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window,console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
   const target=dataset=>({dataset,disabled:false,closest(selector){return selector==='[data-action]'||selector==='button'?this:null;},matches(){return false;}});
@@ -876,6 +884,27 @@ test('documentos retornam a Ajustes ou Banco de questões sem redesenhar a orige
     await app.value('publicDocuments.open()');await app.value('publicDocuments.return()');
     assert.equal(app.value('view'),page);assert.equal(app.auth.profile,profile);assert.equal(app.auth.token,token);assert.equal(app.html(),html);assert.equal(app.renders,renders);
     assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.restores,0);assert.equal(app.authorizations,0);assert.equal(app.value('restoration'),null);
+  }
+});
+test('histórico real dos documentos preserva conta, campos e estudos no Desktop e Mobile',async()=>{
+  for(const mobile of [false,true])for(const [page,name] of [['settings','termos.html'],['settings','privacidade.html'],['banks','formato-json.html']]){
+    const app=runtime({mobile,realDocuments:true});await app.start();await app.click('nav',{view:page});
+    const profile=app.auth.profile,token=app.auth.token,events=app.value('JSON.stringify(store.events)'),html=app.html(),renders=app.renders;
+    app.document.querySelector('#main').scrollTop=460;
+    app.value(`publicDocuments.open('https://foco-concurso-wine.vercel.app/${name}','Documento')`);
+    app.value('window.history.go(-1)');await tick();
+    assert.equal(app.value('publicDocuments.dialog'),null);assert.equal(app.value('view'),page);assert.equal(app.renders,renders);assert.equal(app.html(),html);
+    assert.equal(app.document.querySelector('#main').scrollTop,460);assert.equal(app.auth.profile,profile);assert.equal(app.auth.token,token);
+    assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.authorizations,0);assert.equal(app.restores,0);
+    app.value('window.history.go(1)');await tick();assert(app.value('publicDocuments.dialog.open'));
+    await app.value('publicDocuments.close()');assert.equal(app.value('view'),page);assert.equal(app.renders,renders);
+  }
+});
+test('Voltar do navegador na entrada não recupera cookie nem inicia OAuth no Desktop ou Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const app=runtime({mobile,init:true,realDocuments:true,redirectEnabled:true,googleReady:false});app.auth.signOut();await app.value('init()');
+    app.value('publicDocuments.open("https://foco-concurso-wine.vercel.app/termos.html","Termos")');app.value('window.history.go(-1)');await tick();
+    assert.equal(app.value('publicDocuments.dialog'),null);assert.equal(app.auth.profile,null);assert.equal(app.auth.token,null);assert.equal(app.authorizations,0);assert.equal(app.restores,0);assert.match(app.html(),/Continuar com Google/);
   }
 });
 test('ajuda JSON aparece uma vez na importação; Ajustes mantém só os documentos institucionais',async()=>{
