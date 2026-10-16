@@ -54,6 +54,13 @@ test('build publica o catálogo descoberto e os JSONs com a mesma revisão autom
   await assert.rejects(buildSite(root),/lei-9394.json/);assert.equal(await readFile(join(root,'dist/keep.txt'),'utf8'),'último build válido');
 });
 
+test('build com pasta oficial vazia não publica bancos de exemplo dos módulos',async t=>{
+  const root=await directory(t);for(const path of ['public/data/question-banks','src','docs'])await mkdir(join(root,path),{recursive:true});
+  await writeFile(join(root,'public/app-config.json'),'{}');await writeFile(join(root,'src/lei-8112.json'),JSON.stringify(bank('8112','1990')));
+  const manifest=await buildSite(root);assert.deepEqual(manifest.banks,[]);
+  await assert.rejects(readFile(join(root,'dist/assets/lei-8112.json')),error=>error.code==='ENOENT');
+});
+
 test('API consulta o mesmo catálogo sem Google ou Blob e recusa todas as gravações',async t=>{
   const root=await directory(t);await save(root,bank());const handler=createBankCatalogHandler({directory:root}),url='https://foco-concurso-wine.vercel.app/api/question-banks';
   const response=await handler(new Request(url));assert.equal(response.status,200);assert.deepEqual(await response.json(),repositoryCatalog(root).manifest);assert.equal(response.headers.get('Access-Control-Allow-Origin'),'*');

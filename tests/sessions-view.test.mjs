@@ -7,7 +7,7 @@ import {TemporaryStorage} from '../src/temporary-storage.mjs';
 import {AccountStorage} from '../src/account.mjs';
 import {sessionLibrary,sessionSummary,sessionReport,sessionsView,performanceForBank,sessionBankCatalog} from '../src/sessions-view.mjs';
 
-const base=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
+const base=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const a={...structuredClone(base),id:'law-a',name:'Lei nº 8.112/1990',questions:base.questions.slice(0,3)};
 const b={...structuredClone(a),id:'law-b',name:'Lei nº 8.069/1990'};
 const at=n=>new Date(Date.parse('2026-10-15T12:00:00Z')+n*1000).toISOString();

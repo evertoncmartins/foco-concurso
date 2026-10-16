@@ -1,5 +1,7 @@
 # Formato JSON dos bancos — versão 1
 
+O [guia visual de formato JSON](https://foco-concurso-wine.vercel.app/formato-json.html) explica este formato passo a passo.
+
 Cada arquivo representa um banco, com `schemaVersion`, `id`, `name` e `questions`. `description` é opcional. Use UTF-8, aspas duplas, sem comentários e sem vírgula após o último item.
 
 | Campo | Obrigatório | Regra |

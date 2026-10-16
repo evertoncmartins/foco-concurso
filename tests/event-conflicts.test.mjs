@@ -6,7 +6,7 @@ import {reconcileEvents,coversEvents} from '../src/event-conflicts.mjs';
 import {Store} from '../src/store.mjs';
 
 class MemoryStorage{data=new Map();get length(){return this.data.size;}key(i){return [...this.data.keys()][i]??null;}getItem(key){return this.data.get(key)??null;}setItem(key,value){this.data.set(key,String(value));}removeItem(key){this.data.delete(key);}}
-const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
+const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const seed={id:'builtin-lei-8112-v1',at:'2026-10-08T00:00:00.000Z',type:'bank',bank};
 const flag=(value,at='2026-10-08T12:00:00.000Z')=>({id:'same-flag',at,type:'flag',key:'bank:q1',flag:'favorite',value});
 const answer=(selected,at)=>({id:'answer-session-bank:q1',at,type:'answer',key:'bank:q1',sessionId:'session',selected,correctOption:'A',correct:selected==='A',discipline:'Legislação',subject:'Lei',topic:'Direitos'});

@@ -11,7 +11,7 @@ import {DriveSync} from '../src/drive.mjs';
 import {validateBank} from '../src/engine.mjs';
 import {longBank} from './helpers/long-bank.mjs';
 
-const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
+const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const imports={};
 for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
@@ -102,6 +102,15 @@ async function studyRuntime(options={},mode='smart'){
   await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');await navigate('session');})()`);
   return app;
 }
+
+test('catálogo oficial vazio inicia sem questões de demonstração no Desktop e Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const app=runtime({mobile,systemBanks:[]});app.auth.signOut();await app.click('guest');
+    assert.equal(app.value('model.questions.length'),0);assert.equal(app.value('model.banks.length'),0);
+    await app.click('nav',{view:'banks'});assert(!app.html().includes('Baixar as 10 questões'));
+    assert(!app.value('store.events.some(e=>e.type==="bank")'));
+  }
+});
 
 test('visitante usa bancos do sistema e pessoais, com origem por questão e renomeação sem alterar resultados',async()=>{
   for(const mobile of [false,true]){

@@ -62,11 +62,11 @@ scripts/                build e verificações sem dependências
 .openai/hosting.json     identidade e configuração de Sites
 ```
 
-O build copia `public/`, `src/` e `docs/` para `dist/`. O conteúdo é implantável como site estático. Não contém credenciais ou tokens. As funções em `api/auth/` e sua implementação em `server/` são publicadas separadamente pelo Vercel e nunca entram no build público.
+O build copia `public/`, os módulos de `src/` e `docs/` para `dist/`. Bancos usados apenas em testes ficam em `tests/fixtures/` e não são publicados. Os bancos nativos vêm exclusivamente de `public/data/question-banks/`. O conteúdo é implantável como site estático. Não contém credenciais ou tokens. As funções em `api/auth/` e sua implementação em `server/` são publicadas separadamente pelo Vercel e nunca entram no build público.
 
 ## Questões
 
-Leia [FORMATO_JSON.md](docs/FORMATO_JSON.md), utilize [modelo-banco.json](docs/modelo-banco.json) e valide com [questions.schema.json](docs/questions.schema.json). A importação também verifica IDs repetidos, alternativas repetidas e existência da alternativa correta — relações que o JSON Schema sozinho não garante.
+Veja o [guia didático de formato JSON](public/formato-json.html) ou a [referência técnica](docs/FORMATO_JSON.md), utilize [modelo-banco.json](docs/modelo-banco.json) e valide com [questions.schema.json](docs/questions.schema.json). A importação também verifica IDs repetidos, alternativas repetidas e existência da alternativa correta — relações que o JSON Schema sozinho não garante.
 
 ## Progresso e revisão
 

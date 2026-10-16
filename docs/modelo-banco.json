@@ -1,26 +1,37 @@
 {
   "schemaVersion": 1,
-  "id": "meu-banco-exemplo",
-  "name": "Nome do banco de questões",
-  "description": "Conteúdo, objetivo e data de atualização.",
+  "id": "meu-banco",
+  "name": "Nome do meu banco",
+  "description": "Descreva o conteúdo deste banco.",
   "questions": [
     {
-      "id": "tema-001",
-      "discipline": "Legislação",
-      "subject": "Provimento",
-      "topic": "Investidura",
-      "statement": "Conforme o art. 7º da Lei nº 8.112/1990, quando ocorre a investidura em cargo público?",
+      "id": "questao-001",
+      "discipline": "Nome da disciplina",
+      "subject": "Nome do assunto",
+      "topic": "Nome do tópico",
+      "statement": "Escreva aqui o enunciado da questão.",
       "options": [
-        {"id": "A", "text": "Na aprovação no concurso."},
-        {"id": "B", "text": "Na posse."},
-        {"id": "C", "text": "No primeiro dia de exercício."},
-        {"id": "D", "text": "Na inscrição no concurso."}
+        {
+          "id": "A",
+          "text": "Texto da alternativa A."
+        },
+        {
+          "id": "B",
+          "text": "Texto da alternativa B."
+        },
+        {
+          "id": "C",
+          "text": "Texto da alternativa C."
+        },
+        {
+          "id": "D",
+          "text": "Texto da alternativa D."
+        }
       ],
-      "correctOption": "B",
-      "explanation": "A posse é o momento da investidura. Aprovação e exercício são etapas distintas.",
-      "reference": {"label": "Lei nº 8.112/1990, art. 7º", "url": "https://www.planalto.gov.br/ccivil_03/leis/l8112compilado.htm"},
+      "correctOption": "A",
+      "explanation": "A: explique por que esta alternativa está correta.\n\nB: explique por que esta alternativa está incorreta.\n\nC: comente esta alternativa.\n\nD: comente esta alternativa.",
       "difficulty": "easy",
-      "tags": ["IFSP", "posse"]
+      "tags": []
     }
   ]
 }

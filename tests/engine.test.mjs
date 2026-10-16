@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {validateBank,validateEvents,mergeEvents,derive,makeQueue,filterQuestions,breakdown,studyStreak,localDay,DAY} from '../src/engine.mjs';
 import {Store} from '../src/store.mjs';
 import {createSession,chooseAnswer,advanceSession} from '../src/session.mjs';
-const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
+const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const seed={id:'seed',at:'2026-10-01T00:00:00.000Z',type:'bank',bank};
 let serial=0;const event=item=>({id:`event-${++serial}`,at:new Date(Date.parse('2026-10-08T12:00:00Z')+serial*1000).toISOString(),...item});
 const key=i=>`${bank.id}:${bank.questions[i].id}`;
