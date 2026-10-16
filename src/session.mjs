@@ -1,8 +1,9 @@
+import {questionSource} from './bank-source.mjs';
 export function createSession(queue,mode='smart',id=crypto.randomUUID(),at=new Date().toISOString(),progressEpoch=null){
   if(!Array.isArray(queue)||!queue.length||new Set(queue).size!==queue.length)throw new Error('A sessão deve ter questões únicas e não pode estar vazia.');
   return {id,mode,queue:[...queue],index:0,answers:{},startedAt:at,completed:false,...(progressEpoch!==null?{progressEpoch}:{})};
 }
-export function answerEvent(session,q,chosen){return {id:`answer-${session.id}-${q.key}`,type:'answer',key:q.key,sessionId:session.id,selected:chosen,correctOption:q.correctOption,correct:chosen===q.correctOption,discipline:q.discipline,subject:q.subject,topic:q.topic,progressEpoch:session.progressEpoch??null};}
+export function answerEvent(session,q,chosen){return {id:`answer-${session.id}-${q.key}`,type:'answer',key:q.key,sessionId:session.id,selected:chosen,correctOption:q.correctOption,correct:chosen===q.correctOption,discipline:q.discipline,subject:q.subject,topic:q.topic,...questionSource(q),...(q.id&&q.statement?{questionSnapshot:{...q}}:{}),progressEpoch:session.progressEpoch??null};}
 export function chooseAnswer(session,q,chosen){
   if(session.completed||session.queue[session.index]!==q.key||session.answers[q.key])throw new Error('Esta questão já foi respondida ou não está ativa.');
   if(!q.options.some(o=>o.id===chosen))throw new Error('Selecione uma alternativa válida.');

@@ -1,34 +1,12 @@
 import {icon} from './icons.mjs';
+import {sourceTag,sourceType} from './bank-source.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const plural=(n,one,many)=>n===1?one:many;
 const compare=(a,b)=>a.localeCompare(b,'pt-BR',{numeric:true,sensitivity:'base'});
-const laws=[
-  {key:'8112',matches:name=>/\b8\.?112\b/u.test(name),name:'Lei nº 8.112/1990',subtitle:'Servidores públicos federais',description:'Estabelece as regras da vida funcional dos servidores públicos civis federais: ingresso, movimentação, direitos, deveres e responsabilidades no serviço público.',url:'https://www.planalto.gov.br/ccivil_03/leis/l8112compilado.htm'},
-  {key:'8069',matches:name=>/\b8\.?069\b|\bECA\b|Estatuto da Criança e do Adolescente/iu.test(name),name:'Lei nº 8.069/1990',subtitle:'Estatuto da Criança e do Adolescente',description:'Protege os direitos de crianças e adolescentes e define responsabilidades da família, da sociedade e do poder público para garantir seu desenvolvimento, sua dignidade e sua proteção integral.',url:'https://www.planalto.gov.br/ccivil_03/leis/l8069.htm'}
-];
 const titles={I:'Disposições preliminares',II:'Provimento, vacância e movimentação',III:'Direitos e vantagens',IV:'Regime disciplinar',V:'Processo administrativo disciplinar',VI:'Seguridade social',VII:'Disposições gerais',VIII:'Disposições transitórias e finais'};
-
-// Share the naming convention across the bank catalog and the home cards.
-// Preserve imported names/IDs; format only a single, explicitly identified law.
-export function bankPresentation(bank){
-  const name=String(bank.name||''),matched=laws.filter(l=>l.matches(name));
-  const disciplines=[...new Set((bank.questions||[]).map(q=>q.discipline).filter(Boolean))];
-  const fallback={law:null,title:name,subtitle:disciplines.join(' · ')||'Banco de questões'};
-  const explicit=[...name.matchAll(/\bLei\s+(?:n[º°o.]?\s*)?(\d+(?:\.\d+)*)\s*\/\s*(\d{4})\b/giu)].filter(m=>!/Decreto\s*[-–—]\s*$/iu.test(name.slice(0,m.index)));
-  const normalizeNumber=n=>n.replace(/\./g,'').replace(/^0+(?=\d)/u,'').replace(/\B(?=(\d{3})+(?!\d))/gu,'.');
-  const identified=new Set(explicit.map(m=>`Lei nº ${normalizeNumber(m[1])}/${m[2]}`));
-  if(matched.length>1||identified.size>1)return fallback;
-  const law=matched.length===1?matched[0]:null;
-  const title=[...identified][0]||law?.name;
-  if(!title)return fallback;
-  if(law&&title===law.name)return {law,title,subtitle:law.subtitle};
-  const match=explicit[0],trim=v=>v.replace(/^[\s·:—–-]+|[\s·:—–-]+$/gu,'');
-  const suffix=match?trim(name.slice(match.index+match[0].length)):'';
-  const prefix=match?trim(name.slice(0,match.index)):'';
-  const useful=v=>v.length>5&&!/^(?:banco|questões|unificado|recorte|edital|títulos|capítulos|arts?\.)\b/iu.test(v);
-  return {law:null,title,subtitle:useful(suffix)?suffix:useful(prefix)?prefix:fallback.subtitle};
-}
+import {bankPresentation} from './bank-names.mjs';
+export {bankPresentation} from './bank-names.mjs';
 
 function origin(q){
   const tag=[q.tag,...(q.tags||[])].find(t=>/^[A-Z][A-Z0-9.-]*-[12]\d{3}$/.test(t||''));
@@ -74,16 +52,16 @@ export function bankOverviewData(bank){
   return {...presentation,institutions:counts(institutions),subjects:counts(subjects),disciplines,firstYear,lastYear,period,missingInstitutions,missingYears,total:bank.questions.length};
 }
 
-export function bankCardView(bank,{detailsOpen=false,index=0}={}){
+export function bankCardView(bank,{detailsOpen=false,index=0,isAdmin=false}={}){
   const panelId=`bank-details-${index}`,overview=bankOverviewData(bank);
   const {law,institutions,subjects,disciplines,total,period,missingInstitutions,missingYears}=overview;
   const detailLabel=detailsOpen?'Ocultar detalhes':'Ver mais detalhes';
   const {title,subtitle}=overview;
-  const description=law?.description||`Questões ${disciplines.length?`de ${disciplines.join(' e ')}`:'para concursos públicos'} para praticar e revisar os assuntos apresentados abaixo.`;
-  return `<article class="card bank-card ${bank.enabled?'':'disabled'}" aria-label="${esc(bank.name)}">
+  const description=sourceType(bank)==='system'&&bank.description?.trim()?bank.description:law?.description||`Questões ${disciplines.length?`de ${disciplines.join(' e ')}`:'para concursos públicos'} para praticar e revisar os assuntos apresentados abaixo.`;
+  return `<article class="card bank-card ${bank.enabled?'':'disabled'}" aria-label="${esc(bank.displayName||bank.name)}">
     <header class="bank-heading">
-      <div class="bank-heading-top"><span class="bank-symbol">${icon('book',20)}</span><span class="bank-status ${bank.enabled?'is-active':''}"><span aria-hidden="true"></span>${bank.enabled?'Ativo':'Desativado'}</span></div>
-      <div class="bank-title"><h3 title="${esc(bank.name)}">${esc(title)}</h3><p>${esc(subtitle)}</p></div>
+      <div class="bank-heading-top"><span class="bank-symbol">${icon('book',20)}</span>${sourceTag(bank)}<span class="bank-status ${bank.enabled?'is-active':''}"><span aria-hidden="true"></span>${bank.enabled?'Ativo':'Desativado'}</span></div>
+      <div class="bank-title"><h3 title="${esc(bank.displayName||bank.name)}">${esc(title)}</h3><p>${esc(subtitle)}</p></div>
     </header>
     <dl class="bank-stats" aria-label="Resumo do conteúdo">
       <div><dt>Questões</dt><dd>${total}</dd></div>
@@ -92,7 +70,7 @@ export function bankCardView(bank,{detailsOpen=false,index=0}={}){
     </dl>
     <div class="bank-primary-actions">
       <button class="btn small primary" data-action="start" data-bank="${esc(bank.id)}" ${bank.enabled?'':'disabled'}>Estudar ${icon('arrow',14)}</button>
-      <button class="bank-details-toggle" data-action="bank-details" data-bank="${esc(bank.id)}" aria-expanded="${detailsOpen}" aria-controls="${panelId}" aria-label="${detailLabel} de ${esc(bank.name)}"><span class="bank-details-label">${detailLabel}</span><svg class="bank-details-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <button class="bank-details-toggle" data-action="bank-details" data-bank="${esc(bank.id)}" aria-expanded="${detailsOpen}" aria-controls="${panelId}" aria-label="${detailLabel} de ${esc(bank.displayName||bank.name)}"><span class="bank-details-label">${detailLabel}</span><svg class="bank-details-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
     </div>
     <div class="bank-details-panel" id="${panelId}" ${detailsOpen?'':'hidden'}>
       <section class="bank-detail-section"><h4>${law?'Sobre a lei':'Sobre o conteúdo'}</h4><p class="bank-about">${esc(description)}</p>${law?`<a class="bank-law-link" href="${law.url}" target="_blank" rel="noopener noreferrer">Ler a lei ${icon('arrow',13)}</a>`:''}</section>
@@ -102,8 +80,9 @@ export function bankCardView(bank,{detailsOpen=false,index=0}={}){
       <div class="bank-management">
         <button class="btn small" data-action="bank-toggle" data-bank="${esc(bank.id)}">${bank.enabled?'Desativar':'Ativar'} banco</button>
         <div class="bank-file-actions">
-          <button class="icon-btn" data-action="bank-export" data-bank="${esc(bank.id)}" aria-label="Exportar ${esc(bank.name)}" title="Exportar JSON">${icon('download',17)}</button>
-          <button class="icon-btn" data-action="bank-delete" data-bank="${esc(bank.id)}" aria-label="Excluir ${esc(bank.name)}" title="Excluir banco">${icon('trash',17)}</button>
+          ${sourceType(bank)==='personal'?`<button class="btn small ghost" data-action="bank-rename" data-bank="${esc(bank.id)}">Renomear</button>`:isAdmin?`<button class="btn small ghost" data-action="system-edit" data-bank="${esc(bank.id)}">Gerenciar</button>`:''}
+          <button class="icon-btn" data-action="bank-export" data-bank="${esc(bank.id)}" aria-label="Exportar ${esc(bank.displayName||bank.name)}" title="Exportar JSON">${icon('download',17)}</button>
+          ${sourceType(bank)==='personal'?`<button class="icon-btn" data-action="bank-delete" data-bank="${esc(bank.id)}" aria-label="Excluir ${esc(bank.displayName||bank.name)}" title="Excluir banco">${icon('trash',17)}</button>`:''}
         </div>
       </div>
     </div>

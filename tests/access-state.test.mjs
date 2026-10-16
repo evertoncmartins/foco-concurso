@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -83,7 +83,9 @@ function runtime(options={}){
       }finally{this.connecting=false;}
     }
   }
-  const context=vm.createContext({...imports,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
+  class FixtureStore extends Store{constructor(storage){super(storage);if(!this.events.length&&!options.systemBanks){this.storage.setItem('foco:v1:event:builtin-lei-8112-v1',JSON.stringify({id:'builtin-lei-8112-v1',at:'2026-10-08T00:00:00.000Z',type:'bank',bank}));this.load();}}}
+  class FixtureCatalog{constructor(){this.banks=options.systemBanks||[];this.admin=false;this.storageReady=false;}async load(){return this.banks;}clearPermissions(){this.admin=false;}async permissions(){return false;}}
+  const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
   const target=dataset=>({dataset,disabled:false,closest(selector){return selector==='[data-action]'||selector==='button'?this:null;},matches(){return false;}});
@@ -100,6 +102,22 @@ async function studyRuntime(options={},mode='smart'){
   await app.value(`(async()=>{await newSession(model.questions.slice(0,3).map(q=>q.key),'${mode}');await navigate('session');})()`);
   return app;
 }
+
+test('visitante usa bancos do sistema e pessoais, com origem por questão e renomeação sem alterar resultados',async()=>{
+  for(const mobile of [false,true]){
+    const native=imports.validateSystemBank({...bank,id:'lei-8112',sourceType:'system',revision:'fixture',questions:bank.questions.slice(0,2)}),app=runtime({mobile,systemBanks:[native]});
+    app.auth.signOut();await app.click('guest');assert.equal(app.value('model.systemBanks.length'),1);assert.equal(app.value('model.personalBanks.length'),0);
+    await app.click('nav',{view:'banks'});assert(app.html().includes('bank-source system'));assert(!app.html().includes('data-action="system-add"'));assert(!app.html().includes('data-action="bank-rename"'));
+    await app.value('(async()=>{const own=structuredClone(bank);own.id="my-import";await importBank(own);})()');await app.click('nav',{view:'banks'});
+    const d=app.document.querySelector('#dialog'),form=d.querySelector('#rename-bank-form'),input={value:'Concurso IFSP — RJU do meu jeito'},button={disabled:false};form.elements={namedItem(){return input;}};form.querySelector=()=>button;
+    await app.click('bank-rename',{bank:'my-import'});await form.onsubmit({preventDefault(){}});assert.equal(app.value('model.personalBanks[0].displayName'),input.value);assert(app.html().includes(input.value));
+    await app.click('bank-delete',{bank:'lei-8112'});assert.equal(app.value('model.systemBanks.length'),1);assert(!d.open);
+    await app.value('(async()=>{const q=[model.questions.find(q=>q.sourceType==="system"),model.questions.find(q=>q.sourceType==="personal")];await newSession(q.map(q=>q.key),"exam");await navigate("session");})()');
+    assert(app.html().includes('bank-source system'));await app.click('select',{option:'A'});await app.click('answer');await app.click('next');assert(app.html().includes('bank-source personal'));await app.click('select',{option:'B'});await app.click('answer');await app.click('previous');assert(app.html().includes('bank-source system'));await app.click('next');await app.finish();
+    assert.equal(app.value('model.answers.filter(a=>a.sourceType==="system").length'),1);assert.equal(app.value('model.answers.filter(a=>a.sourceType==="personal").length'),1);assert(app.html().includes('bank-source system'));assert(app.html().includes('bank-source personal'));assert(app.html().includes(input.value));
+    await app.click('nav',{view:'performance'});await app.document.emit('change',{target:{dataset:{performanceOrigin:''},value:'system'}});assert.equal(app.value('performanceOrigin'),'system');assert(app.html().includes('Desempenho por origem'));
+  }
+});
 
 test('configuração de estudo atualiza bancos e filtros, bloqueia seleção vazia e inicia somente o conteúdo escolhido',async()=>{
   for(const mobile of [false,true]){

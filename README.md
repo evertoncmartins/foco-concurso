@@ -1,6 +1,6 @@
 # Foco — Estudos para concursos
 
-Plataforma para resolver questões e estudar para qualquer concurso com seus próprios bancos JSON. HTML5, CSS3 e JavaScript em módulos ES, sem dependências de produção e sem banco de dados tradicional.
+Plataforma para resolver questões e estudar para qualquer concurso com seus próprios bancos JSON. HTML5, CSS3 e JavaScript em módulos ES, com catálogo público de bancos e progresso pessoal em JSON, sem banco de dados tradicional.
 
 ## Funcionalidades
 
@@ -28,20 +28,21 @@ Plataforma para resolver questões e estudar para qualquer concurso com seus pr�
 - Progresso local automático; exportação e restauração de JSON sem substituir o histórico.
 - Sincronização Google Drive com OAuth, união de eventos e um único JSON de progresso por conta e pasta, atualizado com controle de versão e migração automática dos lotes antigos.
 - Pasta recuperada pela conta Google em outros dispositivos, via configuração privada no Drive.
-- Banco inicial com dez questões autorais sobre a Lei nº 8.112/1990.
+- Bancos do sistema disponíveis sem login ou Drive: Lei nº 8.112/1990 (126 questões) e Lei nº 8.069/1990 (73 questões). Bancos pessoais continuam importáveis e podem ser renomeados livremente. Tags Sistema/Pessoal acompanham questões, sessões e resultados; o Desempenho filtra também por origem. Administração global exige verificação Google no servidor. Consulte [BANCOS_SISTEMA.md](docs/BANCOS_SISTEMA.md) para a configuração de armazenamento da plataforma.
 
 ## Executar
 
-Requer Node.js 22 ou superior e Python 3 apenas para o servidor de desenvolvimento:
+Requer Node.js 22 ou superior:
 
 ```sh
+npm ci
 npm test
 npm run check
 npm run build
 npm run dev
 ```
 
-Abra `http://localhost:5173`. Não abra o HTML pelo protocolo `file://`: os módulos e o carregamento do banco dependem de HTTP. Nenhum `npm install` é necessário. Para outro servidor, publique o conteúdo de `dist/`.
+Abra `http://localhost:5173`. Não abra o HTML pelo protocolo `file://`: os módulos e o carregamento do banco dependem de HTTP. O SDK Blob é usado somente nas funções administrativas do servidor, sem entrar no build público. Para outro servidor, publique o conteúdo de `dist/`.
 
 ## Tela cheia no celular
 

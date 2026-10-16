@@ -58,3 +58,7 @@ A interface apresenta a tag junto da dificuldade, também no modo foco. Questõe
 ## Arquivo de progresso
 
 É diferente do banco. Contém `schemaVersion: 1`, `app: "foco-concursos"`, `events` e, na exportação, `summary` e `performance`. A restauração importa `events`, e os campos agregados são recalculados. Isso evita aceitar percentuais ou contadores inconsistentes. Não edite eventos existentes; importe bancos pela tela Meus bancos.
+
+## Nome de exibição e procedência
+
+Bancos importados pelo usuário são sempre Pessoal, mesmo que o JSON declare `sourceType: system`. O campo opcional `displayName` pode informar um nome de exibição livre; Renomear na plataforma preserva a escolha sem trocar o ID. `bankId` e `sourceType` das questões são atribuídos pela aplicação e não substituem a procedência da prova, instituição, banca ou ano. O espaço `lei-NUMERO` é reservado aos nativos; uma importação pessoal conflitante recebe o prefixo `personal_bank_`, com compatibilidade para o histórico antigo. Veja [BANCOS_SISTEMA.md](BANCOS_SISTEMA.md).
