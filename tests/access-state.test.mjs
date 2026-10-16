@@ -84,7 +84,7 @@ function runtime(options={}){
     }
   }
   class FixtureStore extends Store{constructor(storage){super(storage);if(!this.events.length&&!options.systemBanks){this.storage.setItem('foco:v1:event:builtin-lei-8112-v1',JSON.stringify({id:'builtin-lei-8112-v1',at:'2026-10-08T00:00:00.000Z',type:'bank',bank}));this.load();}}}
-  class FixtureCatalog{constructor(){this.banks=options.systemBanks||[];this.admin=false;this.storageReady=false;}async load(){return this.banks;}clearPermissions(){this.admin=false;}async permissions(){return false;}}
+  class FixtureCatalog{constructor(){this.banks=options.systemBanks||[];}async load(){return this.banks;}}
   const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);

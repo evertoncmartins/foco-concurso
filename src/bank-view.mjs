@@ -52,7 +52,7 @@ export function bankOverviewData(bank){
   return {...presentation,institutions:counts(institutions),subjects:counts(subjects),disciplines,firstYear,lastYear,period,missingInstitutions,missingYears,total:bank.questions.length};
 }
 
-export function bankCardView(bank,{detailsOpen=false,index=0,isAdmin=false}={}){
+export function bankCardView(bank,{detailsOpen=false,index=0}={}){
   const panelId=`bank-details-${index}`,overview=bankOverviewData(bank);
   const {law,institutions,subjects,disciplines,total,period,missingInstitutions,missingYears}=overview;
   const detailLabel=detailsOpen?'Ocultar detalhes':'Ver mais detalhes';
@@ -80,7 +80,7 @@ export function bankCardView(bank,{detailsOpen=false,index=0,isAdmin=false}={}){
       <div class="bank-management">
         <button class="btn small" data-action="bank-toggle" data-bank="${esc(bank.id)}">${bank.enabled?'Desativar':'Ativar'} banco</button>
         <div class="bank-file-actions">
-          ${sourceType(bank)==='personal'?`<button class="btn small ghost" data-action="bank-rename" data-bank="${esc(bank.id)}">Renomear</button>`:isAdmin?`<button class="btn small ghost" data-action="system-edit" data-bank="${esc(bank.id)}">Gerenciar</button>`:''}
+          ${sourceType(bank)==='personal'?`<button class="btn small ghost" data-action="bank-rename" data-bank="${esc(bank.id)}">Renomear</button>`:''}
           <button class="icon-btn" data-action="bank-export" data-bank="${esc(bank.id)}" aria-label="Exportar ${esc(bank.displayName||bank.name)}" title="Exportar JSON">${icon('download',17)}</button>
           ${sourceType(bank)==='personal'?`<button class="icon-btn" data-action="bank-delete" data-bank="${esc(bank.id)}" aria-label="Excluir ${esc(bank.displayName||bank.name)}" title="Excluir banco">${icon('trash',17)}</button>`:''}
         </div>

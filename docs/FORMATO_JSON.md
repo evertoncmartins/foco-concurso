@@ -62,3 +62,7 @@ A interface apresenta a tag junto da dificuldade, também no modo foco. Questõe
 ## Nome de exibição e procedência
 
 Bancos importados pelo usuário são sempre Pessoal, mesmo que o JSON declare `sourceType: system`. O campo opcional `displayName` pode informar um nome de exibição livre; Renomear na plataforma preserva a escolha sem trocar o ID. `bankId` e `sourceType` das questões são atribuídos pela aplicação e não substituem a procedência da prova, instituição, banca ou ano. O espaço `lei-NUMERO` é reservado aos nativos; uma importação pessoal conflitante recebe o prefixo `personal_bank_`, com compatibilidade para o histórico antigo. Veja [BANCOS_SISTEMA.md](BANCOS_SISTEMA.md).
+
+## Publicar um banco do Sistema pelo GitHub
+
+Envie o JSON em `public/data/question-banks/lei-NUMERO.json`. O `id` deve coincidir com o nome do arquivo sem a extensão e `name` deve identificar a mesma lei, por exemplo `Lei nº 9.394/1996`. Use `subtitle` para a descrição curta. Os demais campos seguem o formato acima. Catálogo e revisões são automáticos; não envie `index.json`. Atualizações devem preservar IDs de questões que mantêm o mesmo conteúdo. Veja [BANCOS_SISTEMA.md](BANCOS_SISTEMA.md). A importação pessoal pelo Drive ou pelo aplicativo não exige esse padrão de nome.
