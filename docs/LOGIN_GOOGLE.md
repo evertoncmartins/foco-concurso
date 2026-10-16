@@ -119,8 +119,8 @@ Usuários com a autorização antiga precisam entrar/conectar o Google uma vez a
 
 Referências: https://developers.google.com/identity/protocols/oauth2/web-server#offline e https://developers.google.com/identity/protocols/oauth2#expiration.
 
-## Retorno dos documentos — 1.18.3
+## Retorno dos documentos — 1.18.4
 
-Política de Privacidade, Termos de Serviço e guia JSON são exibidos dentro do aplicativo, mantendo a sessão ativa em memória. Voltar ao Foco fecha o documento e abre o início quando a conta já está autenticada. Se a página foi aberta pela entrada, o retorno permanece no login e aguarda o clique explícito em Continuar com Google. Os documentos públicos acessados diretamente continuam com retorno normal à raiz, que exibe o login.
+Política de Privacidade, Termos de Serviço e guia JSON são exibidos dentro do aplicativo, mantendo a sessão ativa em memória. Voltar ao Foco fecha o documento e retorna à página interna de origem quando a mesma conta continua autenticada: Termos e Política voltam para Ajustes; o guia JSON volta para Banco de Questões. A tela preservada não é redesenhada, mantendo campos em edição e rolagem. O foco retorna ao link que abriu o documento. A origem permanece em memória e não é aplicada depois de sair ou trocar de conta. Se a página foi aberta pela entrada, o retorno permanece no login e aguarda o clique explícito em Continuar com Google. Os documentos públicos acessados diretamente continuam com retorno normal à raiz, que exibe o login.
 
 O retorno não consulta cookies para autenticar, não consome uma nova autorização, não recarrega a conta e não restaura o Drive novamente. A tentativa de recuperação automática da versão 1.18.2 foi retirada, incluindo a API `/api/auth/resume`. A renovação de uma conta já conectada durante os estudos permanece no POST `/api/auth/refresh`, com as proteções existentes. Mensagens de retorno do documento são aceitas somente da origem e do quadro abertos pelo aplicativo.

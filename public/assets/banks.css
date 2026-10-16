@@ -67,3 +67,13 @@
   .bank-file-actions .icon-btn{width:44px;height:44px}
 }
 @media(prefers-reduced-motion:reduce){.bank-details-chevron{transition:none}}
+
+.bank-format-help{display:flex;align-items:center;justify-content:space-between;gap:20px;text-align:left;border-top:1px solid var(--border);margin-top:22px;padding-top:20px}
+.bank-format-help>div{min-width:0}
+.bank-format-help h4{margin:0;font-size:13px;font-weight:600;color:var(--text);line-height:1.5}
+.import-zone .bank-format-help p{font-size:12px;line-height:1.75;margin:6px 0 0;max-width:570px}
+.bank-format-actions{display:flex;flex-direction:column;align-items:flex-start;gap:10px;flex-shrink:0}
+.bank-format-actions .btn{white-space:normal;text-align:left;line-height:1.5}
+.bank-format-actions .text-link{font-size:11px}
+@media(max-width:1000px){.bank-format-help{flex-direction:column;align-items:stretch;gap:14px}.bank-format-actions{flex-shrink:1}}
+@media(max-width:700px){.bank-format-actions .btn{min-height:44px}.bank-format-actions .text-link{display:inline-flex;align-items:center;min-height:44px}}

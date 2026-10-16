@@ -3,8 +3,8 @@ const documents={'privacidade.html':'Política de Privacidade','termos.html':'Te
 // Keep the live application in memory while reading a public document. Returning
 // never exchanges Google credentials or infers a login from an old cookie.
 export class PublicDocuments{
-  constructor({document=globalThis.document,window=globalThis.window,canOpen=()=>true,onReturn=()=>{}}={}){
-    this.document=document;this.window=window;this.canOpen=canOpen;this.onReturn=onReturn;this.dialog=null;this.frame=null;
+  constructor({document=globalThis.document,window=globalThis.window,canOpen=()=>true,getContext=()=>null,onReturn=()=>{}}={}){
+    this.document=document;this.window=window;this.canOpen=canOpen;this.getContext=getContext;this.onReturn=onReturn;this.dialog=null;this.frame=null;
     document.addEventListener('click',event=>{
       const link=event.target.closest('a[data-foco-document]');
       if(!link||event.defaultPrevented||event.button>0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
@@ -18,6 +18,7 @@ export class PublicDocuments{
   }
   open(url,title){
     if(this.dialog)return;
+    this.context=this.getContext();this.returnFocus=this.document.activeElement;
     const dialog=this.document.createElement('dialog'),frame=this.document.createElement('iframe');
     dialog.className='public-document-dialog';dialog.setAttribute('aria-label',title);
     frame.src=url;frame.title=title;frame.setAttribute('referrerpolicy','same-origin');
@@ -28,8 +29,9 @@ export class PublicDocuments{
   }
   async close(){
     if(!this.dialog)return;
-    const dialog=this.dialog;this.dialog=null;this.frame=null;
+    const dialog=this.dialog,context=this.context,returnFocus=this.returnFocus;this.dialog=null;this.frame=null;this.context=null;this.returnFocus=null;
     dialog.close();dialog.remove();this.document.body.style.overflow=this.previousOverflow;
-    await this.onReturn();
+    await this.onReturn(context);
+    if(returnFocus?.isConnected)returnFocus.focus({preventScroll:true});
   }
 }
