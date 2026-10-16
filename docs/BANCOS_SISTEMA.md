@@ -38,6 +38,14 @@ Os bancos enviados pelo importador do Foco ou pela pasta do Drive continuam **Pe
 
 IDs pessoais antigos reservados (`lei-NUMERO`) continuam traduzidos de forma determinística no modelo, sem reescrever o diário ou perder progresso. Não ocorre transferência automática do progresso de um banco pessoal para um banco do Sistema. Os snapshots já gravados na 1.17.0 continuam aceitos. No modo visitante, o progresso continua temporário.
 
+## Associar progresso pessoal ao Sistema — 1.19.0
+
+Quando todas as questões de um banco pessoal têm correspondência exata e sem ambiguidade em um único banco nativo, o card pessoal em **Banco de questões** oferece **Associar progresso**. A comparação considera enunciado, IDs e textos das alternativas e gabarito; não usa nome do arquivo ou título da lei para concluir equivalência. IDs de questões diferentes só são relacionados quando o conteúdo tem uma correspondência única. Melhorias de explicação e metadados não impedem a comparação.
+
+A confirmação associa o progresso da conta ao banco nativo e desativa o banco pessoal para novos estudos. Não reescreve nem copia tentativas: respostas, datas, acertos/erros, favoritos, revisões e sessões originais são preservados, com a origem Pessoal nos registros anteriores. Novas respostas no Sistema e respostas equivalentes de dispositivos antigos entram na mesma sequência de revisão, sem duplicar o histórico. Sessões antigas podem ser retomadas mesmo depois de remover o banco pessoal da lista; os resultados preservam seus gabaritos registrados. A associação pode ser desfeita nos detalhes do card.
+
+A prova da associação referencia a versão importada e um snapshot da versão nativa. O evento é salvo no arquivo principal de progresso, pela sincronização normal. Confirme **Drive sincronizado** antes de remover os JSONs separados das leis. Apagar esses JSONs do Drive não remove um banco já incorporado ao arquivo principal. Para deixar de exibi-lo na lista, use a exclusão do banco pessoal no Foco depois de associar. **Não apague o arquivo `foco-progresso-…-principal.json`**: ele contém o histórico, as questões pessoais e as associações. A funcionalidade não exclui arquivos do Drive e não associa contas diferentes.
+
 ## Verificação
 
 Os testes cobrem descoberta de arquivos adicionados e removidos sem índice, validação antes de substituir o build, revisão automática, consistência entre catálogo e arquivos publicados, API somente leitura, carregamento remoto pelo espelho, fallback, sessões mistas, renomeação pessoal e resultados históricos após atualização. Login Google e Drive mantêm sua infraestrutura anterior; esta mudança não exige Blob nem novas variáveis da Vercel.

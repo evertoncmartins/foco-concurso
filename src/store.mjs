@@ -1,5 +1,6 @@
 import {mergeEvents,validateEvents,derive,breakdown,studyStreak,sameEvent,isStudyEvent,studyEpoch,currentProgressEpoch} from './engine.mjs';
 import {reconcileEvents} from './event-conflicts.mjs';
+import {bankProgressPlan} from './bank-progress.mjs';
 const PREFIX='foco:v1:event:';
 const resetError=()=>Object.assign(new Error('Seu progresso foi reiniciado. Inicie uma nova sessão de estudo.'),{code:'PROGRESS_RESET'});
 export class Store extends EventTarget {
@@ -23,6 +24,19 @@ export class Store extends EventTarget {
     return saved;
   }
   async resetProgress(){return this.add([{type:'progress-reset'}]);}
+  async associateBank(fromBankId,toBankId){
+    this.load();const model=this.model(),source=model.personalBanks.find(b=>b.id===fromBankId),target=model.systemBanks.find(b=>b.id===toBankId);
+    if(source?.linkedTo){if(source.linkedTo.toBankId===toBankId)return false;throw new Error('Este banco já está associado. Desfaça a associação antes de escolher outro.');}
+    const plan=bankProgressPlan(source,target),from=model.bankHistory.findLast(e=>e.type==='bank'&&e.bank.id===fromBankId);
+    if(!plan||!from||!target)throw new Error('Não foi possível confirmar que todas as questões são equivalentes. Seus estudos foram mantidos.');
+    const revision=target.revision||'1',snapshot=model.bankHistory.some(e=>e.type==='system-bank-snapshot'&&e.bank.id===target.id&&e.revision===revision);
+    const events=[];
+    if(!snapshot)events.push({type:'system-bank-snapshot',revision,bank:target});
+    if(!target.enabled)events.push({type:'system-bank-state',bankId:target.id,value:'enabled'});
+    events.push({type:'bank-progress-link',...plan,fromEventId:from.id,toRevision:revision});
+    await this.add(events);return true;
+  }
+  async unlinkBank(fromBankId){return this.add([{type:'bank-progress-unlink',fromBankId}]);}
   async merge(events) {
     const incoming=validateEvents({schemaVersion:1,events});
     // Each event has its own key: different tabs never rewrite a shared document.

@@ -1,6 +1,7 @@
 import {normalizeQuestionOrigin} from './question-origin.mjs';
 import {bankPresentation} from './bank-names.mjs';
 import {personalBankId,sourceType} from './bank-source.mjs';
+import {deriveProgressLinks,linkedStudyKey,questionIdentity} from './bank-progress.mjs';
 export const VERSION = 1;
 export const DAY = 86400000;
 export const questionKey = (b, q) => `${b}:${q}`;
@@ -64,6 +65,13 @@ export function validateEvents(document) {
     if(e.type==='system-bank-snapshot'){const bank=validateBank(e.bank);if(!/^lei-[1-9]\d*$/.test(bank.id)||typeof e.revision!=='string'||!e.revision)throw new Error('Versão histórica de banco inválida.');return {...e,bank:{...bank,revision:e.revision,sourceType:'system'}};}
     if (e.type === 'bank-state'||e.type==='system-bank-state') { if (typeof e.bankId !== 'string' || !(e.type==='system-bank-state'?['enabled','disabled']:['enabled','disabled','deleted']).includes(e.value)) throw new Error('Estado de banco inválido.'); }
     else if(e.type==='bank-metadata'){text(e.bankId,'Banco');text(e.displayName,'Nome de exibição');}
+    else if(e.type==='bank-progress-link'||e.type==='bank-progress-unlink'){
+      if(typeof e.fromBankId!=='string'||!/^[\w-]{1,120}$/.test(e.fromBankId))throw new Error('Banco de origem da associação inválido.');
+      if(e.type==='bank-progress-link'){
+        if(typeof e.toBankId!=='string'||!/^lei-[1-9]\d*$/.test(e.toBankId)||e.fromBankId===e.toBankId||typeof e.fromEventId!=='string'||!e.fromEventId||e.fromEventId.length>300||typeof e.toRevision!=='string'||!e.toRevision)throw new Error('Destino da associação inválido.');
+        if(!Array.isArray(e.questions)||!e.questions.length||e.questions.length>5000||e.questions.some(q=>!q||typeof q.from!=='string'||typeof q.to!=='string'||!/^[\w-]{1,120}$/.test(q.from)||!/^[\w-]{1,120}$/.test(q.to))||new Set(e.questions.map(q=>q.from)).size!==e.questions.length||new Set(e.questions.map(q=>q.to)).size!==e.questions.length)throw new Error('Questões da associação inválidas.');
+      }
+    }
     else if (e.type === 'answer') {
       if (typeof e.key !== 'string' || typeof e.sessionId !== 'string' || typeof e.correct !== 'boolean' || !/^[A-H]$/.test(e.selected) || !/^[A-H]$/.test(e.correctOption)) throw new Error('Resposta inválida.');
       if (e.correct !== (e.selected === e.correctOption)) throw new Error('Resultado inconsistente.');
@@ -88,7 +96,7 @@ export function mergeEvents(...collections) {
   return [...map.values()].sort((a,b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id));
 }
 export function derive(events, now = Date.now(), systemBanks=[]) {
-  const banks = new Map(), states = new Map(), metadata=new Map(), systemStates=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], bankHistory=[], sessionUpdatedAt=new Map();
+  const banks = new Map(), states = new Map(), metadata=new Map(), systemStates=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], flagEvents=[],bankHistory=[], sessionUpdatedAt=new Map();
   const ordered=mergeEvents(events),progressEpoch=ordered.findLast(e=>e.type==='progress-reset')?.id??null;
   const aliases=new Map(ordered.filter(e=>e.type==='bank'&&personalBankId(e.bank.id)!==e.bank.id).map(e=>[e.bank.id,personalBankId(e.bank.id)]));
   const keyAlias=(key,origin)=>origin==='system'?key:aliases.has(key.split(':')[0])?`${aliases.get(key.split(':')[0])}${key.slice(key.indexOf(':'))}`:key;
@@ -101,24 +109,37 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
     if(e.type==='system-bank-state')systemStates.set(e.bankId,e.value);
     if(e.type==='bank-metadata')metadata.set(aliases.get(e.bankId)||e.bankId,e.displayName);
     if (e.type === 'session') {const s=structuredClone(e.session),sources=s.questionSources||{};s.queue=s.queue.map(k=>keyAlias(k,sources[k]?.sourceType));s.answers=Object.fromEntries(Object.entries(s.answers).map(([k,v])=>[keyAlias(k,sources[k]?.sourceType),v]));if(s.questionSources)s.questionSources=Object.fromEntries(Object.entries(sources).map(([k,v])=>[keyAlias(k,v.sourceType),v]));sessions.set(s.id,s);sessionUpdatedAt.set(s.id,e.at);}
-    if (e.type === 'flag') {const key=keyAlias(e.key,e.sourceType);if (!flags.has(key)) flags.set(key, {}); flags.get(key)[e.flag] = e.value; }
+    if (e.type === 'flag') flagEvents.push({...e,key:keyAlias(e.key,e.sourceType)});
     if (e.type === 'answer') {
-      const key=keyAlias(e.key,e.sourceType);answers.push({...e,key,bankId:key.split(':')[0],sourceType:sourceType(e)}); const p = progress.get(key) || {attempts:0, correct:0, wrong:0, streak:0};
+      const key=keyAlias(e.key,e.sourceType);answers.push({...e,key,bankId:key.split(':')[0],sourceType:sourceType(e)});
+    }
+  }
+  const links=deriveProgressLinks(ordered,bankHistory,systemBanks);
+  for(const e of answers){
+      const key=linkedStudyKey(e,e.key,links.keys,bankHistory);e.progressKey=key;const p = progress.get(key) || {attempts:0, correct:0, wrong:0, streak:0};
       p.attempts++; p.correct += +e.correct; p.wrong += +!e.correct; p.streak = e.correct ? p.streak + 1 : 0; p.lastCorrect = e.correct; p.lastAt = e.at;
       p.due = new Date(Date.parse(e.at) + DAY * (e.correct ? [1,3,7,14,30,60][Math.min(p.streak-1,5)] : 1)).toISOString();
       progress.set(key, p);
-    }
   }
-  const personal=[...banks.values()].filter(b => states.get(b.id) !== 'deleted').map(b=>({...b,displayName:metadata.get(b.id)||bankPresentation(b).title,enabled:states.get(b.id)!=='disabled'}));
+  for(const e of flagEvents){const key=linkedStudyKey(e,e.key,links.keys,bankHistory);if(!flags.has(key))flags.set(key,{});flags.get(key)[e.flag]=e.value;}
+  for(const [key,link] of links.keys){
+    const current=banks.get(key.split(':')[0])?.questions.find(q=>q.id===key.slice(key.indexOf(':')+1));
+    if(current&&questionIdentity(current)!==link.signature)continue;
+    if(progress.has(link.key))progress.set(key,progress.get(link.key));if(flags.has(link.key))flags.set(key,flags.get(link.key));
+  }
+  const personal=[...banks.values()].filter(b => states.get(b.id) !== 'deleted').map(b=>({...b,displayName:metadata.get(b.id)||bankPresentation(b).title,enabled:!links.banks.has(b.id)&&states.get(b.id)!=='disabled',linkedTo:links.banks.get(b.id)||null}));
   for(const event of bankHistory){const custom=metadata.get(event.bank.id);if(custom)event.bank={...event.bank,displayName:custom};}
   const native=systemBanks.map(b=>({...b,bankId:b.id,sourceType:'system',editable:false,removable:false,enabled:systemStates.get(b.id)!=='disabled'}));
   const visibleBanks=[...native,...personal];
   const questions = visibleBanks.flatMap(b => b.questions.map(q => ({...q, key:questionKey(b.id,q.id), bankId:b.id, bankName:b.displayName||b.name, displayName:b.displayName||b.name,sourceType:b.sourceType,bankRevision:b.revision||null,enabled:b.enabled})));
   const available=new Set(questions.map(q=>q.key)),needed=new Set([...sessions.values()].filter(s=>!s.completed&&!s.abandoned).flatMap(s=>s.queue));
   for(const e of [...bankHistory].reverse())if(e.type==='system-bank-snapshot')for(const q of e.bank.questions){const key=questionKey(e.bank.id,q.id);if(needed.has(key)&&!available.has(key)){questions.push({...q,key,bankId:e.bank.id,bankName:e.bank.displayName||e.bank.name,displayName:e.bank.displayName||e.bank.name,sourceType:'system',bankRevision:e.revision,enabled:false});available.add(key);}}
+  for(const [key,link] of links.keys)if(needed.has(key)&&!available.has(key)){questions.push({...link.question,key,bankId:link.bank.id,bankName:link.bank.displayName||link.bank.name,displayName:link.bank.displayName||link.bank.name,sourceType:'personal',enabled:false});available.add(key);}
+  for(const q of questions){const link=links.keys.get(q.key);q.progressKey=link&&questionIdentity(q)===link.signature?link.key:q.key;}
+  const uniqueQuestions=[...new Map(questions.map(q=>[q.progressKey,q])).values()];
   const correct = answers.filter(e => e.correct).length;
-  const stats = {attempts:answers.length, correct, wrong:answers.length-correct, accuracy:answers.length?Math.round(correct/answers.length*100):0, answered:questions.filter(q=>progress.has(q.key)).length, pending:questions.filter(q=>!progress.has(q.key)).length, errors:questions.filter(q=>progress.get(q.key)?.lastCorrect===false).length, favorites:questions.filter(q=>flags.get(q.key)?.favorite).length, review:questions.filter(q=>flags.get(q.key)?.review || (progress.has(q.key)&&Date.parse(progress.get(q.key).due)<=now)).length};
-  return {banks:visibleBanks,systemBanks:native,personalBanks:personal,questions,progress,flags,answers,sessions:[...sessions.values()],stats,progressEpoch,bankHistory,sessionUpdatedAt};
+  const stats = {attempts:answers.length, correct, wrong:answers.length-correct, accuracy:answers.length?Math.round(correct/answers.length*100):0, answered:uniqueQuestions.filter(q=>progress.has(q.progressKey)).length, pending:uniqueQuestions.filter(q=>!progress.has(q.progressKey)).length, errors:uniqueQuestions.filter(q=>progress.get(q.progressKey)?.lastCorrect===false).length, favorites:uniqueQuestions.filter(q=>flags.get(q.progressKey)?.favorite).length, review:uniqueQuestions.filter(q=>flags.get(q.progressKey)?.review || (progress.has(q.progressKey)&&Date.parse(progress.get(q.progressKey).due)<=now)).length};
+  return {banks:visibleBanks,systemBanks:native,personalBanks:personal,questions,progress,flags,answers,sessions:[...sessions.values()],stats,progressEpoch,bankHistory,sessionUpdatedAt,bankLinks:links.banks,progressLinks:links.keys};
 }
 export function filterQuestions(model, options, now = Date.now()) {
   return model.questions.filter(q => {

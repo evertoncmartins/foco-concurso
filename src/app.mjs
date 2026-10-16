@@ -1,4 +1,5 @@
 import {PublicDocuments} from './public-documents.mjs';
+import {progressLinkCandidates} from './bank-progress.mjs';
 import {Store} from './store.mjs';
 import {validateBank,validateEvents,derive,makeQueue,filterQuestions,breakdown,studyStreak,localDay} from './engine.mjs';
 import {DriveSync} from './drive.mjs';
@@ -127,7 +128,7 @@ function banks(){
   return heading('Banco de questões','Seu conteúdo, organizado do seu jeito.',`<button class="btn primary" data-action="import">${icon('plus',16)} Importar JSON</button>`)+`
     ${systemCatalogError?`<p class="system-catalog-error" role="status">${esc(systemCatalogError)} Seus dados pessoais foram preservados.</p>`:''}<p class="system-catalog-note">Bancos do sistema disponíveis para todos. ${sourceTag({sourceType:'personal'})} identifica os seus arquivos. <button class="text-link" data-action="refresh-system-banks">Atualizar catálogo</button></p><section class="import-zone" id="drop-zone"><div class="flex">${icon('upload',25)}<h3>Um novo conteúdo começa aqui.</h3></div><p>Selecione ou arraste arquivos JSON. Não é preciso alterar o código.</p><div class="flex"><button class="btn small" data-action="import">Escolher arquivos</button><button class="btn small ghost" data-action="drive-banks">${icon('cloud',15)} Buscar no Drive</button><a class="btn small ghost" href="./docs/modelo-banco.json" download>Baixar modelo JSON ${icon('download',14)}</a></div>
     <div class="bank-format-help" aria-labelledby="bank-format-title"><div><h4 id="bank-format-title">Crie seus próprios bancos</h4><p>Consulte a estrutura do JSON, os campos das questões e exemplos para criar e importar seus bancos personalizados.</p></div><div class="bank-format-actions"><a class="btn small" data-foco-document href="./formato-json.html">Ler a documentação do formato ${icon('arrow',14)}</a><a class="text-link" href="./docs/questions.schema.json" download>Baixar JSON Schema</a></div></div></section>
-    <div class="banks-grid">${model.banks.map((bank,index)=>bankCardView(bank,{index,detailsOpen:expandedBankDetails.has(bank.id)})).join('')}</div>
+    <div class="banks-grid">${model.banks.map((bank,index)=>{const candidates=progressLinkCandidates(model,bank);return bankCardView(bank,{index,detailsOpen:expandedBankDetails.has(bank.id),association:candidates.length===1?candidates[0]:null});}).join('')}</div>
     ${model.banks.length?'':empty('Seu primeiro banco','Use o modelo JSON para organizar seu conteúdo.')}`;
 }
 function performanceRows(field,answers=model.answers){const rows=breakdown(answers,field);return rows.length?rows.map(r=>`<div class="perf-row"><div class="between"><span>${esc(r.label)}</span><strong>${r.accuracy}%</strong></div><div class="progress-track"><span class="${r.accuracy<60?'low':''}" style="width:${r.accuracy}%"></span></div><small>${r.correct} acertos · ${r.wrong} erros · ${r.total} tentativas</small></div>`).join(''):'<p class="muted" style="font-size:12px">Os resultados aparecerão após suas primeiras respostas.</p>';}
@@ -319,6 +320,26 @@ async function finish(){
 async function toggleFlag(flag){if(!session)return;const key=session.queue[session.index];await store.add([{type:'flag',key,sourceType:model.questions.find(q=>q.key===key)?.sourceType||'personal',flag,value:!model.flags.get(key)?.[flag],progressEpoch:session.progressEpoch??null}]);render();toast(flag==='favorite'?(model.flags.get(key)?.favorite?'Questão favoritada.':'Favorito removido.'):(model.flags.get(key)?.review?'Questão marcada para revisão.':'Marcação removida.'));}
 function download(name,document){const url=URL.createObjectURL(new Blob([JSON.stringify(document,null,2)],{type:'application/json'}));const link=documentElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function documentElement(tag){return document.createElement(tag);}
+async function associatePersonalProgress(id,targetId,unlink=false){
+  if(guest){toast('Entre com Google para associar e salvar seu progresso.');return;}
+  const ownStore=store,subject=auth.profile.sub,generation=auth.generation,bank=model.personalBanks.find(b=>b.id===id);
+  if(!bank)return;
+  const target=unlink?null:progressLinkCandidates(model,bank).find(b=>b.id===targetId);
+  if(!unlink&&!target)throw new Error('Não foi possível confirmar a equivalência de todas as questões.');
+  const title=unlink?'Desfazer associação?':'Usar seu progresso no banco do Sistema?';
+  const message=unlink?'Os registros originais continuam preservados. O progresso Pessoal e o do Sistema voltarão a ser consultados separadamente.':`${bank.questions.length} questões correspondem ao banco “${target.displayName||target.name}”. Respostas, acertos, erros, favoritos e revisões serão considerados nos estudos do Sistema, sem duplicar tentativas. Suas sessões e a origem dos registros serão mantidas. O banco Pessoal ficará desativado; nenhum arquivo do Drive será excluído.`;
+  if(!await confirmDialog(title,message,unlink?'Desfazer associação':'Associar progresso'))return;
+  if(store!==ownStore||auth?.profile?.sub!==subject||auth.generation!==generation)return;
+  working=true;
+  try{
+    if(unlink)await store.unlinkBank(id);else await store.associateBank(id,targetId);
+    render();
+    if(drive.token){
+      try{await drive.sync();toast(drive.status==='synced'?'Associação atualizada e sincronizada no Drive.':'Associação salva neste dispositivo. Aguarde a sincronização antes de remover arquivos.');}
+      catch{toast('Associação salva neste dispositivo. O envio ao Drive está pendente; sincronize antes de remover arquivos.');}
+    }else toast('Associação salva neste dispositivo. Conecte e sincronize o Drive antes de remover arquivos.');
+  }finally{working=false;}
+}
 async function readJSON(file){const content=await file.text();try{return JSON.parse(content.replace(/^\uFEFF/,''));}catch{throw new Error(`${file.name}: JSON inválido. Confira vírgulas, aspas e colchetes.`);}}
 async function importBank(raw){const bank=preparePersonalBank(validateBank(raw)),old=model.banks.find(b=>b.id===bank.id&&sourceType(b)==='personal');if(old&&!(await confirmDialog('Atualizar banco?',`Já existe “${old.displayName||old.name}” com este ID. O conteúdo será atualizado, preservando seu histórico de respostas. Mantenha IDs existentes apenas para as mesmas questões.`,'Atualizar')))return false;await store.add([{type:'bank',bank},{type:'bank-state',bankId:bank.id,value:'enabled'}]);refreshModel();return true;}
 async function renamePersonalBank(id){
@@ -383,8 +404,10 @@ document.addEventListener('click',async event=>{
     }
     if(action==='refresh-system-banks'){working=true;await loadSystemCatalog({force:true});render();if(systemCatalogError)toast(systemCatalogError);else toast('Catálogo atualizado.');return;}
     if(action==='bank-rename'){await renamePersonalBank(target.dataset.bank);return;}
+    if(action==='bank-associate'){await associatePersonalProgress(target.dataset.bank,target.dataset.target);return;}
+    if(action==='bank-unlink'){await associatePersonalProgress(target.dataset.bank,null,true);return;}
     if(action==='bank-toggle'){const b=model.banks.find(b=>b.id===target.dataset.bank);await store.add([{type:sourceType(b)==='system'?'system-bank-state':'bank-state',bankId:b.id,value:b.enabled?'disabled':'enabled'}]);render();return;}
-    if(action==='bank-delete'){const b=model.banks.find(b=>b.id===target.dataset.bank);if(!b||sourceType(b)!=='personal'){toast('Apenas bancos pessoais podem ser excluídos.');return;}if(await confirmDialog('Excluir este banco?',`“${b.displayName||b.name}” sairá da lista de estudos. Seu histórico será preservado. Você poderá importar o banco novamente.`, 'Excluir banco')){await store.add([{type:'bank-state',bankId:b.id,value:'deleted'}]);render();toast('Banco removido da lista.');}return;}
+    if(action==='bank-delete'){const b=model.banks.find(b=>b.id===target.dataset.bank);if(!b||sourceType(b)!=='personal'){toast('Apenas bancos pessoais podem ser excluídos.');return;}const warning=progressLinkCandidates(model,b).length?' Este progresso ainda está separado do Sistema. Para continuar os mesmos estudos no banco nativo, cancele e use Associar progresso primeiro.':'';if(await confirmDialog('Excluir este banco?',`“${b.displayName||b.name}” sairá da lista de estudos. Seu histórico será preservado. Você poderá importar o banco novamente.${warning}`, 'Excluir banco')){await store.add([{type:'bank-state',bankId:b.id,value:'deleted'}]);render();toast('Banco removido da lista.');}return;}
     if(action==='resume'||action==='session-resume'){await resumeStudy(target.dataset.session);return;}
     if(action==='session-result'){
       const item=model.sessions.find(s=>s.id===target.dataset.session);
@@ -399,7 +422,7 @@ document.addEventListener('click',async event=>{
     if(action==='single'){await newSession([target.dataset.key]);navigate('session');return;}
     if(action==='session-errors'){
       const source=currentResultSession();if(!source?.completed)return;
-      const queue=sessionReport(source,model).questions.filter(q=>q.correct===false&&model.questions.some(current=>current.key===q.key)).map(q=>q.key);
+      const queue=[...new Set(sessionReport(source,model).questions.filter(q=>q.correct===false).map(q=>model.progressLinks?.get(q.key)?.key||q.key).filter(key=>model.questions.some(current=>current.key===key)))];
       if(!queue.length){toast('Reimporte o banco para revisar as questões desta sessão.');return;}
       await newSession(queue,'errors');navigate('session');return;
     }

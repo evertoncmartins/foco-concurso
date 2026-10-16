@@ -30,7 +30,7 @@ export function sessionSummary(s,model,context={}){
 }
 export function sessionLibrary(model,{status='open',bankId='',type='all',page=1,pageSize=12}={}){
   const context={recordings:recordings(model),catalog:sessionBankCatalog(model),available:new Set(model.questions.map(q=>q.key))};
-  const matching=model.sessions.filter(s=>!s.abandoned).filter(s=>(!bankId||sessionBankIds(s).includes(bankId))&&(type==='all'||(type==='exam')===(s.mode==='exam'))).map(s=>sessionSummary(s,model,context));
+  const matching=model.sessions.filter(s=>!s.abandoned).filter(s=>(!bankId||sessionBankIds(s).includes(bankId)||s.queue.some(key=>model.progressLinks?.get(key)?.key.startsWith(`${bankId}:`)))&&(type==='all'||(type==='exam')===(s.mode==='exam'))).map(s=>sessionSummary(s,model,context));
   const open=matching.filter(s=>!s.completed).length,completed=matching.length-open;
   const rows=matching.filter(s=>s.completed===(status==='completed')).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt)||b.id.localeCompare(a.id));
   const pages=Math.max(1,Math.ceil(rows.length/pageSize)),current=Math.max(1,Math.min(pages,Math.floor(Number(page)||1)));
@@ -56,9 +56,9 @@ export function sessionReport(s,model){
   return {...summary,questions};
 }
 export function performanceForBank(model,bankId='',origin='all'){
-  if(!bankId&&origin==='all')return model;
-  const answers=model.answers.filter(a=>(!bankId||a.key.startsWith(`${bankId}:`))&&(origin==='all'||sourceType(a)===origin)),questions=model.questions.filter(q=>(!bankId||q.bankId===bankId)&&(origin==='all'||sourceType(q)===origin)),correct=answers.filter(a=>a.correct).length;
-  return {...model,answers,questions,stats:{...model.stats,attempts:answers.length,correct,wrong:answers.length-correct,accuracy:answers.length?Math.round(correct/answers.length*100):0,answered:new Set(answers.map(a=>a.key)).size}};
+  if(!bankId&&origin==='all'&&!model.progressLinks?.size)return model;
+  const answers=model.answers.filter(a=>(!bankId||a.key.startsWith(`${bankId}:`)||a.progressKey?.startsWith(`${bankId}:`))&&(origin==='all'||sourceType(a)===origin)),questions=model.questions.filter(q=>(bankId?q.bankId===bankId:q.progressKey===q.key||!q.progressKey)&&(origin==='all'||sourceType(q)===origin)),correct=answers.filter(a=>a.correct).length;
+  return {...model,answers,questions,stats:{...model.stats,attempts:answers.length,correct,wrong:answers.length-correct,accuracy:answers.length?Math.round(correct/answers.length*100):0,answered:new Set(answers.map(a=>a.progressKey||a.key)).size}};
 }
 export function bankSelect(model,value='',{id='sessions-bank',attribute='data-session-filter="bankId"'}={}){
   return `<label class="history-filter" for="${id}"><span>Banco / lei</span><select id="${id}" ${attribute}><option value="">Todos os bancos</option>${sessionBankCatalog(model).map(b=>`<option value="${esc(b.id)}" ${value===b.id?'selected':''}>${esc(b.title)} · ${sourceLabel(b)}${b.removed?' (removido)':''}</option>`).join('')}</select></label>`;
