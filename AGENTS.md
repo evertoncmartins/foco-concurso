@@ -20,6 +20,7 @@
 ## Origens e administração
 
 - Bancos nativos ficam em `public/data/question-banks/lei-NUMERO.json`. O build descobre os arquivos e gera `dist/data/question-banks/index.json`; não manter índice manual no código-fonte. Carregue-os sem depender do Drive ou do login. Nunca trate um JSON pessoal que declare Sistema como autoridade do catálogo.
+- Não embutir bancos de demonstração em `src/` ou nos assets públicos. Fixtures ficam em `tests/fixtures/`; os bancos nativos vêm exclusivamente da pasta oficial.
 - Preserve `bankId`, `sourceType` e `displayName` em sessões, questões e respostas. Não use nomes para relacionar progresso. IDs reservados pessoais antigos são traduzidos sem apagar o diário; não remapeie respostas novas explicitamente originadas do sistema.
 - Renomeação pessoal usa evento `bank-metadata`; não reimporte o banco nem troque IDs para alterar um nome. Prefira as tags discretas Sistema/Pessoal, mantendo o Mobile compacto.
 - Por solicitação do usuário em 16/10/2026, o catálogo global é administrado exclusivamente pelo GitHub. A API é somente leitura e o painel não oferece gravações de bancos do sistema. Não reintroduzir Blob ou permissões administrativas Google para essa finalidade.

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f9fc">
+  <meta name="description" content="Aprenda a preparar e importar seus bancos de questões no Foco: modelo JSON, campos, alternativas, comentários e sincronização com o Google Drive.">
+  <title>Guia do formato JSON — Foco</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/style.css">
+  <link rel="stylesheet" href="./assets/privacidade.css">
+  <link rel="stylesheet" href="./assets/formato-json.css">
+  <script src="./assets/theme.js"></script>
+  <script src="./assets/formato-json.js" defer></script>
+</head>
+<body class="privacy-page format-page">
+  <a class="skip-link" href="#main">Ir para o guia do formato JSON</a>
+  <header class="privacy-header">
+    <a class="privacy-brand" href="./" aria-label="Foco, página inicial"><span class="brand-mark" aria-hidden="true">f.</span><span>foco</span></a>
+    <a class="btn small" href="./">Voltar ao Foco <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="main" class="privacy-content format-content">
+    <div class="privacy-intro">
+      <p class="privacy-eyebrow">UM GUIA PARA SEUS CONTEÚDOS</p>
+      <h1>Suas questões,<br>do seu jeito.</h1>
+      <p class="privacy-lead">Aprenda a organizar um banco em JSON, importar suas questões e levar seus estudos para outros dispositivos.</p>
+      <div class="format-actions"><a class="btn primary" href="./docs/modelo-banco.json" download>Baixar modelo JSON <span aria-hidden="true">↓</span></a><a class="btn" href="#comecar">Entender o formato <span aria-hidden="true">↓</span></a></div>
+      <p class="privacy-date">Formato versão 1 · Atualizado em <time datetime="2026-10-16">16 de outubro de 2026</time></p>
+    </div>
+    <div class="privacy-summary" aria-label="Do arquivo ao seu estudo">
+      <article><span class="privacy-tag blue">01</span><h2>Prepare o conteúdo</h2><p>Use o modelo para reunir enunciados, alternativas, gabaritos e comentários em um arquivo.</p></article>
+      <article><span class="privacy-tag violet">02</span><h2>Importe no Foco</h2><p>Selecione o JSON em Banco de questões. Seu conteúdo aparece como um banco Pessoal.</p></article>
+      <article><span class="privacy-tag amber">03</span><h2>Estude e sincronize</h2><p>Com Google e uma pasta do Drive conectados, seus bancos e estudos acompanham sua conta.</p></article>
+    </div>
+    <nav class="privacy-index" aria-label="Neste guia"><a href="#comecar">Comece aqui</a><a href="#exemplo">Exemplo de JSON</a><a href="#campos">Entenda os campos</a><a href="#importar">Importação e Drive</a><a href="#pedir">Pedir questões</a><a href="#duvidas">Dúvidas frequentes</a></nav>
+    <div class="privacy-sections format-sections">
+      <section id="comecar" aria-labelledby="comecar-title">
+        <p class="format-section-label">COMECE PELO ESSENCIAL</p>
+        <h2 id="comecar-title">1. Um arquivo representa um banco.</h2>
+        <p>JSON é um formato de arquivo de texto. Ele organiza as informações com nomes de campos, aspas, chaves e listas. Você pode preparar o arquivo em um editor de texto ou pedir que outro chat organize suas questões nesse formato.</p>
+        <p>O banco tem um nome e uma lista de questões. Cada questão reúne o enunciado, as alternativas, a resposta correta e a explicação. Disciplina, assunto e tópico ajudam o Foco a filtrar o conteúdo.</p>
+        <div class="format-origins">
+          <article><span class="format-source system">Sistema</span><h3>Disponíveis na plataforma</h3><p>São os bancos publicados pelo responsável pelo Foco. Você pode estudar e ativar ou desativar cada um para seu uso.</p></article>
+          <article><span class="format-source personal">Pessoal</span><h3>Importados por você</h3><p>São os bancos enviados pelo importador ou pelo seu Drive. Você pode renomeá-los, atualizá-los e removê-los da sua lista.</p></article>
+        </div>
+        <div class="privacy-note"><strong>Comece pelo modelo.</strong><p>Substitua os textos de orientação pelas suas questões e salve como <code>meu-banco.json</code>, em UTF-8. O modelo serve para montar seu conteúdo e só entra nos estudos se você o importar.</p></div>
+      </section>
+      <section id="exemplo" aria-labelledby="exemplo-title">
+        <p class="format-section-label">VEJA A ESTRUTURA</p>
+        <h2 id="exemplo-title">2. As informações têm um lugar.</h2>
+        <p>Este é um modelo completo com uma questão. Os textos são orientações para preenchimento. Troque também o gabarito e os comentários para corresponderem ao seu conteúdo.</p>
+        <div class="format-code-panel">
+          <div class="format-code-header"><span><span class="format-file-icon" aria-hidden="true">{ }</span> meu-banco.json</span><button class="btn small" type="button" data-copy-target="json-example" data-copy-label="Copiar JSON">Copiar JSON</button></div>
+          <pre tabindex="0" aria-label="Modelo completo de banco JSON"><code id="json-example">{
+  <span class="json-key">&quot;schemaVersion&quot;</span>: <span class="json-number">1</span>,
+  <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;meu-banco&quot;</span>,
+  <span class="json-key">&quot;name&quot;</span>: <span class="json-string">&quot;Nome do meu banco&quot;</span>,
+  <span class="json-key">&quot;description&quot;</span>: <span class="json-string">&quot;Descreva o conteúdo deste banco.&quot;</span>,
+  <span class="json-key">&quot;questions&quot;</span>: [
+    {
+      <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;questao-001&quot;</span>,
+      <span class="json-key">&quot;discipline&quot;</span>: <span class="json-string">&quot;Nome da disciplina&quot;</span>,
+      <span class="json-key">&quot;subject&quot;</span>: <span class="json-string">&quot;Nome do assunto&quot;</span>,
+      <span class="json-key">&quot;topic&quot;</span>: <span class="json-string">&quot;Nome do tópico&quot;</span>,
+      <span class="json-key">&quot;statement&quot;</span>: <span class="json-string">&quot;Escreva aqui o enunciado da questão.&quot;</span>,
+      <span class="json-key">&quot;options&quot;</span>: [
+        {
+          <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;A&quot;</span>,
+          <span class="json-key">&quot;text&quot;</span>: <span class="json-string">&quot;Texto da alternativa A.&quot;</span>
+        },
+        {
+          <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;B&quot;</span>,
+          <span class="json-key">&quot;text&quot;</span>: <span class="json-string">&quot;Texto da alternativa B.&quot;</span>
+        },
+        {
+          <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;C&quot;</span>,
+          <span class="json-key">&quot;text&quot;</span>: <span class="json-string">&quot;Texto da alternativa C.&quot;</span>
+        },
+        {
+          <span class="json-key">&quot;id&quot;</span>: <span class="json-string">&quot;D&quot;</span>,
+          <span class="json-key">&quot;text&quot;</span>: <span class="json-string">&quot;Texto da alternativa D.&quot;</span>
+        }
+      ],
+      <span class="json-key">&quot;correctOption&quot;</span>: <span class="json-string">&quot;A&quot;</span>,
+      <span class="json-key">&quot;explanation&quot;</span>: <span class="json-string">&quot;A: explique por que esta alternativa está correta.\n\nB: explique por que esta alternativa está incorreta.\n\nC: comente esta alternativa.\n\nD: comente esta alternativa.&quot;</span>,
+      <span class="json-key">&quot;difficulty&quot;</span>: <span class="json-string">&quot;easy&quot;</span>,
+      <span class="json-key">&quot;tags&quot;</span>: []
+    }
+  ]
+}</code></pre>
+        </div>
+        <p class="format-copy-status" id="copy-status" role="status" aria-live="polite"></p>
+        <div class="format-example-notes"><p><strong>Fora de <code>questions</code>:</strong> informações do banco.</p><p><strong>Dentro de <code>questions</code>:</strong> uma ou mais questões, separadas por vírgula.</p><p><strong>Dentro de <code>options</code>:</strong> as alternativas de cada questão.</p></div>
+      </section>
+      <section id="campos" aria-labelledby="campos-title">
+        <p class="format-section-label">PREENCHA COM SEGURANÇA</p>
+        <h2 id="campos-title">3. O que cada campo significa?</h2>
+        <h3 class="format-subheading">Informações do banco</h3>
+        <div class="format-table-wrap" tabindex="0" role="region" aria-label="Campos do banco"><table class="format-table"><thead><tr><th scope="col">Campo</th><th scope="col">Como preencher</th></tr></thead><tbody>
+          <tr><th scope="row"><code>schemaVersion</code></th><td>Use o número <code>1</code>. Ele identifica a versão do formato.</td></tr>
+          <tr><th scope="row"><code>id</code></th><td>Identificador estável, como <code>meu-banco</code>. Use letras, números, hífen ou sublinhado, com até 120 caracteres.</td></tr>
+          <tr><th scope="row"><code>name</code></th><td>O nome que identifica seu banco. Depois, você pode usar Renomear no Foco.</td></tr>
+          <tr><th scope="row"><code>description</code> <span class="format-optional">opcional</span></th><td>Um resumo do conteúdo e do objetivo do banco.</td></tr>
+          <tr><th scope="row"><code>questions</code></th><td>A lista de questões. Cada banco aceita de 1 a 5.000 questões.</td></tr>
+        </tbody></table></div>
+        <h3 class="format-subheading">Informações de cada questão</h3>
+        <div class="format-table-wrap" tabindex="0" role="region" aria-label="Campos da questão"><table class="format-table"><thead><tr><th scope="col">Campo</th><th scope="col">Como preencher</th></tr></thead><tbody>
+          <tr><th scope="row"><code>id</code></th><td>Identificador único dentro do banco, como <code>questao-001</code>. Mantenha o mesmo ID ao corrigir a mesma questão.</td></tr>
+          <tr><th scope="row"><code>discipline</code><br><code>subject</code><br><code>topic</code></th><td>Disciplina, assunto e tópico. Por exemplo: Informática → Redes → Modelo OSI. Os três são obrigatórios.</td></tr>
+          <tr><th scope="row"><code>statement</code></th><td>O enunciado completo. Use <code>\n</code> dentro do texto para quebrar uma linha.</td></tr>
+          <tr><th scope="row"><code>options</code></th><td>De 2 a 8 alternativas. Cada uma precisa de <code>id</code> único, de A a H, e <code>text</code> com seu conteúdo.</td></tr>
+          <tr><th scope="row"><code>correctOption</code></th><td>A letra da alternativa correta. Ela precisa existir em <code>options</code>.</td></tr>
+          <tr><th scope="row"><code>explanation</code></th><td>Comentário que explica o gabarito. Para comentar cada opção, use <code>A: ...\n\nB: ...</code> e continue com as letras existentes.</td></tr>
+          <tr><th scope="row"><code>difficulty</code></th><td><code>easy</code> para fácil, <code>medium</code> para média ou <code>hard</code> para difícil.</td></tr>
+          <tr><th scope="row"><code>tags</code></th><td>Uma lista de até 30 etiquetas. Use <code>[]</code> se não quiser adicionar nenhuma.</td></tr>
+          <tr><th scope="row"><code>reference</code> <span class="format-optional">opcional</span></th><td>Referência com <code>label</code> e, se houver link, <code>url</code> começando por <code>https://</code>.</td></tr>
+        </tbody></table></div>
+        <div class="format-tips"><article><h3>Um ID, a mesma questão</h3><p>Seu histórico usa os identificadores. Ao criar outra pergunta, use um ID novo. Para mudar apenas o nome do banco, use Renomear.</p></article><article><h3>Texto com espaço para explicar</h3><p>Enunciados e comentários não são cortados por um limite de caracteres. Use texto simples e parágrafos para facilitar a leitura.</p></article></div>
+        <details class="format-detail"><summary>Minha questão veio de uma prova. Como informar a origem?</summary><div><p>Você pode acrescentar <code>instituicao</code>, <code>ano</code>, <code>banca</code>, <code>cargo</code> e <code>tipo</code>. O campo <code>tag</code> identifica a instituição e o ano, como <code>INSS-2026</code>, quando essa origem estiver comprovada.</p><p>Use <code>fundamentoLegal</code> para indicar dispositivos e <code>fonte</code> para os links da prova, do gabarito e de outras referências. Em questões autorais, informe essa condição e preserve as fontes consultadas.</p><p>A <a href="./docs/FORMATO_JSON.md">referência técnica completa</a> detalha os campos opcionais. O <a href="./docs/questions.schema.json" download>JSON Schema</a> também está disponível para validação técnica.</p></div></details>
+      </section>
+      <section id="importar" aria-labelledby="importar-title">
+        <p class="format-section-label">DO ARQUIVO À PRÁTICA</p>
+        <h2 id="importar-title">4. Importe e retome seus estudos.</h2>
+        <ol class="format-steps">
+          <li><strong>Abra Banco de questões.</strong><p>No Foco, clique em <b>Importar JSON</b> e selecione o arquivo. Você também pode arrastá-lo para a área de importação.</p></li>
+          <li><strong>Confira seu banco Pessoal.</strong><p>O sistema valida o arquivo e apresenta o banco na sua lista. Use Ver mais detalhes para consultar o conteúdo e Renomear para escolher o nome exibido.</p></li>
+          <li><strong>Escolha o que estudar.</strong><p>Inicie uma sessão com um ou mais bancos. Você pode combinar questões do Sistema e Pessoais; a tag mostra a origem de cada uma.</p></li>
+          <li><strong>Conecte o Drive para levar os estudos.</strong><p>Entre com Google e autorize uma pasta do seu Meu Drive em Ajustes. Depois, aguarde a indicação de sincronização concluída.</p></li>
+        </ol>
+        <div class="privacy-note"><strong>O que fica salvo no Drive?</strong><p>O conteúdo dos bancos pessoais, suas respostas, sessões e renomeações ficam no arquivo principal de progresso da conta, na pasta conectada. A importação pelo Foco incorpora as questões a esse arquivo; ela não cria uma cópia separada do JSON original.</p><p>Ao entrar com a mesma conta em outro dispositivo e concluir a restauração do Drive, você recupera esses dados. Como visitante, seus bancos importados e o progresso são temporários.</p></div>
+      </section>
+      <section id="pedir" aria-labelledby="pedir-title">
+        <p class="format-section-label">UM PONTO DE PARTIDA</p>
+        <h2 id="pedir-title">5. Peça questões em outro chat.</h2>
+        <p>Copie a sugestão abaixo, preencha os trechos entre colchetes e envie junto do conteúdo ou das fontes que deseja utilizar.</p>
+        <div class="format-prompt"><p id="question-prompt">Prepare um banco JSON compatível com o Foco, schemaVersion 1, sobre [tema], com [quantidade] questões, conforme [edital ou conteúdo enviado]. Use id estável, name, description e questions. Em cada questão, inclua id único, discipline, subject, topic, statement, options com id A–E e text, correctOption, explanation por alternativa, difficulty (easy, medium ou hard) e tags. Preserve fontes comprovadas e identifique questões autorais. Não invente origem de provas, referências ou gabaritos. Entregue somente JSON válido, sem comentários de código e sem Markdown.</p><button class="btn small" type="button" data-copy-target="question-prompt" data-copy-label="Copiar sugestão">Copiar sugestão</button></div>
+        <p class="format-caption">Confira os enunciados, gabaritos e referências antes de começar a estudar. A validação do arquivo verifica a estrutura dos dados.</p>
+      </section>
+      <section id="duvidas" aria-labelledby="duvidas-title">
+        <p class="format-section-label">QUANDO SURGIR UMA DÚVIDA</p>
+        <h2 id="duvidas-title">6. Respostas rápidas.</h2>
+        <details class="format-detail"><summary>O arquivo foi recusado. O que devo conferir?</summary><div><p>Leia a mensagem exibida pelo Foco. Confira aspas duplas, vírgulas entre os itens, IDs repetidos e campos obrigatórios. A letra de <code>correctOption</code> precisa corresponder a uma alternativa existente. JSON não aceita comentários nem vírgula depois do último item.</p><p>Salve como texto UTF-8 com extensão <code>.json</code>. Um documento do Word ou um PDF não se torna JSON apenas trocando sua extensão.</p></div></details>
+        <details class="format-detail"><summary>Posso atualizar um banco que já importei?</summary><div><p>Sim. Importe a versão nova com o mesmo ID do banco e confirme a atualização. Mantenha os IDs das questões que continuam sendo as mesmas. Seu nome personalizado e o histórico de respostas são preservados.</p></div></details>
+        <details class="format-detail"><summary>Posso colocar HTML ou alternativas numéricas?</summary><div><p>Use texto simples: HTML é exibido como texto, sem executar formatação. Prefira alternativas com <code>text</code> entre aspas. Números finitos também são aceitos e convertidos em texto; use aspas para preservar valores como <code>"03"</code>, <code>"3,14"</code> e <code>"50%"</code>.</p></div></details>
+        <details class="format-detail"><summary>Um banco JSON e um arquivo de progresso são a mesma coisa?</summary><div><p>São arquivos com finalidades diferentes. O banco reúne as questões para importar em Banco de questões. A exportação de progresso reúne os eventos de estudo da conta e deve ser usada na opção Restaurar JSON em Ajustes.</p></div></details>
+        <details class="format-detail"><summary>Meu banco importado fica disponível para outras pessoas?</summary><div><p>No Foco, ele pertence ao seu perfil e recebe a tag Pessoal. A publicação de bancos do Sistema é feita pelo responsável pela plataforma. Se sua pasta do Drive tiver compartilhamento, as permissões dessa pasta continuam sendo controladas no Google Drive.</p></div></details>
+      </section>
+      <div class="format-bottom"><div><h2>Seu próximo banco começa aqui.</h2><p>Baixe o modelo, organize o conteúdo e volte para seus estudos.</p></div><a class="btn primary" href="./docs/modelo-banco.json" download>Baixar modelo JSON <span aria-hidden="true">↓</span></a></div>
+    </div>
+  </main>
+  <footer class="privacy-footer"><span>Foco · Uma questão de cada vez.</span><nav aria-label="Documentos e navegação"><a href="./privacidade.html">Política de Privacidade</a><a href="./termos.html">Termos de Serviço</a><a href="./">Voltar aos estudos</a></nav></footer>
+</body>
+</html>

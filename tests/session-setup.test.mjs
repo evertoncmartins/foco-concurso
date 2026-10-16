@@ -5,7 +5,7 @@ import {validateBank,derive} from '../src/engine.mjs';
 import {bankPresentation} from '../src/bank-view.mjs';
 import {sessionSetupView,sessionSetupStatus} from '../src/session-setup.mjs';
 
-const base=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
+const base=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const banks=[{...base,id:'rju',name:'Lei nº 8.112/1990 — banco unificado — Títulos I a V'},{...base,id:'eca',name:'ECA — banco unificado — IFs e universidades — recorte do edital'}];
 const modes={smart:['Recomendadas','Combine questões novas e revisões.'],subject:['Por assunto','Escolha um conteúdo.'],exam:['Simulado','Gabarito somente ao concluir.']};
 

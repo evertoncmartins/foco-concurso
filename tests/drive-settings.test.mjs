@@ -7,7 +7,7 @@ import {Store} from '../src/store.mjs';
 import {validateBank} from '../src/engine.mjs';
 import {readFile} from 'node:fs/promises';
 
-const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
+const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 
 class MemoryStorage {
   data=new Map();get length(){return this.data.size;}key(i){return [...this.data.keys()][i]??null;}

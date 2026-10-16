@@ -6,7 +6,7 @@ import {Store} from '../src/store.mjs';
 import {TemporaryStorage} from '../src/temporary-storage.mjs';
 import {questionOriginBadges,questionSourceDetails} from '../src/question-origin.mjs';
 
-const base=JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url)));
+const base=JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url)));
 function fixture(){
   const bank=structuredClone(base);bank.questions=bank.questions.slice(0,1);
   Object.assign(bank.questions[0],{instituicao:'IFSP',ano:2026,tag:'IFSP-2026',banca:'Comissão do IFSP',cargo:'Cargo de teste',nivelCargo:'Superior',tipo:'Adaptada de prova oficial',fundamentoLegal:'Art. 8º, II',atualizacaoLegislativa:'Conferida em 2026.',fonte:{prova:'https://example.test/prova.pdf',gabarito:'https://example.test/final.pdf',editalUrl:'https://example.test/concurso',editalDocumento:'https://example.test/edital.pdf',edital:'253/2025',questaoOriginal:12,paginaProva:7,paginaGabarito:1,observacao:'Gabarito após recursos.',dataProva:'2026-01-25',consultaEm:'2026-10-10',statusGabarito:'Definitivo',gabaritoOriginal:'B',unknown:'discard'}});

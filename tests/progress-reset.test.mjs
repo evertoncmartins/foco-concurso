@@ -7,7 +7,7 @@ import {AccountStorage} from '../src/account.mjs';
 import {validateBank,validateEvents,derive,mergeEvents} from '../src/engine.mjs';
 import {createSession,chooseAnswer,moveSession,completeSession} from '../src/session.mjs';
 
-const bank=validateBank(JSON.parse(await readFile(new URL('../src/lei-8112.json',import.meta.url))));
+const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 async function fixture(storage=new TemporaryStorage()){
   const store=new Store(storage);await store.add([{type:'bank',bank}]);
   const questions=store.model().questions.slice(0,2),originalSession=createSession(questions.map(q=>q.key));
