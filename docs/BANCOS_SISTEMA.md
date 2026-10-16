@@ -49,3 +49,9 @@ A prova da associação referencia a versão importada e um snapshot da versão 
 ## Verificação
 
 Os testes cobrem descoberta de arquivos adicionados e removidos sem índice, validação antes de substituir o build, revisão automática, consistência entre catálogo e arquivos publicados, API somente leitura, carregamento remoto pelo espelho, fallback, sessões mistas, renomeação pessoal e resultados históricos após atualização. Login Google e Drive mantêm sua infraestrutura anterior; esta mudança não exige Blob nem novas variáveis da Vercel.
+
+## Feedback completo obrigatório — 1.20.0
+
+Todos os bancos dessa pasta seguem os mesmos campos de [FORMATO_JSON.md](FORMATO_JSON.md) e do [schema único](questions.schema.json), perfil `#/$defs/nativeBank`: `explanation` geral, `optionExplanations` com uma justificativa específica por alternativa, `fundamentoLegal`, `reference` com nome e URL oficial, e `tipo`. A justificativa deve explicar a opção e seu dispositivo, incluindo o sentido do comando em questões de exceção. Não use campos alternativos para o mesmo conteúdo. Origem, ano e banca só devem ser informados quando comprovados.
+
+O catálogo verifica esse perfil antes de publicar ou substituir o build anterior. A importação pessoal continua aceitando o formato anterior, sem novos campos obrigatórios. Melhorias de feedback preservam IDs, gabaritos, alternativas e progresso. Sessões históricas de questões nativas idênticas recebem apenas a apresentação explicativa atual; sua nota e seus eventos não são regravados. O modelo para download e o exemplo do guia público usam a mesma fonte JSON no build.

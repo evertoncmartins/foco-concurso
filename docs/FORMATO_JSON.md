@@ -18,7 +18,9 @@ Cada arquivo representa um banco, com `schemaVersion`, `id`, `name` e `questions
 | `statement` | Sim | Enunciado em texto não vazio, sem limite de caracteres; `\n` quebra linhas |
 | `options` | Sim | 2–8 objetos `{ "id": "A", "text": "..." }`; IDs únicos A–H; texto não vazio, sem limite de caracteres; números finitos também são aceitos e convertidos em texto |
 | `correctOption` | Sim | ID de uma alternativa existente |
-| `explanation` | Sim | Comentário didático em texto não vazio, sem limite de caracteres |
+| `explanation` | Sim | Explicação geral didática, em texto não vazio, sem limite de caracteres |
+| `optionExplanations` | Pessoal: não; Sistema: sim | Objeto `{ "A": "justificativa", "B": "justificativa" }`, com exatamente as letras existentes em `options`, cada texto não vazio. Não grave um campo de correta/incorreta: a interface usa `correctOption` |
+| `fundamentoLegal` | Pessoal: não; Sistema: sim | Lei e dispositivos precisos, como `Lei nº 8.112/1990 — art. 149, caput e § 2º; arts. 156 e 174` |
 | `reference` | Não | `{ "label": "...", "url": "https://..." }`; label não vazio, sem limite de caracteres; URL opcional; `null` é permitido |
 | `difficulty` | Sim | `easy`, `medium` ou `hard` |
 | `tags` | Sim | Lista de até 30 textos, sem limite de caracteres por tag; pode ser `[]` |
@@ -31,7 +33,19 @@ O identificador interno é `banco:questão`. Use IDs globalmente descritivos par
 
 O [modelo-banco.json](modelo-banco.json) contém um exemplo completo. [questions.schema.json](questions.schema.json) pode ser usado em validadores JSON Schema 2020-12. A aplicação complementa a validação com unicidade dos IDs e vínculo do gabarito às opções. Metadados desconhecidos são descartados na normalização; não use HTML.
 
-No comentário, prefira identificar cada alternativa com `A: ...\n\nB: ...\n\nC: ...`, usando apenas letras das opções existentes. A interface separa essas explicações em parágrafos e destaca as letras, sem alterar o JSON nem o progresso. Comentários antigos como `C corresponde... A erra... B ignora...` também são organizados quando as letras podem ser reconhecidas com segurança. Trechos ambíguos, como `A acumulação...`, continuam como texto normal; HTML não é interpretado.
+## Feedback: um único padrão
+
+Use `explanation` para explicar o conteúdo em geral e `optionExplanations` para analisar cada alternativa separadamente. Cada chave é o ID de uma opção; cada valor deve explicar o motivo concreto e, quando aplicável, citar o dispositivo legal. A avaliação correta/incorreta é calculada de `correctOption`, evitando flags contraditórias no JSON. Em questões que pedem a alternativa **incorreta** ou uma **exceção**, explique que a opção gabaritada atende ao comando, ainda que sua afirmação seja falsa.
+
+`fundamentoLegal` contém número da lei e artigos, parágrafos, incisos ou alíneas pertinentes. `reference.label` identifica a legislação/fonte e `reference.url` fornece o link HTTPS oficial. Não crie campos paralelos como `justificativa`, `explicacao` ou `legalBasis`: os campos oficiais são os documentados aqui. A origem da prova continua nos metadados `instituicao`, `ano`, `tag`, `banca`, `cargo`, `tipo` e `fonte`; a lei consultada fica em `reference`.
+
+Em bancos pessoais, `optionExplanations`, `fundamentoLegal` e `reference` continuam opcionais. Se `optionExplanations` estiver presente, todas as opções devem ter justificativa, sem letras extras. Arquivos anteriores, com análises apenas no texto de `explanation`, continuam aceitos e exibidos; não há conversão ou atualização automática do conteúdo pessoal. HTML é sempre texto, nunca código executado.
+
+Nos bancos nativos de `public/data/question-banks/`, são obrigatórios: explicação geral, justificativa de cada alternativa, fundamento legal, `reference.label`, `reference.url` oficial e `tipo`. Use fonte HTTPS de domínio brasileiro `.gov.br`, `.leg.br` ou `.jus.br`. Informe instituição, ano e origem somente quando comprovados; identifique conteúdo autoral em `tipo`, sem atribuir uma prova fictícia. A ausência de feedback completo impede o build e a publicação do catálogo. No mesmo schema, o perfil padrão aceita bancos pessoais antigos; `#/$defs/nativeBank` acrescenta as exigências editoriais dos nativos. O código também verifica unicidade e correspondência exata das letras, relações que o JSON Schema não compara sozinho.
+
+Na interface, o resultado informa sua escolha e o gabarito; as seções **Explicação**, **Análise das alternativas** e **Fundamentação legal** organizam o conteúdo. O link **Consultar legislação** abre a fonte oficial. Simulados continuam ocultando comentário e gabarito até a conclusão. Melhorias explicativas de uma questão nativa também podem aparecer na consulta de uma sessão antiga quando enunciado, alternativas e gabarito são idênticos; o registro e a nota da época permanecem preservados.
+
+O exemplo completo exibido no guia público é gerado no build diretamente de [modelo-banco.json](modelo-banco.json), o mesmo arquivo oferecido para download. Não mantenha uma segunda cópia do exemplo no HTML.
 
 ## Origem de questões de concursos
 
@@ -55,7 +69,7 @@ A interface apresenta a tag junto da dificuldade, também no modo foco. Questõe
 
 ## Prompt reutilizável
 
-> Gere um banco JSON UTF-8 compatível com Foco, schemaVersion 1, sobre [tema], para preparação do concurso [órgão ou instituição], cargo [cargo], conforme o edital [referência]. Entregue somente JSON válido, sem Markdown. O objeto raiz deve ter id único, name, description e questions. Cada questão deve ter id estável, discipline, subject, topic, statement, options (objetos com id A–E e text), correctOption (ID existente), explanation didática, reference (label e URL HTTPS oficial quando disponível), difficulty (easy/medium/hard) e tags. Crie [quantidade] questões autorais. Confira legislação e bibliografia em fontes oficiais atualizadas. Não invente fontes ou dispositivos legais. Mantenha uma única alternativa correta. Não reutilize IDs de questões diferentes.
+> Gere um banco JSON UTF-8 compatível com Foco, schemaVersion 1, sobre [tema], para preparação do concurso [órgão ou instituição], cargo [cargo], conforme o edital [referência]. Entregue somente JSON válido, sem Markdown. O objeto raiz deve ter id único, name, description e questions. Cada questão deve ter id estável, discipline, subject, topic, statement, options (objetos com id A–E e text), correctOption (ID existente), explanation geral didática, optionExplanations com justificativa específica para cada ID de options, fundamentoLegal com lei e dispositivos, reference (label e URL HTTPS oficial), difficulty (easy/medium/hard) e tags. Crie [quantidade] questões autorais. Confira legislação e bibliografia em fontes oficiais atualizadas. Não invente fontes ou dispositivos legais. Mantenha uma única alternativa correta. Não reutilize IDs de questões diferentes.
 
 ## Arquivo de progresso
 
@@ -67,4 +81,4 @@ Bancos importados pelo usuário são sempre Pessoal, mesmo que o JSON declare `s
 
 ## Publicar um banco do Sistema pelo GitHub
 
-Envie o JSON em `public/data/question-banks/lei-NUMERO.json`. O `id` deve coincidir com o nome do arquivo sem a extensão e `name` deve identificar a mesma lei, por exemplo `Lei nº 9.394/1996`. Use `subtitle` para a descrição curta. Os demais campos seguem o formato acima. Catálogo e revisões são automáticos; não envie `index.json`. Atualizações devem preservar IDs de questões que mantêm o mesmo conteúdo. Veja [BANCOS_SISTEMA.md](BANCOS_SISTEMA.md). A importação pessoal pelo Drive ou pelo aplicativo não exige esse padrão de nome.
+Envie o JSON em `public/data/question-banks/lei-NUMERO.json`. O `id` deve coincidir com o nome do arquivo sem a extensão e `name` deve identificar a mesma lei, por exemplo `Lei nº 9.394/1996`. Use `subtitle` para a descrição curta. Use o perfil de feedback completo descrito acima e no schema em #/$defs/nativeBank. Os demais campos seguem o mesmo formato. Catálogo e revisões são automáticos; não envie `index.json`. Atualizações devem preservar IDs de questões que mantêm o mesmo conteúdo. Veja [BANCOS_SISTEMA.md](BANCOS_SISTEMA.md). A importação pessoal pelo Drive ou pelo aplicativo não exige esse padrão de nome.

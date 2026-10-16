@@ -2,6 +2,20 @@ import {validateBank} from './engine.mjs';
 import {bankPresentation} from './bank-names.mjs';
 
 const PRIMARY_ORIGIN='https://foco-concurso-wine.vercel.app';
+// Publication profile. Historical snapshots and personal imports still use
+// validateBank, so adding feedback does not invalidate existing progress.
+export function requireNativeFeedback(bank){
+  for(const q of bank.questions){
+    const label=`Questão ${q.id}`;
+    if(!q.optionExplanations||q.options.some(o=>!q.optionExplanations[o.id]?.trim()))throw new Error(`${label}: o banco nativo exige optionExplanations para todas as alternativas.`);
+    if(!q.fundamentoLegal?.trim())throw new Error(`${label}: informe fundamentoLegal com os dispositivos aplicáveis.`);
+    if(!q.tipo?.trim())throw new Error(`${label}: informe tipo sem atribuir uma origem não comprovada.`);
+    let official=false;
+    try{const url=new URL(q.reference?.url);official=url.protocol==='https:'&&!url.username&&!url.password&&(url.hostname.endsWith('.gov.br')||url.hostname.endsWith('.leg.br')||url.hostname.endsWith('.jus.br'));}catch{}
+    if(!official)throw new Error(`${label}: reference deve conter label e URL HTTPS de fonte oficial brasileira.`);
+  }
+  return bank;
+}
 export function validateSystemBank(raw){
   const bank=validateBank(raw);
   if(!/^lei-[1-9]\d*$/.test(bank.id))throw new Error('Bancos do sistema devem usar ID lei-NUMERO.');

@@ -45,6 +45,11 @@ export function validateBank(raw) {
     n.options = q.options.map(o => { const id = text(o?.id, `${label} alternativa ID`, 1); if (!/^[A-H]$/.test(id) || optionIds.has(id)) throw new Error(`${label}: alternativas precisam de IDs únicos A–H.`); optionIds.add(id); return {id, text: optionText(o.text, `${label} alternativa ${id}`)}; });
     if (!optionIds.has(q.correctOption)) throw new Error(`${label}: correctOption precisa existir nas alternativas.`);
     n.correctOption = q.correctOption;
+    if(q.optionExplanations!==undefined){
+      const explanations=q.optionExplanations;
+      if(!explanations||typeof explanations!=='object'||Array.isArray(explanations)||Object.keys(explanations).length!==optionIds.size||Object.keys(explanations).some(id=>!optionIds.has(id)))throw new Error(`${label}: optionExplanations deve conter exatamente uma justificativa para cada alternativa.`);
+      n.optionExplanations=Object.fromEntries(n.options.map(({id})=>[id,text(explanations[id],`${label} justificativa ${id}`)]));
+    }
     if (q.reference != null) { n.reference = {label: text(q.reference.label, `${label} referência`)}; if (q.reference.url) { const u = new URL(q.reference.url); if (u.protocol !== 'https:') throw new Error(`${label}: a referência deve usar HTTPS.`); n.reference.url = u.href; } }
     return {...n,...normalizeQuestionOrigin(q,label)};
   });

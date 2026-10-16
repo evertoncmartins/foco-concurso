@@ -66,7 +66,7 @@ O build copia `public/`, os módulos de `src/` e `docs/` para `dist/`. Bancos us
 
 ## Questões
 
-Veja o [guia didático de formato JSON](public/formato-json.html) ou a [referência técnica](docs/FORMATO_JSON.md), utilize [modelo-banco.json](docs/modelo-banco.json) e valide com [questions.schema.json](docs/questions.schema.json). A importação também verifica IDs repetidos, alternativas repetidas e existência da alternativa correta — relações que o JSON Schema sozinho não garante.
+Veja o [guia didático de formato JSON](public/formato-json.html) ou a [referência técnica](docs/FORMATO_JSON.md), utilize [modelo-banco.json](docs/modelo-banco.json) e valide com [questions.schema.json](docs/questions.schema.json). O feedback completo usa `explanation`, `optionExplanations`, `fundamentoLegal` e `reference`, com análise de todas as alternativas. Os nativos exigem esse perfil antes da publicação; os campos novos continuam opcionais em bancos pessoais antigos. O exemplo exibido no guia é gerado diretamente do modelo para download. A importação também verifica IDs repetidos, alternativas repetidas e existência da alternativa correta — relações que o JSON Schema sozinho não garante.
 
 ## Progresso e revisão
 

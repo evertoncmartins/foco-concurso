@@ -1,6 +1,6 @@
 import {bankPresentation} from './bank-view.mjs';
 import {icon} from './icons.mjs';
-import {sourceType,sourceLabel,sourceTag} from './bank-source.mjs';
+import {sourceType,sourceLabel,sourceTag,latestNativeFeedback} from './bank-source.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const sessionBankIds=session=>[...new Set(session.queue.map(key=>key.includes(':')?key.slice(0,key.indexOf(':')):'').filter(Boolean))];
@@ -50,7 +50,7 @@ export function sessionReport(s,model){
     if(grade?.questionSnapshot)question=grade.questionSnapshot;
     if(question&&grade&&!question.options.some(o=>o.id===grade.correctOption))question=null;
     const bank=bankMap.get(bankId),metadata={bankId,sourceType:grade?.sourceType||saved?.sourceType||sourceType(bank),displayName:bank?.title||grade?.displayName||saved?.displayName||'Banco indisponível'};
-    if(question)question={...question,key,...metadata,correctOption:grade?.correctOption||question.correctOption};
+    if(question)question=latestNativeFeedback({...question,key,...metadata,correctOption:grade?.correctOption||question.correctOption},current.get(key));
     return {key,question,...metadata,selected,correctOption:grade?.correctOption||question?.correctOption||null,correct:selected&&grade?selected===grade.correctOption:null};
   });
   return {...summary,questions};
