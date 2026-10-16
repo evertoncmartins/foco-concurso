@@ -14,8 +14,8 @@
 <body class="privacy-page">
   <a class="skip-link" href="#main">Ir para os termos de serviço</a>
   <header class="privacy-header">
-    <a class="privacy-brand" href="./?return=home" aria-label="Foco, página inicial"><span class="brand-mark" aria-hidden="true">f.</span><span>foco</span></a>
-    <a class="btn small" href="./?return=home">Voltar ao Foco <span aria-hidden="true">↗</span></a>
+    <a class="privacy-brand" data-foco-return href="./" aria-label="Foco, página inicial"><span class="brand-mark" aria-hidden="true">f.</span><span>foco</span></a>
+    <a class="btn small" data-foco-return href="./">Voltar ao Foco <span aria-hidden="true">↗</span></a>
   </header>
   <main id="main" class="privacy-content">
     <div class="privacy-intro">
@@ -110,6 +110,7 @@
       </section>
     </div>
   </main>
-  <footer class="privacy-footer"><span>Foco Estudos Concursos</span><nav aria-label="Documentos e navegação"><a href="./privacidade.html">Política de Privacidade</a><a href="./?return=home">Voltar aos estudos</a></nav></footer>
+  <footer class="privacy-footer"><span>Foco Estudos Concursos</span><nav aria-label="Documentos e navegação"><a href="./privacidade.html">Política de Privacidade</a><a data-foco-return href="./">Voltar aos estudos</a></nav></footer>
+  <script src="./assets/document-return.js" defer></script>
 </body>
 </html>

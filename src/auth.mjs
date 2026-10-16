@@ -35,17 +35,11 @@ export function consumeGoogleReturn(location=globalThis.location,history=globalT
   url.searchParams.delete('google_auth');history.replaceState(history.state,'',`${url.pathname}${url.search}${url.hash}`);
   return ['success','denied','failed','account_mismatch','permissions','invalid_request'].includes(notice)?notice:'failed';
 }
-export function consumeHomeReturn(location=globalThis.location,history=globalThis.history){
-  const url=new URL(location.href);
-  if(url.searchParams.get('return')!=='home')return false;
-  url.searchParams.delete('return');history.replaceState(history.state,'',`${url.pathname}${url.search}${url.hash}`);
-  return true;
-}
 export function googleReturnMessage(notice){
   return ({denied:'A autorização Google foi cancelada. Clique novamente para entrar.',account_mismatch:'A conta escolhida é diferente da conta conectada. Entre com a mesma conta para conectar o Drive.',permissions:'Autorize as permissões solicitadas para restaurar sua pasta e seus estudos.',invalid_request:'A entrada expirou ou não pôde ser confirmada. Clique novamente para entrar.'})[notice]||'Não foi possível concluir a entrada no Google. Tente novamente.';
 }
 export class GoogleAccount extends EventTarget{
-  constructor(clientId){super();this.clientId=clientId;this.profile=null;this.token=null;this.expires=0;this.scopes='';this.generation=0;this.canDrive=false;this.canAppData=false;this.canRefresh=false;this.refreshing=null;this.restoring=null;this.prepared=new Map();this.redirectEnabled=false;}
+  constructor(clientId){super();this.clientId=clientId;this.profile=null;this.token=null;this.expires=0;this.scopes='';this.generation=0;this.canDrive=false;this.canAppData=false;this.canRefresh=false;this.refreshing=null;this.prepared=new Map();this.redirectEnabled=false;}
   async prepareRedirect(fetcher=fetch){
     this.redirectEnabled=false;const clientId=this.clientId;
     try{
@@ -55,33 +49,18 @@ export class GoogleAccount extends EventTarget{
     return this.redirectEnabled;
   }
   async restoreRedirect(fetcher=fetch){
-    return this.restoreAuthorization('/api/auth/session',fetcher);
-  }
-  async restoreSession(fetcher=fetch){
-    return this.restoreAuthorization('/api/auth/resume',fetcher,true);
-  }
-  async restoreAuthorization(path,fetcher,optional=false){
-    if(!this.redirectEnabled){if(optional)return null;throw new Error('O retorno do Google ainda não está configurado neste site.');}
-    if(this.restoring)return this.restoring;
+    if(!this.redirectEnabled)throw new Error('O retorno do Google ainda não está configurado neste site.');
     const generation=this.generation;
-    const pending=(async()=>{
-      const response=await fetcher(path,{method:'POST',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(optional?45000:15000)});
-      if(generation!==this.generation)throw new Error('A entrada foi cancelada.');
-      if(optional&&response.status===401)return null;
-      if(!response.ok)throw new Error(optional?'Não foi possível recuperar sua sessão agora. Tente voltar ao Foco novamente ou entre com Google. Seus estudos continuam salvos.':'Não foi possível confirmar o retorno do Google. Entre novamente.');
-      const result=(await response.json()).authorization;
-      if(generation!==this.generation)throw new Error('A entrada foi cancelada.');
-      if(optional&&result===null)return null;
-      if(!result||typeof result.token!=='string'||!result.token||!Number.isFinite(result.expires)||result.expires<=Date.now()+10000)throw new Error('A entrada expirou. Clique novamente para entrar com Google.');
-      const profile=normalizeGoogleProfile(result.profile);
-      const pendingFolderId=result.pendingFolderId?parseFolder(result.pendingFolderId):undefined;
-      if(generation!==this.generation)throw new Error('A entrada foi cancelada.');
-      if(this.profile&&profile.sub!==this.profile.sub)throw new Error(googleReturnMessage('account_mismatch'));
-      this.profile=profile;this.token=result.token;this.expires=result.expires;this.scopes=result.scope||'';this.canDrive=result.canDrive===true;this.canAppData=result.canAppData===true;this.canRefresh=result.canRefresh===true;
-      return {profile,token:this.token,expires:this.expires,withDrive:result.withDrive===true,canDrive:this.canDrive,canAppData:this.canAppData,canRefresh:this.canRefresh,...(pendingFolderId?{pendingFolderId}:{})};
-    })();
-    this.restoring=pending;
-    try{return await pending;}finally{if(this.restoring===pending)this.restoring=null;}
+    const response=await fetcher('/api/auth/session',{method:'POST',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(15000)});
+    if(!response.ok)throw new Error('Não foi possível confirmar o retorno do Google. Entre novamente.');
+    const result=(await response.json()).authorization;
+    if(!result||typeof result.token!=='string'||!result.token||!Number.isFinite(result.expires)||result.expires<=Date.now()+10000)throw new Error('A entrada expirou. Clique novamente para entrar com Google.');
+    const profile=normalizeGoogleProfile(result.profile);
+    const pendingFolderId=result.pendingFolderId?parseFolder(result.pendingFolderId):undefined;
+    if(generation!==this.generation)throw new Error('A entrada foi cancelada.');
+    if(this.profile&&profile.sub!==this.profile.sub)throw new Error(googleReturnMessage('account_mismatch'));
+    this.profile=profile;this.token=result.token;this.expires=result.expires;this.scopes=result.scope||'';this.canDrive=result.canDrive===true;this.canAppData=result.canAppData===true;this.canRefresh=result.canRefresh===true;
+    return {profile,token:this.token,expires:this.expires,withDrive:result.withDrive===true,canDrive:this.canDrive,canAppData:this.canAppData,canRefresh:this.canRefresh,...(pendingFolderId?{pendingFolderId}:{})};
   }
   async ensureAccess({force=false,fetcher=fetch}={}){
     if(!this.profile)throw new Error('Entre com Google para conectar o Drive.');
@@ -146,8 +125,8 @@ export class GoogleAccount extends EventTarget{
     return {profile,token:this.token,expires:this.expires,withDrive,canDrive:this.canDrive,canAppData:this.canAppData};
   }
   signOut(){
-    const pending=[this.refreshing,this.restoring],clearSession=this.redirectEnabled;
-    this.generation++;this.prepared.clear();this.profile=null;this.token=null;this.expires=0;this.scopes='';this.canDrive=false;this.canAppData=false;this.canRefresh=false;this.refreshing=null;this.restoring=null;
-    if(clearSession)return Promise.allSettled(pending).then(()=>fetch('/api/auth/logout',{method:'POST',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)})).catch(()=>{});
+    const pending=this.refreshing,clearSession=this.redirectEnabled;
+    this.generation++;this.prepared.clear();this.profile=null;this.token=null;this.expires=0;this.scopes='';this.canDrive=false;this.canAppData=false;this.canRefresh=false;this.refreshing=null;
+    if(clearSession)return Promise.resolve(pending).catch(()=>{}).then(()=>fetch('/api/auth/logout',{method:'POST',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)})).catch(()=>{});
   }
 }

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createAuthHandler} from '../server/google-redirect.mjs';
-import {GoogleAccount,IDENTITY_SCOPES,APPDATA_SCOPE,DRIVE_SCOPE,consumeGoogleReturn,consumeHomeReturn} from '../src/auth.mjs';
+import {GoogleAccount,IDENTITY_SCOPES,APPDATA_SCOPE,DRIVE_SCOPE,consumeGoogleReturn} from '../src/auth.mjs';
 const origin='https://foco-concurso-wine.vercel.app';
 const env={GOOGLE_REDIRECT_ENABLED:'true',GOOGLE_CLIENT_ID:'fixture.apps.googleusercontent.com',GOOGLE_CLIENT_SECRET:'fixture-only-secret-for-automated-tests'};
 const profile={sub:'111',email:'test@example.test',email_verified:true,name:'Teste'};
@@ -20,54 +20,8 @@ function fixture(options={}){
   const callback=async(flow,query='code=fixture-code')=>handler('callback')(request(`/api/auth/callback?state=${flow.target.searchParams.get('state')}&${query}`,{headers:{cookie:flow.cookie}}));
   const session=async(response,headers={})=>handler('session')(request('/api/auth/session',{method:'POST',headers:{origin,cookie:cookieHeader(response),...headers}}));
   const refresh=(returned,subject='111',headers={})=>handler('refresh')(request('/api/auth/refresh',{method:'POST',headers:{origin,cookie:cookieHeader(returned),...headers},body:JSON.stringify({subject})}));
-  const resume=(returned,headers={})=>handler('resume')(request('/api/auth/resume',{method:'POST',headers:{origin,cookie:returned?cookieHeader(returned):'',...headers}}));
-  return {calls,handler,request,start,callback,session,refresh,resume,cookieHeader,advance(ms){now+=ms;}};
+  return {calls,handler,request,start,callback,session,refresh,cookieHeader,advance(ms){now+=ms;}};
 }
-
-test('retorno de documento recupera a mesma conta após consumir o handoff e abrir outra aba',async()=>{
-  const f=fixture(),returned=await f.callback(await f.start('?drive=1'));
-  await f.session(returned);f.advance(121000);
-  assert.equal((await (await f.session(returned)).json()).authorization,null);
-  const cookie=f.cookieHeader(returned).split('; ').filter(c=>c.startsWith('__Host-foco-drive-session=')).join('; ');
-  const account=new GoogleAccount(env.GOOGLE_CLIENT_ID);account.redirectEnabled=true;
-  const restored=await account.restoreSession(async(path,init)=>{
-    assert.equal(path,'/api/auth/resume');assert.equal(init.method,'POST');assert.equal(init.credentials,'same-origin');assert.equal(init.cache,'no-store');
-    return f.resume(returned,{cookie});
-  });
-  assert.equal(restored.profile.sub,'111');assert.equal(restored.token,'fixture-renewed-token');assert(restored.canDrive&&restored.canAppData&&restored.canRefresh);
-  assert(!JSON.stringify(restored).includes('must-not-persist'));assert.equal(account.profile.sub,'111');
-});
-
-test('retorno sem sessão ou com cookie vencido/adulterado fica anônimo sem consultar o Google',async()=>{
-  const f=fixture(),returned=await f.callback(await f.start()),count=f.calls.length;
-  for(const headers of [{cookie:''},{cookie:'__Host-foco-drive-session=invalid'}]){
-    assert.deepEqual(await (await f.resume(returned,headers)).json(),{authorization:null});
-  }
-  f.advance(31*24*60*60*1000);assert.deepEqual(await (await f.resume(returned)).json(),{authorization:null});assert.equal(f.calls.length,count);
-});
-
-test('recuperação de sessão exige POST de mesma origem e confere identidade com Google',async()=>{
-  const options={},f=fixture(options),returned=await f.callback(await f.start()),count=f.calls.length;
-  assert.equal((await f.handler('resume')(f.request('/api/auth/resume'))).status,405);
-  assert.equal((await f.resume(returned,{origin:'https://evil.test'})).status,403);
-  assert.equal((await f.resume(returned,{'sec-fetch-site':'cross-site'})).status,403);assert.equal(f.calls.length,count);
-  options.profile={...profile,sub:'222'};const refused=await f.resume(returned);assert.equal(refused.status,401);assert.match(refused.headers.getSetCookie()[0],/Max-Age=0/);
-});
-
-test('recuperação distingue revogação de indisponibilidade sem apagar uma sessão válida',async()=>{
-  const options={},f=fixture(options),returned=await f.callback(await f.start());
-  options.refreshStatus=503;options.refreshResponse={error:'temporarily_unavailable'};
-  let response=await f.resume(returned);assert.equal(response.status,503);assert.equal(response.headers.getSetCookie().length,0);
-  options.refreshStatus=400;options.refreshResponse={error:'invalid_grant'};
-  response=await f.resume(returned);assert.equal(response.status,401);assert.match(response.headers.getSetCookie()[0],/Max-Age=0/);
-});
-
-test('destino início é consumido sem remover parâmetros OAuth, fragmento ou outros destinos',()=>{
-  const history={state:{},replaceState(...args){this.args=args;}};
-  assert(consumeHomeReturn({href:`${origin}/?return=home&google_auth=success&keep=yes#position`},history));
-  assert.equal(history.args[2],'/?google_auth=success&keep=yes#position');
-  history.args=null;assert.equal(consumeHomeReturn({href:`${origin}/?return=other`},history),false);assert.equal(history.args,null);
-});
 
 test('acesso offline renova após uma hora com cookie cifrado de 30 dias sem expor o refresh token',async()=>{
   const f=fixture(),flow=await f.start('?drive=1'),returned=await f.callback(flow);
