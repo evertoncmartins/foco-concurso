@@ -113,10 +113,10 @@ test('client fallback does not enable redirect on a static host or different cli
   assert.equal(await account.prepareRedirect(async()=>Response.json({enabled:true,clientId:env.GOOGLE_CLIENT_ID})),true);
   await assert.rejects(account.restoreRedirect(async()=>Response.json({authorization:null})),/expirou/);assert.equal(account.profile,null);
 });
-test('client navigates in the same tab without Google SDK and removes return notices',async()=>{
+test('client replaces the login entry in the same tab without Google SDK and removes return notices',async()=>{
   const descriptor=Object.getOwnPropertyDescriptor(globalThis,'location'),destinations=[];
   try{
-    Object.defineProperty(globalThis,'location',{configurable:true,value:{assign:value=>destinations.push(value)}});
+    Object.defineProperty(globalThis,'location',{configurable:true,value:{replace:value=>destinations.push(value),assign:()=>assert.fail('OAuth must replace the entry')}});
     const account=new GoogleAccount(env.GOOGLE_CLIENT_ID);account.redirectEnabled=true;account.profile=profile;
     void account.authorize(true,{folderId:'https://drive.google.com/drive/folders/my-folder'});
     assert.equal(destinations.length,1);const target=new URL(destinations[0],origin);assert.equal(target.pathname,'/api/auth/start');assert.equal(target.searchParams.get('drive'),'1');assert.equal(target.searchParams.get('folder'),'my-folder');assert.equal(target.searchParams.get('subject'),'111');assert.equal(account.token,null);

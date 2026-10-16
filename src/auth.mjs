@@ -97,7 +97,7 @@ export class GoogleAccount extends EventTarget{
     if(!validClientId(this.clientId))throw new Error('O responsável pela plataforma ainda precisa configurar o acesso Google.');
     if(this.redirectEnabled){
       const params=new URLSearchParams();if(withDrive){params.set('drive','1');if(folderId)params.set('folder',parseFolder(folderId));}if(this.profile)params.set('subject',this.profile.sub);
-      globalThis.location.assign(`/api/auth/start${params.size?`?${params}`:''}`);
+      globalThis.location.replace(`/api/auth/start${params.size?`?${params}`:''}`);
       return new Promise(()=>{}); // Keep the entry blocked until the same-tab navigation completes.
     }
     const scope=`${IDENTITY_SCOPES} ${APPDATA_SCOPE}${withDrive?` ${DRIVE_SCOPE}`:''}`;
