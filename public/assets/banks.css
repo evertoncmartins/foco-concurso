@@ -46,6 +46,8 @@
 .bank-management{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--border);padding-top:17px;margin-top:20px}
 .bank-file-actions{display:flex;gap:8px}
 .bank-file-actions .icon-btn{width:40px;height:40px}
+.bank-action-label{display:none}
+.bank-card.disabled{opacity:1}
 @media(max-width:700px){
   .banks-grid{gap:14px}
   .bank-card{padding:20px}
@@ -61,10 +63,13 @@
   .bank-stats dd{font-size:21px}
   .bank-stats .bank-period dd{font-size:12px;line-height:2.45}
   .bank-primary-actions{margin-top:20px;gap:8px}
-  .bank-management>.btn{min-height:44px}
+  .bank-management{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+  .bank-file-actions{display:contents}
+  .bank-management .btn,.bank-management .icon-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-width:0;min-height:48px;height:auto;padding:10px 8px;white-space:normal;text-align:center;line-height:1.45;font-size:12px}
+  .bank-management svg{flex-shrink:0}
+  .bank-action-label{display:inline;font-size:12px}
   .bank-details-toggle{font-size:11px}
   .bank-details-panel{padding-top:19px;margin-top:18px}
-  .bank-file-actions .icon-btn{width:44px;height:44px}
 }
 @media(prefers-reduced-motion:reduce){.bank-details-chevron{transition:none}}
 

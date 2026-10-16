@@ -81,7 +81,7 @@ export class DriveSync extends EventTarget {
   }
   cacheKey(){return `foco:drive:${this.config.folderId}`;}
   cache(){const raw=this.storage.getItem(this.cacheKey());return raw?JSON.parse(raw):{files:[],events:[],pending:null};}
-  saveCache(cache){this.storage.setItem(this.cacheKey(),JSON.stringify(cache));}
+  saveCache(cache){const value=JSON.stringify(cache);return this.storage.setLargeItem?this.storage.setLargeItem(this.cacheKey(),value):this.storage.setItem(this.cacheKey(),value);}
   progressPrefix(){return this.userId?`foco-progresso-${this.userId}-`:'foco-progresso-';}
   progressName(){return `${this.progressPrefix()}principal.json`;}
   async readFile(file){return this.request(`${API}/files/${encodeURIComponent(file.id)}?alt=media`);}
@@ -104,7 +104,7 @@ export class DriveSync extends EventTarget {
       if((await this.progressMetadata(file.id)).etag!==metadata.etag)throw changed();
     }
     if(!covers(this.store.events,events))await this.store.merge(events);
-    cache.snapshots[file.id]={etag:metadata.etag,events:events.map(e=>e.id),signature:await contentDigest(events)};this.saveCache(cache);
+    cache.snapshots[file.id]={etag:metadata.etag,events:events.map(e=>e.id),signature:await contentDigest(events)};await this.saveCache(cache);
     return {id:file.id,name:metadata.title,etag:metadata.etag,events};
   }
   progressDocument(events){
@@ -132,11 +132,11 @@ export class DriveSync extends EventTarget {
       if(!cache.pending){
         const ids=await this.request(`${API}/files/generateIds?count=1&space=drive&type=files`);
         if(typeof ids.ids?.[0]!=='string')throw new Error('O Drive não forneceu um ID para o progresso.');
-        cache.pending={id:ids.ids[0],name:this.progressName(),document:this.progressDocument(events)};this.saveCache(cache);
+        cache.pending={id:ids.ids[0],name:this.progressName(),document:this.progressDocument(events)};await this.saveCache(cache);
       }
       await this.upload(cache.pending);principal=await this.readProgress(cache.pending,cache,{force:true});
       if(!covers(principal.events,cache.pending.document.events))throw changed();
-      cache.pending=null;this.saveCache(cache);wrote=true;
+      cache.pending=null;await this.saveCache(cache);wrote=true;
       // Include actions made while the initial upload was in flight.
       if(!covers(principal.events,this.store.load()))throw changed();
     }else if(principal.name!==this.progressName()||!covers(principal.events,events)){
@@ -144,19 +144,19 @@ export class DriveSync extends EventTarget {
       principal=await this.readProgress(principal,cache,{force:true});
       if(!covers(principal.events,events))throw changed();
     }
-    if(cache.pending){cache.pending=null;this.saveCache(cache);}
+    if(cache.pending){cache.pending=null;await this.saveCache(cache);}
     for(const source of sources.slice(1)){
       if(!covers(principal.events,source.events))throw changed();
       // Check the target is still the verified live file before cleanup.
       if((await this.progressMetadata(principal.id)).etag!==principal.etag)throw changed();
-      await this.trashProgress(source);delete cache.snapshots[source.id];this.saveCache(cache);
+      await this.trashProgress(source);delete cache.snapshots[source.id];await this.saveCache(cache);
     }
     // Reconcile simultaneous first creation or an older client writing a journal.
     if(wrote||sources.length>1){
       const remaining=(await this.list(`name contains '${this.progressPrefix()}' and mimeType = 'application/json'`)).filter(f=>f.name.startsWith(this.progressPrefix())&&(!this.userId||f.ownedByMe===true));
       if(remaining.length!==1||remaining[0].id!==principal.id)throw changed();
     }
-    cache.snapshots={[principal.id]:{etag:principal.etag,events:principal.events.map(e=>e.id),signature:await contentDigest(principal.events)}};this.saveCache(cache);
+    cache.snapshots={[principal.id]:{etag:principal.etag,events:principal.events.map(e=>e.id),signature:await contentDigest(principal.events)}};await this.saveCache(cache);
     return principal;
   }
   schedule(){if(!this.token||this.connecting)return;clearTimeout(this.timer);this.setStatus('pending','Alterações locais aguardando envio.');this.timer=setTimeout(()=>this.sync().catch(()=>{}),6000);}
@@ -165,11 +165,12 @@ export class DriveSync extends EventTarget {
     if(this.busy)return;this.busy=true;this.setStatus('syncing','Unindo os históricos do Drive e deste dispositivo…');
     try{
       this.reportProgress('history',0,1);
+      await this.storage.refresh?.();
       const previous=this.cache();
       // Recover a pending journal from the older implementation before retiring it.
       if(previous.pending){assertProgressOwner(previous.pending.document,this.userId);await this.store.merge(validateEvents(previous.pending.document));}
       const cache={schemaVersion:2,snapshots:previous.schemaVersion===2?previous.snapshots||{}:{},pending:previous.pending?.name===this.progressName()?previous.pending:null};
-      this.saveCache(cache);let principal;
+      await this.saveCache(cache);let principal;
       for(let attempt=0;attempt<6;attempt++){
         try{principal=await this.consolidate(cache);break;}
         catch(e){if(!e.retrySync&&e.status!==412&&e.status!==404)throw e;if(attempt===5)throw new Error('O histórico está sendo alterado em outro dispositivo. Os dados locais e os arquivos ainda não consolidados foram preservados. Tente sincronizar novamente.');}

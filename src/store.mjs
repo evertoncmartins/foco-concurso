@@ -7,6 +7,7 @@ export class Store extends EventTarget {
   constructor(storage=globalThis.localStorage) { super(); this.storage=storage; this.events=[];this.systemBanks=[];this.load(); }
   load() { const list=[]; for(let i=0;i<this.storage.length;i++){const key=this.storage.key(i);if(key?.startsWith(PREFIX)){let e;try{e=JSON.parse(this.storage.getItem(key));}catch{throw new Error('Há dados locais corrompidos. Não serão substituídos. Exporte uma cópia antes de restaurar.');}list.push(e);}} this.events=mergeEvents(validateEvents({schemaVersion:1,events:list}));return this.events; }
   async add(items) {
+    await this.storage.refresh?.();
     this.load();const epoch=currentProgressEpoch(this.events),hasStudy=items.some(isStudyEvent),resetting=items.some(e=>e.type==='progress-reset');
     const timeline=resetting?this.events.filter(e=>e.type==='progress-reset'):hasStudy?this.events.filter(e=>isStudyEvent(e)&&studyEpoch(e)===epoch):this.events;
     let time=Math.max(Date.now(),Date.parse(timeline.at(-1)?.at||0)+1||0);
@@ -20,7 +21,7 @@ export class Store extends EventTarget {
       return event;
     });
     const saved=await this.merge(result);
-    if(hasStudy&&currentProgressEpoch(this.load())!==epoch)throw resetError();
+    if(hasStudy){await this.storage.refresh?.();if(currentProgressEpoch(this.load())!==epoch)throw resetError();}
     return saved;
   }
   async resetProgress(){return this.add([{type:'progress-reset'}]);}
@@ -39,11 +40,16 @@ export class Store extends EventTarget {
   async unlinkBank(fromBankId){return this.add([{type:'bank-progress-unlink',fromBankId}]);}
   async merge(events) {
     const incoming=validateEvents({schemaVersion:1,events});
-    // Each event has its own key: different tabs never rewrite a shared document.
-    // Recheck after hashing: another tab may append events while it is in flight.
+    // Recheck after hashing; persistent journals also enforce an atomic revision
+    // check so another tab cannot lose events appended while reconciliation runs.
     for(let attempt=0;attempt<6;attempt++){
+      await this.storage.refresh?.();
       const before=this.load(),merged=await reconcileEvents(before,incoming),current=this.load();
       if(before.length!==current.length||before.some((event,index)=>!sameEvent(event,current[index])))continue;
+      if(this.storage.commitEvents){
+        try{await this.storage.commitEvents(merged);}catch(error){if(error.code==='JOURNAL_CHANGED')continue;throw error;}
+        this.load();this.dispatchEvent(new Event('change'));return incoming;
+      }
       const previous=[];
       // Preserve the originals before replacing any active version. All writes
       // are rolled back if quota/storage fails, including changed active keys.
