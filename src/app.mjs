@@ -1,4 +1,5 @@
 import {PublicDocuments} from './public-documents.mjs';
+import {openAccountStorage} from './journal-storage.mjs';
 import {progressLinkCandidates} from './bank-progress.mjs';
 import {Store} from './store.mjs';
 import {validateBank,validateEvents,derive,makeQueue,filterQuestions,breakdown,studyStreak,localDay} from './engine.mjs';
@@ -374,7 +375,7 @@ document.addEventListener('click',async event=>{
     if(action==='guest'){working=true;await openGuest();return;}
     if(action==='guest-login'){await logout();return;}
     if(action==='retry-google'){await loadGoogleForLogin();return;}
-    if(action==='login'){if(!auth.redirectEnabled&&!isGoogleReady()){void loadGoogleForLogin();return;}working=true;loginError='';loginErrorCode='';const authorization=auth.authorize();renderLogin();try{const result=await authorization;await openAccount(result);}catch(error){loginError=error.message;loginErrorCode=error.code||'';drive?.close();await auth.signOut();guest=false;restoration=null;accountStorage=null;store=null;drive=null;renderLogin();}return;}
+    if(action==='login'){if(!auth.redirectEnabled&&!isGoogleReady()){void loadGoogleForLogin();return;}working=true;loginError='';loginErrorCode='';const authorization=auth.authorize();renderLogin();try{const result=await authorization;await openAccount(result);}catch(error){loginError=error.message;loginErrorCode=error.code||'';drive?.close();await auth.signOut();guest=false;restoration=null;accountStorage?.close?.();accountStorage=null;store=null;drive=null;renderLogin();}return;}
     if(action==='logout'){await logout();return;}
     if(action==='toggle-sidebar'){config.sidebarCollapsed=!config.sidebarCollapsed;saveConfig();render();$('[data-action=toggle-sidebar]')?.focus({preventScroll:true});return;}
     if(action==='toggle-focus'){if(view==='session'&&session&&!session.completed)await focusMode.enter();return;}
@@ -495,9 +496,14 @@ document.addEventListener('keydown',async event=>{
     if(event.key==='Enter'&&!session.answers[q.key]&&selected){event.preventDefault();working=true;await answer();}
   }catch(e){failure(e);}finally{working=false;}
 });
-window.addEventListener('storage',event=>{if(!restoration&&auth?.profile&&accountStorage?.ownsKey(event.key)&&event.key.includes(':foco:v1:event:')){try{store.load();refreshModel();if(view!=='session'&&!$('#dialog').open)render();}catch(e){failure(e);}}});
+async function refreshAccountJournal(){
+  const ownStorage=accountStorage;if(restoration||!ownStorage||!store)return;
+  await ownStorage.refresh?.();if(accountStorage!==ownStorage||restoration||!store)return;
+  store.load();refreshModel();if(view!=='session'&&!$('#dialog').open)render();
+}
+window.addEventListener('storage',event=>{if(auth?.profile&&accountStorage?.ownsKey(event.key)&&event.key.includes(':foco:v1:event:'))void refreshAccountJournal().catch(failure);});
 window.addEventListener('online',()=>{if(!restoration&&!resetSaving&&drive?.token&&!drive.connecting)drive.sync().catch(()=>{});});
-window.addEventListener('focus',()=>{if(!restoration&&!resetSaving&&drive?.token&&!drive.busy&&!drive.connecting)drive.sync().catch(()=>{});});
+window.addEventListener('focus',()=>{void refreshAccountJournal().then(()=>{if(!restoration&&!resetSaving&&drive?.token&&!drive.busy&&!drive.connecting)return drive.sync();}).catch(()=>{});});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(config.theme==='system'){applyTheme();render();}});
 async function loadGoogleForLogin(){
   if(googleLoading||auth?.redirectEnabled||!validClientId(auth?.clientId))return;
@@ -514,7 +520,9 @@ function renderLogin(){
 }
 async function openAccount(result){
   guest=false;resetHistoryUI();restoreAuthorization=result;restoration=restoreProgress(null,{stage:'profile'});renderLoading();
-  const profile=result.profile;accountStorage=new AccountStorage(localStorage,profile.sub);
+  const profile=result.profile;accountStorage?.close?.();accountStorage=await openAccountStorage(localStorage,profile.sub);
+  const ownStorage=accountStorage;
+  accountStorage.addEventListener?.('change',()=>{if(accountStorage!==ownStorage||!store||restoration)return;try{store.load();refreshModel();if(view!=='session'&&!$('#dialog').open)render();}catch(error){failure(error);}});
   config={...defaults,...JSON.parse(accountStorage.getItem('foco:config')||'{}')};config.name=config.name==='Estudante'?profile.name:config.name;applyTheme();store=new Store(accountStorage);
   await loadSystemCatalog();
   legacyAvailable=false;
@@ -576,13 +584,13 @@ async function openGuest(){
     store=new Store(accountStorage);await loadSystemCatalog();
     drive=new DriveSync(store,config);store.addEventListener('change',refreshModel);
     finishRestoration();
-  }catch(error){guest=false;restoration=null;store=null;drive=null;accountStorage=null;loginError=error.message;loginErrorCode=error.code||'';renderLogin();}
+  }catch(error){guest=false;restoration=null;store=null;drive=null;accountStorage?.close?.();accountStorage=null;loginError=error.message;loginErrorCode=error.code||'';renderLogin();}
 }
 
 async function logout(){
   if(drive?.busy||drive?.connecting){toast('Aguarde a sincronização terminar para sair.');return;}
   if(drive?.token&&drive.status==='pending'){working=true;try{await drive.sync();}catch{toast('O envio não foi concluído. O progresso local desta conta foi preservado.');}}
-  await focusMode.exit();drive?.close();await auth.signOut();guest=false;restoration=null;restoreAuthorization=null;closeDialog();store=null;model=null;drive=null;accountStorage=null;session=null;selected=null;draftSelections.clear();resetCuts();resetHistoryUI();expandedBankDetails.clear();view='home';legacyAvailable=false;working=false;loginError='';loginErrorCode='';config={...defaults,theme:localStorage.getItem('foco:appearance')||'light'};applyTheme();renderLogin();window.scrollTo(0,0);
+  await focusMode.exit();drive?.close();await auth.signOut();guest=false;restoration=null;restoreAuthorization=null;closeDialog();store=null;model=null;drive=null;accountStorage?.close?.();accountStorage=null;session=null;selected=null;draftSelections.clear();resetCuts();resetHistoryUI();expandedBankDetails.clear();view='home';legacyAvailable=false;working=false;loginError='';loginErrorCode='';config={...defaults,theme:localStorage.getItem('foco:appearance')||'light'};applyTheme();renderLogin();window.scrollTo(0,0);
 }
 async function migrateLegacy(){
   if(!legacyAvailable)return;
@@ -600,7 +608,7 @@ async function init(){
     if(guest)return;
     if(notice==='success'){
       try{await openAccount(await auth.restoreRedirect());}
-      catch(error){loginError=error.message;drive?.close();await auth.signOut();restoration=null;accountStorage=null;store=null;drive=null;}
+      catch(error){loginError=error.message;drive?.close();await auth.signOut();restoration=null;accountStorage?.close?.();accountStorage=null;store=null;drive=null;}
       finally{working=false;}
     }else if(notice)loginError=googleReturnMessage(notice);
     if(!auth.profile&&!restoration){renderLogin();if(!auth.redirectEnabled)void loadGoogleForLogin();}

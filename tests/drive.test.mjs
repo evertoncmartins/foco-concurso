@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {Store} from '../src/store.mjs';
 import {DriveSync} from '../src/drive.mjs';
 import {AccountStorage} from '../src/account.mjs';
+import {openAccountStorage} from '../src/journal-storage.mjs';
 import {coversEvents} from '../src/event-conflicts.mjs';
 import {longBank} from './helpers/long-bank.mjs';
 import {GoogleAccount} from '../src/auth.mjs';
@@ -225,3 +226,25 @@ test('Drive: consolidação respeita conta, propriedade e bancos de questões',(
 test('Drive: token expirado exige reconectar sem enviar nem apagar',async()=>{
   const {store,drive}=syncClient();await store.merge([flag('local')]);drive.expires=Date.now()-1;await assert.rejects(()=>drive.request('https://www.googleapis.com/drive/v3/files'),/expirou/);assert.equal(drive.status,'expired');assert.equal(store.events.length,1);assert.equal(drive.token,null);
 });
+
+function journalDriver(){
+  const records=new Map();return {
+    async read(subject){await new Promise(setImmediate);return structuredClone(records.get(subject)||{subject,revision:0,items:[]});},
+    async commit(subject,expected,items){await new Promise(setImmediate);if((records.get(subject)?.revision||0)!==expected)throw Object.assign(new Error('conflict'),{code:'JOURNAL_CHANGED'});records.set(subject,{subject,revision:expected+1,items:[...items]});return expected+1;}
+  };
+}
+test('Drive: diário e cache assíncronos sincronizam, reabrem e restauram sem depender do localStorage',()=>withRemote(async remote=>{
+  const base=new MemoryStorage(),driver=journalDriver(),storage=await openAccountStorage(base,'111',{driver,channelFactory:()=>null}),store=new Store(storage);
+  const drive=new DriveSync(store,{folderId:'test-folder',clientId:''});drive.token='fixture-only';drive.expires=Date.now()+3600000;
+  await store.merge([flag('durable-local')]);remote.seed('remote','foco-progresso-111-principal.json',[flag('durable-remote')],'111');await drive.sync();
+  assert.equal(drive.status,'synced');assert.deepEqual(ids(remote.live()[0][1]),['durable-local','durable-remote']);
+  assert.equal(new AccountStorage(base,'111').keys().filter(k=>k.startsWith('foco:v1:event:')||k.startsWith('foco:drive:')).length,0);
+  const reopened=await openAccountStorage(base,'111',{driver,channelFactory:()=>null}),copy=new Store(reopened);assert.deepEqual(copy.events,store.events);
+  assert.equal(JSON.parse(reopened.getItem('foco:drive:test-folder')).schemaVersion,2);storage.close();reopened.close();drive.close();
+}));
+test('Drive: falha no cache persistente é aguardada e impede upload com falso sucesso',()=>withRemote(async remote=>{
+  const driver=journalDriver(),storage=await openAccountStorage(new MemoryStorage(),'111',{driver,channelFactory:()=>null}),store=new Store(storage);await store.merge([flag('preserve')]);
+  const drive=new DriveSync(store,{folderId:'test-folder',clientId:''});drive.token='fixture-only';drive.expires=Date.now()+3600000;
+  driver.commit=async()=>{await new Promise(setImmediate);throw new Error('durable cache failed');};
+  await assert.rejects(drive.sync(),/durable cache failed/);assert.equal(drive.status,'error');assert.equal(remote.calls.length,0);assert.equal(store.events[0].id,'preserve');storage.close();drive.close();
+}));

@@ -70,6 +70,8 @@ As gravações usam o ETag do recurso de arquivo da API Drive v2 em `If-Match`. 
 
 Bancos, respostas, marcações e sessões continuam como eventos. Um evento idêntico já existente não aumenta tentativas novamente. Mesmo ID com conteúdos válidos diferentes é reconciliado automaticamente conforme a política abaixo. Sessões independentes se unem normalmente. Alterações locais recebidas durante um envio são incluídas na próxima atualização do principal.
 
+Desde a versão 1.19.1, diário e cache locais usam IndexedDB por conta, com gravação atômica e revisão para concorrência entre abas. A migração do `localStorage` verifica a cópia persistida antes de remover os registros anteriores e recupera eventos em envios pendentes. Se a gravação ou a conferência falhar, os dados anteriores são mantidos. Nenhuma autorização Google adicional é necessária.
+
 O cache local guarda IDs de eventos/arquivos confirmados, ETags, uma assinatura SHA-256 do conteúdo e, durante a primeira criação, um envio pendente com ID estável. A assinatura impede que uma versão local reconciliada seja confundida com o conteúdo remoto só por ter o mesmo ID. Nunca guarda tokens. Falhas de leitura não são interpretadas como histórico vazio. Criações simultâneas em uma pasta vazia podem gerar dois principais temporariamente; a sincronização os reúne e mantém um único arquivo ativo. Clientes antigos ainda abertos podem gerar lotes, que a nova versão incorpora na próxima sincronização. Atualize todas as abas e dispositivos para utilizar o fluxo novo.
 
 ## Reconciliação automática — 1.10.2
