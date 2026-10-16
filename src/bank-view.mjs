@@ -52,7 +52,7 @@ export function bankOverviewData(bank){
   return {...presentation,institutions:counts(institutions),subjects:counts(subjects),disciplines,firstYear,lastYear,period,missingInstitutions,missingYears,total:bank.questions.length};
 }
 
-export function bankCardView(bank,{detailsOpen=false,index=0}={}){
+export function bankCardView(bank,{detailsOpen=false,index=0,association=null}={}){
   const panelId=`bank-details-${index}`,overview=bankOverviewData(bank);
   const {law,institutions,subjects,disciplines,total,period,missingInstitutions,missingYears}=overview;
   const detailLabel=detailsOpen?'Ocultar detalhes':'Ver mais detalhes';
@@ -72,13 +72,14 @@ export function bankCardView(bank,{detailsOpen=false,index=0}={}){
       <button class="btn small primary" data-action="start" data-bank="${esc(bank.id)}" ${bank.enabled?'':'disabled'}>Estudar ${icon('arrow',14)}</button>
       <button class="bank-details-toggle" data-action="bank-details" data-bank="${esc(bank.id)}" aria-expanded="${detailsOpen}" aria-controls="${panelId}" aria-label="${detailLabel} de ${esc(bank.displayName||bank.name)}"><span class="bank-details-label">${detailLabel}</span><svg class="bank-details-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
     </div>
+    ${bank.linkedTo?`<div class="bank-progress-link"><p>Progresso associado a <strong>${esc(bank.linkedTo.displayName)}</strong>, do Sistema. Suas sessões anteriores continuam disponíveis.</p></div>`:association?`<div class="bank-progress-link"><p>Este conteúdo também está em <strong>${esc(association.displayName||association.name)}</strong>, do Sistema. Continue seus estudos com o progresso que já fez.</p><button class="btn small" data-action="bank-associate" data-bank="${esc(bank.id)}" data-target="${esc(association.id)}">Associar progresso ${icon('arrow',14)}</button></div>`:''}
     <div class="bank-details-panel" id="${panelId}" ${detailsOpen?'':'hidden'}>
       <section class="bank-detail-section"><h4>${law?'Sobre a lei':'Sobre o conteúdo'}</h4><p class="bank-about">${esc(description)}</p>${law?`<a class="bank-law-link" href="${law.url}" target="_blank" rel="noopener noreferrer">Ler a lei ${icon('arrow',13)}</a>`:''}</section>
       <section class="bank-detail-section"><h4>Assuntos abordados <span>${subjects.length}</span></h4><p class="bank-section-note">Questões por assunto principal</p><ul class="bank-subject-list">${subjects.map(s=>`<li><span>${esc(s.label)}</span><strong>${s.count}<span class="bank-count-unit"> ${plural(s.count,'questão','questões')}</span></strong></li>`).join('')}</ul></section>
       <section class="bank-detail-section"><h4>Instituições de origem <span>${institutions.length}</span></h4>${institutions.length?`<ul class="bank-institution-list">${institutions.map(i=>`<li><span>${esc(i.label)}</span><strong>${i.count}<span class="bank-count-unit"> ${plural(i.count,'questão','questões')}</span></strong></li>`).join('')}</ul>`:'<p class="bank-section-note">Instituições não informadas nas questões.</p>'}${missingInstitutions&&institutions.length?`<p class="bank-section-note">${missingInstitutions} ${plural(missingInstitutions,'questão sem instituição informada','questões sem instituição informada')}.</p>`:''}</section>
       <div class="bank-period-note">${icon('clock',14)}<span>Período das provas: <strong>${esc(period)}</strong>${missingYears&&overview.firstYear!==null?` · ${missingYears} ${plural(missingYears,'questão sem ano informado','questões sem ano informado')}`:''}</span></div>
       <div class="bank-management">
-        <button class="btn small" data-action="bank-toggle" data-bank="${esc(bank.id)}">${bank.enabled?'Desativar':'Ativar'} banco</button>
+        ${bank.linkedTo?`<button class="btn small" data-action="bank-unlink" data-bank="${esc(bank.id)}">Desfazer associação</button>`:`<button class="btn small" data-action="bank-toggle" data-bank="${esc(bank.id)}">${bank.enabled?'Desativar':'Ativar'} banco</button>`}
         <div class="bank-file-actions">
           ${sourceType(bank)==='personal'?`<button class="btn small ghost" data-action="bank-rename" data-bank="${esc(bank.id)}">Renomear</button>`:''}
           <button class="icon-btn" data-action="bank-export" data-bank="${esc(bank.id)}" aria-label="Exportar ${esc(bank.displayName||bank.name)}" title="Exportar JSON">${icon('download',17)}</button>

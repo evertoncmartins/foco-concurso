@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -134,6 +134,31 @@ test('visitante usa bancos do sistema e pessoais, com origem por questão e reno
     assert.equal(app.value('model.answers.filter(a=>a.sourceType==="system").length'),1);assert.equal(app.value('model.answers.filter(a=>a.sourceType==="personal").length'),1);assert(app.html().includes('bank-source system'));assert(app.html().includes('bank-source personal'));assert(app.html().includes(input.value));
     await app.click('nav',{view:'performance'});await app.document.emit('change',{target:{dataset:{performanceOrigin:''},value:'system'}});assert.equal(app.value('performanceOrigin'),'system');assert(app.html().includes('Desempenho por origem'));
   }
+});
+
+test('associação pela interface preserva estudo, sincroniza e continua após excluir o pessoal no Desktop e Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const native=imports.validateSystemBank({...bank,id:'lei-8112',revision:'association-test'}),app=runtime({mobile,systemBanks:[native]});await app.start();
+    await app.value('store.add([{type:"bank",bank:{...bank,id:"my-personal-copy"}}])');await app.click('nav',{view:'banks'});
+    assert(app.html().includes('data-action="bank-associate"'));assert(app.html().includes('Associar progresso'));
+    await app.value('(async()=>{await newSession([model.questions.find(q=>q.bankId==="my-personal-copy").key]);await navigate("session");})()');
+    await app.click('select',{option:bank.questions[0].correctOption});await app.click('answer');await app.click('nav',{view:'banks'});
+    const original=app.value('JSON.stringify(store.events)'),count=app.value('model.stats.attempts'),sessionId=app.value('session.id');
+    app.value('var associationSyncs=0;drive.sync=async()=>{associationSyncs++;drive.status="synced";};');
+    let pending=app.click('bank-associate',{bank:'my-personal-copy',target:'lei-8112'});await tick();app.confirm(false);await pending;
+    assert.equal(app.value('JSON.stringify(store.events)'),original);
+    pending=app.click('bank-associate',{bank:'my-personal-copy',target:'lei-8112'});await tick();app.confirm(true);await pending;
+    assert.equal(app.value('model.bankLinks.size'),1);assert.equal(app.value('model.stats.attempts'),count);assert.equal(app.value('associationSyncs'),1);
+    assert.equal(app.value('model.personalBanks[0].enabled'),false);assert(app.html().includes('Progresso associado'));assert(app.html().includes('data-action="bank-unlink"'));
+    pending=app.click('bank-delete',{bank:'my-personal-copy'});await tick();app.confirm(true);await pending;assert.equal(app.value('model.personalBanks.length'),0);
+    await app.click('session-resume',{session:sessionId});assert.equal(app.value('view'),'session');assert.equal(app.value('session.id'),sessionId);assert.equal(app.value('model.stats.attempts'),count);
+  }
+});
+test('troca de conta na confirmação impede associar os dados da sessão anterior',async()=>{
+  const native=imports.validateSystemBank({...bank,id:'lei-8112',revision:'association-test'}),app=runtime({systemBanks:[native]});await app.start();
+  await app.value('store.add([{type:"bank",bank:{...bank,id:"my-personal-copy"}}])');await app.click('nav',{view:'banks'});
+  const pending=app.click('bank-associate',{bank:'my-personal-copy',target:'lei-8112'});await tick();app.auth.generation++;app.confirm(true);await pending;
+  assert.equal(app.value('model.bankLinks.size'),0);assert.equal(app.value('store.events.filter(e=>e.type==="bank-progress-link").length'),0);
 });
 
 test('configuração de estudo atualiza bancos e filtros, bloqueia seleção vazia e inicia somente o conteúdo escolhido',async()=>{
