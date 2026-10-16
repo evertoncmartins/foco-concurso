@@ -14,6 +14,32 @@ function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{reso
 async function withFetch(fetcher,run){const old=globalThis.fetch;globalThis.fetch=fetcher;try{await run();}finally{globalThis.fetch=old;}}
 function client(){const a=account(),storage=new AccountStorage(new TemporaryStorage(),'111'),store=new Store(storage),drive=new DriveSync(store,{folderId:'fixture-folder'},a),settings=new DriveSettings(storage,a);drive.token=a.token;drive.expires=a.expires;return {a,storage,store,drive,settings};}
 
+test('recuperação anônima não abre login Google nem aceita token vencido ou perfil inválido',async()=>{
+  const a=new GoogleAccount('fixture.apps.googleusercontent.com');let calls=0;
+  assert.equal(await a.restoreSession(async()=>{calls++;}),null);assert.equal(calls,0);
+  a.redirectEnabled=true;
+  for(const response of [Response.json({authorization:null}),Response.json({error:'reauthorization_required'},{status:401})])assert.equal(await a.restoreSession(async()=>response),null);
+  for(const result of [{...authorization(),expires:Date.now()-1},{...authorization(),profile:{...profile,email_verified:false}},{...authorization(),token:''}]){
+    await assert.rejects(a.restoreSession(async()=>Response.json({authorization:result})));assert.equal(a.profile,null);assert.equal(a.token,null);
+  }
+  await assert.rejects(a.restoreSession(async()=>Response.json({error:'renewal_unavailable'},{status:503})),/recuperar sua sessão agora/);assert.equal(a.profile,null);
+});
+
+test('logout aguarda recuperação pendente e impede que a resposta reative a conta',async()=>{
+  const wait=deferred(),calls=[],a=new GoogleAccount('fixture.apps.googleusercontent.com');a.redirectEnabled=true;
+  await withFetch(async url=>{calls.push(url);if(url==='/api/auth/resume'){await wait.promise;return Response.json({authorization:authorization()});}return Response.json({signedOut:true});},async()=>{
+    const restoring=a.restoreSession(),rejected=assert.rejects(restoring,/cancelada/),logout=a.signOut();
+    assert.deepEqual(calls,['/api/auth/resume']);wait.resolve();await Promise.all([rejected,logout]);
+    assert.deepEqual(calls,['/api/auth/resume','/api/auth/logout']);assert.equal(a.profile,null);assert.equal(a.token,null);assert.equal(a.restoring,null);
+  });
+});
+
+test('recuperação não substitui outra conta que já esteja conectada',async()=>{
+  const a=account();
+  await assert.rejects(a.restoreSession(async()=>Response.json({authorization:{...authorization(),profile:{...profile,sub:'222'}}})),/diferente/);
+  assert.equal(a.profile.sub,'111');assert.equal(a.token,'old-fixture-token');
+});
+
 test('renovação simultânea compartilha uma requisição e mantém perfil sem abrir login',async()=>{
   const a=account(),wait=deferred();let calls=0;
   const fetcher=async(url,init)=>{calls++;assert.equal(url,'/api/auth/refresh');assert.equal(JSON.parse(init.body).subject,'111');assert.equal(init.credentials,'same-origin');await wait.promise;return Response.json({authorization:authorization()});};

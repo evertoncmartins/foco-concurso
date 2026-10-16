@@ -22,7 +22,7 @@ async function tick(){await new Promise(resolve=>setImmediate(resolve));}
 // This checks state/ordering, not visual rendering or actual Google consent.
 function runtime(options={}){
   const browserStorage=new TemporaryStorage(),nodes=new Map(),listeners={};
-  let googleReady=options.googleReady??true,authorizations=0,preparations=0,restores=0,renders=0;
+  let googleReady=options.googleReady??true,authorizations=0,preparations=0,restores=0,resumes=0,renders=0;
   function element(classes=''){
     const names=new Set(classes.split(/\s+/).filter(Boolean)),attributes=new Map();
     const events=new Map();
@@ -63,9 +63,10 @@ function runtime(options={}){
   const media=new Map(),mediaListeners=new Map();
   const matchMedia=query=>{if(!media.has(query))media.set(query,{matches:query.includes('701')&&!options.mobile||query==='(display-mode: standalone)'&&!!options.standalone,addEventListener(name,callback){if(name==='change'){const callbacks=mediaListeners.get(query)||[];callbacks.push(callback);mediaListeners.set(query,callbacks);}}});return media.get(query);};
   const profile={sub:'111',name:'Estudante',email:'test@example.test'};
-  const auth={profile,token:'fixture',expires:Date.now()+3600000,generation:0,canAppData:options.canAppData??true,canDrive:options.canDrive??true,clientId:'test.apps.googleusercontent.com',prepareAuthorization(){preparations++;},signOut(){this.profile=null;this.token=null;},async authorize(){authorizations++;if(options.authorizationError)throw options.authorizationError;this.profile=profile;this.token='fixture';this.canAppData=true;this.canDrive=true;return authorization();}};
+  const auth={profile,token:'fixture',expires:Date.now()+3600000,generation:0,canAppData:options.canAppData??true,canDrive:options.canDrive??true,clientId:'test.apps.googleusercontent.com',prepareAuthorization(){preparations++;},signOut(){this.generation++;this.profile=null;this.token=null;},async authorize(){authorizations++;if(options.authorizationError)throw options.authorizationError;this.profile=profile;this.token='fixture';this.canAppData=true;this.canDrive=true;return authorization();}};
   auth.prepareRedirect=async()=>{if(options.statusWait)await options.statusWait.promise;auth.redirectEnabled=options.redirectEnabled===true;return auth.redirectEnabled;};
   auth.restoreRedirect=async()=>{restores++;if(options.returnError)throw options.returnError;auth.profile=profile;auth.token='fixture';return authorization();};
+  auth.restoreSession=async()=>{resumes++;const generation=auth.generation;if(options.resumeWait)await options.resumeWait.promise;if(generation!==auth.generation)throw new Error('A entrada foi cancelada.');if(options.resumeError)throw options.resumeError;if(!options.sessionActive)return null;auth.profile=profile;auth.token='fixture';return authorization();};
   function authorization(){return {profile:auth.profile,token:auth.token,expires:auth.expires,canAppData:auth.canAppData,canDrive:auth.canDrive,...(options.pendingFolderId?{pendingFolderId:options.pendingFolderId}:{})};}
   class Settings extends DriveSettings{
     async restore(){if(options.folderWait)await options.folderWait.promise;if(options.folderError)throw options.folderError;return options.folder===null?null:{folderId:'my-folder'};}
@@ -85,7 +86,7 @@ function runtime(options={}){
   }
   class FixtureStore extends Store{constructor(storage){super(storage);if(!this.events.length&&!options.systemBanks){this.storage.setItem('foco:v1:event:builtin-lei-8112-v1',JSON.stringify({id:'builtin-lei-8112-v1',at:'2026-10-08T00:00:00.000Z',type:'bank',bank}));this.load();}}}
   class FixtureCatalog{constructor(){this.banks=options.systemBanks||[];}async load(){return this.banks;}}
-  const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
+  const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,consumeHomeReturn:()=>options.returnHome===true,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
   const target=dataset=>({dataset,disabled:false,closest(selector){return selector==='[data-action]'||selector==='button'?this:null;},matches(){return false;}});
@@ -94,7 +95,7 @@ function runtime(options={}){
     const event={key:' ',code:overrides?.key?'':'Space',target:{dataset:{},closest(){return null;},matches(){return false;}},defaultPrevented:false,preventDefault(){this.defaultPrevented=true;},altKey:false,ctrlKey:false,metaKey:false,shiftKey:false,repeat:false,isComposing:false,...overrides};
     await document.emit('keydown',event);return event;
   };
-  return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),confirm:accepted=>node(accepted?'#confirm-ok':'#confirm-cancel').onclick(),finish:async()=>{const pending=document.emit('click',{target:target({action:'finish'})});await tick();if(node('#dialog').open)node('#confirm-ok').onclick();await pending;},key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
+  return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get resumes(){return resumes;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),confirm:accepted=>node(accepted?'#confirm-ok':'#confirm-cancel').onclick(),finish:async()=>{const pending=document.emit('click',{target:target({action:'finish'})});await tick();if(node('#dialog').open)node('#confirm-ok').onclick();await pending;},key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
 }
 
 async function studyRuntime(options={},mode='smart'){
@@ -868,6 +869,38 @@ test('retorno Google recupera autorização e mantém bloqueio até restaurar a 
   const historyWait=deferred(),app=runtime({init:true,notice:'success',redirectEnabled:true,googleReady:false,pendingFolderId:'chosen-folder',historyWait});app.auth.signOut();
   const loading=app.value('init()');await tick();assert.equal(app.restores,1);assert.match(app.html(),/Preparando seus estudos/);assert.equal(app.preparations,0);assert.equal(app.authorizations,0);
   historyWait.resolve();await loading;assert.equal(app.value('config.folderId'),'chosen-folder');assert.equal(app.value('restoration'),null);assert.equal(app.value('view'),'home');assert.equal(app.value('working'),false);
+});
+test('Voltar ao Foco recupera conta e histórico antes de abrir início no Desktop e Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const resumeWait=deferred(),historyWait=deferred(),app=runtime({init:true,returnHome:true,sessionActive:true,redirectEnabled:true,googleReady:false,mobile,resumeWait,historyWait,events:[{id:'return-answer',sessionId:'return-session',at:'2026-10-16T10:00:00.000Z',type:'answer',key:`${bank.id}:${bank.questions[0].id}`,selected:'A',correctOption:'A',correct:true,discipline:'Legislação',subject:'Lei',topic:'Direitos'}]});app.auth.signOut();
+    const loading=app.value('init()');await tick();assert.equal(app.resumes,1);assert.match(app.html(),/Preparando seus estudos/);assert.equal(app.value('store'),undefined);
+    resumeWait.resolve();await tick();assert.match(app.html(),/Preparando seus estudos/);assert.notEqual(app.value('restoration'),null);
+    historyWait.resolve();await loading;assert.equal(app.value('view'),'home');assert.equal(app.value('restoration'),null);assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.authorizations,0);assert.equal(app.preparations,0);
+  }
+});
+test('Voltar ao Foco sem sessão mostra login; conta sem pasta configurada retorna ao início',async()=>{
+  for(const sessionActive of [false,true]){
+    const app=runtime({init:true,returnHome:true,sessionActive,redirectEnabled:true,googleReady:false,folder:null});app.auth.signOut();await app.value('init()');
+    assert.equal(app.value('restoration'),null);assert.equal(app.value('working'),false);assert.equal(app.authorizations,0);
+    if(sessionActive){assert.equal(app.value('view'),'home');assert.equal(app.auth.profile.sub,'111');}
+    else{assert.equal(app.auth.profile,null);assert.equal(app.value('store'),undefined);assert.match(app.html(),/Continuar com Google/);}
+  }
+});
+test('retorno de documento preserva recuperação do Drive em erro ou permissão ausente',async()=>{
+  for(const options of [{historyError:new Error('Drive indisponível')},{canDrive:false}]){
+    const app=runtime({init:true,returnHome:true,sessionActive:true,redirectEnabled:true,googleReady:false,...options});app.auth.signOut();await app.value('init()');
+    assert.equal(app.value('restoration.state'),options.canDrive===false?'permission':'error');assert(!app.html().includes('data-action="login"'));assert.equal(app.authorizations,0);
+  }
+});
+test('falha temporária no retorno mantém login disponível e não encerra a sessão segura',async()=>{
+  const app=runtime({init:true,returnHome:true,redirectEnabled:true,googleReady:false,resumeError:new Error('Não foi possível recuperar sua sessão agora.')});app.auth.signOut();const generation=app.auth.generation;
+  await app.value('init()');assert.match(app.html(),/recuperar sua sessão agora/);assert.equal(app.auth.generation,generation);assert.equal(app.value('working'),false);assert.equal(app.value('restoration'),null);
+});
+test('retorno pendente não reabre conta após logout; entrada comum não recupera conta sozinha',async()=>{
+  const resumeWait=deferred(),app=runtime({init:true,returnHome:true,sessionActive:true,redirectEnabled:true,googleReady:false,resumeWait});app.auth.signOut();
+  const pending=app.value('init()');await tick();await app.value('logout()');resumeWait.resolve();await pending;
+  assert.equal(app.auth.profile,null);assert.equal(app.value('store'),null);assert.match(app.html(),/Continuar com Google/);
+  const login=runtime({init:true,redirectEnabled:true,googleReady:false});login.auth.signOut();await login.value('init()');assert.equal(login.resumes,0);assert.equal(login.auth.profile,null);
 });
 test('retorno expirado informa erro e não abre conta nem importa progresso',async()=>{
   const app=runtime({init:true,notice:'success',redirectEnabled:true,googleReady:false,returnError:new Error('A entrada expirou.')});app.auth.signOut();await app.value('init()');
