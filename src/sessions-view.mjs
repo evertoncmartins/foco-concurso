@@ -43,12 +43,13 @@ export function sessionReport(s,model){
   const questions=s.queue.map(key=>{
     const grade=grades.get(key),selected=s.answers[key]||null,bankId=key.split(':')[0],id=key.slice(bankId.length+1);
     const cutoff=grade?.at||summary.updatedAt;
-    const history=versions.get(bankId)||[],version=history.findLast(e=>e.at<=cutoff)||history[0];
+    const saved=s.questionSources?.[key],history=versions.get(bankId)||[];
+    const version=(saved?.sourceType==='system'&&history.findLast(e=>e.revision===saved.bankRevision))||history.findLast(e=>e.at<=cutoff)||history[0];
     let question=current.get(key)||null;
     if(version){if(!maps.has(version))maps.set(version,new Map(version.bank.questions.map(q=>[q.id,q])));question=maps.get(version).get(id)||null;}
     if(grade?.questionSnapshot)question=grade.questionSnapshot;
     if(question&&grade&&!question.options.some(o=>o.id===grade.correctOption))question=null;
-    const bank=bankMap.get(bankId),saved=s.questionSources?.[key],metadata={bankId,sourceType:grade?.sourceType||saved?.sourceType||sourceType(bank),displayName:bank?.title||grade?.displayName||saved?.displayName||'Banco indisponível'};
+    const bank=bankMap.get(bankId),metadata={bankId,sourceType:grade?.sourceType||saved?.sourceType||sourceType(bank),displayName:bank?.title||grade?.displayName||saved?.displayName||'Banco indisponível'};
     if(question)question={...question,key,...metadata,correctOption:grade?.correctOption||question.correctOption};
     return {key,question,...metadata,selected,correctOption:grade?.correctOption||question?.correctOption||null,correct:selected&&grade?selected===grade.correctOption:null};
   });

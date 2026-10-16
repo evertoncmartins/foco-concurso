@@ -28,7 +28,7 @@ Plataforma para resolver questões e estudar para qualquer concurso com seus pr�
 - Progresso local automático; exportação e restauração de JSON sem substituir o histórico.
 - Sincronização Google Drive com OAuth, união de eventos e um único JSON de progresso por conta e pasta, atualizado com controle de versão e migração automática dos lotes antigos.
 - Pasta recuperada pela conta Google em outros dispositivos, via configuração privada no Drive.
-- Bancos do sistema disponíveis sem login ou Drive: Lei nº 8.112/1990 (126 questões) e Lei nº 8.069/1990 (73 questões). Bancos pessoais continuam importáveis e podem ser renomeados livremente. Tags Sistema/Pessoal acompanham questões, sessões e resultados; o Desempenho filtra também por origem. Administração global exige verificação Google no servidor. Consulte [BANCOS_SISTEMA.md](docs/BANCOS_SISTEMA.md) para a configuração de armazenamento da plataforma.
+- Bancos do sistema disponíveis sem login ou Drive: Lei nº 8.112/1990 (126 questões) e Lei nº 8.069/1990 (73 questões). Bancos pessoais continuam importáveis e podem ser renomeados livremente. Tags Sistema/Pessoal acompanham questões, sessões e resultados; o Desempenho filtra também por origem. Envie bancos nativos em `public/data/question-banks/lei-NUMERO.json` pelo GitHub: o catálogo e as revisões são gerados automaticamente no build. Não requer Blob nem administração pelo aplicativo. Consulte [BANCOS_SISTEMA.md](docs/BANCOS_SISTEMA.md).
 
 ## Executar
 
@@ -42,7 +42,7 @@ npm run build
 npm run dev
 ```
 
-Abra `http://localhost:5173`. Não abra o HTML pelo protocolo `file://`: os módulos e o carregamento do banco dependem de HTTP. O SDK Blob é usado somente nas funções administrativas do servidor, sem entrar no build público. Para outro servidor, publique o conteúdo de `dist/`.
+Abra `http://localhost:5173`. Não abra o HTML pelo protocolo `file://`: os módulos e o carregamento do banco dependem de HTTP. O catálogo dos bancos é gerado automaticamente a partir de `public/data/question-banks/`. Para outro servidor, publique o conteúdo de `dist/`.
 
 ## Tela cheia no celular
 

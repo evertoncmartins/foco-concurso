@@ -19,11 +19,11 @@
 
 ## Origens e administração
 
-- Bancos nativos ficam em `public/data/question-banks/lei-NUMERO.json`, listados em `index.json`. Carregue-os sem depender do Drive ou do login. Nunca trate um JSON pessoal que declare Sistema como autoridade do catálogo.
+- Bancos nativos ficam em `public/data/question-banks/lei-NUMERO.json`. O build descobre os arquivos e gera `dist/data/question-banks/index.json`; não manter índice manual no código-fonte. Carregue-os sem depender do Drive ou do login. Nunca trate um JSON pessoal que declare Sistema como autoridade do catálogo.
 - Preserve `bankId`, `sourceType` e `displayName` em sessões, questões e respostas. Não use nomes para relacionar progresso. IDs reservados pessoais antigos são traduzidos sem apagar o diário; não remapeie respostas novas explicitamente originadas do sistema.
 - Renomeação pessoal usa evento `bank-metadata`; não reimporte o banco nem troque IDs para alterar um nome. Prefira as tags discretas Sistema/Pessoal, mantendo o Mobile compacto.
-- Operações globais exigem autorização no servidor via Google UserInfo, e-mail verificado e conta `ecmdigital@gmail.com`. Nunca substitua isso por botões ocultos, checagem de e-mail no cliente ou armazenamento local.
-- Atualizações do catálogo precisam de persistência compartilhada e controle de versão. Sem Blob conectado, bloqueie gravações e informe a pendência; não apresente alterações globais como salvas. Veja `docs/BANCOS_SISTEMA.md`.
+- Por solicitação do usuário em 16/10/2026, o catálogo global é administrado exclusivamente pelo GitHub. A API é somente leitura e o painel não oferece gravações de bancos do sistema. Não reintroduzir Blob ou permissões administrativas Google para essa finalidade.
+- Gere revisões pelo conteúdo e preserve snapshots e IDs de questões ao atualizar arquivos. Espelhos consultam o catálogo público e os arquivos da produção, com fallback local. Veja `docs/BANCOS_SISTEMA.md`.
 
 ## Reinício de estudos
 

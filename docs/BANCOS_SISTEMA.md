@@ -1,41 +1,43 @@
-# Bancos do sistema e pessoais — 1.17.0
+# Bancos do sistema pelo GitHub — 1.18.0
 
-Os arquivos públicos em `public/data/question-banks/` formam o catálogo nativo. `index.json` lista os arquivos `lei-NUMERO.json`. O primeiro catálogo contém 126 questões da Lei nº 8.112/1990 e 73 da Lei nº 8.069/1990, dos bancos já preparados para o Foco. As fontes e os comentários de cada questão foram preservados; Sistema identifica a procedência na plataforma, não uma chancela governamental.
+## Pasta para enviar os arquivos
 
-O navegador carrega o catálogo sem login ou Drive. Na produção, `/api/question-banks` fornece o catálogo vigente, combinando os arquivos incluídos no projeto com as atualizações administrativas. Hospedagens estáticas consultam também o catálogo público da produção e conservam o fallback dos arquivos incluídos no build. Não envie o token de armazenamento para `app-config.json`, o build público ou os arquivos de progresso.
+[public/data/question-banks/](https://github.com/evertoncmartins/foco-concurso/tree/main/public/data/question-banks)
 
-## Bancos pessoais e compatibilidade
+Essa pasta é a fonte dos bancos do Sistema. Para disponibilizar um banco a todos, envie seu JSON diretamente nessa pasta, na branch `main`, pelo botão **Add file → Upload files**, e confirme o commit. A integração GitHub/Vercel executa a validação e publica a atualização automaticamente. Aguarde a implantação terminar; a simples seleção do arquivo na tela de upload não publica o banco.
 
-Eventos de importação existentes continuam pessoais. Os IDs e as questões permanecem associados às respostas, sessões e marcações originais. O evento `bank-metadata` guarda `displayName` separadamente do conteúdo: atualizar ou reimportar o JSON não desfaz o nome escolhido. Renomear altera a apresentação, sem renomear o arquivo físico do Drive. O nome explícito é respeitado em cards, seleção, questões, filtros, histórico e resultados.
+Não é necessário editar um catálogo, cadastrar o arquivo no código ou configurar armazenamento. O build descobre todos os arquivos de banco e gera `dist/data/question-banks/index.json`. Esse índice é um resultado da publicação e não deve ser enviado ou mantido manualmente. Um `index.json` antigo na pasta de origem é ignorado.
 
-O espaço de IDs `lei-NUMERO` fica reservado ao sistema. Uma importação pessoal com esse ID passa a `personal_bank_lei-NUMERO`. Se o ID já existia, o modelo traduz suas referências antigas de forma determinística, sem apagar ou reescrever o diário original. Respostas e sessões novas possuem origem explícita, permitindo que uma questão do sistema e uma pessoal de mesmo número continuem distintas. Outros IDs existentes não são alterados. Arquivos pessoais que declarem `sourceType: system` continuam pessoais.
+## Padrão obrigatório
 
-O Drive mantém o arquivo principal por conta. Bancos pessoais, nomes escolhidos, preferências de ativação, respostas e sessões continuam sincronizados. O catálogo nativo atual não é importado para o Drive. Ao estudar um banco nativo, uma cópia histórica da versão utilizada pode integrar o progresso, para preservar sessões e resultados após atualizações ou remoções. Essa cópia não administra nem substitui o catálogo público. No modo visitante, tudo isso continua temporário.
+| Arquivo | `id` dentro do JSON | `name` dentro do JSON | Subtítulo |
+| --- | --- | --- | --- |
+| `lei-8112.json` | `lei-8112` | `Lei nº 8.112/1990` | Servidores públicos federais |
+| `lei-8069.json` | `lei-8069` | `Lei nº 8.069/1990` | Estatuto da Criança e do Adolescente |
+| `lei-9394.json` | `lei-9394` | `Lei nº 9.394/1996` | Lei de Diretrizes e Bases da Educação Nacional |
 
-As questões derivadas e as respostas novas carregam `bankId`, `sourceType` e `displayName`. As sessões guardam a origem de suas questões. Resultados históricos usam gabaritos e conteúdo da época. Bancos nativos retirados do catálogo deixam de ser oferecidos em novas sessões, enquanto sessões já salvas podem consultar sua versão histórica. O reset de progresso preserva bancos e nomes, reiniciando apenas os estudos da conta.
+Use letras minúsculas, sem pontos ou ano no nome do arquivo e no ID. O ano aparece no título. Um arquivo representa uma lei; para juntar mais questões da mesma lei, atualize seu arquivo existente. O campo opcional `subtitle` guarda o nome descritivo. O sistema padroniza o título da lei; `displayName` não substitui esse título em bancos do Sistema.
 
-## Administração segura
+O JSON deve seguir o [formato nativo do importador](FORMATO_JSON.md): objeto com `schemaVersion: 1`, `id`, `name`, `description` e `questions`. Cada questão precisa de ID único, disciplina, assunto, tópico, enunciado, alternativas textuais com IDs A–H, gabarito existente, comentário, dificuldade e tags. Fontes e metadados de origem continuam suportados. JSON em UTF-8 com ou sem BOM é aceito. Arquivos devem ficar diretamente nessa pasta, sem subpastas.
 
-Somente `ecmdigital@gmail.com`, com e-mail confirmado pelo Google, pode administrar o catálogo. O servidor consulta diretamente o endpoint Google UserInfo com o bearer recebido. E-mail enviado no corpo, sinalizadores locais e botões manipulados não autorizam operações. Todas as gravações exigem POST JSON de mesma origem e verificação da conta. Tokens não são registrados em logs ou expostos no catálogo público.
+O build recusa nomes de arquivo incorretos, ID divergente, título de outra lei, JSON inválido, questões repetidas e gabaritos inexistentes, indicando o arquivo e o problema. Uma validação que falha impede a implantação; a versão anterior permanece publicada.
 
-Em Banco de questões, o administrador recebe Adicionar banco do sistema e Gerenciar nos detalhes. Pode importar JSON, substituir as questões, editar descrição e subtítulo ou retirar um banco do catálogo. IDs existentes permanecem fixos. Um novo banco precisa usar `lei-NUMERO`, e seu nome deve identificar a mesma lei. Usuários comuns podem apenas estudar, exportar e ativar/desativar os nativos em seu próprio perfil; as operações pessoais de excluir e renomear não afetam os nativos.
+## Atualizar e retirar bancos
 
-As atualizações usam armazenamento Blob da plataforma. Cada versão JSON tem endereço imutável. Um manifesto pequeno é atualizado com ETag/`ifMatch`, impedindo sobrescrita concorrente silenciosa. A primeira criação também recusa sobrescrita. Remoções usam tombstones no catálogo, preservando versões históricas. Uma falha entre upload e publicação não torna o novo arquivo parte do catálogo.
+Para atualizar, substitua o JSON mantendo o nome do arquivo, o ID do banco e os IDs das questões que continuam sendo as mesmas. Conteúdos diferentes devem receber IDs novos. Não é necessário editar `revision`, `publishedAt` ou a versão do catálogo: as revisões são calculadas automaticamente pelo conteúdo. Alterar o conteúdo muda sua revisão; reformatar o JSON não cria uma revisão diferente.
 
-### Configuração da produção
+Para retirar um banco de novas sessões, remova o respectivo arquivo pelo GitHub e confirme o commit. As sessões e respostas já salvas conservam as versões históricas utilizadas. O gabarito de um resultado anterior não é recalculado com um arquivo novo.
 
-1. No projeto Vercel `foco-concurso`, conectar um **Blob público** destinado exclusivamente aos bancos da plataforma.
-2. Disponibilizar `BLOB_STORE_ID` com a autenticação OIDC do projeto, ou `BLOB_READ_WRITE_TOKEN` somente no servidor. O SDK suporta ambas as configurações. Não colocar esses valores em variáveis públicas.
-3. Publicar novamente para aplicar as variáveis. Entrar com `ecmdigital@gmail.com` no endereço principal e abrir Banco de questões.
+Quem já estiver com o Foco aberto pode usar **Banco de questões → Atualizar catálogo** depois da implantação. O espelho Sites consulta o catálogo e os arquivos públicos da produção, inclusive bancos adicionados posteriormente pelo GitHub. Se a produção estiver indisponível, conserva o fallback dos bancos incluídos na sua própria publicação.
 
-Sem o armazenamento configurado, os arquivos nativos incluídos no projeto continuam públicos e funcionais. O administrador pode consultar as opções, mas gravações são bloqueadas com uma mensagem de configuração pendente. Não há simulação de salvamento local de mudanças globais.
+## Sistema e Pessoal
 
-**Situação verificada em 16/10/2026:** a integração Vercel encontrou o projeto, mas retornou 403 por falta de acesso à equipe ao tentar criar o Blob e consultar as variáveis. Não foi possível concluir a conexão do armazenamento nesta execução. A API foi testada com armazenamento simulado; uma gravação administrativa real permanece pendente dessa configuração.
+Os bancos do Sistema são públicos e carregam sem login ou Drive. Usuários podem estudar, exportar e ativar/desativar esses bancos em seu perfil. A interface não oferece renomeação, exclusão global ou upload administrativo de bancos do Sistema. O acesso de escrita ao repositório determina quem pode publicá-los. A API `/api/question-banks` é somente leitura, inclusive para a conta administradora, e não consulta Google UserInfo nem armazenamento externo.
 
-## Adicionar arquivos pelo repositório
+Os bancos enviados pelo importador do Foco ou pela pasta do Drive continuam **Pessoais**, mesmo que declarem `sourceType: system`. Podem ser renomeados e removidos pelo próprio usuário. Bancos pessoais, preferências, sessões e respostas continuam no arquivo principal de progresso da conta; não são enviados ao GitHub. Sessões podem combinar as duas origens, identificadas pelas tags Sistema/Pessoal.
 
-Adicionar `public/data/question-banks/lei-NUMERO.json` e sua entrada em `index.json`. O servidor descobre os arquivos pelo manifesto; `vercel.json` inclui a pasta nas Functions. O build valida IDs, nomes de arquivo e formato de cada banco antes de copiar os assets. Para alterar uma versão existente, atualizar seu `revision`, `publishedAt` e a versão do manifesto. Não reutilizar IDs de questões para conteúdos diferentes.
+IDs pessoais antigos reservados (`lei-NUMERO`) continuam traduzidos de forma determinística no modelo, sem reescrever o diário ou perder progresso. Não ocorre transferência automática do progresso de um banco pessoal para um banco do Sistema. Os snapshots já gravados na 1.17.0 continuam aceitos. No modo visitante, o progresso continua temporário.
 
-## Validação
+## Verificação
 
-Os testes cobrem carregamento sem conta, isolamento entre origens, nomes livres, importação com ID reservado, restauração, sessões mistas, gabaritos históricos, retirada de bancos, reset, proteção da API, versão concorrente e mudanças de conta durante a verificação administrativa. Os testes de Google e Blob usam respostas simuladas e não comprovam uma escrita real na conta administradora.
+Os testes cobrem descoberta de arquivos adicionados e removidos sem índice, validação antes de substituir o build, revisão automática, consistência entre catálogo e arquivos publicados, API somente leitura, carregamento remoto pelo espelho, fallback, sessões mistas, renomeação pessoal e resultados históricos após atualização. Login Google e Drive mantêm sua infraestrutura anterior; esta mudança não exige Blob nem novas variáveis da Vercel.
