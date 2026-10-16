@@ -6,13 +6,14 @@ import {PublicDocuments} from '../src/public-documents.mjs';
 
 const origin='https://foco-concurso-wine.vercel.app';
 function runtime(){
-  const listeners={},windowListeners={},body={style:{overflow:'auto'},children:[],append(node){this.children.push(node);}},state={returns:0,ready:true};
-  const document={body,addEventListener(name,fn){listeners[name]=fn;},createElement(tag){return {tag,contentWindow:tag==='iframe'?{}:undefined,attributes:{},listeners:{},setAttribute(key,value){this.attributes[key]=value;},append(node){this.child=node;},addEventListener(name,fn){this.listeners[name]=fn;},showModal(){this.open=true;},close(){this.open=false;},remove(){body.children=body.children.filter(n=>n!==this);},focus(){this.focused=true;}};}};
+  const listeners={},windowListeners={},body={style:{overflow:'auto'},children:[],append(node){this.children.push(node);}},state={returns:0,ready:true,context:{view:'settings',subject:'111'},returned:[]};
+  const launcher={isConnected:true,focus(options){this.focusOptions=options;}};
+  const document={body,activeElement:launcher,addEventListener(name,fn){listeners[name]=fn;},createElement(tag){return {tag,contentWindow:tag==='iframe'?{}:undefined,attributes:{},listeners:{},setAttribute(key,value){this.attributes[key]=value;},append(node){this.child=node;},addEventListener(name,fn){this.listeners[name]=fn;},showModal(){this.open=true;},close(){this.open=false;},remove(){body.children=body.children.filter(n=>n!==this);},focus(){this.focused=true;}};}};
   const window={location:{href:origin+'/',origin},addEventListener(name,fn){windowListeners[name]=fn;}};
-  const controller=new PublicDocuments({document,window,canOpen:()=>state.ready,onReturn:()=>{state.returns++;}});
+  const controller=new PublicDocuments({document,window,canOpen:()=>state.ready,getContext:()=>({...state.context}),onReturn:context=>{state.returns++;state.returned.push(context);}});
   const click=(name,overrides={})=>{const event={button:0,defaultPrevented:false,target:{closest:()=>({href:new URL(name,origin).href})},preventDefault(){this.defaultPrevented=true;},...overrides};listeners.click(event);return event;};
   const message=overrides=>windowListeners.message({source:controller.frame?.contentWindow,origin,data:{type:'foco:document:return'},...overrides});
-  return {controller,document,window,state,click,message};
+  return {controller,document,window,state,launcher,click,message};
 }
 
 test('documentos abrem no aplicativo sem navegar ou recriar a sessão',async()=>{
@@ -22,6 +23,19 @@ test('documentos abrem no aplicativo sem navegar ou recriar a sessão',async()=>
     app.message();await Promise.resolve();assert.equal(app.state.returns,1);assert.equal(app.controller.dialog,null);assert.equal(app.document.body.children.length,0);assert.equal(app.document.body.style.overflow,'auto');
     app.message();assert.equal(app.state.returns,1);
   }
+});
+
+test('origem e foco são preservados durante a leitura sem guardar credenciais',async()=>{
+  for(const view of ['settings','banks']){
+    const app=runtime();app.state.context={view,subject:'111'};app.click(view==='banks'?'formato-json.html':'privacidade.html');
+    app.state.context={view:'home',subject:'222'};await app.controller.close();
+    assert.deepEqual(app.state.returned,[{view,subject:'111'}]);assert.deepEqual(app.launcher.focusOptions,{preventScroll:true});assert.equal(app.controller.context,null);
+  }
+});
+
+test('retorno não tenta focar um link removido após logout ou mudança da tela',async()=>{
+  const app=runtime();app.click('termos.html');app.launcher.isConnected=false;await app.controller.close();
+  assert.equal(app.launcher.focusOptions,undefined);assert.equal(app.state.returns,1);
 });
 
 test('mensagens de outro site, aba ou formato não fecham o documento',()=>{

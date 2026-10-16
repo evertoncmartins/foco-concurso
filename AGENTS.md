@@ -45,3 +45,9 @@
 - Nunca revele gabarito, acertos ou erros de simulados em andamento. Filtros por banco/lei e tipo apenas restringem consultas; sessões mistas pertencem a todos os bancos da fila.
 - Nos filtros de banco/lei, mostre bancos atuais e removidos apenas quando estes tenham sessões consultáveis ou respostas na etapa atual. Não liste toda importação antiga nem apague eventos para ocultar opções sem estudo.
 - Mantenha histórico e filtros isolados por conta, respeite progressEpoch e deixe explícito que Zerar progresso afeta todos os bancos, mesmo com um filtro selecionado.
+
+## Documentação e navegação
+
+- A ajuda de formato JSON, o modelo e o schema ficam em Banco de Questões, junto da importação. Evite duplicar esses recursos em Ajustes; mantenha ali os links de Termos e Política.
+- Documentos abertos dentro do aplicativo preservam a página de origem, rolagem e campos em edição da mesma sessão autenticada. Voltar ao Foco retorna a Ajustes ou Banco de Questões conforme a origem, sem forçar Home, refazer login ou restaurar o Drive.
+- Sem autenticação, o retorno continua no login e aguarda o clique explícito em Continuar com Google. Não recupere login por cookie no retorno dos documentos nem aplique o contexto de uma conta após logout/troca de conta.

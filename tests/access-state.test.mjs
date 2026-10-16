@@ -85,7 +85,7 @@ function runtime(options={}){
   }
   class FixtureStore extends Store{constructor(storage){super(storage);if(!this.events.length&&!options.systemBanks){this.storage.setItem('foco:v1:event:builtin-lei-8112-v1',JSON.stringify({id:'builtin-lei-8112-v1',at:'2026-10-08T00:00:00.000Z',type:'bank',bank}));this.load();}}}
   class FixtureCatalog{constructor(){this.banks=options.systemBanks||[];}async load(){return this.banks;}}
-  const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,PublicDocuments:class{constructor(options){this.options=options;}return(){return this.options.onReturn();}},GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
+  const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,PublicDocuments:class{constructor(options){this.options=options;}open(){this.context=this.options.getContext();}return(){return this.options.onReturn(this.context);}},GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window:{addEventListener(){},scrollTo(){}},console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
   const target=dataset=>({dataset,disabled:false,closest(selector){return selector==='[data-action]'||selector==='button'?this:null;},matches(){return false;}});
@@ -869,24 +869,41 @@ test('retorno Google recupera autorização e mantém bloqueio até restaurar a 
   const loading=app.value('init()');await tick();assert.equal(app.restores,1);assert.match(app.html(),/Preparando seus estudos/);assert.equal(app.preparations,0);assert.equal(app.authorizations,0);
   historyWait.resolve();await loading;assert.equal(app.value('config.folderId'),'chosen-folder');assert.equal(app.value('restoration'),null);assert.equal(app.value('view'),'home');assert.equal(app.value('working'),false);
 });
-test('retorno de documento com conta ativa abre início sem restaurar conta ou trocar token',async()=>{
-  for(const mobile of [false,true]){
-    const app=runtime({mobile});await app.start();await app.click('nav',{view:'settings'});
-    const token=app.auth.token,profile=app.auth.profile,events=app.value('JSON.stringify(store.events)');
-    await app.value('publicDocuments.return()');assert.equal(app.value('view'),'home');assert.equal(app.auth.profile,profile);assert.equal(app.auth.token,token);
+test('documentos retornam a Ajustes ou Banco de questões sem redesenhar a origem ou renovar login',async()=>{
+  for(const mobile of [false,true])for(const page of ['settings','banks']){
+    const app=runtime({mobile});await app.start();await app.click('nav',{view:page});
+    const token=app.auth.token,profile=app.auth.profile,events=app.value('JSON.stringify(store.events)'),html=app.html(),renders=app.renders;
+    await app.value('publicDocuments.open()');await app.value('publicDocuments.return()');
+    assert.equal(app.value('view'),page);assert.equal(app.auth.profile,profile);assert.equal(app.auth.token,token);assert.equal(app.html(),html);assert.equal(app.renders,renders);
     assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.restores,0);assert.equal(app.authorizations,0);assert.equal(app.value('restoration'),null);
   }
+});
+test('ajuda JSON aparece uma vez na importação; Ajustes mantém só os documentos institucionais',async()=>{
+  for(const mobile of [false,true])for(const systemBanks of [undefined,[]]){
+    const app=runtime({mobile,systemBanks});await app.start();await app.click('nav',{view:'banks'});
+    assert.equal((app.html().match(/href="\.\/formato-json.html"/g)||[]).length,1);assert(app.html().includes('Baixar modelo JSON'));assert(app.html().includes('href="./docs/questions.schema.json"'));assert(app.html().includes('estrutura do JSON'));
+    assert(app.html().includes('data-action="import"'));assert(app.html().includes('data-action="drive-banks"'));
+    await app.click('nav',{view:'settings'});assert(!app.html().includes('formato-json.html'));assert(!app.html().includes('modelo-banco.json'));assert(!app.html().includes('questions.schema.json'));
+    assert(app.html().includes('data-foco-document href="./privacidade.html"'));assert(app.html().includes('data-foco-document href="./termos.html"'));
+  }
+});
+test('origem capturada é reaplicada somente para a mesma sessão autenticada',async()=>{
+  const app=runtime();await app.start();await app.click('nav',{view:'settings'});await app.value('publicDocuments.open()');
+  app.value('view="home"');await app.value('publicDocuments.return()');assert.equal(app.value('view'),'settings');
+  await app.value('publicDocuments.open()');await app.value('logout()');
+  app.auth.profile={sub:'222',name:'Outra conta',email:'other@example.test'};app.auth.token='other-fixture';await app.start();await app.click('nav',{view:'banks'});
+  await app.value('publicDocuments.return()');assert.equal(app.value('view'),'banks');assert.equal(app.auth.profile.sub,'222');assert.equal(app.value('accountStorage.userId'),'222');
 });
 test('retorno de documento na entrada continua deslogado mesmo com cookie antigo',async()=>{
   for(const mobile of [false,true]){
     const app=runtime({init:true,redirectEnabled:true,googleReady:false,mobile});app.auth.signOut();
     app.auth.restoreSession=()=>{throw new Error('Não deve recuperar cookie antigo.');};
-    await app.value('init()');await app.value('publicDocuments.return()');
+    await app.value('init()');await app.value('publicDocuments.open()');await app.value('publicDocuments.return()');
     assert.equal(app.auth.profile,null);assert.equal(app.auth.token,null);assert.equal(app.restores,0);assert.equal(app.authorizations,0);assert.match(app.html(),/Continuar com Google/);assert.equal(app.value('store'),undefined);
   }
 });
 test('retorno usa o estado atual depois de sair e não reabre a conta anterior',async()=>{
-  const app=runtime();await app.start();await app.value('logout()');await app.value('publicDocuments.return()');
+  const app=runtime();await app.start();await app.value('publicDocuments.open()');await app.value('logout()');await app.value('publicDocuments.return()');
   assert.equal(app.auth.profile,null);assert.equal(app.auth.token,null);assert.equal(app.value('store'),null);assert.equal(app.restores,0);assert.equal(app.authorizations,0);assert.match(app.html(),/Continuar com Google/);
 });
 test('retorno expirado informa erro e não abre conta nem importa progresso',async()=>{
