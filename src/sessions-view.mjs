@@ -4,6 +4,12 @@ import {sourceType,sourceLabel,sourceTag,latestNativeFeedback,studyPresentation}
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const sessionBankIds=session=>[...new Set(session.queue.map(key=>key.includes(':')?key.slice(0,key.indexOf(':')):'').filter(Boolean))];
+// A verified association has one filter entry: its current native destination.
+// Keep the original catalog and journal intact for historical reports/unlinking.
+function bankFilterId(model,id){
+  const target=model.bankLinks?.get(id)?.toBankId;
+  return target&&model.systemBanks?.some(bank=>bank.id===target)?target:id;
+}
 export function sessionBankCatalog(model){
   const currentIds=new Set(model.banks.map(b=>b.id)),studiedIds=new Set(model.sessions.filter(s=>!s.abandoned).flatMap(sessionBankIds));
   const banks=new Map((model.bankHistory||[]).map(e=>[e.bank.id,e.bank]));
@@ -45,6 +51,7 @@ export function sessionSummary(s,model,context={}){
     updatedAt:model.sessionUpdatedAt?.get(s.id)||s.completedAt||s.startedAt||'',exam:s.mode==='exam',completed:!!s.completed};
 }
 export function sessionLibrary(model,{status='open',bankId='',type='all',page=1,pageSize=12}={}){
+  bankId=bankFilterId(model,bankId);
   const context={recordings:recordings(model),catalog:sessionBankCatalog(model),available:new Set(model.questions.map(q=>q.key))};
   context.origins=sourceContext(model,context.catalog);
   const matching=model.sessions.filter(s=>!s.abandoned).filter(s=>(!bankId||sessionBankIds(s).includes(bankId)||s.queue.some(key=>model.progressLinks?.get(key)?.key.startsWith(`${bankId}:`)))&&(type==='all'||(type==='exam')===(s.mode==='exam'))).map(s=>sessionSummary(s,model,context));
@@ -62,15 +69,14 @@ export function sessionReport(s,model){
   return {...summary,questions};
 }
 export function performanceForBank(model,bankId='',origin='all'){
+  bankId=bankFilterId(model,bankId);
   if(!bankId&&origin==='all'&&!model.progressLinks?.size)return model;
   const answers=model.answers.filter(a=>(!bankId||a.key.startsWith(`${bankId}:`)||a.progressKey?.startsWith(`${bankId}:`))&&(origin==='all'||sourceType(studyPresentation(model,a))===origin)),questions=model.questions.filter(q=>(bankId?q.bankId===bankId:q.progressKey===q.key||!q.progressKey)&&(origin==='all'||sourceType(studyPresentation(model,q))===origin)),correct=answers.filter(a=>a.correct).length;
   return {...model,answers,questions,stats:{...model.stats,attempts:answers.length,correct,wrong:answers.length-correct,accuracy:answers.length?Math.round(correct/answers.length*100):0,answered:new Set(answers.map(a=>a.progressKey||a.key)).size}};
 }
 export function bankSelect(model,value='',{id='sessions-bank',attribute='data-session-filter="bankId"'}={}){
-  return `<label class="history-filter" for="${id}"><span>Banco / lei</span><select id="${id}" ${attribute}><option value="">Todos os bancos</option>${sessionBankCatalog(model).map(b=>{
-    const link=model.bankLinks?.get(b.id),native=link&&model.systemBanks?.find(n=>n.id===link.toBankId);
-    return `<option value="${esc(b.id)}" ${value===b.id?'selected':''}>${esc(native?.displayName||native?.name||b.title)} · ${native?'Sistema (histórico associado)':sourceLabel(b)+(b.removed?' (removido)':'')}</option>`;
-  }).join('')}</select></label>`;
+  value=bankFilterId(model,value);
+  return `<label class="history-filter" for="${id}"><span>Banco / lei</span><select id="${id}" ${attribute}><option value="">Todos os bancos</option>${sessionBankCatalog(model).filter(b=>bankFilterId(model,b.id)===b.id).map(b=>`<option value="${esc(b.id)}" ${value===b.id?'selected':''}>${esc(b.title)} · ${sourceLabel(b)}${b.removed?' (removido)':''}</option>`).join('')}</select></label>`;
 }
 export function sessionDate(value){const date=new Date(value);return Number.isFinite(date.getTime())?date.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'}):'Data não informada';}
 export function sessionsView(model,filters){

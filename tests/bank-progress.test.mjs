@@ -28,7 +28,7 @@ test('tag, sessões e filtros mostram destino Sistema após associar e excluir o
   const store=await fixture(),s=await study(store,personal.id),original=structuredClone(store.events);
   await store.associateBank(personal.id,native.id);await store.add([{type:'bank-state',bankId:personal.id,value:'deleted'}]);let m=store.model();
   const q=sessionQuestion(m,s,s.queue[0]),shown=studyPresentation(m,q);assert.equal(shown.sourceType,'system');assert.equal(shown.associatedFrom.sourceType,'personal');assert.equal(q.sourceType,'personal');
-  assert(sourceTag(shown).includes('Sistema, com progresso associado'));assert.deepEqual(sessionSummary(s,m).sources,['system']);assert(sessionSummary(s,m).associated);assert(bankSelect(m).includes('Sistema (histórico associado)'));
+  assert(sourceTag(shown).includes('Sistema, com progresso associado'));assert.deepEqual(sessionSummary(s,m).sources,['system']);assert(sessionSummary(s,m).associated);assert(!bankSelect(m).includes(`value="${personal.id}"`));assert(bankSelect(m).includes(`value="${native.id}"`));
   const done=completeSession(s,[q]);await store.add(done.events);m=store.model();const report=sessionReport(done.session,m);assert.equal(report.questions[0].presentation.sourceType,'system');assert.equal(report.questions[0].sourceType,'personal');assert.equal(report.correct,1);
   assert(original.every(e=>JSON.stringify(store.events.find(x=>x.id===e.id))===JSON.stringify(e)));
   await store.unlinkBank(personal.id);m=store.model();assert.deepEqual(sessionSummary(done.session,m).sources,['personal']);assert.equal(sessionReport(done.session,m).questions[0].presentation.sourceType,'personal');
@@ -37,6 +37,35 @@ test('apresentação não atribui Sistema a questão diferente ou a banco sem as
   const store=await fixture(),s=await study(store,personal.id);await store.associateBank(personal.id,native.id);const m=store.model(),q=sessionQuestion(m,s,s.queue[0]);
   assert.equal(studyPresentation(m,{...q,statement:'Outro conteúdo'}).sourceType,'personal');assert.equal(studyPresentation({...m,systemBanks:[]},q).sourceType,'personal');
   assert.equal(studyPresentation({...m,progressLinks:new Map()},q).sourceType,'personal');
+});
+test('filtros unificam cópias associadas no Sistema e mantêm sessões, tentativas e seleção antiga',async()=>{
+  const store=await fixture(),copy={...structuredClone(personal),id:'another-associated-copy'},separate={...structuredClone(personal),id:'unlinked-personal',displayName:'Meu estudo independente'};
+  await store.add([{type:'bank',bank:copy},{type:'bank',bank:separate}]);
+  const old=await study(store,personal.id),current=await study(store,native.id),second=await study(store,copy.id,true);await study(store,separate.id);
+  const original=structuredClone(store.events);await store.associateBank(personal.id,native.id);await store.associateBank(copy.id,native.id);
+  await store.add([{type:'bank-state',bankId:personal.id,value:'deleted'},{type:'bank-state',bankId:copy.id,value:'deleted'}]);
+  let m=store.model();const done=completeSession(old,old.queue.map(key=>sessionQuestion(m,old,key)));await store.add(done.events);m=store.model();
+  for(const value of ['',personal.id,copy.id,native.id]){
+    const html=bankSelect(m,value);assert.equal(html.split(`value="${native.id}"`).length-1,1);assert(!html.includes(`value="${personal.id}"`));assert(!html.includes(`value="${copy.id}"`));assert(!html.includes('histórico associado'));
+    assert(html.includes(`value="${separate.id}"`));assert(html.includes('Meu estudo independente · Pessoal'));
+    if(value)assert(html.includes(`value="${native.id}" selected`));
+  }
+  for(const value of [native.id,personal.id,copy.id]){
+    assert.deepEqual(sessionLibrary(m,{bankId:value}).rows.map(row=>row.id).sort(),[current.id,second.id].sort());
+    assert.deepEqual(sessionLibrary(m,{bankId:value,status:'completed'}).rows.map(row=>row.id),[old.id]);
+    const scoped=performanceForBank(m,value);assert.equal(scoped.stats.attempts,3);assert.equal(scoped.stats.correct,2);assert.equal(scoped.stats.wrong,1);assert.equal(scoped.stats.answered,1);
+  }
+  assert.equal(m.stats.attempts,4);assert.equal(performanceForBank(m,separate.id).stats.attempts,1);
+  assert(original.every(e=>JSON.stringify(store.events.find(x=>x.id===e.id))===JSON.stringify(e)));
+});
+test('filtro pessoal reaparece ao desfazer associação ou perder o destino nativo válido',async()=>{
+  const store=await fixture();await study(store,personal.id);await store.associateBank(personal.id,native.id);
+  assert(!bankSelect(store.model()).includes(`value="${personal.id}"`));
+  store.setSystemBanks([]);assert(bankSelect(store.model(),personal.id).includes(`value="${personal.id}" selected`));
+  const changed=structuredClone(native);changed.questions[0].statement+=' Conteúdo alterado';store.setSystemBanks([changed]);
+  assert(bankSelect(store.model(),personal.id).includes(`value="${personal.id}" selected`));
+  store.setSystemBanks([native]);await store.unlinkBank(personal.id);const m=store.model();
+  assert(bankSelect(m,personal.id).includes(`value="${personal.id}" selected`));assert.equal(performanceForBank(m,native.id).stats.attempts,0);assert.equal(performanceForBank(m,personal.id).stats.attempts,1);
 });
 test('comparação exige todo o conteúdo e o gabarito, recusando correspondência parcial ou ambígua',()=>{
   assert(bankProgressPlan(personal,native));
