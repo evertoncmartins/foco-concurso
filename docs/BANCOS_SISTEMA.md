@@ -22,6 +22,12 @@ O JSON deve seguir o [formato nativo do importador](FORMATO_JSON.md): objeto com
 
 O build recusa nomes de arquivo incorretos, ID divergente, título de outra lei, JSON inválido, questões repetidas e gabaritos inexistentes, indicando o arquivo e o problema. Uma validação que falha impede a implantação; a versão anterior permanece publicada.
 
+## Apresentação dos próximos bancos
+
+Use o card da Lei nº 8.112/1990 como referência: título e subtítulo, resumo de questões/instituições/período, descrição breve, link oficial, assuntos com quantidades e instituições de origem. `description` deve resumir conteúdo e recorte; registre observações sobre pesquisa e situação do gabarito em `fonte` de cada questão.
+
+Em `subject`, informe um assunto principal temático, como `Educação profissional e tecnológica`; em `topic`, detalhe o conteúdo, como `Formação técnica integrada`. Não repita apenas o nome da lei no assunto de todas as questões. O card calcula as quantidades pelos registros reais e conta cada questão uma vez; a soma dos assuntos deve corresponder ao total. Não mantenha contagens ou listas de assuntos manualmente na descrição. Confira também o reconhecimento da lei e o link de consulta na apresentação compartilhada.
+
 ## Atualizar e retirar bancos
 
 Para atualizar, substitua o JSON mantendo o nome do arquivo, o ID do banco e os IDs das questões que continuam sendo as mesmas. Conteúdos diferentes devem receber IDs novos. Não é necessário editar `revision`, `publishedAt` ou a versão do catálogo: as revisões são calculadas automaticamente pelo conteúdo. Alterar o conteúdo muda sua revisão; reformatar o JSON não cria uma revisão diferente.

@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFile,readdir} from 'node:fs/promises';
 import {bankOverviewData,bankCardView} from '../src/bank-view.mjs';
+import {validateBank} from '../src/engine.mjs';
+import {questionIdentity} from '../src/bank-progress.mjs';
 
 test('resumo usa origem e ano de cada questão, agrupa instituições e não inventa metadados ausentes',()=>{
   const bank={name:'Meu conteúdo',questions:[
@@ -50,4 +53,27 @@ test('visão usa explicação breve da lei e metadados escapados, preservando a 
   assert(html.includes('Estabelece as regras da vida funcional'));
   assert(!html.includes('IMPLEMENTAÇÃO E CURADORIA'));assert.equal(bank.description,'IMPLEMENTAÇÃO E CURADORIA: texto técnico original.');
   assert(!html.includes('<img'));assert(!html.includes('<script>'));assert(html.includes('&lt;script&gt;'));
+});
+
+test('LDB usa o card de lei com assuntos temáticos, contagens e fonte oficial',async()=>{
+  const bank={...validateBank(JSON.parse(await readFile(new URL('../public/data/question-banks/lei-9394.json',import.meta.url)))),sourceType:'system',enabled:true};
+  const data=bankOverviewData(bank),html=bankCardView(bank,{detailsOpen:true});
+  assert.equal(data.law.key,'9394');assert.equal(data.title,'Lei nº 9.394/1996');
+  assert(data.subjects.length>=10);assert(data.subjects.every(s=>s.label!==bank.name&&s.count>0));
+  for(const label of ['Educação profissional e tecnológica','Educação superior','Currículo e diversidade','Formação dos profissionais da educação'])assert(data.subjects.some(s=>s.label===label));
+  assert.equal(data.subjects.reduce((sum,s)=>sum+s.count,0),bank.questions.length);
+  assert.equal(data.institutions.reduce((sum,s)=>sum+s.count,0)+data.missingInstitutions,bank.questions.length);
+  assert(html.includes('Sobre a lei'));assert(html.includes('Ler a lei'));assert(html.includes('https://www.planalto.gov.br/ccivil_03/leis/l9394compilado.htm'));
+  assert(!html.includes('Triagem de'));assert(!html.includes('Não é inventário'));assert(!html.includes('Fontes:'));
+  for(const q of bank.questions)assert.equal(questionIdentity(q),questionIdentity({...q,subject:bank.name}));
+});
+
+test('bancos nativos apresentam contagens reais e não usam o nome da lei como assunto do card',async()=>{
+  const root=new URL('../public/data/question-banks/',import.meta.url);
+  for(const file of await readdir(root))if(/^lei-\d+\.json$/.test(file)){
+    const bank=validateBank(JSON.parse(await readFile(new URL(file,root)))),data=bankOverviewData(bank);
+    assert.equal(data.total,bank.questions.length);
+    assert.equal(data.subjects.reduce((sum,s)=>sum+s.count,0),data.total,file);
+    assert(data.subjects.every(s=>s.label!==data.title),`${file}: classifique os assuntos pelo conteúdo, não pelo nome da lei`);
+  }
 });
