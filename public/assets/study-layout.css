@@ -23,7 +23,7 @@
 .connection-card[data-status=synced] strong{color:var(--success)}
 .focus-toolbar{display:none}
 .question-body:focus{outline:none}
-.focus-install,.focus-mobile-progress,.focus-guest-label,.focus-exit-mobile{display:none}
+.focus-install,.focus-mobile-discipline,.focus-guest-label,.focus-exit-mobile{display:none}
 .fullscreen-help{font-size:13px}
 .fullscreen-help h3{margin-top:20px;font-size:14px}
 .fullscreen-help ol{padding-left:20px;margin-block:12px 18px}
@@ -169,11 +169,12 @@
   .session .session-header,.session .session-progress{flex-shrink:0}
   .session .session-header{margin-bottom:8px}
   .session .session-progress{margin-bottom:10px}
-  /* This sibling reserves one line above the card, outside its only scroller. */
+  /* Keep metadata outside the question scroller; wrap it before crowding actions. */
   .session .mobile-question-bar{display:flex;flex-shrink:0;align-items:center;gap:8px;min-width:0;min-height:44px;margin-bottom:6px;padding-inline:2px;background:var(--bg);white-space:nowrap;font-size:11px;line-height:1.4}
-  .mobile-question-bar .question-discipline{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:550;color:var(--detail-blue)}
+  .mobile-question-bar .mobile-question-details{display:flex;flex:1;flex-wrap:wrap;align-items:center;gap:4px 6px;min-width:0}
+  .mobile-question-bar .question-position{flex-shrink:0;font-weight:550;color:var(--detail-blue);font-variant-numeric:tabular-nums}
   .mobile-question-bar .question-difficulty{flex-shrink:0;color:var(--muted)}
-  .mobile-question-bar .badge.origin{display:block;flex-shrink:0;max-width:28%;overflow:hidden;text-overflow:ellipsis;padding:4px 6px;border-radius:5px;font-size:10px;line-height:1.4}
+  .mobile-question-bar .badge.origin{display:block;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;padding:4px 6px;border-radius:5px;font-size:10px;line-height:1.4}
   .mobile-question-bar .question-tools{flex-shrink:0;gap:6px}
   .mobile-question-bar .question-tools .icon-btn{width:44px;height:44px}
   .mobile-question-bar .question-tools svg{width:15px;height:15px}
@@ -184,12 +185,12 @@
   .session .session-summary-bar{flex-shrink:0;flex-wrap:wrap;row-gap:4px;background:var(--bg);margin-block:12px}
   .session.focus-mode .topbar,.session.focus-mode .session-header,.session.focus-mode .guest-banner{display:none}
   .session.focus-mode .focus-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;padding:calc(6px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 6px max(12px,env(safe-area-inset-left,0px));background:var(--bg)}
-  .focus-mode .focus-caption{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:11px;color:var(--muted);min-width:0}
+  .focus-mode .focus-caption{display:grid;grid-template-columns:16px minmax(0,1fr);align-items:center;gap:4px 6px;flex:1;min-width:0;font-size:11px;color:var(--muted)}
   .focus-mode .focus-desktop-label,.focus-mode .focus-escape{display:none}
   .focus-mode .focus-exit-desktop{display:none}
   .focus-mode .focus-exit-mobile{display:inline}
-  .focus-mode .focus-mobile-progress{display:inline;font-weight:550;color:var(--text)}
-  .focus-mode .focus-guest-label{display:block;flex-basis:100%;font-size:9px;line-height:1.3}
+  .focus-mode .focus-mobile-discipline{display:block;min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.45;font-weight:550;color:var(--detail-blue)}
+  .focus-mode .focus-guest-label{display:block;grid-column:1 / -1;font-size:9px;line-height:1.3;overflow-wrap:anywhere}
   .focus-mode .focus-toolbar>.flex{gap:6px;flex-shrink:0}
   .focus-mode .focus-toolbar .icon-btn{width:40px;height:40px}
   .focus-mode .focus-install{display:inline-flex}
