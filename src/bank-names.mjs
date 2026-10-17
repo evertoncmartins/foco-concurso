@@ -1,6 +1,7 @@
 const laws=[
   {key:'8112',matches:name=>/\b8\.?112\b/u.test(name),name:'Lei nº 8.112/1990',subtitle:'Servidores públicos federais',description:'Estabelece as regras da vida funcional dos servidores públicos civis federais: ingresso, movimentação, direitos, deveres e responsabilidades no serviço público.',url:'https://www.planalto.gov.br/ccivil_03/leis/l8112compilado.htm'},
-  {key:'8069',matches:name=>/\b8\.?069\b|\bECA\b|Estatuto da Criança e do Adolescente/iu.test(name),name:'Lei nº 8.069/1990',subtitle:'Estatuto da Criança e do Adolescente',description:'Protege os direitos de crianças e adolescentes e define responsabilidades da família, da sociedade e do poder público para garantir seu desenvolvimento, sua dignidade e sua proteção integral.',url:'https://www.planalto.gov.br/ccivil_03/leis/l8069.htm'}
+  {key:'8069',matches:name=>/\b8\.?069\b|\bECA\b|Estatuto da Criança e do Adolescente/iu.test(name),name:'Lei nº 8.069/1990',subtitle:'Estatuto da Criança e do Adolescente',description:'Protege os direitos de crianças e adolescentes e define responsabilidades da família, da sociedade e do poder público para garantir seu desenvolvimento, sua dignidade e sua proteção integral.',url:'https://www.planalto.gov.br/ccivil_03/leis/l8069.htm'},
+  {key:'9394',matches:name=>/\b9\.?394\b|\bLDB\b|Diretrizes e Bases da Educação Nacional/iu.test(name),name:'Lei nº 9.394/1996',subtitle:'Diretrizes e bases da educação nacional',description:'Estabelece as diretrizes e bases da educação nacional: direito à educação, organização dos sistemas de ensino, níveis e modalidades, currículo e formação dos profissionais da educação.',url:'https://www.planalto.gov.br/ccivil_03/leis/l9394compilado.htm'}
 ];
 
 

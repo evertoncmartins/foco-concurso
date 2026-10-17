@@ -3,7 +3,7 @@
   "id": "lei-9394",
   "name": "Lei nº 9.394/1996",
   "subtitle": "Diretrizes e bases da educação nacional",
-  "description": "Questões selecionadas para estudo dos arts. 1º a 63, em provas de cargos de nível superior de Institutos Federais e universidades públicas. Contém 222 questões com explicação geral, análise por alternativa e referência legal. Fontes: 10 itens com gabarito definitivo conferido em fonte oficial e 212 itens cujo gabarito consta do PDF Qconcursos fornecido, sem confirmação oficial independente; a situação está indicada na origem de cada questão. Triagem de 390 itens do PDF: excluídos conteúdos externos, provas identificadas como anuladas, respostas duvidosas, redações superadas e repetições. Não é inventário exaustivo de provas de todas as instituições do país. Legislação consultada em 17/10/2026.",
+  "description": "Organização da educação nacional, níveis e modalidades de ensino, currículo, avaliação e formação dos profissionais da educação, nos arts. 1º a 63.",
   "questions": [
     {
       "id": "ldb-ufv-2025-q26",
@@ -14,7 +14,7 @@
       "cargo": "Técnico em Assuntos Educacionais",
       "nivelCargo": "Superior",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Finalidades do ensino superior",
       "difficulty": "medium",
       "tags": [
@@ -73,7 +73,7 @@
     {
       "id": "ldb-q2562097",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "História e cultura afro-brasileira e indígena",
       "difficulty": "medium",
       "statement": "Segundo a Lei nº 9.394/1996, torna-se componente curricular obrigatório, nos estabelecimentos de ensino",
@@ -143,7 +143,7 @@
     {
       "id": "ldb-q2356043",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Composição dos sistemas de ensino",
       "difficulty": "medium",
       "statement": "Os sistemas de ensino dos Estados e do Distrito Federal, segundo a Lei de Diretrizes e Bases da Educação (Lei n.º 9.394/1996),\ncompreendem as instituições de:",
@@ -204,7 +204,7 @@
     {
       "id": "ldb-q2356051",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formas integrada, concomitante e subsequente",
       "difficulty": "medium",
       "statement": "No Brasil, legalmente, a Educação Básica tem por finalidades desenvolver o educando, assegurar-lhe a formação comum\nindispensável para o exercício da cidadania e fornecer-lhe meios para progredir no trabalho e em estudos posteriores.\nAnalise o que preceitua o artigo 36 da atual LDBEN (Lei Nº 9.394/1996);\nNo artigo 36-A da LDBEN está previsto que o “ensino médio, atendida a formação geral do educando, poderá prepará-lo para\no exercício de profissões técnicas”. Dessa maneira, a educação profissional técnica poderá ser ofertada nas seguintes formas:\nArticulada/integrada com o ensino médio; subsequente ao ensino médio; concomitante ao ensino médio (BRASIL, 1996). A\nforma concomitante com o ensino médio é",
@@ -265,7 +265,7 @@
     {
       "id": "ldb-q2501904",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Competências da União e organização curricular",
       "difficulty": "medium",
       "statement": "De acordo com o que preconiza a Lei de Diretrizes e Bases da Educação, assinale a alternativa correta.",
@@ -331,7 +331,7 @@
     {
       "id": "ldb-q2471692",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Finalidades da educação",
       "difficulty": "medium",
       "statement": "A Lei nº 9.394/1996, no seu artigo art. 2º estabelece que “A educação, dever da família e do Estado, inspirada nos princípios de\nliberdade e nos ideais de solidariedade humana”, tem como finalidade",
@@ -392,7 +392,7 @@
     {
       "id": "ldb-q2471693",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Liberdade religiosa e prestação alternativa",
       "difficulty": "medium",
       "statement": "Leia o caso a seguir.\nA estudante M. E., que estuda na 7º série de uma escola no interior de Sergipe de tempo integral, não pôde comparecer a\numa avaliação no sábado por motivos religiosos.\nSegundo a Lei de Diretrizes e Bases da Educação Nacional (LDB), art. 7-A, com respaldo ao art. 5º, qual deve ser a prática a ser\nadotada pela escola em relação à estudante que perdeu a avaliação por motivos religiosos?",
@@ -453,7 +453,7 @@
     {
       "id": "ldb-q2471703",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Objetivos da educação básica",
       "difficulty": "medium",
       "statement": "O art. 22 da Lei de Diretrizes e Bases da Educação Nacional (LDB) estabelece que a educação básica tem por finalidades\ndesenvolver o educando, assegurar-lhe a formação comum indispensável para o exercício da cidadania e fornecer-lhe meios\npara progredir no trabalho e em estudos posteriores. Em busca do cumprimento dessas finalidades, a referida Lei prevê",
@@ -514,7 +514,7 @@
     {
       "id": "ldb-q2542583",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Itinerários formativos contínuos",
       "difficulty": "medium",
       "statement": "No âmbito da educação profissional e tecnológica, regulamentada pela Lei de Diretrizes e Bases da Educação Nacional (LDB),\no percurso formativo estruturado de forma a permitir o aproveitamento incremental de experiências, certificações e\nconhecimentos desenvolvidos ao longo da trajetória individual do estudante é chamado de",
@@ -584,7 +584,7 @@
       "cargo": "Professor EBTT — Pedagogia",
       "nivelCargo": "Superior",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Princípios e direito à educação",
       "difficulty": "medium",
       "tags": [
@@ -648,7 +648,7 @@
     {
       "id": "ldb-q2210538",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Finalidades, diversidade e obrigatoriedade",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9.394/1996, que estabelece as Diretrizes e Bases da Educação Nacional, analise as assertivas abaixo e\nassinale a alternativa correta.\nI. A educação, dever da família e do Estado, inspirada nos princípios de liberdade e nos ideais de solidariedade humana, tem\npor finalidade o pleno desenvolvimento do educando, seu preparo para o exercício da cidadania e sua qualificação para o\ntrabalho. II. O dever do Estado com a educação escolar pública será efetivado mediante a garantia de educação básica\nobrigatória e gratuita dos 7 (sete) aos 21 (vinte um) anos de idade, apenas. III. O ensino será ministrado com base no respeito\nà diversidade humana, linguística, cultural e identitária das pessoas surdas, surdo-cegas e com deficiência auditiva.",
@@ -714,7 +714,7 @@
     {
       "id": "ldb-q2224150",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Desenvolvimento, cidadania e trabalho",
       "difficulty": "medium",
       "statement": "De acordo com o Art. 2º da Lei de Diretrizes e Bases da Educação Nacional (LDB), é correto afirmar que:",
@@ -780,7 +780,7 @@
     {
       "id": "ldb-q2224151",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Competências federativas na educação",
       "difficulty": "medium",
       "statement": "A educação brasileira, como está disposta na LDB, está organizada em regime de colaboração da União, dos Estados, do\nDistrito Federal e dos Municípios. Sobre isso, analise as assertivas abaixo:\nI. Cabe aos Estados a coordenação da política nacional de educação, articulando os diferentes níveis e sistemas e exercendo\nfunção normativa, redistributiva e supletiva em relação às demais instâncias educacionais bem como a elaboração o Plano\nNacional de Educação. II. Os Municípios devem oferecer a educação infantil em creches e pré-escolas e, com prioridade, o\nensino fundamental, permitida a atuação em outros níveis de ensino somente quando estiverem atendidas plenamente as\nnecessidades de sua área de competência e com recursos acima dos percentuais mínimos vinculados pela Constituição\nFederal à manutenção e desenvolvimento do ensino. III. A União tem o dever de organizar, manter e desenvolver os órgãos e\ninstituições oficiais dos seus sistemas de ensino; definir, com os Municípios, formas de colaboração na oferta do ensino\nfundamental, as quais devem assegurar a distribuição proporcional das responsabilidades, de acordo com a população a ser\natendida e os recursos financeiros disponíveis em cada uma dessas esferas do Poder Público. IV. Caberá à União assegurar,\nanualmente, em seu Orçamento Geral, recursos suficientes para manutenção e desenvolvimento das instituições de\neducação superior por ela mantidas. Quais estão corretas?",
@@ -846,7 +846,7 @@
     {
       "id": "ldb-q2224929",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Evolução da obrigatoriedade escolar",
       "difficulty": "medium",
       "statement": "Quando de sua promulgação, em 1996, a Lei de Diretrizes e Bases da Educação Nacional garantiu uma série de conquistas.\nAssinale a alternativa que NÃO corresponde a uma dessas conquistas, naquele momento histórico.",
@@ -912,7 +912,7 @@
     {
       "id": "ldb-q2343552",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Níveis da educação escolar",
       "difficulty": "medium",
       "statement": "Assinale a alternativa que apresenta a composição da educação escolar, segundo a Lei de Diretrizes e Bases da Educação\nNacional:",
@@ -978,7 +978,7 @@
     {
       "id": "ldb-q2174959",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Abrangência dos processos educativos",
       "difficulty": "medium",
       "statement": "Com referência na Lei nº 9.394/1996, que estabelece as diretrizes e bases da educação nacional, analise as assertivas abaixo,\nassinalando V, se verdadeiras, ou F, se falsas. A educação abrange os processos formativos que se desenvolvem:\n( ) Nas instituições de pesquisa. () Na convivência humana. () Nas organizações da sociedade civil. A ordem correta de\npreenchimento dos parênteses, de cima para baixo, é:",
@@ -1044,7 +1044,7 @@
     {
       "id": "ldb-q2174968",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Faixa etária da educação obrigatória",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9.394/1996, que estabelece as diretrizes e bases da educação nacional, o dever do Estado com\neducação escolar pública será efetivado mediante a garantia de educação básica obrigatória e gratuita dos __________ anos de idade. Assinale a alternativa que preenche corretamente a lacuna do trecho acima.",
@@ -1110,7 +1110,7 @@
     {
       "id": "ldb-q2238451",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Princípios do ensino",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9.394/1996, que estabelece as diretrizes e bases da educação nacional, é INCORRETO afirmar que o\nensino será ministrado com base no princípio da:",
@@ -1176,7 +1176,7 @@
     {
       "id": "ldb-q2240121",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino médio",
       "topic": "Finalidades do ensino médio",
       "difficulty": "medium",
       "statement": "Conforme exposto no Artigo 35 da Lei nº 9.394/1996, o Ensino Médio, como etapa final da Educação Básica, terá duração\nmínima de três anos. São finalidades dessa etapa da Educação Básica, em conformidade com o que consta na referida lei,\nEXCETO:",
@@ -1242,7 +1242,7 @@
     {
       "id": "ldb-q2228483",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Níveis e etapas da educação",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional (LDB) - Lei nº 9.394/1996 define a composição dos níveis escolares\nque fazem parte do sistema nacional de ensino. Quais são os níveis da educação escolar nacional?",
@@ -1308,7 +1308,7 @@
     {
       "id": "ldb-q2228772",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Educação profissional técnica na LDB",
       "difficulty": "medium",
       "statement": "A educação profissional técnica de nível médio prevista na Lei de Diretrizes e Bases da Educação Lei n.º 9.394/1996, foi\nincluída pela",
@@ -1374,7 +1374,7 @@
     {
       "id": "ldb-q2238730",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Garantias e organização da educação nacional",
       "difficulty": "medium",
       "statement": "De acordo com a Lei Federal nº 9.394/1996, que estabelece as diretrizes e bases da educação nacional, assinale a\nalternativa correta.",
@@ -1440,7 +1440,7 @@
     {
       "id": "ldb-q2238731",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Abrangência e formas da educação profissional",
       "difficulty": "medium",
       "statement": "Sobre educação profissional, assinale a alternativa correta em conformidade com a Lei Federal nº 9.394/1996, que\nestabelece as diretrizes e bases da educação nacional.",
@@ -1506,7 +1506,7 @@
     {
       "id": "ldb-q2187475",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Componentes curriculares e cinema nacional",
       "difficulty": "medium",
       "statement": "Ao tratar dos currículos da educação infantil, do ensino fundamental e do ensino médio, a Lei de Diretrizes e Bases da\nEducação Nacional estabeleceu que estes devem ter base nacional comum, a ser complementada, em cada sistema de ensino\ne em cada estabelecimento escolar, por uma parte diversificada, exigida pelas características regionais e locais da sociedade,\nda cultura, da economia e dos educandos. Segundo essa perspectiva, é CORRETO afirmar:",
@@ -1572,7 +1572,7 @@
     {
       "id": "ldb-q2188933",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Avaliação do rendimento escolar",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional, ao tratar do ensino básico, estabeleceu expressamente que este\nnível de ensino tem por finalidades: desenvolver o educando, assegurar-lhe a formação comum indispensável para o\nexercício da cidadania e fornecer-lhe meios para progredir no trabalho e em estudos posteriores. Para tanto, um dos\naspectos garantidores constantes na LDB foi a definição de regras comuns para a organização da educação básica, nos níveis\nfundamental e médio. Nesse contexto, no que diz respeito ao rendimento escolar, este observará os seguintes critérios,\nEXCETO:",
@@ -1638,7 +1638,7 @@
     {
       "id": "ldb-q2182329",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Etapas e modalidades educacionais",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional organiza a educação em níveis e modalidades. Sobre essa estrutura,\né correto afirmar:",
@@ -1704,7 +1704,7 @@
     {
       "id": "ldb-q2354282",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Princípios e condições do ensino privado",
       "difficulty": "medium",
       "statement": "A Lei nº 9.394/1996 estabelece as diretrizes e bases da educação nacional. Sobre o referido instrumento normativo, assinale a\nalternativa INCORRETA.",
@@ -1770,7 +1770,7 @@
     {
       "id": "ldb-q2357591",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Garantias do dever estatal",
       "difficulty": "medium",
       "statement": "Conforme a Lei de Diretrizes e Bases da Educação Nacional (LDB), a educação, dever da família e do Estado, tem por\nfinalidade o pleno desenvolvimento do educando, seu preparo para o exercício da cidadania e sua qualificação para o\ntrabalho. Assim, o dever do Estado com a educação escolar pública será efetivado mediante as seguintes garantias, entre\noutras:\nI. Atendimento educacional especializado gratuito aos educandos com deficiência, transtornos globais do desenvolvimento e\naltas habilidades ou superdotação, transversal a todos os níveis, etapas e modalidades, preferencialmente na rede regular de\nensino. II. Educação infantil gratuita às crianças de até 4 (quatro) anos de idade. III. Vaga na escola pública de educação\ninfantil ou de ensino fundamental mais próxima de sua residência a toda criança a partir do dia em que completar 5 (cinco)\nanos de idade. IV. Padrões mínimos de qualidade do ensino, definidos como a variedade e a quantidade mínimas, por aluno,\nde insumos indispensáveis ao desenvolvimento do processo de ensino-aprendizagem adequados à idade e às necessidades\nespecíficas de cada estudante, inclusive mediante a provisão de mobiliário, equipamentos e materiais pedagógicos\napropriados. Quais estão corretas?",
@@ -1836,7 +1836,7 @@
     {
       "id": "ldb-q2357600",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação especial e inclusão",
       "topic": "Garantias da educação especial",
       "difficulty": "medium",
       "statement": "De acordo com a LDB, os sistemas de ensino assegurarão aos educandos com deficiência, transtornos globais do\ndesenvolvimento e altas habilidades ou superdotação, EXCETO:",
@@ -1902,7 +1902,7 @@
     {
       "id": "ldb-q2357605",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Classificação, progressão e frequência",
       "difficulty": "medium",
       "statement": "Na LDB, em seu capítulo II - da Educação Básica, consta que os níveis Fundamental e Médio serão organizados de acordo\ncom regras comuns:\nI. Pode ser feita a classificação em qualquer série ou etapa. II. Nos estabelecimentos que adotam a progressão regular por\nsérie, o regimento escolar pode admitir formas de progressão parcial, desde que preservada a sequência do currículo,\nobservadas as normas do respectivo sistema de ensino. III. Poderão organizar-se classes, ou turmas, com alunos de séries\ndistintas, com níveis equivalentes de adiantamento na matéria, para o ensino de línguas estrangeiras, artes ou outros\ncomponentes curriculares. IV. O controle de frequência fica a cargo da escola, conforme o disposto no seu regimento e nas\nnormas do respectivo sistema de ensino, exigida a frequência mínima de 70% do total de horas letivas para aprovação. Quais\nestão corretas?",
@@ -1968,7 +1968,7 @@
     {
       "id": "ldb-q2357607",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Composição do Conselho Escolar",
       "difficulty": "medium",
       "statement": "A LDB relata que o Conselho Escolar, órgão deliberativo, será composto do diretor da escola, membro nato, e de\nrepresentantes das comunidades escolar e local, sendo eleitos por seus pares nas seguintes categorias, EXCETO:",
@@ -2040,7 +2040,7 @@
       "cargo": "Técnico em Assuntos Educacionais",
       "nivelCargo": "Superior",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Atribuições universitárias",
       "difficulty": "medium",
       "tags": [
@@ -2104,7 +2104,7 @@
     {
       "id": "ldb-q2404537",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Organização e gestão dos sistemas de ensino",
       "difficulty": "medium",
       "statement": "A respeito da organização da educação na Lei de Diretrizes e Bases da Educação Nacional (Lei nº 9.394/1996) e suas\nalterações, assinale a afirmativa INCORRETA.",
@@ -2170,7 +2170,7 @@
     {
       "id": "ldb-q1964068",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Direito de acesso fora da idade própria",
       "difficulty": "medium",
       "statement": "Assinale a alternativa CORRETA, à luz da lei de diretrizes e bases da educação nacional:",
@@ -2236,7 +2236,7 @@
     {
       "id": "ldb-q1973540",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Arte, cinema e diversidade étnico-racial",
       "difficulty": "medium",
       "statement": "Sobre o que a Lei Nº 9.394/1996 (LDB) estabelece acerca da arte e cultura, é CORRETO afirmar que:",
@@ -2302,7 +2302,7 @@
     {
       "id": "ldb-q2408250",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Gestão democrática do ensino público",
       "difficulty": "medium",
       "statement": "Loren é professora e deseja participar da gestão da escola municipal onde leciona. A escolha da Diretora deu-se em eleição\nque ocorre em processo similar às eleições nacionais, com registro, debate e voto, secreto. Após a apuração dos votos, Loren\nperde por um voto. Nos termos da Lei nº 9.394, de 20 de dezembro de 1996, os sistemas de ensino definirão as normas da\ngestão do ensino público na educação básica, que será:",
@@ -2363,7 +2363,7 @@
     {
       "id": "ldb-q2408386",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Preparo para o exercício da cidadania",
       "difficulty": "medium",
       "statement": "O artigo 2º da Lei de Diretrizes e Bases da Educação (Lei 9.394, de 20 de dezembro de 1996), inspirado no texto da\nConstituição Federal, indica que a educação tem por finalidade o pleno desenvolvimento do educando, sua qualificação para\no trabalho e:",
@@ -2424,7 +2424,7 @@
     {
       "id": "ldb-q2408427",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação infantil",
       "topic": "Avaliação na educação infantil",
       "difficulty": "medium",
       "statement": "De acordo com a Lei de Diretrizes e Bases da Educação Nacional (Lei nº 9.394 de 20 de dezembro de 1996), a avaliação, na\netapa da educação infantil, deve ocorrer:",
@@ -2485,7 +2485,7 @@
     {
       "id": "ldb-q1926995",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Diretrizes dos conteúdos curriculares",
       "difficulty": "medium",
       "statement": "Assinale a alternativa correta que corresponde as diretrizes previstas na LDBEN para os conteúdos curriculares na Educação\nBásica.",
@@ -2557,7 +2557,7 @@
       "cargo": "Professor EBTT — Gestão",
       "nivelCargo": "Superior",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "História e cultura afro-brasileira e indígena",
       "difficulty": "medium",
       "tags": [
@@ -2622,7 +2622,7 @@
       "cargo": "Professor EBTT — Gestão",
       "nivelCargo": "Superior",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Cursos de EPT",
       "difficulty": "medium",
       "tags": [
@@ -2687,7 +2687,7 @@
       "cargo": "Professor EBTT — Gestão",
       "nivelCargo": "Superior",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Organização da educação superior",
       "difficulty": "medium",
       "tags": [
@@ -2746,7 +2746,7 @@
     {
       "id": "ldb-q1925953",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Níveis, organização e cursos superiores",
       "difficulty": "medium",
       "statement": "A respeito dos Níveis e das Modalidades de Educação e Ensino expressos na Lei nº 9.394, de 1996, julgue os itens a seguir:\nI. A educação escolar no Brasil compõe-se da educação básica (educação infantil, ensino fundamental e ensino médio) e\neducação superior; II. A educação básica pode ser organizada em séries anuais, períodos semestrais, ciclos, alternância\nregular de períodos de estudos, grupos não-seriados, com base na idade, na competência e em outros critérios, ou por forma\ndiversa de organização, sempre que o interesse do processo de aprendizagem assim o recomendar; III. A educação infantil,\nprimeira etapa da educação básica, é destinada a crianças de até 5 (cinco) anos. Sendo essa, oferecida em creches, ou\nentidades equivalentes, para crianças de até 3 (três) anos de idade e pré-escolas, para as crianças de 4 (quatro) a 5 (cinco)\nanos de idade; IV. A educação superior no Brasil abrange cursos sequenciais por campo de saber, curso de graduação, cursos\nde pós-graduação e curso de extensão. Está(ão) correto(s) o(s) itens:",
@@ -2812,7 +2812,7 @@
     {
       "id": "ldb-q1925954",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formas de oferta da educação técnica",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9.394, de 1996, o ensino médio, atendida a formação geral do educando, poderá prepará-lo para o\nexercício de profissões técnicas. Segundo a referida lei, a educação profissional técnica de nível médio será desenvolvida em\nduas formas:",
@@ -2878,7 +2878,7 @@
     {
       "id": "ldb-q1925966",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Integração entre educação e trabalho",
       "difficulty": "medium",
       "statement": "A educação profissional e tecnológica contemplada na LDB - Lei de Diretrizes e Bases da Educação Nacional - tem como\nobjetivo preparar o estudante para o exercício da profissão. Os cursos técnicos possuem integração com os diferentes níveis\ne modalidades da educação. A educação profissional e tecnológica, de acordo com a LDB, converge para dois direitos\nfundamentais do cidadão:",
@@ -2944,7 +2944,7 @@
     {
       "id": "ldb-q2421870",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino médio",
       "topic": "Finalidades do ensino médio",
       "difficulty": "medium",
       "statement": "Segundo a Lei nº 9394/96, LDB, a educação nacional é composta pela educação básica (educação infantil, ensino fundamental\ne ensino médio) e educação superior.\nO ensino médio, última etapa da educação básica, conforme artigo 35 da mesma lei, tem por finalidade:\nI. a consolidação e o aprofundamento dos conhecimentos adquiridos no ensino fundamental, possibilitando o\nprosseguimento de estudos;\nII. a preparação básica para o trabalho e a cidadania do educando, para continuar aprendendo, de modo a ser capaz de se\nadaptar com flexibilidade a novas condições de ocupação ou aperfeiçoamento posteriores;\nIII. O aprimoramento do educando como pessoa humana, incluindo a formação ética e o desenvolvimento da autonomia\nintelectual e do pensamento crítico;\nIV. a compreensão dos fundamentos científico-tecnológicos dos processos produtivos, relacionando a teoria com a prática, no\nensino de cada disciplina.\nEstão corretas as afirmativas",
@@ -3005,7 +3005,7 @@
     {
       "id": "ldb-q2421871",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Organização da educação profissional e tecnológica",
       "difficulty": "medium",
       "statement": "Ao tratar da educação profissional e tecnológica, a LDB afirma, no artigo 39, que “A educação profissional e tecnológica, no\ncumprimento dos objetivos da educação nacional, integra-se aos diferentes níveis e modalidades de educação e às\ndimensões do trabalho, da ciência e da tecnologia”.\nSegundo os parágrafos desse artigo,",
@@ -3066,7 +3066,7 @@
     {
       "id": "ldb-q1845563",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Cursos da educação profissional e tecnológica",
       "difficulty": "medium",
       "statement": "A Lei nº 9.394 de 20 de dezembro de 1996 (LDB), em seu capítulo que trata da educação profissional e tecnológica, estabelece\nque essa modalidade abrangerá",
@@ -3132,7 +3132,7 @@
     {
       "id": "ldb-q1406226",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Incumbências dos docentes",
       "difficulty": "medium",
       "statement": "A Lei 9.394/96, que estabelece as diretrizes e bases da educação nacional (LDB), em seu art. 13, discorre sobre as\nincumbências dos docentes. Qual das atribuições abaixo não está expressa no referido artigo?",
@@ -3198,7 +3198,7 @@
     {
       "id": "ldb-q1619734",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação infantil",
       "topic": "Organização da educação infantil",
       "difficulty": "medium",
       "statement": "A organização da Educação Infantil, de acordo com a Lei 9.394/96 - LDB, considera algumas das seguintes regras comuns:\nI. Avaliação mediante acompanhamento e registro do desenvolvimento das crianças, sem o objetivo de promoção, mesmo\npara o acesso ao ensino fundamental. II. Carga horária mínima anual de 800 (oitocentas) horas, distribuída por um mínimo de\n200 (duzentos) dias de trabalho educacional. III. Atendimento à criança de, no mínimo, 4 (quatro) horas diárias para o turno\nparcial e de 7 (sete) horas para a jornada integral. Assinale",
@@ -3264,7 +3264,7 @@
     {
       "id": "ldb-pdf-item-74",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Prática facultativa de educação física",
       "difficulty": "medium",
       "statement": "No ano de 2003, a Educação Física escolar sofreu grande descaso frente à legislação e à comunidade escolar, quando a\nredação do § 3º, do artigo 26 da Lei de Diretrizes e Bases - Lei nº 9.394/96, foi modificada pela Lei nº 10.793/2003,\nestabelecendo-a como facultativa aos alunos",
@@ -3330,7 +3330,7 @@
     {
       "id": "ldb-q998467",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Direito público subjetivo à educação",
       "difficulty": "medium",
       "statement": "De acordo com o Art. 5º da LDB, Lei n. 9.394/1996, “O acesso à educação básica obrigatória é direito público subjetivo,\npodendo qualquer cidadão, grupo de cidadãos, associação comunitária, organização sindical, entidade de classe ou outra\nlegalmente constituída e, ainda, o Ministério Público, acionar o poder público para exigi-lo”. Assim,",
@@ -3391,7 +3391,7 @@
     {
       "id": "ldb-q998559",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Etapas da educação básica obrigatória",
       "difficulty": "medium",
       "statement": "De acordo com a Lein. 12.796, de 4 de abril de 2013, que altera a Lei n. 9.394, de 20 de dezembro de 1996, a educação básica,\nobrigatória e gratuita dos 4 aos 17 anos de idade, deverá se organizar da seguinte forma:",
@@ -3452,7 +3452,7 @@
     {
       "id": "ldb-q998560",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino médio",
       "topic": "Finalidades do ensino médio",
       "difficulty": "medium",
       "statement": "A educação básica tem por finalidade desenvolver o educando, assegurando-lhe a formação comum indispensável para o\nexercício da cidadania e fornecer meios para que ele progrida no trabalho e em estudos posteriores. Dentre as etapas da\neducação básica encontra-se o ensino médio. De acordo com o artigo 35, da Lei n. 9.394, de 20 de dezembro de 1996, essa\netapa do ensino regular tem como finalidade:",
@@ -3513,7 +3513,7 @@
     {
       "id": "ldb-q1817233",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Garantia do ensino obrigatório",
       "difficulty": "medium",
       "statement": "A respeito do Direito à Educação e o Dever de Educar, assinale a alternativa correta.",
@@ -3579,7 +3579,7 @@
     {
       "id": "ldb-q968201",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Organização da recuperação escolar",
       "difficulty": "medium",
       "statement": "Em seu artigo 24, a Lei 9.394/1996 - LDB, institui a obrigatoriedade de estudos de recuperação, de preferência paralelos ao\nperíodo letivo, para os casos de baixo rendimento escolar. Os responsáveis pela organização deste processo são:",
@@ -3645,7 +3645,7 @@
     {
       "id": "ldb-q968203",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação especial e inclusão",
       "topic": "Duração da oferta da educação especial",
       "difficulty": "medium",
       "statement": "Leia o texto abaixo que trata da Educação Especial na Lei 9.394/1996 - LDB:\nArt. 58. Entende-se por educação especial, para os efeitos desta Lei, a modalidade de educação escolar oferecida\npreferencialmente na rede regular de ensino, para educandos com deficiência, transtornos globais do desenvolvimento e\naltas habilidades ou superdotação.\nA lei, neste artigo, em seu § 3º, prevê que a oferta da educação especial:",
@@ -3711,7 +3711,7 @@
     {
       "id": "ldb-q969712",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino médio",
       "topic": "Finalidades do ensino médio e fundamental",
       "difficulty": "medium",
       "statement": "Analise os itens abaixo e indique o INCORRETO:\nSegundo Lei 9.394/1996 - LDB (Art. 35.), o ensino médio, etapa final da educação básica, com duração mínima de três anos,\nterá como finalidades:",
@@ -3777,7 +3777,7 @@
     {
       "id": "ldb-q969713",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Extensão na educação superior",
       "difficulty": "medium",
       "statement": "Segundo a Lei 9.394/1996 - LDB, a educação superior tem por finalidade promover o tripé ensino, pesquisa e extensão.\nSegundo a legislação citada, atividades de extensão seriam:",
@@ -3843,7 +3843,7 @@
     {
       "id": "ldb-q969716",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Responsabilidades docentes",
       "difficulty": "medium",
       "statement": "De acordo com a Lei 9.394/1996 - LDB, em seu Título IV, Da Organização da Educação Nacional, em relação ao Art. 13, das\nincumbências dos docentes:\nI - É facultativa a participação na elaboração da proposta pedagógica do estabelecimento de ensino.\nII - Elaborar e cumprir plano de trabalho, segundo a proposta pedagógica do estabelecimento de ensino.\nIII - Zelar pela aprendizagem dos alunos.\nIV - Estabelecer estratégias de recuperação para os alunos de menor rendimento.\nV - Ministrar os dias letivos e horas-aula estabelecidos, além de participar integralmente dos períodos dedicados ao\nplanejamento, à avaliação e ao desenvolvimento profissional.\nVI - É opcional colaborar com as atividades de articulação da escola com as famílias e a comunidade.\nAssinale a alternativa que apresente somente as proposições CORRETAS:",
@@ -3909,7 +3909,7 @@
     {
       "id": "ldb-q969724",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Competências federativas na educação",
       "difficulty": "medium",
       "statement": "Segundo a Lei 9.394/1996 - LDB, em seu Art. 8º, a União, os Estados, o Distrito Federal e os Municípios organizarão, em\nregime de colaboração, os respectivos sistemas de ensino. Abaixo estão especificadas as atribuições, neste regime de\ncolaboração de cada uma destas esferas. Faça a relação entre as esferas e as descrições abaixo:\nI- União\nII - Estados\nIII - Municípios\n(.) Assegurar processo nacional de avaliação do rendimento escolar no ensino fundamental, médio e superior, em\ncolaboração com os sistemas de ensino, objetivando a definição de prioridades e a melhoria da qualidade do ensino.\n() Definir, com os Municípios, formas de colaboração na oferta do ensino fundamental, as quais devem assegurar a\ndistribuição proporcional das responsabilidades, de acordo com a população a ser atendida e os recursos financeiros\ndisponíveis em cada uma dessas esferas do Poder Público.\n() Assegurar o ensino fundamental e oferecer, com prioridade, o ensino médio a todos que o demandarem, respeitado o\ndisposto no art. 38 desta Lei.\n( ) Assumir o transporte escolar dos alunos da rede municipal.\n() Assegurar processo nacional de avaliação das instituições de educação superior, com a cooperação dos sistemas que\ntiverem responsabilidade sobre este nível de ensino.\n() Oferecer a educação infantil em creches e pré-escolas e, com prioridade, o ensino fundamental, permitida a atuação em\noutros níveis de ensino somente quando estiverem atendidas plenamente as necessidades de sua área de competência e\ncom recursos acima dos percentuais mínimos vinculados pela Constituição Federal à manutenção e desenvolvimento do\nensino.\nMarque a sequência CORRETA, de cima para baixo:",
@@ -3975,7 +3975,7 @@
     {
       "id": "ldb-q1289881",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Autonomia universitária",
       "difficulty": "medium",
       "statement": "No exercício de sua autonomia, são asseguradas às universidades algumas atribuições. NÃO é uma dessas atribuição:",
@@ -4041,7 +4041,7 @@
     {
       "id": "ldb-q2047267",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formas da educação profissional técnica",
       "difficulty": "medium",
       "statement": "A Lei nº 9.394, de 20 de dezembro de 1996 - conhecida como a Lei de Diretrizes e Bases da Educação Nacional (LDB) -, já\nsofreu alterações durante os seus mais de vinte anos de vigência. Analise as assertivas abaixo e assinale a alternativa que\nNÃO condiz com o texto da LDB e suas alterações.",
@@ -4107,7 +4107,7 @@
     {
       "id": "ldb-q2047506",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Vinculação da educação escolar",
       "difficulty": "medium",
       "statement": "Segundo o artigo 1º da Lei nº 9.394/1996, “A educação abrange os processos formativos que se desenvolvem na vida familiar, na\nconvivência humana, no trabalho, nas instituições de ensino e pesquisa, nos movimentos sociais e organizações da sociedade civil e\nnas manifestações culturais”, Considerando que nos Institutos Federais a educação física é componente curricular obrigatório\nnos cursos técnicos, tal disciplina, para estar em consonância com o parágrafo 2º do referido artigo, deverá vincularse ao",
@@ -4173,7 +4173,7 @@
     {
       "id": "ldb-q2047508",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Educação alimentar e nutricional",
       "difficulty": "medium",
       "statement": "Segundo dados da Pesquisa de Vigilância de Fatores de Risco e Proteção de Doenças Crônicas por Inquérito Telefônico\n(Vigitel), em 2017 aproximadamente 18% dos brasileiros eram obesos e 54% da população apresentavam sobrepeso. De\nencontro a essa situação incorporou-se o parágrafo 9º-A ao Artigo 26 da Lei n. 9.394/1996 (Lei de Diretrizes e Bases da\nEducação Nacional - LDB). Com essa determinação, a LDB estabelece a",
@@ -4239,7 +4239,7 @@
     {
       "id": "ldb-q963657",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Diretrizes dos conteúdos curriculares",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional, Lei nº 9.394/1996, estabelece que na Educação Básica os conteúdos\ncurriculares observarão diretrizes relacionadas:\nI. à difusão de valores fundamentais ao interesse social, aos direitos e deveres dos cidadãos, de respeito ao bem comum e à\nordem democrática;\nII. à consideração das condições de escolaridade dos alunos em cada estabelecimento;\nIII, à orientação para o trabalho;\nIV, à promoção do desporto educacional e apoio às práticas desportivas não-formais.\nV. à liberdade de aprender, ensinar, pesquisar e divulgar a cultura, o pensamento, a arte e o saber.",
@@ -4305,7 +4305,7 @@
     {
       "id": "ldb-q1027467",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Educação obrigatória dos quatro aos dezessete anos",
       "difficulty": "medium",
       "statement": "A Lei 9.394, de 20 de dezembro de 1996, Lei de Diretrizes e Bases da Educação Nacional- LDB, em seu artigo 4º, estabelece\nque é dever do Estado garantir educação básica obrigatória e gratuita dos 4 (quatro) aos 17 (dezessete) anos de idade. A\neducação básica, nos termos da LDB, está organizada da seguinte forma:",
@@ -4371,7 +4371,7 @@
     {
       "id": "ldb-q1062513",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Relação entre escola, famílias e comunidade",
       "difficulty": "medium",
       "statement": "A Lei 9.394/1996 estabelece a educação como dever da família e do Estado, tendo por finalidade o pleno desenvolvimento do\neducando, seu preparo para o exercício da cidadania e sua qualificação para o trabalho. Para cumprir a finalidade da\neducação, os estabelecimentos de ensino, respeitadas as normas comuns e as do seu sistema de ensino, terão a incumbência\nde:",
@@ -4437,7 +4437,7 @@
     {
       "id": "ldb-q971498",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Educação física: componente e prática",
       "difficulty": "medium",
       "statement": "A Lei 9394/1996 estabelece que a educação física é componente curricular obrigatório da educação básica, sendo sua prática\nfacultativa ao aluno que:",
@@ -4503,7 +4503,7 @@
     {
       "id": "ldb-q971499",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Incumbências da União",
       "difficulty": "medium",
       "statement": "De acordo com a Lei de Diretrizes e Bases é incumbência da União:",
@@ -4569,7 +4569,7 @@
     {
       "id": "ldb-q971519",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Abrangência dos cursos de EPT",
       "difficulty": "medium",
       "statement": "A partir de uma concepção mais genérica, com base no senso comum, acredita-se que seja necessário o poder público\ninvestir na educação profissional, pois a educação profissional é uma modalidade de ensino que inclui o egresso ao mundo\ndo trabalho, ou seja, é o caminho que faz as escolas técnicas em qualificar o aluno como trabalhador. Essa premissa vem\nsendo habitualmente utilizada em programas e debates eleitorais nos últimos anos. Mas a referência à educação profissional,\nnesse período, não se resumiu a esse contexto. Para tanto, com Base nas Diretrizes Curriculares Nacionais para a Educação\nProfissional Técnica de Nível Médio, definida por meio da Resolução nº 06, de 20 de setembro de 2012, em especial em seu\nart. 2º, determina que a Educação Profissional e Tecnológica, nos termos da Lei nº 9.394/96 (LDB), alterada pela Lei nº\n11.741/2008, abrange os cursos de:\nI. Formação inicial e continuada ou qualificação profissional;\nII. Educação Profissional Técnica, especificamente nos Institutos Federais, na modalidade subsequente e concomitante;\nIII, Educação Profissional Tecnológica, de graduação e de pós-graduação.\nQual das alternativas a seguir está CORRETA?",
@@ -4635,7 +4635,7 @@
     {
       "id": "ldb-q971522",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formação técnica articulada e subsequente",
       "difficulty": "medium",
       "statement": "Segundo o art. 36-B da LDB, complete as lacunas:\nI. __________ com o ensino __________;\nII. __________, em cursos destinados a quem já tenha __________ o __________.\nAssinale a sequência correta.",
@@ -4701,7 +4701,7 @@
     {
       "id": "ldb-q971523",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Preparação para profissões técnicas",
       "difficulty": "medium",
       "statement": "Analisando o art. 36-A da Lei de Diretrizes e Bases da Educação Nacional, Lei nº 9. 394/1996, percebese que não havendo\nprejuízo no disposto da Seção IV, do Capítulo II, que trata, especificamente do ensino médio, observando que quando, nesse\npróprio ensino médio, atendida a formação geral do educando, poderá prepará-lo para o exercício de profissões técnicas,\nmediante:",
@@ -4767,7 +4767,7 @@
     {
       "id": "ldb-q971541",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Diplomas da educação profissional técnica",
       "difficulty": "medium",
       "statement": "Na Lei de Diretrizes e bases da Educação Nacional, Lei nº 9. 394/1996, em seu Art. 36-D, o qual foi incluído pela Lei Nº 11.\n741/2008, trás como Caput a seguinte redação:",
@@ -4833,7 +4833,7 @@
     {
       "id": "ldb-q996303",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Verificação do rendimento escolar",
       "difficulty": "medium",
       "statement": "Em relação a verificação do rendimento escolar na educação básica, é incorreto afirmar:",
@@ -4899,7 +4899,7 @@
     {
       "id": "ldb-q1036824",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Currículo e avaliação na educação básica",
       "difficulty": "medium",
       "statement": "A Educação Básica tem por finalidades desenvolver o educando, assegurar-lhe a formação comum indispensável para o\nexercício da cidadania e fornecer-lhe meios para progredir no trabalho e em estudos posteriores (BRASIL, 1996). De acordo\ncom a Lei nº 9.394, de 20 de dezembro de 1996 (LDB), na Educação Básica,",
@@ -4965,7 +4965,7 @@
     {
       "id": "ldb-q1059194",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Liberdade religiosa e prestações alternativas",
       "difficulty": "medium",
       "statement": "A Lei nº 13.796, de 3 de janeiro de 2019, alterou a Lei de Diretrizes e Bases da Educação Nacional para fixar, em virtude de\nescusa de consciência, prestações alternativas à aplicação de provas e à frequência a aulas realizadas em dia de guarda\nreligiosa. A alteração assegura ao aluno regularmente matriculado a atribuição de prestações alternativas em substituição à\nprova ou aula marcada para dia em que, segundo os preceitos de sua religião, seja vedado o exercício de tais atividades. As\nprestações alternativas referidas na lei",
@@ -5031,7 +5031,7 @@
     {
       "id": "ldb-q1857633",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Escusa de consciência por motivo religioso",
       "difficulty": "medium",
       "statement": "O art. 7º da Lei de Diretrizes e Bases da Educação Nacional (lei nº 9.394/1996) diz que ao aluno regularmente matriculado em\ninstituição de ensino pública ou privada, de qualquer nível, é assegurado, no exercício da liberdade de consciência e de\ncrença, o direito de, mediante prévio e motivado requerimento, ausentar-se de prova ou de aula marcada para dia em que,\nsegundo os preceitos de sua religião, seja vedado o exercício de tais atividades, devendo-se-lhe atribuir, a critério da\ninstituição e sem custos para o aluno, prestações alternativas, nos termos do inciso VIIl do caput do art. 5º da Constituição\nFederal.\nSobre esse artigo, todas as alternativas a seguir estão corretas, exceto:",
@@ -5097,7 +5097,7 @@
     {
       "id": "ldb-q1618804",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação de jovens e adultos",
       "topic": "Educação de jovens e adultos",
       "difficulty": "medium",
       "statement": "Assinale a alternativa CORRETA: “Nos termos no Art. 37 da Lei de Diretrizes e Bases (BRASIL, 2017), que versa sobre a\nEducação de Jovens e Adultos, a qual se destina àqueles que não tiveram acesso ou continuidade de estudos no\nensino fundamental e médio na idade própria”. E complementa, que os sistemas de ensino assegurarão\ngratuitamente aos jovens e aos adultos, que não puderam efetuar os estudos na idade regular, oportunidades\neducacionais apropriadas, consideradas as características do alunado, seus interesses, condições de vida e de\ntrabalho, mediante cursos e exames. Dessa maneira compete ao:",
@@ -5163,7 +5163,7 @@
     {
       "id": "ldb-q1618805",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Integração da educação profissional e tecnológica",
       "difficulty": "medium",
       "statement": "A __________ e __________, no cumprimento dos objetivos da educação nacional, integra-se aos diferentes\n__________ e __________ de educação e às dimensões do trabalho, da ciência e da tecnologia. Os cursos de educação profissional e\ntecnológica poderão ser organizados por eixos __________, possibilitando a construção de diferentes itinerários\nformativos, observadas as normas do respectivo sistema e nível de ensino. (Lei de Diretrizes e Bases, BRASIL, 2017).\nAssinale a alternativa CORRETA com as palavras que correspondem às lacunas:",
@@ -5229,7 +5229,7 @@
     {
       "id": "ldb-q1618807",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Abrangência da educação profissional e tecnológica",
       "difficulty": "medium",
       "statement": "Em consonância com o Capítulo III da Lei de Diretrizes e Bases (BRASIL, 2017), que discorre sobre a Educação\nProfissional e Tecnológica, afirma que:\nAssinale a alternativa CORRETA:",
@@ -5295,7 +5295,7 @@
     {
       "id": "ldb-q2028928",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Organização da educação superior",
       "difficulty": "medium",
       "statement": "Sobre educação superior disposta na Lei de Diretrizes e Bases da Educação Nacional (Lei nº 9.394/1996), assinale a\nalternativa CORRETA:",
@@ -5361,7 +5361,7 @@
     {
       "id": "ldb-q1116490",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formas da educação profissional técnica",
       "difficulty": "medium",
       "statement": "Segundo a Lei de Diretrizes e Bases da Educação Nacional - LDB nº 9394/1996, a educação profissional técnica de nível médio\npode ser desenvolvida:",
@@ -5427,7 +5427,7 @@
     {
       "id": "ldb-q1116500",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Tipos de cursos de EPT",
       "difficulty": "medium",
       "statement": "ALDB nº 9394/1996 estabelece os tipos de curso que podem integrar a educação profissional e tecnológica no Brasil. Dentre\nesses tipos de curso estão:",
@@ -5493,7 +5493,7 @@
     {
       "id": "ldb-q1116506",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Finalidades da educação superior",
       "difficulty": "medium",
       "statement": "A educação superior é uma modalidade educacional que, segundo a LDB nº 9394/1996, possui algumas finalidades. Uma das\nfinalidades da educação superior é:",
@@ -5559,7 +5559,7 @@
     {
       "id": "ldb-q1117677",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formação técnica integrada",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9394/96 - LDB, Art. 36-C, a educação técnica de nível médio articulada, quando oferecida somente aos\nalunos que já concluíram o ensino fundamental, de forma que esses cursem a formação técnica e o ensino médio na mesma\ninstituição de ensino, ocorre de forma:",
@@ -5625,7 +5625,7 @@
     {
       "id": "ldb-q1117683",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formação técnica subsequente",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9394/96 - LDB, a educação profissional técnica de nível médio, quando destinada aos alunos que já\nconcluíram o ensino médio, será:",
@@ -5691,7 +5691,7 @@
     {
       "id": "ldb-q1117690",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação especial e inclusão",
       "topic": "Garantias da educação especial",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9394/96 (LDB), quanto aos estudantes com deficiência:",
@@ -5757,7 +5757,7 @@
     {
       "id": "ldb-q1003467",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Gratuidade da educação infantil",
       "difficulty": "medium",
       "statement": "Leia o trecho a seguir e complete a lacuna.\nA Lei nº 12.796, de 4 de abril de 2013, altera a Lei no 9.394/96. Em seu Art. 4, inciso II, estabelece que o dever do Estado com\neducação escolar pública será efetivado mediante a garantia de “educação infantil gratuita às crianças de até\nA afirmação que completa corretamente a lacuna é:",
@@ -5818,7 +5818,7 @@
     {
       "id": "ldb-q2007384",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Pluralismo, tolerância e diversidade",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional, Lei nº 9394 de 20/12/1996, disciplina a educação escolar, a qual se\ndesenvolve, predominantemente, por meio do ensino, em instituições próprias, devendo a mesma vincular-se ao mundo do\ntrabalho e à prática social. Assim sendo, e em conformidade com a lei em questão, o ensino será ministrado tendo por\nprincípio:\nI. a consideração com a diversidade étnico-racial. II. a unicidade de ideias e de concepções pedagógicas. III. o respeito à\nliberdade e apreço à tolerância. IV. a valorização da experiência extraescolar. Sobre as alternativas é CORRETO afirmar que:",
@@ -5879,7 +5879,7 @@
     {
       "id": "ldb-q2053059",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Organização e acesso à EPT",
       "difficulty": "medium",
       "statement": "Embasado na Lei 9.394/1996 e nas alterações introduzidas pela Lei 11.741/2008, julgue as sentenças a seguir e, então,\nassinale a alternativa correta. I - A educação profissional e tecnológica, no cumprimento dos objetivos da educação nacional,\nintegra-se apenas aos cursos de nível superior e às dimensções do trabalho da ciência e da tecnologia. II - Os cursos de\neducação profissional e tecnológica poderção ser organizados por eixos tecnológicos, possibilitando a construção de\ndiferentes itinerários formativos, observadas as normas do respectivo sistema e nível de ensino. III - Os cursos de educação\nprofissional tecnológica de graduação e pós-graduação organizar-se-ão, no que concerne a objetivos, características e\nduração, de acordo com as diretrizes curriculares nacionais estabelecidas pelo Ministério da Educação. IV - A educação\nprofissional será desenvolvida em articulação com o ensino regular ou por diferentes estratégicas de educação continuada,\nem instituições especializadas ou no ambiente de trabalho. V - As intituições de educação profissional e tecnoloógica, além\ndos seus cursos regulares, oferecerão cursos especiais, abertos à comunidade, condicionada a matrícula à capacidade de\naproveitamento e necessariamente ao nível de escolaridade.",
@@ -5945,7 +5945,7 @@
     {
       "id": "ldb-q935354",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Conceito amplo de educação",
       "difficulty": "medium",
       "statement": "Segundo a Lei de Diretrizes e Bases da Educação Nacional (Lei n. 9.394/1996), o conceito de Educação é",
@@ -6011,7 +6011,7 @@
     {
       "id": "ldb-q935355",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Níveis da educação escolar",
       "difficulty": "medium",
       "statement": "A partir da Lei n. 9.394/1996 (LDB), a educação escolar brasileira é composta pelos níveis",
@@ -6077,7 +6077,7 @@
     {
       "id": "ldb-q935362",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Princípios do ensino",
       "difficulty": "medium",
       "statement": "De acordo com a Lei de Diretrizes e Bases da Educação Nacional, Lei n. 9.394/1996, constitui-se como um princípio da\nEducação Nacional",
@@ -6143,7 +6143,7 @@
     {
       "id": "ldb-q935363",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Direito público subjetivo à educação",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional (LDB 9.394/1996) define educação como um direito, entendido como",
@@ -6209,7 +6209,7 @@
     {
       "id": "ldb-q920679",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Composição da educação escolar",
       "difficulty": "medium",
       "statement": "Com base na Lei de Diretrizes e Bases para a Educação Nacional, 9.394/96, o art. 21º estabelece que a educação escolar\ncompõe-se de: I - educação básica, formada pela educação infantil, ensino fundamental e ensino médio. II - cursos\nprofissionalizantes. III - educação superior. Assinale a alternativa CORRETA:",
@@ -6270,7 +6270,7 @@
     {
       "id": "ldb-q945318",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação especial e inclusão",
       "topic": "Atendimento educacional especializado",
       "difficulty": "medium",
       "statement": "Um câmpus do IFSP está discutindo no âmbito do NAPNE (Núcleo de apoio às pessoas com necessidades educacionais\nespecíficas), as políticas e ações de educação inclusiva. De acordo com a Lei de Diretrizes e Bases da Educação Nacional nº\n9.394/1996 (LDB), artigo 4º, inciso III, é dever do Estado garantir o atendimento educacional especializado gratuito aos\nestudantes com deficiência, transtornos globais do desenvolvimento e altas habilidades ou superdotação. Este atendimento\ndeve ocorrer:",
@@ -6331,7 +6331,7 @@
     {
       "id": "ldb-q920611",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Componentes curriculares obrigatórios",
       "difficulty": "medium",
       "statement": "Considerando a Lei de Diretrizes e Bases da Educação Nacional, Lei n.º 9.394, de 20 de dezembro de 1996, marque a\nalternativa correta:",
@@ -6397,7 +6397,7 @@
     {
       "id": "ldb-q920614",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Competências da União",
       "difficulty": "medium",
       "statement": "De acordo com o artigo 9º da Lei de Diretrizes e Bases da Educação Nacional, Lei n.º 9.394, de 20 de dezembro de 1996, a\nUnião incumbir-se-á:\nI. Assumir o transporte escolar dos alunos da rede municipal e estadual.\nII. Autorizar, reconhecer, credenciar, supervisionar e avaliar, respectivamente, os cursos das instituições de educação superior\ne os estabelecimentos do seu sistema de ensino.\nIII. Coletar, analisar e disseminar informações sobre a educação.\nIV. Estabelecer, em colaboração com os Estados, o Distrito Federal e os Municípios, diretrizes e procedimentos para\nidentificação, cadastramento e atendimento, na Educação Básica e na Educação Superior, de alunos com altas habilidades ou\nsuperdotação.\nConsiderando as afirmativas acima, marque a alternativa correta:",
@@ -6463,7 +6463,7 @@
     {
       "id": "ldb-q920628",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Incumbências das escolas",
       "difficulty": "medium",
       "statement": "O Art. 12 da Lei de Diretrizes e Bases da Educação (Lei n.º 9.394/96) e suas alterações, preconiza que os estabelecimentos de\nensino, respeitadas as normas comuns e as do seu sistema de ensino, terão a incumbência de, exceto:",
@@ -6529,7 +6529,7 @@
     {
       "id": "ldb-q920629",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Etapas da educação básica",
       "difficulty": "medium",
       "statement": "A respeito dos níveis da educação brasileira, e nos termos da legislação vigente, é possível afirmar que a Educação Básica\ncompreende:",
@@ -6595,7 +6595,7 @@
     {
       "id": "ldb-q921685",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Atribuições docentes e institucionais",
       "difficulty": "medium",
       "statement": "Em conformidade com o Título IV - Da Organização da Educação Nacional - da Lei n.º 9394, de 20 de dezembro de 1996, são\nincumbências dos docentes, exceto:",
@@ -6661,7 +6661,7 @@
     {
       "id": "ldb-q807124",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação especial e inclusão",
       "topic": "Formação para atendimento educacional especializado",
       "difficulty": "medium",
       "statement": "São inúmeras as pesquisas que demonstram o impacto positivo da formação de professores nos processos educacionais.\nAssim, O Artigo 59 da LDB - Lei nº 9.394/96 - ressalta a importância de se promover especialização adequada aos professores\nde classes especiais que atenderão aos educandos com deficiência, transtornos globais do desenvolvimento e altas\nhabilidades ou superdotação. Quanto a essa formação específica, de acordo com o mencionado artigo, o professor deve:",
@@ -6727,7 +6727,7 @@
     {
       "id": "ldb-q807135",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Avaliação e exames supletivos",
       "difficulty": "medium",
       "statement": "Considerando o que a Lei de Diretrizes e Bases da Educação - Lei nº 9.394/96 -, estabelece sobre avaliação, marque a\nalternativa CORRETA.",
@@ -6793,7 +6793,7 @@
     {
       "id": "ldb-q807140",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Colaboração federativa e prioridades",
       "difficulty": "medium",
       "statement": "No Título IV - Da organização da Educação Nacional, da Lei de Diretrizes e Bases da Educação Nacional (Lei nº 9.394/96), foi\ndisposta a organização, em regime de colaboração, dos sistemas de ensino da União, dos Estados, do Distrito Federal e dos\nmunicípios. Isso posto, assinale a afirmativa que NÃO condiz com o que está disposto na referida Lei.",
@@ -6859,7 +6859,7 @@
     {
       "id": "ldb-q771355",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Organização da educação básica",
       "difficulty": "medium",
       "statement": "No que concerne aos níveis e modalidades de educação e ensino, previstos na Lei nº 9394/96, pode-se afirmar que:",
@@ -6925,7 +6925,7 @@
     {
       "id": "ldb-q776873",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Níveis e modalidades de ensino",
       "difficulty": "medium",
       "statement": "Sobre os níveis e modalidades de educação de ensino atuais no Brasil, leia atentamente as afirmações a seguir.\nI. A educação brasileira é composta de dois níveis: educação básica e educação superior.\nII) A educação básica é formada pela: educação infantil, ensino fundamental e ensino médio.\nIII) O ensino fundamental é composto por 8 (oito) anos.\nIV) A educação superior abrange os seguintes cursos e programas: cursos sequenciais por campo de saber; cursos de\ngraduação, cursos de pós-graduação e cursos de extensão.\nV) A LDB/1996 apresenta duas modalidades de educação: educação de jovens e adultos e educação profissional.\nCom base nas afirmativas anteriores, marque a opção em que todas as alternativas estejam CORRETAS:",
@@ -6991,7 +6991,7 @@
     {
       "id": "ldb-q833360",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Finalidades da educação superior",
       "difficulty": "medium",
       "statement": "Nos termos da Lei 9.394/1996, NÃO é finalidade da educação superior:",
@@ -7057,7 +7057,7 @@
     {
       "id": "ldb-q1112483",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Finalidades da educação superior",
       "difficulty": "medium",
       "statement": "Segundo a Lei Nº 9.394/96 (que estabelece as Diretrizes e Bases da Educação Nacional), são finalidades do ensino superior,\nEXCETO:",
@@ -7118,7 +7118,7 @@
     {
       "id": "ldb-q783808",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Oferta da formação técnica",
       "difficulty": "medium",
       "statement": "De acordo com a Seção IV-A, Da Educação Profissional Técnica de Nível Médio, da Lei de Diretrizes e Bases da Educação, a\neducação profissional técnica de nível médio",
@@ -7184,7 +7184,7 @@
     {
       "id": "ldb-q783809",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Quadro de pessoal das universidades públicas",
       "difficulty": "medium",
       "statement": "Segundo o § 1º do Art. 54, da Lei de Diretrizes e Bases da Educação Nacional, as universidades públicas poderão",
@@ -7250,7 +7250,7 @@
     {
       "id": "ldb-q2212319",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Ensino da arte",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional vigente tornou componente curricular obrigatório",
@@ -7311,7 +7311,7 @@
     {
       "id": "ldb-q2212329",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Linguagens do componente arte",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional vigente indica que",
@@ -7372,7 +7372,7 @@
     {
       "id": "ldb-pdf-item-175",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Cursos de educação profissional e tecnológica",
       "difficulty": "medium",
       "statement": "A educação profissional e tecnológica nos termos do Art. 39. Da Lei nº 9.394 de 20 de dezembro de 1996 (LDB/96) alterada\npela Lei nº 11.741, de 2008, deve integrar-se aos diferentes níveis e modalidades de educação e às dimensões do trabalho, da\nciência e da tecnologia e abrangerá os seguintes cursos:",
@@ -7438,7 +7438,7 @@
     {
       "id": "ldb-q837795",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Escolas e docentes: divisão de incumbências",
       "difficulty": "medium",
       "statement": "Em conformidade com o Título IV - Da Organização da Educação Nacional - da Lei n.º 9394, de 20 de dezembro de 1996,\nrelacione as incumbências correspondentes:\nI. Docentes\n2. Estabelecimentos de Ensino\nI. Elaborar e executar sua proposta pedagógica. ( )\nII. Prover meios para a recuperação dos alunos com menor rendimento. ( )\nIII. Ministrar os dias letivos e horas-aula estabelecidos, além de participar integralmente dos períodos dedicados ao\nplanejamento, à avaliação e ao desenvolvimento profissional. (. )\nIV. Articular-se com as famílias e a comunidade, criando processos de integração da sociedade com a escola. (. )\nV. Colaborar com as atividades de articulação da escola com as famílias e a comunidade. (. )\nVI. Assegurar o cumprimento dos dias letivos e horas-aula estabelecidas. (. )\nAssinale a sequência correta das incumbências relacionadas é:",
@@ -7504,7 +7504,7 @@
     {
       "id": "ldb-q838296",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Cursos abrangidos pela EPT",
       "difficulty": "medium",
       "statement": "Tendo como parâmetro a Resolução nº 6, de 20 de setembro de 2012, que define Diretrizes Curriculares Nacionais para a\nEducação Profissional Técnica de Nível Médio, em seu parágrafo 2º estabelece a abrangência da educação Profissional e\nTecnológica nos termos da Lei nº 9.394/96 (LDB) como sendo:\nI. Formação inicial e continuada ou qualificação profissional.\nII. Educação Profissional Técnica de Nível Médio.\nIII, Educação Profissional Tecnológica, de graduação e de pós-graduação.\nApós a análise, é certo afirmar que:",
@@ -7570,7 +7570,7 @@
     {
       "id": "ldb-q722931",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Informações educacionais e competências",
       "difficulty": "medium",
       "statement": "Tendo em vista as Diretrizes e as Bases da Educação Nacional, orientadas pela Lei 9.394, de 20 de dezembro de 1996, se\nfocalizarmos as atribuições da União na organização da educação, teremos a seguinte incumbência:",
@@ -7636,7 +7636,7 @@
     {
       "id": "ldb-q670462",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino médio",
       "topic": "Duração e currículo das etapas escolares",
       "difficulty": "medium",
       "statement": "Com base na Lei de Diretrizes e Bases da Educação Nacional (LDBN), assinale a alternativa correta.",
@@ -7702,7 +7702,7 @@
     {
       "id": "ldb-q670466",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Regras da educação superior",
       "difficulty": "medium",
       "statement": "Com relação à educação superior, assinale a alternativa correta à luz da LDBN.",
@@ -7768,7 +7768,7 @@
     {
       "id": "ldb-q680663",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formação técnica e prosseguimento de estudos",
       "difficulty": "medium",
       "statement": "Com base na LDBN, assinale a alternativa correta acerca da educação profissional.",
@@ -7834,7 +7834,7 @@
     {
       "id": "ldb-q690233",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Categorias e ingresso na educação superior",
       "difficulty": "medium",
       "statement": "De acordo com a Lei de Diretrizes e Bases da Educação Nacional (LDBN), são cursos da educação superior os cursos de",
@@ -7900,7 +7900,7 @@
     {
       "id": "ldb-q742837",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Princípios do ensino",
       "difficulty": "medium",
       "statement": "ALDEB, Lei nº 9.394/96, dispõe que o ensino será ministrado ante o princípio da(o):",
@@ -7966,7 +7966,7 @@
     {
       "id": "ldb-q764033",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Organização e níveis da educação escolar",
       "difficulty": "medium",
       "statement": "Leia as afirmativas sobre os níveis de ensino da educação brasileira, conforme a Lei de Diretrizes e Bases da Educação\nNacional nº 9.394 de 1996. I) A educação escolar compõe-se de dois níveis: educação básica e educação superior. II) A\neducação básica, formada pelos ensinos fundamental e médio, tem por finalidades desenvolver o educando, assegurar-lhe a\nformação comum indispensável para o exercício da cidadania e fornecer-lhe meios para progredir no trabalho. III) A educação\nbásica poderá organizar-se em séries anuais, períodos semestrais, ciclos, alternância regular de períodos de estudos, grupos\nnão seriados, com base na idade, na competência e em outros critérios, ou por forma diversa de organização, sempre que o\ninteresse do processo de aprendizagem assim o recomendar. IV) A educação superior abrangerá os seguintes cursos e\nprogramas: cursos sequenciais por campo de saber, de graduação, de pós-graduação e de extensão. V) Na educação\nsuperior, o ano letivo regular, independente do ano civil, tem, no mínimo, duzentos dias de trabalho acadêmico efetivo,\nincluindo o tempo reservado aos exames finais, quando houver. Assinale a alternativa que apresenta somente as afirmativas\nCORRETAS.",
@@ -8032,7 +8032,7 @@
     {
       "id": "ldb-q776277",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Princípios e garantias educacionais",
       "difficulty": "medium",
       "statement": "São princípios da Lei de Diretrizes e Bases da Educação Nacional (Lei 9.394, de 20 de dezembro de 1996), dentre outros,\nEXCETO:",
@@ -8098,7 +8098,7 @@
     {
       "id": "ldb-q776278",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Finalidades da educação superior",
       "difficulty": "medium",
       "statement": "São finalidades da educação superior, estabelecidas na Lei de Diretrizes e Bases da Educação Nacional (Lei 9.394 de 20 de\ndezembro de 1996), dentre outras, EXCETO:",
@@ -8164,7 +8164,7 @@
     {
       "id": "ldb-q687635",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Faixa etária da educação obrigatória",
       "difficulty": "medium",
       "statement": "A educação básica, obrigatória e gratuita organiza-se da seguinte forma - pré-escola, ensino fundamental e ensino médio - e\ncompreende as idades de",
@@ -8230,7 +8230,7 @@
     {
       "id": "ldb-q715523",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Abrangência dos processos formativos",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases (Lei nº 9.394/ 96) tem como princípios e fins da Educação nacional um dos aspectos apresentados\nabaixo. Assinale-o.",
@@ -8296,7 +8296,7 @@
     {
       "id": "ldb-q740491",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Organização, frequência e arte na educação básica",
       "difficulty": "medium",
       "statement": "De acordo com a Lei de Diretrizes e Bases da Educação (Lei nº 9.394/96 e suas alterações), acerca da Educação Básica,\nassinale a alternativa INCORRETA.",
@@ -8362,7 +8362,7 @@
     {
       "id": "ldb-q760218",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Níveis, etapas e modalidades",
       "difficulty": "medium",
       "statement": "De acordo com a Lei de Diretrizes e Bases da Educação Nacional, Lei nº 9.394/1996, quanto aos Níveis e as Modalidades de\nEnsino da educação brasileira, analise as proposições:\nI. A educação superior abrangerá os seguintes cursos e programas: cursos sequenciais por campo de saber, de graduação, de\npós-graduação, e de extensão.\nII) O ensino médio, etapa secundária da educação básica, com duração mínima de dois anos, terá como finalidade a\nconsolidação e o aprofundamento dos conhecimentos adquiridos no ensino fundamental e a preparação básica para o\ntrabalho.\nIII) Entende-se por educação especial, para os efeitos desta Lei, a modalidade de educação escolar oferecida\npreferencialmente na rede regular de ensino, para educandos com deficiência, transtornos globais do desenvolvimento e\naltas habilidades ou superdotação.\nIV) A educação profissional técnica de nível médio será desenvolvida nas seguintes formas: articulada com o ensino médio; e\nsubsequente, em cursos destinados a quem já tenha concluído o ensino fundamental.\nV) A educação escolar compõe-se de educação básica, formada pela educação infantil, ensino fundamental e ensino médio; e\neducação superior.\nAssinale a alternativa que apresente somente as proposições CORRETAS.",
@@ -8428,7 +8428,7 @@
     {
       "id": "ldb-q760235",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino médio",
       "topic": "Enumeração das finalidades do ensino médio",
       "difficulty": "medium",
       "statement": "Das alternativas abaixo, assinale aquela que NÃO está posta como finalidade do Ensino Médio pela Lei de Diretrizes e Bases\nda Educação Nacional, Lei nº 9.394/1996:",
@@ -8494,7 +8494,7 @@
     {
       "id": "ldb-pdf-item-196",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Princípios e fins da educação nacional",
       "difficulty": "medium",
       "statement": "Dentre os itens a seguir, indique aquele que se relaciona com os princípios e fins da educação nacional, expressos no Artigo\n2º da Lei de Diretrizes e Bases da Educação - LDB Nº. 9.394/96.",
@@ -8560,7 +8560,7 @@
     {
       "id": "ldb-q822919",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Organização e certificação na EPT",
       "difficulty": "medium",
       "statement": "Em relação à Lei de Diretrizes e Bases da Educação Nacional, a partir da redação dada pela Lei nº 11.741, de 2008, nos artigos\nque tratam da educação profissional e tecnológica, é correto afirmar que:\nI. As instituições de educação profissional e tecnológica, além dos seus cursos regulares, oferecerão cursos especiais, abertos\nà comunidade, condicionada a matrícula à capacidade de aproveitamento e não necessariamente ao nível de escolaridade.\nII. O parágrafo 1º do art. 39 da LDB prevê que os cursos de educação profissional e tecnológica poderão ser organizados por\náreas, possibilitando a construção de diferentes itinerários formativos, observadas as normas do Conselho Nacional de\nEducação.\nIII, O conhecimento adquirido na educação profissional e tecnológica, inclusive no trabalho, poderá ser objeto de avaliação,\nreconhecimento e certificação para prosseguimento ou conclusão de estudos.\nIV. Os cursos de graduação e pós-graduação organizar-se-ão, no que concerne a objetivos, características e duração, de\nacordo com as diretrizes curriculares nacionais estabelecidas pelo Conselho Nacional de Educação e não serão objeto da\nnatureza da educação profissional tecnológica.\nDiante das afirmativas, assinale a alternativa correta:",
@@ -8626,7 +8626,7 @@
     {
       "id": "ldb-q683926",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Competências e diretrizes curriculares",
       "difficulty": "medium",
       "statement": "Segundo o art. 9º inciso IV da LDB 9394/96, traçar um conjunto de diretrizes capazes de nortear os currículos e os seus\nconteúdos mínimos para a educação infantil, ensino fundamental e ensino médio é da incumbência de",
@@ -8692,7 +8692,7 @@
     {
       "id": "ldb-q698100",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Princípios da educação nacional",
       "difficulty": "medium",
       "statement": "De acordo com a lei de Diretrizes e Bases da Educação, a educação abrange os processos formativos que se desenvolvem na\nvida familiar, na convivência humana, no trabalho, nas instituições de ensino e pesquisa, nos movimentos sociais e\norganizações da sociedade civil e nas manifestações culturais. O ensino, de acordo com a referida lei, será ministrado com\nbase nos seguintes princípios:",
@@ -8758,7 +8758,7 @@
     {
       "id": "ldb-q766103",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Incumbências expressas dos docentes",
       "difficulty": "medium",
       "statement": "A atual Lei de Diretrizes e Bases da Educação Nacional - LDB, sob o número 9.394/96, também conhecida como Lei Darcy\nRibeiro, define as diretrizes gerais da educação brasileira. Por meio do TÍTULO IV, DA ORGANIZAÇÃO DA EDUCAÇÃO\nNACIONAL, trata, especificamente no art. 13, de incumbências docentes, dentre as quais, destacam-se três:\nI. participar da elaboração da proposta pedagógica do estabelecimento de ensino.\nII. fomentar seu próprio desenvolvimento profissional, permanentemente.\nIII. fomentar e promover a articulação entre a escola e a comunidade em geral.\nIV. cumprir os dias letivos e as horas-aula estabelecidas, além de participar integralmente dos períodos dedicados ao\nplanejamento, à avaliação e ao desenvolvimento profissional.\nV. colaborar com as atividades de articulação da escola com as famílias e a comunidade.\nEstão CORRETAS, apenas:",
@@ -8824,7 +8824,7 @@
     {
       "id": "ldb-q753169",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino médio",
       "topic": "Finalidades do ensino médio",
       "difficulty": "medium",
       "statement": "Em conformidade com a Lei 9.394, o Ensino Médio, etapa final da Educação Básica, com duração mínima de três anos, terá\ncomo finalidades:\n(/) a consolidação e o aprofundamento dos conhecimentos adquiridos no ensino fundamental, possibilitando o\nprosseguimento de estudos.\n() a preparação básica para o trabalho e a cidadania do educando, para continuar aprendendo, de modo a ser capaz de se\nadaptar com flexibilidade a novas condições de ocupação ou aperfeiçoamentos posteriores.\n() o aprimoramento do educando como pessoa humana, incluindo a formação ética e o desenvolvimento da autonomia\nintelectual e do pensamento crítico.\n() a compreensão dos fundamentos científico-tecnológicos dos processos produtivos, relacionando a teoria com a prática, no\nensino de cada disciplina.\nUsando como referência (V) para a assertiva Verdadeira e (F) para Falsa, marque a opção que melhor se aplica, segundo a\nsequência de cima para baixo.",
@@ -8890,7 +8890,7 @@
     {
       "id": "ldb-q753172",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Saberes profissionais e cursos especiais",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional (Lei Nº 9.394/96), no seu Capítulo III-Da Educação Profissional, apresenta\nalgumas determinações e características da educação profissional e tecnológica. No que diz respeito à citada modalidade de\neducação, analise os itens a cima e assinale a alternativa CORRETA:\nI - A educação profissional será desenvolvida em articulação com o ensino regular ou por diferentes estratégias de educação\ncontinuada, apenas em instituições especializadas.\nII - O conhecimento adquirido na educação profissional e tecnológica, inclusive no trabalho, poderá ser objeto de avaliação,\nreconhecimento e certificação para prosseguimento ou conclusão de estudos.\nHI - As instituições de educação profissional e tecnológica, além dos seus cursos regulares, oferecerão cursos especiais,\nabertos à comunidade, condicionada a matrícula à capacidade de aproveitamento e não necessariamente ao nível de\nescolaridade.",
@@ -8956,7 +8956,7 @@
     {
       "id": "ldb-q671207",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Cursos e programas da educação superior",
       "difficulty": "medium",
       "statement": "Segundo a Lei de Diretrizes e Bases da Educação Nacional (LDB), uma das finalidades da educação superior é “formar\ndiplomados nas diferentes áreas de conhecimento, aptos para a inserção em setores profissionais e para a participação no\ndesenvolvimento da sociedade brasileira, e colaborar na sua formação contínua\" e, de acordo com o Art. 44, da LDB n.\n9394/1996, abrange:",
@@ -9017,7 +9017,7 @@
     {
       "id": "ldb-q523257",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Sistemas e competências dos entes",
       "difficulty": "medium",
       "statement": "Conforme o Art. 9º da Lei nº 9.394 de 20 de dezembro de 1996, é incumbência da União:",
@@ -9078,7 +9078,7 @@
     {
       "id": "ldb-q523266",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação especial e inclusão",
       "topic": "Adequação pedagógica na educação especial",
       "difficulty": "medium",
       "statement": "O planejamento das atividades pedagógicas inclusivas deve ter como objetivo propiciar o que está garantido, desde 1996, na\nLDBN, Lei 9394, em seu artigo 59. Neste sentido, é necessário que o professor:",
@@ -9139,7 +9139,7 @@
     {
       "id": "ldb-q523271",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Titulação do corpo docente universitário",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação nº 9394/96, em seu artigo 52, dispõe que as universidades são instituições\npluridisciplinares de formação dos quadros profissionais de nível superior, de pesquisa, de extensão e de domínio e cultivo\ndo saber humano que se caracterizam por:",
@@ -9200,7 +9200,7 @@
     {
       "id": "ldb-q523276",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação de jovens e adultos",
       "topic": "Adequação da oferta de EJA",
       "difficulty": "medium",
       "statement": "As Diretrizes Curriculares Nacionais para a EJA nasceram para fazer cumprir a Lei de Diretrizes e Bases da Educação Nacional,\nLei nº 9.394/96, que contempla a Educação de Jovens e Adultos, considerando a educação como direito social à cidadania.\nNesse sentido, a mencionada lei determina: oferta de educação escolar regular para jovens e adultos, com características e\nmodalidades adequadas às suas necessidades e disponibilidades, garantindo-se aos que forem trabalhadores as condições\nde acesso e permanência na escola (BRASIL, 1996). Isso significa dizer que:",
@@ -9261,7 +9261,7 @@
     {
       "id": "ldb-q599636",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Integração e reconhecimento de saberes na EPT",
       "difficulty": "medium",
       "statement": "Em relação ao que foi estabelecido na Lei de Diretrizes e Bases da Educação Nacional (Lei nº 9.394/1996) para a educação\nprofissional técnica de nível médio, é correto afirmar:",
@@ -9322,7 +9322,7 @@
     {
       "id": "ldb-q543281",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formas e requisitos da formação técnica",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional 9394/96 (LDBEN) dispõe que a educação profissional técnica de nível\nmédio será desenvolvida de acordo com as seguintes formas:",
@@ -9388,7 +9388,7 @@
     {
       "id": "ldb-q543282",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Pesquisa na educação superior",
       "difficulty": "medium",
       "statement": "Referente à Lei Federal nº 9.394/96 - Lei de Diretrizes e Bases da Educação Nacional, incentivar o trabalho de pesquisa\ne investigação científica, visando ao desenvolvimento da ciência e da tecnologia e da criação e difusão da cultura, e,\ndesse modo, desenvolver o entendimento do homem e do meio em que vive é finalidade da:",
@@ -9454,7 +9454,7 @@
     {
       "id": "ldb-q597235",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Idade da matrícula obrigatória",
       "difficulty": "medium",
       "statement": "É dever dos pais ou responsáveis efetuar a matrícula das crianças na educação básica partir dos:",
@@ -9520,7 +9520,7 @@
     {
       "id": "ldb-q597247",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Abrangência dos cursos profissionais",
       "difficulty": "medium",
       "statement": "A educação profissional e tecnológica, no cumprimento dos objetivos da educação nacional, integra-se aos diferentes níveis e\nmodalidades de educação e às dimensões do trabalho, da ciência e da tecnologia. De acordo com o art. 39 da Lei 9394/ 96, a\neducação profissional e tecnológica abrangerá os cursos de:",
@@ -9586,7 +9586,7 @@
     {
       "id": "ldb-q549771",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Cursos especiais abertos à comunidade",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9.394/1996, as instituições de educação profissional e tecnológica, além dos seus cursos regulares,",
@@ -9647,7 +9647,7 @@
     {
       "id": "ldb-q1023562",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Inclusão da história e cultura indígena",
       "difficulty": "medium",
       "statement": "Em 2008, a Lei Federal no 11.645/2008 dá nova redação ao Art. 26-A da Lei Federal no 9.394/96 - LDB, incluindo a\nobrigatoriedade do estudo da História e Cultura:",
@@ -9713,7 +9713,7 @@
     {
       "id": "ldb-q1023569",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino fundamental e ensino religioso",
       "topic": "Objetivos do ensino fundamental",
       "difficulty": "medium",
       "statement": "De acordo com o artigo 32 da Lei Federal n.º 9.394/96 - LDB, o ensino fundamental obrigatório, com duração de 9 (nove) anos,\ngratuito na escola pública, iniciando-se aos 6 (seis) anos de idade, terá por objetivo a formação básica do cidadão. Assinale a\nalternativa que NÃO está de acordo com o referido artigo:",
@@ -9779,7 +9779,7 @@
     {
       "id": "ldb-q1023573",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Formação dos profissionais da educação",
       "topic": "Fundamentos da formação profissional da educação",
       "difficulty": "medium",
       "statement": "Em consonância com a Lei Federal no 9.394/96 - LDB, a formação dos profissionais da educação, de maneira que atenda às\nespecificidades do exercício de suas atividades, bem como aos objetivos das diferentes etapas e modalidades da educação\nbásica, terá como fundamentos:\nI.a associação entre teorias e práticas, mediante estágios supervisionados e capacitação em serviço; II. o aproveitamento da\nformação e experiências anteriores, em instituições de ensino e em outras atividades; III. a realização de atividades - meio\nnecessárias ao funcionamento dos sistemas de ensino; IV. a presença de sólida formação básica, que propicie o\nconhecimento dos fundamentos científicos e sociais de suas competências de trabalho.\nConsiderando essas assertivas, estão corretas:",
@@ -9845,7 +9845,7 @@
     {
       "id": "ldb-q1024104",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "História e cultura afro-brasileira e indígena",
       "difficulty": "medium",
       "statement": "A partir da leitura do Artigo 26-A da Lei 9.394 de 20 de dezembro de 1996, que estabelece as diretrizes e bases da educação\nnacional: “Art. 26-A. Nos estabelecimentos de ensino fundamental e de ensino médio, públicos e privados, torna-se\nobrigatório o estudo da história e cultura afro-brasileira e indígena. 8 1.º O conteúdo programático a que se refere este artigo\nincluirá diversos aspectos da história e da cultura que caracterizam a formação da população brasileira, a partir desses dois\ngrupos étnicos, tais como o estudo da história da África e dos africanos, a luta dos negros e dos povos indígenas no Brasil, a\ncultura negra e indígena brasileira e o negro e o índio na formação da sociedade nacional, resgatando as suas contribuições\nnas áreas social, econômica e política, pertinentes à história do Brasil.” De acordo com a Lei nº. 11.645 de 10 de março de\n2008, que inclui no currículo oficial da rede de ensino a obrigatoriedade da temática “História e Cultura Afro-Brasileira e\nIndígena”, as áreas de educação artística, literatura e história brasileiras devem:",
@@ -9911,7 +9911,7 @@
     {
       "id": "ldb-q1024161",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Áreas de especial atenção curricular",
       "difficulty": "medium",
       "statement": "A Lei Federal nº 11.645/2008 alterou a Lei de Diretrizes e Bases - LDB (Lei Federal nº 9.394/1996), para incluir no currículo\noficial da rede de ensino a obrigatoriedade da temática história e cultura afro-brasileira e indígena. O caput do artigo 26-A\nprevê expressamente que \"Nos estabelecimentos de ensino fundamental e de ensino médio, torna-se obrigatório o estudo da\nhistória e cultura afro-brasileira e indígena\". No parágrafo segundo consta que: \"Os conteúdos referentes à história e cultura\nafro-brasileira e dos povos indígenas brasileiros serão ministrados no âmbito de todo currículo escolar, em especial nas áreas __________",
@@ -9977,7 +9977,7 @@
     {
       "id": "ldb-q582687",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Certificação dos saberes profissionais",
       "difficulty": "medium",
       "statement": "Assinale a alternativa em que a afirmativa sobre a Educação Profissional e Tecnológica, de acordo com a Lei de Diretrizes e\nBases da Educação Nacional, está CORRETA.",
@@ -10043,7 +10043,7 @@
     {
       "id": "ldb-q582699",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Distribuição de competências federativas",
       "difficulty": "medium",
       "statement": "Aleinº 9.394, de 20 de dezembro de 1996, em seu art. 8º, determina que “A União, os Estados, o Distrito Federal e os\nMunicípios organizarão, em regime de colaboração, os respectivos sistemas de ensino\".\nA partir dessa premissa, associe as colunas abaixo, analisando as responsabilidades da União, Estados, Distrito Federal e\nMunicípios em relação aos sistemas da educação brasileira. (1) União (2) Estados (3) Distrito Federal (4) Municípios () Exercer\nação redistributiva em relação às suas escolas. () Coletar, analisar e disseminar informações sobre a educação. () Aplicam-se\nas competências referentes aos Estados e aos Municípios. () Assegurar o ensino fundamental e oferecer, com prioridade, o\nensino médio. Assinale a alternativa que contém a ordem CORRETA de associação, de cima para baixo.",
@@ -10109,7 +10109,7 @@
     {
       "id": "ldb-q584246",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Incumbências de escolas e professores",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9394 de 1996, atualizada, assinale a alternativa que não corresponde a uma das incumbências dos\nprofessores definidas pela LDB.",
@@ -10175,7 +10175,7 @@
     {
       "id": "ldb-q584265",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Validade e registro dos diplomas",
       "difficulty": "medium",
       "statement": "Segundo a Lei nº 9394, de 1996, a respeito do tema “diplomas”, é incorreto afirmar que:",
@@ -10241,7 +10241,7 @@
     {
       "id": "ldb-q584266",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Classificação e progressão parcial",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional (lei nº 9394, de 1996) apresenta regras comuns para o ensino\nfundamental e médio em relação ao processo de avaliação. Leia as afirmativas a seguir sobre o artigo nº 24 da\nreferida lei:\n() a classificação em qualquer série ou etapa, exceto a primeira do ensino fundamental, pode ser feita por promoção, para\nalunos que cursaram, com aproveitamento, a série ou fase anterior, na própria escola.\n() a classificação em qualquer série ou etapa, exceto a primeira do ensino fundamental, pode ser feita por transferência, para\ncandidatos procedentes de outras escolas.\n(.) a classificação em qualquer série ou etapa, exceto a primeira do ensino fundamental, pode ser feita\nindependentemente de escolarização anterior, mediante avaliação feita pela escola, que defina o grau de desenvolvimento e\nexperiência do candidato e permita sua inscrição na série ou etapa adequada, conforme regulamentação do\nrespectivo sistema de ensino.\n(/) nos estabelecimentos que adotam a progressão regular por série, o regimento escolar pode admitir formas de\nprogressão parcial, desde que preservada a sequência do currículo, observadas as normas do respectivo sistema de ensino.\nAssinale a alternativa que contemple a sequência correta de afirmações verdadeiras (V) ou falsas (F):",
@@ -10307,7 +10307,7 @@
     {
       "id": "ldb-q584270",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Abrangência da EPT",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional (lei nº 9394, de 1996) em conjunto com a Lei nº 11.741/2008 define as\ncaracterísticas da Educação Profissional e Tecnológica. Assinale a alternativa que apresente a abrangência correta desta\nmodalidade de ensino.",
@@ -10373,7 +10373,7 @@
     {
       "id": "ldb-q598348",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação de jovens e adultos",
       "topic": "Oportunidades educacionais na EJA",
       "difficulty": "medium",
       "statement": "Em relação à Lei nº 9394, de 1996, na Seção V, que trata da Educação de Jovens e Adultos, considere as afirmativas:\nI. A educação de Jovens e Adultos deve ser articulada, obrigatoriamente, com a educação profissional. II. Devem ser\nasseguradas aos jovens e adultos oportunidades educacionais apropriadas, consideradas as características do alunado, seus\ninteresses, condições de vida e de trabalho. III. Conhecimentos e habilidades adquiridos pelo estudante por meios informais\nnão podem ser reconhecidos formalmente para qualquer fim na instituição que oferta cursos para jovens e adultos. Está(ão)\ncorreta(s) a(s) afirmativa(s):",
@@ -10439,7 +10439,7 @@
     {
       "id": "ldb-q598351",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Critérios de verificação do rendimento",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9.394, de 1996, a verificação do rendimento escolar observará os seguintes critérios:",
@@ -10505,7 +10505,7 @@
     {
       "id": "ldb-q598360",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formas da formação técnica de nível médio",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9.394, de 1996, a educação profissional técnica de nível médio será desenvolvida nas seguintes\nformas:\nI. Articulada com o ensino médio. II. Subsequente, em cursos destinados a quem já tenha concluído o ensino médio. III. A\ncritério de cada instituição de ensino, nos termos de seu projeto pedagógico. Está(ão) incorreta(s) a(s) afirmativa(s):",
@@ -10571,7 +10571,7 @@
     {
       "id": "ldb-q713015",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino médio",
       "topic": "Finalidades do ensino médio",
       "difficulty": "medium",
       "statement": "De acordo com a Lei de Diretrizes e Bases da Educação Nacional - LDBEN - nº 9.394, de 20 de dezembro de 1996, o ensino\nmédio, etapa final da educação básica, com duração mínima de três anos, terá como finalidades: I. A consolidação e o\naprofundamento dos conhecimentos adquiridos no ensino fundamental, possibilitando o prosseguimento de estudos. II. A\npreparação básica para o trabalho e a cidadania do educando, para continuar aprendendo, de modo a ser capaz de se\nadaptar com flexibilidade a novas condições de ocupação ou aperfeiçoamento posteriores. III. O aprimoramento do\neducando como pessoa humana, incluindo a formação ética e o desenvolvimento da autonomia intelectual e do pensamento\ncrítico. IV. A compreensão dos fundamentos históricopolíticos dos processos produtivos, relacionando a teoria com a prática,\nno ensino de cada disciplina. Considerando as afirmativas acima, marque a alternativa correta:",
@@ -10637,7 +10637,7 @@
     {
       "id": "ldb-q713039",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Classificação, progressão e frequência",
       "difficulty": "medium",
       "statement": "Quanto às prerrogativas da Lei de Diretrizes e Bases da Educação Nacional - LDB 9.394/96 - a educação básica, nos níveis\nfundamental e médio, será organizada de acordo com as algumas regras comuns. Quanto a essas regras, assinale a\nalternativa que julgar incorreta.",
@@ -10703,7 +10703,7 @@
     {
       "id": "ldb-q563596",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Organização da educação básica obrigatória",
       "difficulty": "medium",
       "statement": "Em que a LDBN 9394 de 1996 foi alterada no que concerne à organização da educação básica e obrigatória?",
@@ -10769,7 +10769,7 @@
     {
       "id": "ldb-q570615",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Abrangência da EPT",
       "difficulty": "medium",
       "statement": "A LDB, em seu artigo 39, com redação dada pela Lei nº11.741/2008, define que a educação profissional e\ntecnológica abrangerá os seguintes níveis:",
@@ -10835,7 +10835,7 @@
     {
       "id": "ldb-q577545",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Garantias do dever do Estado",
       "difficulty": "medium",
       "statement": "Assinale a alternativa INCORRETA. O dever do Estado com a educação será efetivado mediante a garantia de:",
@@ -10896,7 +10896,7 @@
     {
       "id": "ldb-q754528",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Cursos profissionais e tecnológicos",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação (Lei Nº 9.394/96) dispõe em seu Capítulo III, artigos 39, que “A educação profissional e\ntecnológica, no cumprimento dos objetivos da educação nacional, integra-se aos diferentes níveis e modalidades de educação e às\ndimensões do trabalho, da ciência e da tecnologia”, e o parágrafo 2º deste artigo, determina a abrangência dos cursos. I.\nFormação inicial e continuada ou qualificação profissional. II. Educação profissional técnica de Nível Médio. II. Educação\nprofissional tecnológica somente no nível de graduação. IV. Educação profissional tecnológica de graduação e de pós-\ngraduação. Tomando por base a fundamentação legal, assinale a opção correta.",
@@ -10962,7 +10962,7 @@
     {
       "id": "ldb-q504149",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Modalidades educacionais",
       "difficulty": "medium",
       "statement": "A educação nacional apresenta formatos organizativos diferenciados, definidos pela legislação como modalidades educativas.\nA LDB define como modalidades a",
@@ -11023,7 +11023,7 @@
     {
       "id": "ldb-q504151",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Finalidades gerais da educação",
       "difficulty": "medium",
       "statement": "Segundo a LDB, a educação nacional, dever da família e do Estado, tem por finalidade",
@@ -11084,7 +11084,7 @@
     {
       "id": "ldb-q504152",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Liberdade de aprender e ensinar",
       "difficulty": "medium",
       "statement": "De acordo com a LDB, o ensino deve ser ministrado com base nos seguintes princípios:",
@@ -11145,7 +11145,7 @@
     {
       "id": "ldb-q504156",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação de jovens e adultos",
       "topic": "Articulação da EJA com educação profissional",
       "difficulty": "medium",
       "statement": "De acordo com a LDB e a Lein. 11.741/2008, a Educação de Jovens e Adultos deve articular-se",
@@ -11206,7 +11206,7 @@
     {
       "id": "ldb-q504169",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação infantil",
       "topic": "Creche e pré-escola",
       "difficulty": "medium",
       "statement": "Conforme a atual LDB, a creche e a pré-escola compreendem",
@@ -11267,7 +11267,7 @@
     {
       "id": "ldb-q504174",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação de jovens e adultos",
       "topic": "Destinatários da EJA",
       "difficulty": "medium",
       "statement": "Considerando as atuais Diretrizes Curriculares Nacionais para a Educação de Jovens e Adultos e a atual LDB, a Educação de\nJovens e Adultos garante um direito circunscrito aos",
@@ -11328,7 +11328,7 @@
     {
       "id": "ldb-q540773",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Diretrizes e certificação na EPT",
       "difficulty": "medium",
       "statement": "Sobre a educação profissional e tecnológica na Lei N.º 9.394/1996, é INCORRETO afirmar:",
@@ -11389,7 +11389,7 @@
     {
       "id": "ldb-q659058",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Etapas e modalidades",
       "difficulty": "medium",
       "statement": "Considerando a organização da Educação Básica prevista na legislação atual, marque a alternativa que indica,\nrespectivamente, uma etapa e uma modalidade desse nível da educação.",
@@ -11455,7 +11455,7 @@
     {
       "id": "ldb-q659074",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Formas da educação profissional técnica",
       "difficulty": "medium",
       "statement": "A Lei federal 11.741/2008 altera dispositivos da Lei n. 9.394, de 20 de dezembro de 1996, que estabelece as diretrizes e bases\nda educação nacional, para redimensionar, institucionalizar e integrar as ações da educação profissional técnica de nível\nmédio, da educação de jovens e adultos e da educação profissional e tecnológica. É CORRETO afirmar, conforme o art. 36-B\nda LDB, que a educação profissional técnica de nível médio será desenvolvida nas seguintes formas:",
@@ -11521,7 +11521,7 @@
     {
       "id": "ldb-q659076",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Cursos e programas superiores",
       "difficulty": "medium",
       "statement": "O art. 44 da Lei 9.394/96 trata da educação superior e de sua abrangência em diferentes cursos e programas. Compõem a\neducação superior, segundo a LDB, cursos\nI. sequenciais por campo de saber, de diferentes níveis de abrangência, abertos a candidatos que atendam aos requisitos\nestabelecidos pelas instituições de ensino, desde que tenham concluído o ensino médio ou equivalente;\nII. subsequentes por campo de saber, de diferentes níveis de abrangência, abertos a candidatos que atendam aos requisitos\nestabelecidos pelas instituições de ensino, desde que tenham concluído o ensino médio ou equivalente;\nIII, de graduação, abertos a candidatos que tenham concluído o ensino médio ou equivalente e tenham sido classificados em\nprocesso seletivo;\nIV. de pós-graduação, compreendendo programas de mestrado e doutorado, cursos de especialização, aperfeiçoamento e\noutros, abertos a candidatos diplomados em cursos de graduação e que atendam às exigências das instituições de ensino.\nV. de extensão, abertos a candidatos que atendam aos requisitos estabelecidos em cada caso pelas instituições de ensino.\nEstão CORRETOS apenas os itens:",
@@ -11587,7 +11587,7 @@
     {
       "id": "ldb-q659077",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Regulação, diplomas e trabalho docente no superior",
       "difficulty": "medium",
       "statement": "No que se refere à educação superior, em conformidade com a Lei de Diretrizes e Bases da Educação Nacional, analise as\nseguintes proposições.\nI. Os diplomas expedidos pelas universidades serão por elas próprias registrados, e aqueles conferidos por instituições não-\nuniversitárias serão registrados em universidades indicadas pelo Conselho Universitário de Educação.\nII. Os diplomas de Mestrado e de Doutorado expedidos por universidades estrangeiras só poderão ser reconhecidos por\nuniversidades que possuam cursos de pós-graduação reconhecidos e avaliados, na mesma área de conhecimento e em nível\nequivalente ou superior.\nIII, A autorização e o reconhecimento de cursos, bem como o credenciamento de instituições de educação superior, terão\nprazos limitados, sendo renovados, periodicamente, após processo regular de avaliação.\nIV. Na educação superior, o ano letivo regular, independente do ano civil, tem, no mínimo, duzentos e vinte dias de trabalho\nacadêmico efetivo, excluído o tempo reservado aos exames finais, quando houver.\nV. Nas instituições públicas de educação superior, o professor ficará obrigado ao mínimo de oito horas semanais de aulas.\nEstão CORRETAS apenas as proposições:",
@@ -11653,7 +11653,7 @@
     {
       "id": "ldb-q659084",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Participação docente na proposta pedagógica",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação dispõe sobre as obrigações dos professores, no âmbito pedagógico. De acordo com o\nart. 13 da LDB, as alternativas a seguir são incumbências dos docentes, EXCETO:",
@@ -11719,7 +11719,7 @@
     {
       "id": "ldb-q638182",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação especial e inclusão",
       "topic": "Preferência da rede regular no AEE",
       "difficulty": "medium",
       "statement": "Segundo Matoan (2010), uma escola não pode recusar a matrícula de um aluno com algum tipo de deficiência por causa da\nnossa Constituição de 1988, que garante o direito à educação a todas as crianças, indiscriminadamente. A LDB/ 1996, no\ninciso III, do Art. 4º, do TÍTULO III - Do Direito à Educação e do Dever de Educar - estabelece o “atendimento educacional\nespecializado gratuito aos educandos com deficiência, transtornos globais do desenvolvimento e altas habilidades ou\nsuperdotação, transversal a todos os níveis, etapas e modalidades, preferencialmente...”",
@@ -11785,7 +11785,7 @@
     {
       "id": "ldb-q638184",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Desenvolvimento da educação profissional",
       "difficulty": "medium",
       "statement": "A Educação, enquanto processo de desenvolvimento humano, acontece através da aprendizagem de conceitos socialmente\nelaborados, onde o indivíduo se transforma e é transformado, simultaneamente, no espaço social. Assim sendo, a instituição\nescolar, dotada de condições humanas e materiais, se situa como a agência formadora, comprometida com a transmissão e\nconstrução de novos conhecimentos, promovendo paralelamente a socialização do homem para a vida e para o trabalho.\nPara efetivar essa proposta, o art. 40, da LDB/96, estabelece que “A educação profissional será desenvolvida em articulação\ncom o ensino regular ou por diferentes estratégias de educação continuada, em...",
@@ -11851,7 +11851,7 @@
     {
       "id": "ldb-q449801",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Acesso, currículo e cursos especiais",
       "difficulty": "medium",
       "statement": "Com relação à Lei nº 9.394/1996, que estabelece as diretrizes e bases da educação nacional, marque V para verdadeiro ou F\npara falso e, em seguida, assinale a alternativa que apresenta a sequência correta.\n() É dever dos pais ou responsáveis efetuar a matrícula das crianças na educação básica a partir dos 4 (quatro) anos de idade.\n() Dependendo da escolarização anterior, o Poder Público criará formas alternativas de acesso aos diferentes níveis de\nensino, de forma a garantir o cumprimento da obrigatoriedade de ensino. () Trata-se de uma diretriz observada pelos\nconteúdos curriculares da educação básica a consideração das condições de escolaridade dos alunos em cada\nestabelecimento. () As instituições de educação profissional e tecnológica poderão oferecer cursos especiais, abertos à\ncomunidade, condicionada a matrícula necessariamente ao nível de escolaridade.",
@@ -11917,7 +11917,7 @@
     {
       "id": "ldb-q449819",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Grupos de cursos da EPT",
       "difficulty": "medium",
       "statement": "Considerando a Lei nº 9.394/1996, a educação profissional e tecnológica abrangerá os seguintes cursos, entre outros, de\nI. formação inicial e continuada ou qualificação profissional. II. educação profissional técnica de nível fundamental. III.\neducação profissional tecnológica de graduação. IV. educação profissional tecnológica de pós- graduação. É correto o que\nestá contido em",
@@ -11983,7 +11983,7 @@
     {
       "id": "ldb-q449820",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Princípios e finalidades da educação superior",
       "difficulty": "medium",
       "statement": "Com relação à Lei nº 9.394/1996, assinale a alternativa incorreta.",
@@ -12049,7 +12049,7 @@
     {
       "id": "ldb-q449821",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Atribuições da autonomia universitária",
       "difficulty": "medium",
       "statement": "Segundo o artigo 53, da Lei nº 9.394/1996, no exercício de sua autonomia, são asseguradas às universidades, sem prejuízo de\noutras, certas atribuições, que são, entre outras,\nI. fixar os currículos dos seus cursos e programas, observadas as diretrizes gerais pertinentes. II. fixar o número de vagas de\nacordo com a capacidade institucional e as exigências do seu meio. III. conferir graus, diplomas e outros títulos. IV. firmar\ncontratos, acordos e convênios. É correto o que está contido em",
@@ -12115,7 +12115,7 @@
     {
       "id": "ldb-q454637",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Espaços dos processos educativos",
       "difficulty": "medium",
       "statement": "Educação engloba os processos de ensinar e aprender. É um fenômeno observado em qualquer sociedade e nos grupos\nconstitutivos destas, responsável pela sua manutenção e perpetuação a partir da transposição, às gerações que se seguem,\ndos modos culturais de ser, estar e agir. A Lei de Diretrizes e Bases da Educação Nacional, Lei nº 9.394/1996 (LDBEN),\nestabelece que a educação abarca os processos formativos que são iniciados na",
@@ -12181,7 +12181,7 @@
     {
       "id": "ldb-q454640",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Conteúdos obrigatórios dos currículos",
       "difficulty": "medium",
       "statement": "Os currículos do ensino fundamental e médio devem ter uma base nacional comum, a ser complementada, em cada sistema\nde ensino e estabelecimento escolar, por uma parte diversificada exigida pelas características regionais e locais da sociedade,\nda cultura, da economia e da clientela. Os currículos a que se refere a Lei nº 9.394/1996 (LDBEN) devem abranger,\nobrigatoriamente,",
@@ -12247,7 +12247,7 @@
     {
       "id": "ldb-q454644",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Exigibilidade do direito à educação",
       "difficulty": "medium",
       "statement": "Uma família, que consta de três adultos e quatro crianças, chega ao Estado do Paraná para fixar residência em busca de\nmelhores oportunidades de emprego. Em relação às crianças que estão na fase da educação fundamental, os pais precisam\ngarantir o direito de educação e cumprir seu dever como responsáveis. Em busca de colocação nas escolas das adjacências,\nos pais enfrentam um grave problema existente na maioria dos estados brasileiros, que é a superlotação das escolas. Cientes\nde seus diretos e pautados na Lei nº 9.394/1996 (LDBEN), que preconiza que o acesso ao ensino fundamental é obrigatório e\ngratuito, apelam para o direito público subjetivo. É correto afirmar que esse direito é aquele que",
@@ -12313,7 +12313,7 @@
     {
       "id": "ldb-q454653",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Abrangência legal da EPT",
       "difficulty": "medium",
       "statement": "A educação profissional e tecnológica, no cumprimento dos objetivos da educação nacional, integra-se aos diferentes níveis e\nmodalidades de educação e às dimensões do trabalho, da ciência e da tecnologia. Conforme a Lei nº 9.394/1996 (LDBEN) em\nvigência, a educação profissional e tecnológica deve abranger os seguintes cursos:\nI. de formação inicial e continuada ou qualificação profissional. II. de educação profissional técnica de nível médio. III. de\nformação acadêmica profissional em nível de mestrado e doutorado. IV. de educação profissional tecnológica de graduação e\npós-graduação. V. de educação básica e continuada com qualificação tecnológica. É correto o que está contido em",
@@ -12379,7 +12379,7 @@
     {
       "id": "ldb-q454656",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Etapas abrangidas pela história e cultura afro-brasileira e indígena",
       "difficulty": "medium",
       "statement": "Em 2008, entrou em vigor a Lei nº 11.645/2008, que alterou definitivamente o artigo 26-A da LDBEN. A nova Lei tornou\nobrigatório o estudo da história e cultura afro- brasileira e indígena nos estabelecimentos de",
@@ -12445,7 +12445,7 @@
     {
       "id": "ldb-q448736",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação de jovens e adultos",
       "topic": "Idades para exames supletivos",
       "difficulty": "medium",
       "statement": "Segundo o que dispõe a Lei de Diretrizes e Bases da Educação Nacional, os sistemas de ensino deverão manter cursos e\nexames supletivos para jovens e adultos que não puderam efetuar os estudos em idade regular.\nAinda segundo o que dispõe a citada lei, os referidos exames supletivos deverão se realizar",
@@ -12506,7 +12506,7 @@
     {
       "id": "ldb-q448737",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Condições da iniciativa privada",
       "difficulty": "medium",
       "statement": "Conforme o que prevê a Lei de Diretrizes e Bases da Educação Nacional, o ensino é livre à iniciativa privada, desde que\nobservados determinados requisitos, entre os quais NÃO se inclui",
@@ -12567,7 +12567,7 @@
     {
       "id": "ldb-q448738",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Instituições privadas de educação superior",
       "difficulty": "medium",
       "statement": "É CORRETO afirmar, segundo o que dispõe a Lei de Diretrizes e Bases da Educação Nacional, que as instituições de educação\nsuperior criadas e mantidas pela iniciativa privada",
@@ -12628,7 +12628,7 @@
     {
       "id": "ldb-q448739",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Prática facultativa de educação física",
       "difficulty": "medium",
       "statement": "A Lei de Diretrizes e Bases da Educação Nacional prevê as hipóteses que tornam facultativa para o aluno a prática de\neducação física na educação básica.\nEntre essas hipóteses, NÃO se inclui o fato de",
@@ -12689,7 +12689,7 @@
     {
       "id": "ldb-q448760",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Normas da formação técnica e da EPT",
       "difficulty": "medium",
       "statement": "A Lei nº 9.394/96 regulamenta e integra a educação profissional técnica de nível médio e a educação profissional e\ntecnológica aos diferentes níveis e modalidades de educação.\nNumere a COLUNA II de acordo com a COLUNA I fazendo a correspondência da educação profissional técnica de nível médio\ne da educação profissional e tecnológica com as suas respectivas normas a partir dessa Lei.\nCOLUNA I\nI. Educação profissional técnica de nível médio. 2. Educação profissional e tecnológica. COLUNA II\n() Será desenvolvida nas seguintes formas: articulada com o ensino médio, subsequente, em cursos destinados a quem já\ntenha concluído esse nível de ensino. ( ) Os seus cursos poderão ser organizados por eixos tecnológicos, proporcionando a\nconstrução de diferentes percursos formativos, observadas as normas do respectivo sistema e o nível de ensino. ( ) Será a\neducação profissional desenvolvida em articulação com o ensino regular ou por diferentes estratégias de educação\ncontinuada, em instituições especializadas ou no ambiente de trabalho. ( ) Os cursos, nas formas articulada concomitante e\nsubsequente, quando estruturados e organizados em etapas com terminalidade, possibilitarão a obtenção de certificados de\nqualificação para o trabalho após a conclusão, com aproveitamento, de cada etapa que caracterize uma qualificação para o\ntrabalho. Assinale a alternativa que apresenta a sequência CORRETA.",
@@ -12750,7 +12750,7 @@
     {
       "id": "ldb-q509129",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Princípios expressos do ensino",
       "difficulty": "medium",
       "statement": "São princípios expressos na Lei de Diretrizes e Bases da Educação Nacional, EXCETO:",
@@ -12811,7 +12811,7 @@
     {
       "id": "ldb-q509130",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Incumbências dos estados",
       "difficulty": "medium",
       "statement": "Assinale a alternativa que apresenta a atribuição dos estados descritas na Lei de Diretrizes e Bases da Educação Nacional.",
@@ -12872,7 +12872,7 @@
     {
       "id": "ldb-q772615",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Garantias e responsabilidades na educação básica",
       "difficulty": "medium",
       "statement": "A Lei nº 9.394/ 96 estabelece a organização da educação básica obrigatória em: pré-escola; ensino fundamental e ensino médio.\nAnalise as seguintes afirmativas sobre a educação básica e assinale com V as verdadeiras e com F as falsas.\n() É dever dos pais ou responsáveis efetuar a matrícula das crianças na educação básica a partir dos 6 (seis) anos de idade.\n() É direito público subjetivo o acesso à educação básica obrigatória, podendo qualquer cidadão, grupo de cidadãos,\nassociação comunitária, organização sindical, entidade de classe ou outra legalmente constituída e, ainda, o Ministério\nPúblico, acionar o poder público para exigi-lo.\n() Cabe aos Estados oferecer a educação infantil em creches e pré-escolas, e, com prioridade, o ensino fundamental.\n()A educação básica é obrigatória e gratuita dos 4 (quatro) aos 17 (dezessete) anos de idade.\nAssinale a alternativa que apresenta a sequência CORRETA.",
@@ -12933,7 +12933,7 @@
     {
       "id": "ldb-q772621",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Educação e trabalho",
       "difficulty": "medium",
       "statement": "A Lei nº 9.394/ 96 concebe que educação escolar deverá vincular-se ao mundo do trabalho e à prática social.\nAnalise as seguintes afirmativas sobre a vinculação da educação com trabalho na Lei nº 9.394/ 96 e assinale com V as\nverdadeiras e com F as falsas.\n() A educação de jovens e adultos deverá articular-se, obrigatoriamente, com a educação profissional, na forma do\nregulamento.\n() A orientação para o trabalho é uma das diretrizes a ser observada nos conteúdos curriculares da educação básica.\n() Uma das finalidades da educação é a qualificação do educando para o trabalho.\n( ) A preparação geral para o trabalho e, facultativamente, a habilitação profissional no ensino médio poderão ser\ndesenvolvidas apenas nas instituições especializadas em educação profissional.\nAssinale a alternativa que apresenta a sequência CORRETA.",
@@ -12994,7 +12994,7 @@
     {
       "id": "ldb-q308685",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Incumbências dos estabelecimentos de ensino",
       "difficulty": "medium",
       "statement": "O artigo 12 da LDB 9.394/96 atribui às escolas incumbências que podem revelar certa autonomia. Dentre essas incumbências,\npodemos relacionar:\nI. Administrar seu pessoal e seus recursos materiais e financeiros; II. Articular-se com as famílias e a comunidade, criando\nprocessos de integração da sociedade com a escola; III. Assegurar o cumprimento dos dias letivos e horas-aula estabelecidas;\nIV. Prover meios para recuperação dos alunos de menor rendimento; V. Velar pelo cumprimento do plano de trabalho de\ncada docente. São afirmativas corretas:",
@@ -13060,7 +13060,7 @@
     {
       "id": "ldb-q619763",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Critérios legais de avaliação",
       "difficulty": "medium",
       "statement": "Leia o trecho a seguir:\n“Uma proposta de rompimento com a concepção de avaliação que pune e exclui o aluno em direção a uma concepção de\nprogresso e desenvolvimento da aprendizagem tem feito parte das mudanças implementadas nas escolas brasileiras nos\núltimos anos e está entre as inovações preconizadas pela nova LDB. (Lei nº 9.394, de 20/12/1996 que estabelece as Diretrizes\ne Bases da Educação Nacional)”\nConsiderando os critérios que deverão ser observados em relação à verificação do rendimento escolar, de acordo com a LDB,\nassinale (V) para Verdadeiro e (F) para Falso:\n() Possibilidade de aceleração de estudos para alunos com atraso escolar.\n() Aproveitamento de estudos concluídos com êxito.\n(D Avaliação contínua e cumulativa de desempenho do aluno, com prevalência de aspectos quantitativos sobre os qualitativos\ne dos resultados ao longo do período sobre as eventuais provas finais.\n() Construção de um calendário escolar para a realização das provas, em que os alunos terão mais chance para estudar os\nconteúdos trabalhados ao longo do processo.\n() Garantia de mudança das práticas avaliativas dentro do contexto educacional, bem como da ação educativa do professor.\n() Obrigatoriedade de estudos de recuperação, de preferência paralelos ao período letivo, para os casos de baixo rendimento\nescolar, a serem disciplinados pelas instituições de ensino em seus regimentos.\nA sequência CORRETA é:",
@@ -13126,7 +13126,7 @@
     {
       "id": "ldb-q331098",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino médio",
       "topic": "Finalidades do ensino médio",
       "difficulty": "medium",
       "statement": "Segundo a Lei de Diretrizes e Bases da Educação Nacional, o Ensino Médio, etapa final da educação básica, com duração\nmínima de três anos, terá como finalidades:\nla consolidação e o aprofundamento dos conhecimentos adquiridos no ensino fundamental, possibilitando o\nprosseguimento de estudos; II a preparação básica para o trabalho e a cidadania do educando, para continuar aprendendo,\nde modo a ser capaz de se adaptar com flexibilidade a novas condições de ocupação ou aperfeiçoamento posteriores; III o\naprimoramento do educando como pessoa humana, incluindo a formação ética e o desenvolvimento da autonomia\nintelectual e do pensamento crítico; IV a compreensão dos fundamentos científico-tecnológicos dos processos produtivos,\nprivilegiando o aprofundamento teórico, no ensino de cada disciplina. Está CORRETO apenas o que se afirma em:",
@@ -13192,7 +13192,7 @@
     {
       "id": "ldb-pdf-item-352",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação de jovens e adultos",
       "topic": "EJA e articulação profissional",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9.394/1996 (LDB), a Educação de Jovens eAdultos:",
@@ -13258,7 +13258,7 @@
     {
       "id": "ldb-q416496",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino fundamental e ensino religioso",
       "topic": "Ensino religioso",
       "difficulty": "medium",
       "statement": "Sobre o ensino religioso nas escolas a Lei nº 9.394/1996 (LDB) determina que:",
@@ -13324,7 +13324,7 @@
     {
       "id": "ldb-q416498",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Ensino médio",
       "topic": "Finalidades e duração do médio",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9.394/1996 (LDB), sobre o ensino médio, está correto afirmar que:",
@@ -13390,7 +13390,7 @@
     {
       "id": "ldb-q416499",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Etapas da educação obrigatória",
       "difficulty": "medium",
       "statement": "De acordo com a Lei nº 9.394/1996 (LDB), art. 4, a educação básica obrigatória e gratuita está organizada da seguinte forma:",
@@ -13456,7 +13456,7 @@
     {
       "id": "ldb-q523138",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Prioridades estaduais no ensino",
       "difficulty": "medium",
       "statement": "De acordo com o Título IV da LDB nº 9394/96 é responsabilidade dos Estados, quanto à Organização da Educação:",
@@ -13522,7 +13522,7 @@
     {
       "id": "ldb-q523145",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação especial e inclusão",
       "topic": "Garantias na educação especial",
       "difficulty": "medium",
       "statement": "A Educação Especial, de acordo com a LDB nº 9394/1996, determina para o aluno com necessidades especiais:",
@@ -13588,7 +13588,7 @@
     {
       "id": "ldb-q523149",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação de jovens e adultos",
       "topic": "Natureza da EJA",
       "difficulty": "medium",
       "statement": "Com base na LDB nº 9394/1996, a EJA é considerada:",
@@ -13660,7 +13660,7 @@
       "cargo": "Pedagogo",
       "nivelCargo": "Superior",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Finalidades da educação superior",
       "difficulty": "medium",
       "tags": [
@@ -13730,7 +13730,7 @@
       "cargo": "Pedagogo",
       "nivelCargo": "Superior",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Características das universidades",
       "difficulty": "medium",
       "tags": [
@@ -13794,7 +13794,7 @@
     {
       "id": "ldb-q345911",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação superior",
       "topic": "Finalidades específicas do ensino superior",
       "difficulty": "medium",
       "statement": "Tendo em vista o disposto na Lei n.º 9.394/1996, assinale a alternativa correta acerca da(s) finalidade(s) do curso superior.",
@@ -13860,7 +13860,7 @@
     {
       "id": "ldb-q398247",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Abrangência e itinerários da EPT",
       "difficulty": "medium",
       "statement": "Em 1.º de novembro de 2007, o Senhor Ministro da Educação protocolou, no Conselho Nacional de Educação, o Ofício\nGM/MEC n.º 203/2007, encaminhando, para apreciação da Câmara de Educação Básica, proposta de instituição de Catálogo\nNacional de Cursos Técnicos de Nível Médio, nos seguintes termos:\nA partir dos dados constantes do Cadastro Nacional dos Cursos Técnicos (CNCT), verificou-se uma quantidade excessiva\nde nomenclaturas, aproximadamente 2.700 denominações distintas para os 7.940 cursos técnicos de nível médio em oferta\nem 2005, de acordo com o Censo Escolar MEC/INEP. Tal cenário revela uma dispersão de títulos, além de dificuldade na\norientação e na informação aos usuários e à sociedade, bem como para a formulação de políticas, planejamento e avaliação\ndessa modalidade de educação profissional. Além disso, observou-se, numa mesma área, uma multiplicação de títulos que\nnão se justificam como cursos técnicos, e sim como especializações ou qualificações intermediárias. Entendemos que a\npresença do técnico de nível médio torna-se cada vez mais necessária e relevante no mundo do trabalho, sobretudo em\nfunção do crescente aumento das inovações tecnológicas e dos novos modos de organização da produção. Desse modo, o\nCatálogo objetiva, ainda, induzir a oferta de cursos técnicos de nível médio em áreas insuficientemente atendidas.\nMEC. Parecer 11/2008. Internet: (com adaptações).\nDe acordo com a Lei de Diretrizes e Bases da Educação Nacional, Lei n.º 9.394/1996, e suas alterações, assinale a alternativa\ncorreta.",
@@ -13926,7 +13926,7 @@
     {
       "id": "ldb-q326173",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Avaliação e organização escolar",
       "topic": "Regras comuns do fundamental e médio",
       "difficulty": "medium",
       "statement": "Assinale a alternativa que apresenta, de acordo com a Lei nº 9.394/96, regras comuns aos níveis de ensino fundamental e\nmédio.",
@@ -13992,7 +13992,7 @@
     {
       "id": "ldb-q326175",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Educação física na básica e no superior",
       "difficulty": "medium",
       "statement": "Sobre a educação física no currículo escolar, é correto afirmar que:",
@@ -14058,7 +14058,7 @@
     {
       "id": "ldb-q326177",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Educação profissional e tecnológica",
       "topic": "Integração da educação profissional e tecnológica",
       "difficulty": "medium",
       "statement": "Assinale a alternativa que traz uma afirmação verdadeira sobre a educação profissional e tecnológica, conforme prevista na\nLei nº 9.394/96.",
@@ -14124,7 +14124,7 @@
     {
       "id": "ldb-q510032",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Princípios e direito à educação",
       "topic": "Liberdade, pluralismo e tolerância",
       "difficulty": "medium",
       "statement": "São princípios norteadores do ensino no Brasil, segundo a Lei de Diretrizes e Bases, Lei nº. 9394/96, art. 3º:\nI. A liberdade de aprender, ensinar, pesquisar e divulgar a cultura, o pensamento, a arte e o saber. II. Individualismo de ideias\ne de concepções pedagógicas. III. Respeito à liberdade e apreço à tolerância.",
@@ -14190,7 +14190,7 @@
     {
       "id": "ldb-q510033",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Finalidades da educação básica",
       "difficulty": "medium",
       "statement": "Segundo a Lei 9.394/96, a educação básica tem como finalidades:\nI. Desenvolver o educando. II. Assegurar-lhe formação comum indispensável para o exercício da cidadania. III. Fornecer-lhe\nmeios para progredir no trabalho e em estudos posteriores. Estão corretas as afirmativas:",
@@ -14256,7 +14256,7 @@
     {
       "id": "ldb-q562984",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Organização da educação nacional",
       "topic": "Incumbências federais e estaduais",
       "difficulty": "medium",
       "statement": "A partir da LDB, a União, os estados, o Distrito Federal e os municípios organizarão em regime de colaboração, os respectivos\nsistemas de ensino. É correto afirmar que a União NÃO se incumbirá de",
@@ -14322,7 +14322,7 @@
     {
       "id": "ldb-q72440",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Níveis escolares e educação básica",
       "topic": "Composição da educação escolar",
       "difficulty": "medium",
       "statement": "De acordo com a Lei de Diretrizes e Bases- LDB nº. 9.394, de 20 de dezembro de 1996, a educação escolar compõe-se de:",
@@ -14388,7 +14388,7 @@
     {
       "id": "ldb-q72441",
       "discipline": "Legislação Educacional",
-      "subject": "Lei nº 9.394/1996",
+      "subject": "Currículo e diversidade",
       "topic": "Objeto do art.26-A",
       "difficulty": "medium",
       "statement": "Do que trata o artigo 26-A, inserido na Lei de Diretrizes e Bases- LDB nº. 9.394, através da lei 10.639 de 09 de janeiro de 2003\ne alterado pela redação dada pela Lei nº 11.645, de 2008:",

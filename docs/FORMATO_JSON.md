@@ -13,7 +13,7 @@ Cada arquivo representa um banco, com `schemaVersion`, `id`, `name` e `questions
 | `questions` | Sim | Lista de 1 a 5.000 questões |
 | `questions[].id` | Sim | ID estável, único no banco; mesmas regras do ID do banco |
 | `discipline` | Sim | Disciplina em texto não vazio, sem limite de caracteres |
-| `subject` | Sim | Assunto em texto não vazio, sem limite de caracteres |
+| `subject` | Sim | Assunto principal temático, como `Educação profissional e tecnológica`; não repetir apenas o nome da lei em todas as questões. O card calcula as quantidades por esse assunto |
 | `topic` | Sim | Tópico/subtópico em texto não vazio, sem limite de caracteres |
 | `statement` | Sim | Enunciado em texto não vazio, sem limite de caracteres; `\n` quebra linhas |
 | `options` | Sim | 2–8 objetos `{ "id": "A", "text": "..." }`; IDs únicos A–H; texto não vazio, sem limite de caracteres; números finitos também são aceitos e convertidos em texto |
