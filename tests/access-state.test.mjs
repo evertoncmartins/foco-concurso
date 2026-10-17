@@ -773,7 +773,7 @@ test('foco automático Mobile mantém seleção, cortes e rolagem, pede tela che
   const app=await studyRuntime({mobile:true});assert(app.value('focusMode.active'));await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});app.document.querySelector('.question-body').scrollTop=400;
   const before=app.value('JSON.stringify(store.events)');
   assert(app.value('focusMode.active'));assert.deepEqual(app.document.requestOptions,{navigationUI:'hide'});assert.equal(app.value('selected'),'B');assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.document.querySelector('.question-body').scrollTop,400);assert.equal(app.value('JSON.stringify(store.events)'),before);
-  assert.match(app.html(),/class="question-position" aria-label="Questão 1 de 3">1 \/ 3/);assert.match(app.html(),/Visitante · progresso temporário/);
+  assert.match(app.html(),/class="question-position" aria-label="Questão 1 de 3"><strong class="question-current">1<\/strong><span class="question-total"> \/ 3/);assert.match(app.html(),/Visitante · progresso temporário/);
   await app.click('toggle-theme');assert.equal(app.document.querySelector('.question-body').scrollTop,400);assert.equal(app.value('selected'),'B');
   await app.click('answer');await app.click('next');assert(app.value('focusMode.active'));assert.equal(app.document.fullscreenElement,app.document.documentElement);assert.equal(app.document.querySelector('.question-body').scrollTop,0);assert.match(app.html(),/>Questão 2 de 3</);
   await app.click('next');await app.click('select',{option:'A'});await app.click('answer');await app.finish();
@@ -1047,8 +1047,8 @@ test('Mobile usa uma única faixa antes do cartão e preserva ações, origem e 
   const toolbar=html.slice(html.indexOf('class="focus-toolbar"'),html.indexOf('<main'));
   assert.match(toolbar,/<span class="focus-mobile-discipline">Direito Administrativo com um nome extenso<\/span>/);
   assert(!html.slice(bar,card).includes('Direito Administrativo com um nome extenso'));
-  assert.match(html.slice(bar,card),/class="question-position" aria-label="Questão 1 de 2">1 \/ 2<\/span>/);
-  assert.match(html.slice(bar,card),/question-difficulty">(?:Fácil|Média|Difícil)<\/span><span class="badge origin"[^>]*>IFSP-2025<\/span>/);
+  assert.match(html.slice(bar,card),/class="question-position" aria-label="Questão 1 de 2"><strong class="question-current">1<\/strong><span class="question-total"> \/ 2<\/span><\/span>/);
+  assert.match(html.slice(bar,card),/class="badge question-difficulty">(?:Fácil|Média|Difícil)<\/span><span class="badge origin"[^>]*>IFSP-2025<\/span>/);
   assert(!html.includes('class="question-meta"'));assert(!html.includes('>Adaptada<'));assert(!html.includes('final.pdf'));
   assert.equal((html.match(/data-action="flag"/g)||[]).length,2);assert(!html.slice(card).includes('data-action="flag"'));
   app.document.querySelector('.question-body').scrollTop=420;
@@ -1063,7 +1063,7 @@ test('Mobile usa uma única faixa antes do cartão e preserva ações, origem e 
   const correct=app.value('model.questions.find(q=>q.key===session.queue[0]).correctOption');await app.click('select',{option:correct});await app.click('answer');
   assert.match(app.html(),/Adaptada de prova oficial/);assert.match(app.html(),/https:\/\/example.test\/final.pdf/);
   await app.click('next');const next=app.html().slice(app.html().indexOf('class="mobile-question-bar"'),app.html().indexOf('<article class="question-card">'));
-  assert.match(next,/aria-label="Questão 2 de 2">2 \/ 2/);
+  assert.match(next,/aria-label="Questão 2 de 2"><strong class="question-current">2<\/strong><span class="question-total"> \/ 2/);
   assert(!app.html().includes('<span class="focus-mobile-discipline">Direito Administrativo com um nome extenso</span>'));
   assert(!next.includes('IFSP-2025'));assert(!next.includes('badge origin'));assert(!next.includes('aria-pressed="true"'));assert.equal(app.document.querySelector('.question-body').scrollTop,0);
 });
