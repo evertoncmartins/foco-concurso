@@ -74,7 +74,7 @@ test('Voltar do navegador consome só o documento e mantém a tela anterior ao O
   for(const [view,name,subject] of [['settings','termos.html','111'],['settings','privacidade.html','111'],['banks','formato-json.html','111'],['login','termos.html',undefined]]){
     const app=runtime();app.state.context={view,subject,generation:3};app.click(name);
     assert.equal(app.window.history.position,2);assert.equal(app.window.history.state.keep,'original');
-    assert(!JSON.stringify(app.window.history.state).includes('111'));
+    assert.deepEqual(app.window.history.state,{keep:'original',focoDocument:{owner:app.controller.historyId,id:1}});
     await app.back();
     assert.equal(app.window.history.position,1);assert.equal(app.window.location.href,origin+'/');assert.equal(app.controller.dialog,null);
     assert.deepEqual(app.state.returned,[{view,subject,generation:3}]);assert.deepEqual(app.window.history.state,{keep:'original'});

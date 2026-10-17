@@ -118,3 +118,9 @@ O workflow `ci.yml` executa testes, verificação de sintaxe e build a cada push
 ## Verificação
 
 `npm test` verifica importação, gabaritos, sorteios, filtros, revisão, favoritos, estatísticas, recarga, união de históricos, idempotência, persistência de sessões e falhas/repetições do adaptador Drive com respostas HTTP simuladas. Testes simulados não comprovam consentimento OAuth nem escrita real do site no Google Drive. O relatório em [VERIFICACAO.md](docs/VERIFICACAO.md) distingue testes executados das etapas que dependem de integração e navegador.
+
+## Excluir sessões e visualizar progresso associado
+
+Cada card de **Minhas sessões**, em andamento ou concluído, oferece **Excluir** com confirmação individual. Isso retira a sessão da lista e impede retomada/consulta; tentativas já contabilizadas, acertos, erros, favoritos e revisões continuam no progresso. Escolhas de um simulado não concluído não viram tentativas ao excluir. A exclusão sincroniza no mesmo diário, pertence à conta atual e não é desfeita por backups ou snapshots atrasados. Zerar progresso continua sendo uma ação distinta.
+
+Após associar um banco pessoal ao Sistema, questões e sessões equivalentes exibem a tag **Sistema**, com indicação de progresso associado. O filtro de origem de Desempenho acompanha essa apresentação. IDs, nomes personalizados, fontes originais e dados das respostas permanecem no diário; desfazer a associação restaura a apresentação Pessoal. A exclusão do banco pessoal não desfaz o vínculo já confirmado.

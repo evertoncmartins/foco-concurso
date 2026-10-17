@@ -87,6 +87,7 @@ export function validateEvents(document) {
     else if (e.type === 'session') {
       const s = e.session;
       if (!s || typeof s.id !== 'string' || !Array.isArray(s.queue) || s.queue.length > 5000 || s.queue.some(k => typeof k !== 'string') || !Number.isInteger(s.index) || s.index < 0 || s.index > s.queue.length || !s.answers || typeof s.answers !== 'object' || !['smart','random','new','errors','favorites','review','subject','exam'].includes(s.mode)) throw new Error('Sessão inválida.');
+      if(Object.hasOwn(s,'deleted')&&(s.deleted!==true||s.abandoned!==true))throw new Error('Exclusão de sessão inválida.');
       for (const v of Object.values(s.answers)) if (v !== null && !/^[A-H]$/.test(v)) throw new Error('Alternativa da sessão inválida.');
       if (Object.hasOwn(s,'progressEpoch') && s.progressEpoch!==null && (typeof s.progressEpoch!=='string'||!s.progressEpoch||s.progressEpoch.length>300)) throw new Error('Etapa da sessão inválida.');
       if (Object.hasOwn(e,'progressEpoch') && e.progressEpoch!==(s.progressEpoch??null)) throw new Error('Etapa da sessão inconsistente.');
@@ -103,6 +104,9 @@ export function mergeEvents(...collections) {
 export function derive(events, now = Date.now(), systemBanks=[]) {
   const banks = new Map(), states = new Map(), metadata=new Map(), systemStates=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], flagEvents=[],bankHistory=[], sessionUpdatedAt=new Map();
   const ordered=mergeEvents(events),progressEpoch=ordered.findLast(e=>e.type==='progress-reset')?.id??null;
+  // Deletion wins over later/offline session snapshots and old backups. Keep
+  // answers in the progress journal; this operation removes only the session.
+  const deletedSessions=new Set(ordered.filter(e=>e.type==='session'&&e.session.deleted===true&&studyEpoch(e)===progressEpoch).map(e=>e.session.id));
   const aliases=new Map(ordered.filter(e=>e.type==='bank'&&personalBankId(e.bank.id)!==e.bank.id).map(e=>[e.bank.id,personalBankId(e.bank.id)]));
   const keyAlias=(key,origin)=>origin==='system'?key:aliases.has(key.split(':')[0])?`${aliases.get(key.split(':')[0])}${key.slice(key.indexOf(':'))}`:key;
   for (const e of ordered) {
@@ -119,6 +123,7 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
       const key=keyAlias(e.key,e.sourceType);answers.push({...e,key,bankId:key.split(':')[0],sourceType:sourceType(e)});
     }
   }
+  for(const id of deletedSessions){sessions.delete(id);sessionUpdatedAt.delete(id);}
   const links=deriveProgressLinks(ordered,bankHistory,systemBanks);
   for(const e of answers){
       const key=linkedStudyKey(e,e.key,links.keys,bankHistory);e.progressKey=key;const p = progress.get(key) || {attempts:0, correct:0, wrong:0, streak:0};
@@ -144,7 +149,7 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
   const uniqueQuestions=[...new Map(questions.map(q=>[q.progressKey,q])).values()];
   const correct = answers.filter(e => e.correct).length;
   const stats = {attempts:answers.length, correct, wrong:answers.length-correct, accuracy:answers.length?Math.round(correct/answers.length*100):0, answered:uniqueQuestions.filter(q=>progress.has(q.progressKey)).length, pending:uniqueQuestions.filter(q=>!progress.has(q.progressKey)).length, errors:uniqueQuestions.filter(q=>progress.get(q.progressKey)?.lastCorrect===false).length, favorites:uniqueQuestions.filter(q=>flags.get(q.progressKey)?.favorite).length, review:uniqueQuestions.filter(q=>flags.get(q.progressKey)?.review || (progress.has(q.progressKey)&&Date.parse(progress.get(q.progressKey).due)<=now)).length};
-  return {banks:visibleBanks,systemBanks:native,personalBanks:personal,questions,progress,flags,answers,sessions:[...sessions.values()],stats,progressEpoch,bankHistory,sessionUpdatedAt,bankLinks:links.banks,progressLinks:links.keys};
+  return {banks:visibleBanks,systemBanks:native,personalBanks:personal,questions,progress,flags,answers,sessions:[...sessions.values()],stats,progressEpoch,bankHistory,sessionUpdatedAt,deletedSessions,bankLinks:links.banks,progressLinks:links.keys};
 }
 export function filterQuestions(model, options, now = Date.now()) {
   return model.questions.filter(q => {

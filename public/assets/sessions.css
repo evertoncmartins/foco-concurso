@@ -28,3 +28,9 @@
 .historical-result-info{max-width:680px;margin:12px auto 20px;font-size:12px;color:var(--muted);line-height:1.7;overflow-wrap:anywhere}
 .result-unavailable{padding:18px;font-size:13px;color:var(--muted);line-height:1.7}
 @media(max-width:700px){.saved-sessions{grid-template-columns:1fr;gap:13px}.saved-session{padding:19px}.saved-session h2{font-size:16px}.history-filters{padding:16px;gap:13px}.history-filter{flex-basis:100%;max-width:none}.session-status-tabs{justify-content:space-between}.session-status-tabs button{padding-inline:10px;flex:1}.saved-session footer .btn{min-height:44px}.session-pagination{gap:12px}.session-pagination .btn{min-height:44px}.historical-result-info{font-size:11px}}
+.saved-session footer{gap:10px;justify-content:space-between;flex-wrap:wrap}
+.saved-session footer .btn{white-space:normal;text-align:center;gap:7px}
+.saved-session .session-delete{color:var(--muted)}
+.saved-session .session-delete:hover{color:var(--error);border-color:var(--error)}
+.session-association-note{font-size:11px;line-height:1.7;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
+@media(max-width:700px){.saved-session footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.saved-session footer .btn{width:100%;min-width:0;min-height:44px}}

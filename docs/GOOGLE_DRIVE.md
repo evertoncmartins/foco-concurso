@@ -121,3 +121,9 @@ Consentimento real e escrita do **site** precisam ser verificados após o client
 Os bancos nativos são carregados do projeto e do catálogo público da plataforma, sem login ou Drive. Os seus bancos importados continuam pessoais. Renomeações usam eventos de metadados com IDs estáveis, sem renomear arquivos físicos. Questões, sessões e respostas identificam a origem Sistema/Pessoal. Versões históricas dos bancos nativos utilizados podem integrar o diário para conservar sessões e resultados; essas cópias não alteram o catálogo global. A sincronização usa o mesmo arquivo principal por conta. Consulte [BANCOS_SISTEMA.md](BANCOS_SISTEMA.md).
 
 Os bancos globais são publicados exclusivamente pelo GitHub, na pasta `public/data/question-banks/`. O catálogo e as revisões são gerados no build; não existe gravação administrativa por Blob ou envio dos arquivos pessoais ao repositório.
+
+## Exclusão individual de sessões — 1.21.0
+
+**Minhas sessões → Excluir** remove somente a sessão escolhida, após confirmação. Respostas já contabilizadas e marcas continuam no progresso. O aplicativo registra um snapshot de sessão com `deleted: true` e `abandoned: true`, usando o tipo de evento já existente. A exclusão prevalece sobre estados posteriores de clientes offline, inclusive na reconciliação de colisões, sem apagar o diário nem fazer sessões antigas reaparecerem. Falhas de envio mantêm a exclusão local pendente; outra conta não é afetada. Backups continuam contendo os eventos históricos necessários para preservar progresso e sincronização.
+
+A tag mostrada em estudos/sessões associados reflete o destino Sistema verificado por conteúdo. Uma nota informa a origem Pessoal preservada no histórico. Esse ajuste é de apresentação: não regrava IDs, respostas, gabaritos, nomes personalizados ou a origem da prova.

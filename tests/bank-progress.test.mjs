@@ -7,9 +7,9 @@ import {Store} from '../src/store.mjs';
 import {TemporaryStorage} from '../src/temporary-storage.mjs';
 import {AccountStorage} from '../src/account.mjs';
 import {validateSystemBank} from '../src/system-banks.mjs';
-import {questionSource,sessionQuestion} from '../src/bank-source.mjs';
+import {questionSource,sessionQuestion,studyPresentation,sourceTag} from '../src/bank-source.mjs';
 import {createSession,chooseAnswer,completeSession} from '../src/session.mjs';
-import {performanceForBank,sessionLibrary,sessionReport} from '../src/sessions-view.mjs';
+import {performanceForBank,sessionLibrary,sessionReport,sessionSummary,bankSelect} from '../src/sessions-view.mjs';
 const raw=JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url)));
 const native=validateSystemBank({...raw,id:'lei-8112',revision:'test-revision',questions:raw.questions.slice(0,3)});
 const personal=validateBank({...native,id:'my-original-questions',name:'Meu banco'});
@@ -23,6 +23,20 @@ test('bancos equivalentes continuam separados até a associação explícita',as
   const store=await fixture();await study(store,personal.id);const m=store.model();
   assert.equal(m.progress.has(`${native.id}:${native.questions[0].id}`),false);
   assert.equal(progressLinkCandidates(m,m.personalBanks[0]).length,1);assert.equal(m.stats.attempts,1);
+});
+test('tag, sessões e filtros mostram destino Sistema após associar e excluir o pessoal, preservando origem real',async()=>{
+  const store=await fixture(),s=await study(store,personal.id),original=structuredClone(store.events);
+  await store.associateBank(personal.id,native.id);await store.add([{type:'bank-state',bankId:personal.id,value:'deleted'}]);let m=store.model();
+  const q=sessionQuestion(m,s,s.queue[0]),shown=studyPresentation(m,q);assert.equal(shown.sourceType,'system');assert.equal(shown.associatedFrom.sourceType,'personal');assert.equal(q.sourceType,'personal');
+  assert(sourceTag(shown).includes('Sistema, com progresso associado'));assert.deepEqual(sessionSummary(s,m).sources,['system']);assert(sessionSummary(s,m).associated);assert(bankSelect(m).includes('Sistema (histórico associado)'));
+  const done=completeSession(s,[q]);await store.add(done.events);m=store.model();const report=sessionReport(done.session,m);assert.equal(report.questions[0].presentation.sourceType,'system');assert.equal(report.questions[0].sourceType,'personal');assert.equal(report.correct,1);
+  assert(original.every(e=>JSON.stringify(store.events.find(x=>x.id===e.id))===JSON.stringify(e)));
+  await store.unlinkBank(personal.id);m=store.model();assert.deepEqual(sessionSummary(done.session,m).sources,['personal']);assert.equal(sessionReport(done.session,m).questions[0].presentation.sourceType,'personal');
+});
+test('apresentação não atribui Sistema a questão diferente ou a banco sem associação verificada',async()=>{
+  const store=await fixture(),s=await study(store,personal.id);await store.associateBank(personal.id,native.id);const m=store.model(),q=sessionQuestion(m,s,s.queue[0]);
+  assert.equal(studyPresentation(m,{...q,statement:'Outro conteúdo'}).sourceType,'personal');assert.equal(studyPresentation({...m,systemBanks:[]},q).sourceType,'personal');
+  assert.equal(studyPresentation({...m,progressLinks:new Map()},q).sourceType,'personal');
 });
 test('comparação exige todo o conteúdo e o gabarito, recusando correspondência parcial ou ambígua',()=>{
   assert(bankProgressPlan(personal,native));
@@ -41,7 +55,7 @@ test('associação soma tentativas reais sem duplicá-las e preserva origem, rev
   assert.equal(m.stats.attempts,2);assert.equal(m.stats.correct,1);assert.equal(m.stats.wrong,1);assert.equal(m.stats.answered,1);
   assert.equal(m.progress.get(target).attempts,2);assert.equal(m.progress.get(target).lastAt,before.progress.get(target).lastAt);assert.equal(m.flags.get(target).favorite,true);assert.equal(m.flags.get(target).review,true);
   assert.equal(m.personalBanks[0].enabled,false);assert.equal(m.personalBanks[0].linkedTo.toBankId,native.id);
-  assert.equal(performanceForBank(m,native.id).stats.attempts,2);assert.equal(performanceForBank(m,native.id,'personal').stats.attempts,1);
+  assert.equal(performanceForBank(m,native.id).stats.attempts,2);assert.equal(performanceForBank(m,native.id,'personal').stats.attempts,0);assert.equal(performanceForBank(m,native.id,'system').stats.attempts,2);
   assert.equal(m.answers.find(a=>a.bankId===personal.id).sourceType,'personal');assert(originals.every(e=>JSON.stringify(store.events.find(x=>x.id===e.id))===JSON.stringify(e)));
   assert.equal(filterQuestions(m,{mode:'new',banks:[native.id]}).length,2);assert.equal(filterQuestions(m,{mode:'favorites',banks:[native.id]}).length,1);
   const count=store.events.length;assert.equal(await store.associateBank(personal.id,native.id),false);assert.equal(store.events.length,count);
