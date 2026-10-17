@@ -81,7 +81,7 @@ export function bankCardView(bank,{detailsOpen=false,index=0,association=null}={
       <div class="bank-management">
         ${bank.linkedTo?`<button class="btn small" data-action="bank-unlink" data-bank="${esc(bank.id)}">Desfazer associação</button>`:`<button class="btn small" data-action="bank-toggle" data-bank="${esc(bank.id)}">${bank.enabled?'Desativar':'Ativar'} banco</button>`}
         <div class="bank-file-actions">
-          ${sourceType(bank)==='personal'?`<button class="btn small ghost" data-action="bank-rename" data-bank="${esc(bank.id)}">Renomear</button>`:''}
+          ${sourceType(bank)==='personal'?`<button class="btn small" data-action="bank-rename" data-bank="${esc(bank.id)}">Renomear</button>`:''}
           <button class="icon-btn" data-action="bank-export" data-bank="${esc(bank.id)}" aria-label="Exportar ${esc(bank.displayName||bank.name)}" title="Exportar JSON">${icon('download',17)}<span class="bank-action-label">Exportar</span></button>
           ${sourceType(bank)==='personal'?`<button class="icon-btn" data-action="bank-delete" data-bank="${esc(bank.id)}" aria-label="Excluir ${esc(bank.displayName||bank.name)}" title="Excluir banco">${icon('trash',17)}<span class="bank-action-label">Excluir</span></button>`:''}
         </div>

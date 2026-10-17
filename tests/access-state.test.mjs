@@ -111,6 +111,28 @@ async function studyRuntime(options={},mode='smart'){
   return app;
 }
 
+test('excluir uma sessão exige confirmação, preserva progresso e mantém outra sessão ativa no Desktop e Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const app=await studyRuntime({mobile}),id=app.value('session.id');await app.click('select',{option:app.value('model.questions[0].correctOption')});await app.click('answer');
+    const attempts=app.value('model.stats.attempts');await app.click('nav',{view:'sessions'});assert(app.html().includes('data-action="session-delete"'));
+    let pending=app.click('session-delete',{session:id});await tick();assert(app.document.querySelector('#dialog').innerHTML.includes('continuarão no progresso'));app.confirm(false);await pending;assert.equal(app.value('model.sessions.length'),1);
+    await app.value('newSession([model.questions[0].key])');const other=app.value('session.id');pending=app.click('session-delete',{session:id});await tick();app.confirm(true);await pending;
+    assert.equal(app.value('model.sessions.length'),1);assert.equal(app.value('session.id'),other);assert.equal(app.value('config.activeSession'),other);assert.equal(app.value('model.stats.attempts'),attempts);
+    pending=app.click('session-delete',{session:other});await tick();app.confirm(true);await pending;assert.equal(app.value('model.sessions.length'),0);assert.equal(app.value('session'),null);assert.equal(app.value('config.activeSession'),null);assert(app.html().includes('Nenhuma sessão em andamento'));
+  }
+});
+test('exclusão de sessão concluída, falha de gravação e troca de conta respeitam a confirmação',async()=>{
+  const app=await studyRuntime(),id=app.value('session.id');await app.finish();await app.click('nav',{view:'sessions'});await app.click('sessions-tab',{status:'completed'});
+  let pending=app.click('session-delete',{session:id});await tick();app.auth.generation++;app.confirm(true);await pending;assert.equal(app.value('model.sessions.length'),1);
+  await app.value('originalDelete=store.deleteSession.bind(store);store.deleteSession=async()=>{throw new Error("falha local de teste")};');pending=app.click('session-delete',{session:id});await tick();app.confirm(true);await pending;assert.equal(app.value('model.sessions.length'),1);
+  await app.value('store.deleteSession=originalDelete;drive.token="fixture-only";drive.sync=async()=>{throw new Error("offline de teste")};');pending=app.click('session-delete',{session:id});await tick();app.confirm(true);await pending;
+  assert.equal(app.value('model.sessions.length'),0);assert(app.document.querySelector('#toast').textContent.includes('pendente'));
+});
+test('sessão excluída em outra aba fecha a questão sem tocar no progresso ou iniciar login',async()=>{
+  const app=runtime();await app.start();await app.value('newSession([model.questions[0].key])');await app.click('nav',{view:'session'});const calls=app.authorizations;
+  await app.value('store.deleteSession(session.id)');assert.equal(app.value('view'),'sessions');assert.equal(app.value('session'),null);assert.equal(app.value('model.stats.attempts'),0);assert.equal(app.authorizations,calls);assert(app.html().includes('Nenhuma sessão em andamento'));
+});
+
 test('catálogo oficial vazio inicia sem questões de demonstração no Desktop e Mobile',async()=>{
   for(const mobile of [false,true]){
     const app=runtime({mobile,systemBanks:[]});app.auth.signOut();await app.click('guest');
@@ -152,6 +174,8 @@ test('associação pela interface preserva estudo, sincroniza e continua após e
     assert.equal(app.value('model.personalBanks[0].enabled'),false);assert(app.html().includes('Progresso associado'));assert(app.html().includes('data-action="bank-unlink"'));
     pending=app.click('bank-delete',{bank:'my-personal-copy'});await tick();app.confirm(true);await pending;assert.equal(app.value('model.personalBanks.length'),0);
     await app.click('session-resume',{session:sessionId});assert.equal(app.value('view'),'session');assert.equal(app.value('session.id'),sessionId);assert.equal(app.value('model.stats.attempts'),count);
+    assert(app.html().includes('Sistema, com progresso associado'));assert(!app.html().includes('class="bank-source personal"'));
+    assert.equal(app.value('session.questionSources[session.queue[0]].sourceType'),'personal');
   }
 });
 test('troca de conta na confirmação impede associar os dados da sessão anterior',async()=>{

@@ -89,3 +89,9 @@ test('notificação de outra aba atualiza o diário somente da conta corresponde
   await new Store(a).merge([flag('one')]);channels[1].onmessage({data:{subject:'222'}});await new Promise(setImmediate);assert.equal(changed,0);
   channels[1].onmessage({data:messages[0]});await new Promise(setImmediate);assert.equal(changed,1);assert.equal(new Store(b).events.length,1);a.close();b.close();
 });
+test('exclusão de sessão persiste no IndexedDB entre abas e recarga sem retirar o progresso',async()=>{
+  const base=new TemporaryStorage(),driver=new Driver(),one=await openAccountStorage(base,'111',options(driver)),store=new Store(one);await store.add([{type:'bank',bank:personal}]);
+  const q=store.model().questions[0],s=createSession([q.key]),next=chooseAnswer(s,q,q.correctOption);await store.add(next.events);const backup=store.export();
+  const two=await openAccountStorage(base,'111',options(driver)),second=new Store(two);await store.deleteSession(s.id);await second.merge(validateEvents(backup));assert.equal(second.model().sessions.length,0);assert.equal(second.model().stats.attempts,1);
+  const reopened=await openAccountStorage(base,'111',options(driver));assert.equal(new Store(reopened).model().sessions.length,0);assert.equal(new Store(reopened).model().stats.correct,1);one.close();two.close();reopened.close();
+});

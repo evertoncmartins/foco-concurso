@@ -7,6 +7,7 @@ import {openAccountStorage} from '../src/journal-storage.mjs';
 import {coversEvents} from '../src/event-conflicts.mjs';
 import {longBank} from './helpers/long-bank.mjs';
 import {GoogleAccount} from '../src/auth.mjs';
+import {createSession,chooseAnswer,completeSession} from '../src/session.mjs';
 
 class MemoryStorage{data=new Map();get length(){return this.data.size;}key(i){return [...this.data.keys()][i]??null;}getItem(k){return this.data.get(k)??null;}setItem(k,v){this.data.set(k,String(v));}removeItem(k){this.data.delete(k);}}
 const document=(events,subject)=>({schemaVersion:1,app:'foco-concursos',...(subject?{owner:{provider:'google',subject}}:{}),events});
@@ -62,6 +63,13 @@ function server(){
 }
 function syncClient(subject){const storage=subject?new AccountStorage(new MemoryStorage(),subject):new MemoryStorage(),store=new Store(storage),drive=new DriveSync(store,{folderId:'test-folder',clientId:''});drive.token='fixture-only';drive.expires=Date.now()+3600000;return {store,drive};}
 async function withRemote(run){const remote=server(),old=globalThis.fetch;globalThis.fetch=remote.fetch;try{await run(remote);}finally{globalThis.fetch=old;}}
+
+test('Drive: exclusão de sessão converge entre dispositivos e preserva tentativas após falha e backup antigo',()=>withRemote(async remote=>{
+  const first=syncClient('delete-test'),second=syncClient('delete-test'),bank=longBank();await first.store.add([{type:'bank',bank}]);const q=first.store.model().questions[0];let s=createSession([q.key]);let step=chooseAnswer(s,q,q.correctOption);s=step.session;await first.store.add(step.events);await first.drive.sync();await second.drive.sync();
+  const backup=second.store.export();await first.store.deleteSession(s.id);remote.failWrite=true;await assert.rejects(first.drive.sync());assert.equal(first.store.model().sessions.length,0);assert.equal(first.store.model().stats.attempts,1);
+  step=completeSession(s,[q]);await second.store.add(step.events);await second.drive.sync();await first.drive.sync();await second.drive.sync();await second.store.merge(backup.events);await second.drive.sync();
+  assert.equal(first.store.model().sessions.length,0);assert.equal(second.store.model().sessions.length,0);assert.equal(first.store.model().stats.attempts,1);assert.equal(second.store.model().stats.attempts,1);assert.equal(remote.live().length,1);first.drive.close();second.drive.close();
+}));
 
 test('Drive: sessão expirada renova e salva 30 ações pendentes no único arquivo sem perder progresso',()=>withRemote(async remote=>{
   const {store,drive}=syncClient('111'),account=new GoogleAccount('fixture.apps.googleusercontent.com');

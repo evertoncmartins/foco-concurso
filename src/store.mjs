@@ -3,12 +3,15 @@ import {reconcileEvents} from './event-conflicts.mjs';
 import {bankProgressPlan} from './bank-progress.mjs';
 const PREFIX='foco:v1:event:';
 const resetError=()=>Object.assign(new Error('Seu progresso foi reiniciado. Inicie uma nova sessão de estudo.'),{code:'PROGRESS_RESET'});
+const deletedError=()=>Object.assign(new Error('Esta sessão foi excluída. Inicie outra sessão para continuar seus estudos.'),{code:'SESSION_DELETED'});
 export class Store extends EventTarget {
   constructor(storage=globalThis.localStorage) { super(); this.storage=storage; this.events=[];this.systemBanks=[];this.load(); }
   load() { const list=[]; for(let i=0;i<this.storage.length;i++){const key=this.storage.key(i);if(key?.startsWith(PREFIX)){let e;try{e=JSON.parse(this.storage.getItem(key));}catch{throw new Error('Há dados locais corrompidos. Não serão substituídos. Exporte uma cópia antes de restaurar.');}list.push(e);}} this.events=mergeEvents(validateEvents({schemaVersion:1,events:list}));return this.events; }
   async add(items) {
     await this.storage.refresh?.();
     this.load();const epoch=currentProgressEpoch(this.events),hasStudy=items.some(isStudyEvent),resetting=items.some(e=>e.type==='progress-reset');
+    const targets=items.filter(e=>e.type==='answer'||e.type==='session'&&!e.session.deleted).map(e=>e.type==='answer'?e.sessionId:e.session.id);
+    if(targets.length&&targets.some(id=>this.model().deletedSessions.has(id)))throw deletedError();
     const timeline=resetting?this.events.filter(e=>e.type==='progress-reset'):hasStudy?this.events.filter(e=>isStudyEvent(e)&&studyEpoch(e)===epoch):this.events;
     let time=Math.max(Date.now(),Date.parse(timeline.at(-1)?.at||0)+1||0);
     const result=items.map(item=>{
@@ -21,10 +24,15 @@ export class Store extends EventTarget {
       return event;
     });
     const saved=await this.merge(result);
-    if(hasStudy){await this.storage.refresh?.();if(currentProgressEpoch(this.load())!==epoch)throw resetError();}
+    if(hasStudy){await this.storage.refresh?.();if(currentProgressEpoch(this.load())!==epoch)throw resetError();if(targets.some(id=>this.model().deletedSessions.has(id)))throw deletedError();}
     return saved;
   }
   async resetProgress(){return this.add([{type:'progress-reset'}]);}
+  async deleteSession(id){
+    await this.storage.refresh?.();this.load();const session=this.model().sessions.find(s=>s.id===id);
+    if(!session)return false;
+    await this.add([{type:'session',session:{...session,deleted:true,abandoned:true}}]);return true;
+  }
   async associateBank(fromBankId,toBankId){
     this.load();const model=this.model(),source=model.personalBanks.find(b=>b.id===fromBankId),target=model.systemBanks.find(b=>b.id===toBankId);
     if(source?.linkedTo){if(source.linkedTo.toBankId===toBankId)return false;throw new Error('Este banco já está associado. Desfaça a associação antes de escolher outro.');}

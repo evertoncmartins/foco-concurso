@@ -32,7 +32,8 @@ export async function reconcileEvents(...collections){
     // Answers are immutable attempts: retain the first recorded answer. Mutable
     // bank/state/session records retain the most recent version. Ties use content.
     const firstAnswer=candidates.every(([,event])=>event.type==='answer');
-    active.push(candidates[firstAnswer?0:candidates.length-1][1]);
+    const deleted=candidates.filter(([,event])=>event.type==='session'&&event.session.deleted===true);
+    active.push((deleted.at(-1)||candidates[firstAnswer?0:candidates.length-1])[1]);
     if(candidates.length>1)for(const [,event] of candidates){
       const record=await recoveryRecord(event);recoveries.set(record.id,record);
     }
