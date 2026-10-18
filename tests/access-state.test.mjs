@@ -26,7 +26,7 @@ function runtime(options={}){
   function element(classes=''){
     const names=new Set(classes.split(/\s+/).filter(Boolean)),attributes=new Map();
     const events=new Map();
-    return {dataset:{},innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){document.focused=this;},showModal(){this.open=true;},close(){this.open=false;},querySelector(){return null;},addEventListener(name,fn){events.set(name,fn);},removeEventListener(name){events.delete(name);},emit(name,event){events.get(name)?.(event);},scrollIntoView(){}};
+    return {dataset:{},innerHTML:'',textContent:'',content:'',open:false,title:'',classList:{add(name){names.add(name);},remove(name){names.delete(name);},contains(name){return names.has(name);},toggle(name,force){const active=force??!names.has(name);if(active)names.add(name);else names.delete(name);return active;}},setAttribute(name,value){attributes.set(name,String(value));},getAttribute(name){return attributes.get(name)??null;},focus(){document.focused=this;},showModal(){this.open=true;this.opens=(this.opens||0)+1;},close(){this.open=false;},querySelector(){return null;},addEventListener(name,fn){events.set(name,fn);},removeEventListener(name){events.delete(name);},emit(name,event){events.get(name)?.(event);},scrollIntoView(){}};
   }
   const node=selector=>{
     if(!nodes.has(selector)){
@@ -36,6 +36,9 @@ function runtime(options={}){
         let html='';Object.defineProperty(el,'innerHTML',{get:()=>html,set:value=>{
           html=value;renders++;const question=html.match(/class="question-body" data-question="([^"]+)"/);
           if(question)nodes.set('.question-body',{dataset:{question:question[1]},scrollTop:0,focus(){document.focused='.question-body';}});else nodes.delete('.question-body');
+          const finish=html.match(/<button class="btn primary session-finish"[^>]*>/)?.[0];
+          nodes.delete('.question-actions [data-action=finish]');
+          if(finish){const button=element();button.disabled=/\bdisabled\b/.test(finish);button.hidden=false;button.getClientRects=()=>options.finishHidden?[]:[{}];nodes.set('.question-actions [data-action=finish]',button);}
           for(const key of nodes.keys())if(key.startsWith('[data-option-row='))nodes.delete(key);
           for(const [,classes,id,content] of html.matchAll(/<div class="(option [^"]*)" data-option-row="([^"]+)"[^>]*>([\s\S]*?)<\/div>/g)){
             const row=element(classes),control=element('option-cut'),tag=content.match(/<button[^>]*class="option-cut"[^>]*>/)?.[0]||'';
@@ -52,7 +55,7 @@ function runtime(options={}){
   };
   const document={documentElement:{dataset:{theme:'light'}},fullscreenElement:null,addEventListener(name,fn){(listeners[name]??=[]).push(fn);},querySelector(selector){
     if(['.sync-label','.connection-card'].includes(selector))return node('#app').innerHTML.includes('class="'+selector.slice(1)+'"')?node(selector):null;
-    if(selector==='.question-body'||selector.startsWith('[data-option-row='))return nodes.get(selector)||null;
+    if(selector==='.question-body'||selector==='.question-actions [data-action=finish]'||selector.startsWith('[data-option-row='))return nodes.get(selector)||null;
     if(['#app','#toast','#dialog','#main','#bank-file','#progress-file','#profile-photo-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
     if(selector==='dialog[open],[aria-modal="true"]:not([hidden])'&&options.otherModal)return element();
     return null;
@@ -60,7 +63,7 @@ function runtime(options={}){
   document.documentElement.requestFullscreen=async requestOptions=>{document.fullscreenRequests=(document.fullscreenRequests||0)+1;document.requestOptions=requestOptions;if(options.fullscreenError)throw new Error('Requires user activation');document.fullscreenElement=document.documentElement;await document.emit('fullscreenchange',{});};
   if(options.fullscreenUnavailable)delete document.documentElement.requestFullscreen;
   document.exitFullscreen=async()=>{document.fullscreenElement=null;await document.emit('fullscreenchange',{});};
-  const windowEvents={},window={location:{origin:'https://foco-concurso-wine.vercel.app',href:'https://foco-concurso-wine.vercel.app/'},addEventListener(name,fn){(windowEvents[name]??=[]).push(fn);},scrollTo(){}};
+  const windowEvents={},window={location:{origin:'https://foco-concurso-wine.vercel.app',href:'https://foco-concurso-wine.vercel.app/'},getComputedStyle(node){return {visibility:node.visibility||'visible'};},addEventListener(name,fn){(windowEvents[name]??=[]).push(fn);},scrollTo(){}};
   const history=[null];let historyPosition=0;
   window.history={get state(){return history[historyPosition];},pushState(state){history.splice(++historyPosition);history.push(state);},replaceState(state){history[historyPosition]=state;},go(delta){queueMicrotask(()=>{historyPosition+=delta;for(const fn of windowEvents.popstate??[])fn({state:history[historyPosition]});});}};
   if(options.realDocuments){
@@ -624,9 +627,10 @@ test('três botões mantêm registro no centro, limites de navegação e revisã
     assert.equal(app.value('session.index'),0);assert.equal(app.value('model.stats.correct'),1);
     await app.click('next');await app.click('previous');assert.match(app.html(),/Resposta correta/);
     await app.click('answer');assert.equal(app.value('model.stats.attempts'),1);
-    await app.click('next');await app.click('next');assert.equal(app.value('session.index'),2);assert.match(controls(),/data-action="next"[^>]*disabled/);
+    await app.click('next');await app.click('next');assert.equal(app.value('session.index'),2);assert(!controls().includes('data-action="next"'));
     const end=app.value('JSON.stringify(store.events)');await app.click('next');assert.equal(app.value('JSON.stringify(store.events)'),end);assert.equal(app.value('view'),'session');
-    assert.match(app.html(),/data-action="finish">Concluir sessão/);
+    assert.match(controls(),/class="btn primary session-finish" data-action="finish"/);
+    assert.equal((app.html().match(/data-action="finish"/g)||[]).length,1);
   }
 });
 
@@ -703,8 +707,9 @@ test('Enter registra, passa o foco para Próxima e depois avança uma única que
     await app.keyEvent({key:'ArrowLeft'});assert.equal(app.value('session.index'),0);
     await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),1);
     await app.keyEvent({key:'ArrowRight'});assert.equal(app.value('session.index'),2);
-    await app.keyEvent({key:'b'});await app.keyEvent({key:'Enter'});const end=app.value('JSON.stringify(store.events)');
-    await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),2);assert.equal(app.value('view'),'session');
+    await app.keyEvent({key:'b'});await app.key('Enter','answer');const end=app.value('JSON.stringify(store.events)');
+    assert.equal(app.document.focused,app.document.querySelector('.question-actions [data-action=finish]'));
+    await app.keyEvent({key:'Enter',repeat:true});assert.equal(app.value('session.index'),2);assert.equal(app.value('view'),'session');
     assert.equal(app.value('JSON.stringify(store.events)'),end);assert.equal(app.value('session.completed'),false);
   }
 });
@@ -734,7 +739,7 @@ test('T e Enter Desktop respeitam editores, controles próprios, modais, composi
 
 test('Enter mantém a ação nativa de outros botões e trata elementos internos de Próxima uma vez',async()=>{
   const app=await studyRuntime();await app.keyEvent({key:'a'});
-  for(const action of ['toggle-cut','previous','flag','toggle-theme','finish']){
+  for(const action of ['toggle-cut','previous','flag','toggle-theme']){
     const button={dataset:{action}},target={dataset:{},closest:selector=>selector==='button'?button:null};
     assert.equal((await app.keyEvent({key:'Enter',target})).defaultPrevented,false);
     assert.equal(app.value('JSON.stringify(session.answers)'),'{}');assert.equal(app.value('session.index'),0);
@@ -760,7 +765,138 @@ test('Enter aguarda gravação, não duplica resposta nem navegação e conserva
   assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.value('working'),false);
 });
 
-test('Mobile mantém C como alternativa, tesoura por toque e Enter apenas para registrar',async()=>{
+test('último botão alterna entre Próxima e Concluir na mesma posição, inclusive em sessão única',async()=>{
+  for(const mobile of [false,true])for(const mode of ['smart','exam'])for(const count of [1,3]){
+    const app=await studyRuntime({mobile},mode);
+    await app.value(`(async()=>{await newSession(model.questions.slice(0,${count}).map(q=>q.key),'${mode}');await navigate('session');})()`);
+    const actions=()=>[...app.html().match(/<div class="question-actions">([\s\S]*?)<\/div>/)[1].matchAll(/data-action="([^"]+)"/g)].map(m=>m[1]);
+    assert.deepEqual(actions(),['previous','answer',count===1?'finish':'next']);
+    for(let i=1;i<count;i++)await app.click('next');
+    assert.deepEqual(actions(),['previous','answer','finish']);
+    assert.equal((app.html().match(/data-action="finish"/g)||[]).length,1);
+    assert(!app.html().includes('data-action="next"'));
+    assert.match(app.html(),/class="btn primary session-finish"[^>]*aria-label="Concluir sessão"[^>]*aria-keyshortcuts="Enter"/);
+    assert(!app.html().includes('text-link session-finish'));
+    await app.click('toggle-theme');assert.deepEqual(actions(),['previous','answer','finish']);
+    if(!mobile){await app.click('toggle-focus');assert.match(app.html(),/<span>Concluir sessão<\/span><kbd class="question-nav-key">Enter<\/kbd>/);}
+    const before=app.value('JSON.stringify(session.answers)');
+    if(count>1){
+      await app.click('previous');assert.deepEqual(actions(),['previous','answer','next']);assert(!app.html().includes('data-action="finish"'));
+      assert.equal(app.document.focused,'.question-body');
+      await app.keyEvent({key:'Enter'});assert.equal(app.value('view'),'session');assert.equal(app.document.querySelector('#dialog').open,false);
+      await app.click('next');assert.deepEqual(actions(),['previous','answer','finish']);
+      assert.equal(app.document.focused,app.document.querySelector('.question-actions [data-action=finish]'));
+    }
+    assert.equal(app.value('JSON.stringify(session.answers)'),before);
+  }
+});
+
+test('clique e Enter concluem uma única vez, preservando respostas, resultados e sincronização',async()=>{
+  for(const mobile of [false,true])for(const mode of ['smart','exam'])for(const count of [1,3])for(const input of ['click','enter','button']){
+    const app=await studyRuntime({mobile},mode);
+    await app.value(`(async()=>{await newSession(model.questions.slice(0,${count}).map(q=>q.key),'${mode}');await navigate('session');})()`);
+    if(!mobile&&input==='button')await app.click('toggle-focus');
+    for(let i=0;i<count;i++){
+      await app.click('select',{option:app.value('sessionQuestion(model,session,session.queue[session.index]).correctOption')});await app.click('answer');
+      if(i<count-1)await app.click('next');
+    }
+    const answers=app.value('JSON.stringify(session.answers)');
+    app.value('var finishSyncs=0;drive.token="fixture-only";drive.sync=async()=>{finishSyncs++;};');
+    if(input==='click')await app.click('finish');
+    else if(input==='enter')await app.keyEvent({key:'Enter'});
+    else {
+      const finish={dataset:{action:'finish'}},child={dataset:{},closest:selector=>selector==='button'?finish:null};
+      assert.equal((await app.keyEvent({key:'Enter',target:child})).defaultPrevented,true);
+    }
+    assert.equal(app.value('view'),'result');assert(app.value('session.completed'));assert.equal(app.value('config.activeSession'),null);
+    assert.equal(app.value('JSON.stringify(session.answers)'),answers);assert.equal(app.value('model.stats.attempts'),count);assert.equal(app.value('model.stats.correct'),count);
+    assert.equal(app.value('store.events.filter(e=>e.type==="session"&&e.session.id===session.id&&e.session.completed).length'),1);
+    assert.equal(app.value('finishSyncs'),1);
+    const saved=app.value('JSON.stringify(store.events)');await app.keyEvent({key:'Enter',repeat:true});await app.keyEvent({key:'Enter'});await app.click('finish');
+    assert.equal(app.value('JSON.stringify(store.events)'),saved);assert.equal(app.value('finishSyncs'),1);
+  }
+});
+
+test('Enter na última sem resposta mantém confirmação, cancelamento, foco e bloqueio da tecla mantida',async()=>{
+  for(const mobile of [false,true])for(const count of [1,3]){
+    const app=await studyRuntime({mobile});
+    await app.value(`(async()=>{await newSession(model.questions.slice(0,${count}).map(q=>q.key));await navigate('session');})()`);
+    for(let i=1;i<count;i++)await app.click('next');
+    await app.click('select',{option:'B'});const before=app.value('JSON.stringify(store.events)');
+    let pending=app.keyEvent({key:'Enter'});await tick();
+    assert(app.document.querySelector('#dialog').open);assert(app.value('finishingSession'));assert(app.value('working'));
+    const confirmation={dataset:{},closest:selector=>selector==='button'?confirmation:null};
+    assert.equal((await app.keyEvent({key:'Enter',repeat:true,target:confirmation})).defaultPrevented,true);
+    await app.keyEvent({key:'Enter'});await app.click('finish');
+    assert.equal(app.document.querySelector('#dialog').opens,1);
+    app.confirm(false);await pending;
+    assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.value('selected'),'B');assert.equal(app.value('view'),'session');
+    assert.equal(app.document.focused,app.document.querySelector('.question-actions [data-action=finish]'));assert(!app.value('finishingSession'));assert(!app.value('working'));
+    if(count>1){await app.click('previous');await app.keyEvent({key:'Enter'});assert.equal(app.document.querySelector('#dialog').open,false);await app.click('next');}
+    pending=app.keyEvent({key:'Enter'});await tick();app.confirm(true);await pending;
+    assert.equal(app.value('view'),'result');assert.equal(app.value('model.stats.attempts'),0);assert.equal(app.value('model.stats.wrong'),0);
+    assert.equal(app.value('Object.values(session.answers).filter(v=>v===null).length'),count);
+  }
+});
+
+test('conclusão pendente bloqueia cliques e Enter concorrentes; falha conserva sessão e permite repetir',async()=>{
+  for(const mobile of [false,true])for(const mode of ['smart','exam']){
+    const app=await studyRuntime({mobile},mode);
+    await app.value(`(async()=>{await newSession([model.questions[0].key],'${mode}');await navigate('session');})()`);
+    await app.click('select',{option:'A'});await app.click('answer');
+    app.value('var unlockFinish,finishWrites=0;const addFinish=store.add.bind(store);store.add=async events=>{finishWrites++;await new Promise(resolve=>unlockFinish=resolve);return addFinish(events);};');
+    const pending=app.keyEvent({key:'Enter'});assert(app.value('working'));assert(app.value('finishingSession'));
+    for(const repeat of [true,false,true])await app.keyEvent({key:'Enter',repeat});
+    await app.click('finish');await app.click('previous');await app.value('finish()');
+    assert.equal(app.value('finishWrites'),1);assert.equal(app.value('session.completed'),false);
+    app.value('unlockFinish()');await pending;assert.equal(app.value('view'),'result');assert(!app.value('finishingSession'));assert(!app.value('working'));
+    const failed=await studyRuntime({mobile},mode);
+    await failed.value(`(async()=>{await newSession([model.questions[0].key],'${mode}');await navigate('session');})()`);
+    await failed.click('select',{option:'A'});await failed.click('answer');
+    const saved=failed.value('JSON.stringify(store.events)'),sessionBefore=failed.value('JSON.stringify(session)');
+    failed.value('const addFailedFinish=store.add.bind(store);store.add=async()=>{throw new Error("falha de conclusão de teste");};failure=()=>{};');
+    await failed.keyEvent({key:'Enter'});
+    assert.equal(failed.value('JSON.stringify(store.events)'),saved);assert.equal(failed.value('JSON.stringify(session)'),sessionBefore);assert.equal(failed.value('view'),'session');
+    assert(!failed.value('finishingSession'));assert(!failed.value('working'));assert.equal(failed.document.focused,failed.document.querySelector('.question-actions [data-action=finish]'));
+    failed.value('store.add=addFailedFinish;');await failed.click('finish');assert.equal(failed.value('view'),'result');
+  }
+});
+
+test('Enter só conclui com botão visível e habilitado e respeita campos, links, modais e modificadores',async()=>{
+  for(const mobile of [false,true]){
+    const options={mobile},app=await studyRuntime(options);
+    await app.click('next');await app.click('next');const before=app.value('JSON.stringify(store.events)'),button=app.document.querySelector('.question-actions [data-action=finish]');
+    for(const state of ['disabled','hidden','finishHidden']){
+      if(state==='finishHidden')options.finishHidden=true;else button[state]=true;
+      await app.keyEvent({key:'Enter'});await app.key('Enter','finish');
+      assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.document.querySelector('#dialog').open,false);
+      if(state==='finishHidden')options.finishHidden=false;else button[state]=false;
+    }
+    button.visibility='hidden';await app.keyEvent({key:'Enter'});assert.equal(app.document.querySelector('#dialog').open,false);button.visibility='visible';
+    const control=selector=>({dataset:{},closest(selectors){return selectors.split(',').includes(selector)?this:null;}});
+    for(const selector of ['input','textarea','select','summary','a[href]','[contenteditable]:not([contenteditable="false"])','[role="slider"]']){
+      assert.equal((await app.keyEvent({key:'Enter',target:control(selector)})).defaultPrevented,false);
+      await app.keyEvent({key:'Enter',composedPath:()=>[control(selector)]});
+    }
+    for(const modifier of ['altKey','ctrlKey','metaKey','shiftKey','isComposing','defaultPrevented'])await app.keyEvent({key:'Enter',[modifier]:true});
+    options.otherModal=true;await app.keyEvent({key:'Enter'});options.otherModal=false;
+    app.value('restoration={state:"loading"};');await app.keyEvent({key:'Enter'});app.value('restoration=null;');
+    assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.document.querySelector('#dialog').open,false);
+    await app.click('previous');await app.key('Enter','finish');assert.equal(app.value('view'),'session');assert.equal(app.document.querySelector('#dialog').open,false);
+  }
+});
+
+test('Enter em Registrar na última registra antes de focar Concluir, no Desktop e Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const app=await studyRuntime({mobile});await app.value('(async()=>{await newSession([model.questions[0].key]);await navigate("session");})()');
+    await app.click('select',{option:'A'});await app.key('Enter','answer');
+    assert.equal(app.value('session.answers[session.queue[0]]'),'A');assert.equal(app.value('session.completed'),false);
+    assert.equal(app.document.focused,app.document.querySelector('.question-actions [data-action=finish]'));
+    await app.key('Enter','finish');assert.equal(app.value('view'),'result');assert.equal(app.value('model.stats.attempts'),1);
+  }
+});
+
+test('Mobile mantém C como alternativa, tesoura por toque e Enter para registrar nas questões intermediárias',async()=>{
   const app=await studyRuntime({mobile:true});await app.keyEvent({key:'c'});assert.equal(app.value('selected'),'C');
   await app.keyEvent({key:'c'});assert(!cutRow(app,'C').classList.contains('eliminated'));
   await app.click('toggle-cut',{option:'C'});assert(cutRow(app,'C').classList.contains('eliminated'));
