@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -94,7 +94,7 @@ function runtime(options={}){
     }
   }
   class FixtureStore extends Store{constructor(storage){super(storage);if(!this.events.length&&!options.systemBanks){this.storage.setItem('foco:v1:event:builtin-lei-8112-v1',JSON.stringify({id:'builtin-lei-8112-v1',at:'2026-10-08T00:00:00.000Z',type:'bank',bank}));this.load();}}}
-  class FixtureCatalog{constructor(){this.banks=options.systemBanks||[];}async load(){return this.banks;}}
+  class FixtureCatalog{constructor(){this.banks=options.systemBanks||[];}async load(settings){if(options.catalogLoad)this.banks=await options.catalogLoad(settings);return this.banks;}}
   const Documents=options.realDocuments?class extends imports.PublicDocuments{constructor(settings){super({...settings,document,window});}}:class{constructor(options){this.options=options;}open(){this.context=this.options.getContext();}return(){return this.options.onReturn(this.context);}};
   const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,PublicDocuments:Documents,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window,console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
@@ -107,6 +107,37 @@ function runtime(options={}){
   };
   return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),confirm:accepted=>node(accepted?'#confirm-ok':'#confirm-cancel').onclick(),finish:async()=>{const pending=document.emit('click',{target:target({action:'finish'})});await tick();if(node('#dialog').open)node('#confirm-ok').onclick();await pending;},key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
 }
+
+test('catálogo sincroniza na abertura e no botão com loading, remoções e histórico no Desktop e Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const native=imports.validateSystemBank({...bank,id:'lei-8112',name:'Lei nº 8.112/1990'}),extra=imports.validateSystemBank({...bank,id:'lei-12345',name:'Lei nº 12.345/2010'});
+    let response=[native],wait=null,calls=0,offline=false;
+    const app=runtime({mobile,systemBanks:[native],catalogLoad:async()=>{calls++;if(wait)await wait.promise;if(offline)throw new Error('Falha de consulta de teste.');return response;}});
+    await app.start();
+    await app.value(`(async()=>{await newSession([model.questions[0].key]);await store.add(chooseAnswer(session,model.questions[0],model.questions[0].correctOption).events);})()`);
+    const journal=app.value('JSON.stringify(store.events)');wait=deferred();response=[native,extra];
+    await app.click('nav',{view:'banks'});assert(app.html().includes('Sincronizando…'));assert.equal(app.value('working'),false);
+    const opened=calls;await app.click('refresh-system-banks');assert.equal(calls,opened);
+    wait.resolve();await tick();assert(app.html().includes('Lei nº 12.345/2010'));assert(!app.html().includes('Sincronizando…'));
+    wait=deferred();response=[];const refresh=app.click('refresh-system-banks');await tick();
+    assert(app.html().includes('aria-busy="true" disabled'));assert(app.html().includes('Lei nº 12.345/2010'));
+    wait.resolve();await refresh;assert(app.html().includes('Indisponível'));assert(!app.html().includes('Lei nº 12.345/2010'));
+    assert.equal(app.value('model.banks.length'),0);assert.equal(app.value('JSON.stringify(store.events)'),journal);
+    await app.click('bank-history',{bank:native.id});assert.equal(app.value('view'),'sessions');assert.equal(app.value('sessionFilters.bankId'),native.id);assert.equal(app.value('sessionFilters.status'),'open');
+    wait=null;response=[native];await app.click('nav',{view:'banks'});await tick();assert(!app.html().includes('Indisponível'));
+    offline=true;await app.click('refresh-system-banks');assert(app.html().includes('Falha de consulta de teste.'));assert(app.html().includes('Lei nº 8.112/1990'));assert(!app.html().includes('Sincronizando…'));
+    assert.equal(app.value('JSON.stringify(store.events)'),journal);
+  }
+});
+
+test('consulta pendente não aplica resultado à conta encerrada nem interrompe outra operação',async()=>{
+  const native=imports.validateSystemBank({...bank,id:'lei-8112',name:'Lei nº 8.112/1990'});let wait=null;
+  const app=runtime({systemBanks:[native],catalogLoad:async()=>{if(wait)await wait.promise;return [native];}});await app.start();
+  await app.click('nav',{view:'banks'});await tick();wait=deferred();
+  const refresh=app.click('refresh-system-banks');await tick();app.value('working=true');wait.resolve();await refresh;assert.equal(app.value('working'),true);
+  app.value('working=false');wait=deferred();const pending=app.click('refresh-system-banks');await tick();await app.click('logout');wait.resolve();await pending;
+  assert.equal(app.value('store'),null);assert.equal(app.value('systemCatalogSyncing'),false);assert(!app.html().includes('Banco de questões'));
+});
 
 async function studyRuntime(options={},mode='smart'){
   const app=runtime(options);app.auth.signOut();await app.click('guest');

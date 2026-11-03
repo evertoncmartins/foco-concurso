@@ -8,6 +8,10 @@ Essa pasta é a fonte dos bancos do Sistema. Para disponibilizar um banco a todo
 
 Não é necessário editar um catálogo, cadastrar o arquivo no código ou configurar armazenamento. O build descobre todos os arquivos de banco e gera `dist/data/question-banks/index.json`. Esse índice é um resultado da publicação e não deve ser enviado ou mantido manualmente. Um `index.json` antigo na pasta de origem é ignorado.
 
+Ao abrir **Banco de questões**, o Foco consulta novamente o catálogo. O botão **Sincronizar** permite repetir essa consulta e mostra **Sincronizando…** enquanto busca e valida os arquivos. Novos bancos ganham um card automaticamente; bancos removidos saem da lista. Para quem tem respostas ou sessões consultáveis daquela lei na etapa atual de estudos, o card permanece como **Indisponível**, com acesso às sessões e aos detalhes históricos, sem habilitar novos estudos. A sincronização não altera respostas, notas, sessões, bancos pessoais ou preferências. Se a consulta falhar, o último catálogo carregado é mantido.
+
+No desenvolvimento com `npm run dev`, os bancos são lidos diretamente de `public/data/question-banks/` a cada consulta, sem refazer o build para adicionar, atualizar ou remover uma lei. No endereço publicado, é necessário enviar a mudança à branch `main` do GitHub e aguardar a publicação terminar. O botão consulta os arquivos publicados; ele não envia arquivos locais ao servidor.
+
 ## Padrão obrigatório
 
 | Arquivo | `id` dentro do JSON | `name` dentro do JSON | Subtítulo |
