@@ -12,6 +12,7 @@ import {icon} from './icons.mjs';
 import {homeView} from './home-view.mjs';
 import {bankCardView,bankPresentation} from './bank-view.mjs';
 import {SystemBanks} from './system-banks.mjs';
+import {bankCatalogCards,catalogSyncButton} from './bank-catalog-view.mjs';
 import {sourceType,sourceTag,sourceLabel,questionSource,sessionQuestion,preparePersonalBank,studyPresentation} from './bank-source.mjs';
 import {createSession,chooseAnswer,moveSession,completeSession} from './session.mjs';
 import {FocusMode} from './focus-mode.mjs';
@@ -34,8 +35,26 @@ let finishingSession=false;
 const draftSelections=new Map();
 const expandedBankDetails=new Set();
 const systemCatalog=new SystemBanks();
-let systemCatalogError='';
-async function loadSystemCatalog({force=false}={}){try{await systemCatalog.load({force});systemCatalogError='';}catch(error){systemCatalogError=error.message;}store.setSystemBanks(systemCatalog.banks);}
+let systemCatalogError='',systemCatalogSyncing=false;
+async function loadSystemCatalog({force=false}={}){
+  const owner=store;
+  try{await systemCatalog.load({force});if(store===owner)systemCatalogError='';}
+  catch(error){if(store===owner)systemCatalogError=error.message;}
+  if(store===owner&&owner)owner.setSystemBanks(systemCatalog.banks);
+}
+async function syncSystemCatalog({notify=false}={}){
+  if(systemCatalogSyncing||!store)return;
+  const owner=store;systemCatalogSyncing=true;render();
+  try{await loadSystemCatalog({force:true});}
+  finally{
+    systemCatalogSyncing=false;
+    if(store&&view==='banks'){
+      const focused=$('[data-action=refresh-system-banks]')===document.activeElement;
+      render();if(focused)$('[data-action=refresh-system-banks]')?.focus({preventScroll:true});
+    }
+    if(notify&&store===owner)toast(systemCatalogError?'Não foi possível sincronizar. Os bancos e o histórico foram mantidos.':'Catálogo sincronizado.');
+  }
+}
 let sessionFilters={status:'open',bankId:'',type:'all',page:1},performanceBank='',performanceOrigin='all',resultSessionId=null;
 function resetHistoryUI(){sessionFilters={status:'open',bankId:'',type:'all',page:1};performanceBank='';performanceOrigin='all';resultSessionId=null;}
 const draftKey=()=>session?`${session.id}:${session.queue[session.index]}`:null;
@@ -147,11 +166,12 @@ function weekChart(answers=model.answers){
 function home(){return homeView({model,config,resume:resumeSession(),driveConnected:!!drive.token,driveStatus:drive.status,driveMessage:drive.message,guest});}
 function study(){return heading('O que vamos estudar?','Escolha seu objetivo. O resto é uma questão de prática.',`<button class="btn small" data-action="nav" data-view="sessions">${icon('clock',15)} Minhas sessões</button>`)+`<div class="mode-grid">${Object.entries(modes).map(([key,[name,description,i]])=>`<button class="mode-card" data-action="start" data-mode="${key}">${icon(i,25)}<h3>${name}</h3><p>${description}</p><span class="badge">${filterQuestions(model,{mode:key}).length} questões disponíveis ${icon('arrow',12)}</span></button>`).join('')}</div><p class="study-tip">As sessões não repetem questões. As recomendadas equilibram conteúdo novo e revisão, com intervalos maiores após acertos consecutivos.</p>`;}
 function banks(){
-  return heading('Banco de questões','Seu conteúdo, organizado do seu jeito.',`<button class="btn primary" data-action="import">${icon('plus',16)} Importar JSON</button>`)+`
-    ${systemCatalogError?`<p class="system-catalog-error" role="status">${esc(systemCatalogError)} Seus dados pessoais foram preservados.</p>`:''}<p class="system-catalog-note">Bancos do sistema disponíveis para todos. ${sourceTag({sourceType:'personal'})} identifica os seus arquivos. <button class="text-link" data-action="refresh-system-banks">Atualizar catálogo</button></p><section class="import-zone" id="drop-zone"><div class="flex">${icon('upload',25)}<h3>Um novo conteúdo começa aqui.</h3></div><p>Selecione ou arraste arquivos JSON. Não é preciso alterar o código.</p><div class="flex"><button class="btn small" data-action="import">Escolher arquivos</button><button class="btn small ghost" data-action="drive-banks">${icon('cloud',15)} Buscar no Drive</button><a class="btn small ghost" href="./docs/modelo-banco.json" download>Baixar modelo JSON ${icon('download',14)}</a></div>
+  const cards=bankCatalogCards(model);
+  return heading('Banco de questões','Seu conteúdo, organizado do seu jeito.',`<div class="bank-heading-actions">${catalogSyncButton(systemCatalogSyncing)}<button class="btn primary" data-action="import">${icon('plus',16)} Importar JSON</button></div>`)+`
+    ${systemCatalogError?`<p class="system-catalog-error" role="status">${esc(systemCatalogError)} Os bancos carregados e seu histórico foram mantidos. Tente sincronizar novamente.</p>`:''}<p class="system-catalog-note" role="status">${systemCatalogSyncing?'Buscando atualizações dos bancos do sistema…':`Bancos do sistema disponíveis para todos. ${sourceTag({sourceType:'personal'})} identifica os seus arquivos.`}</p><section class="import-zone" id="drop-zone"><div class="flex">${icon('upload',25)}<h3>Um novo conteúdo começa aqui.</h3></div><p>Selecione ou arraste arquivos JSON. Não é preciso alterar o código.</p><div class="flex"><button class="btn small" data-action="import">Escolher arquivos</button><button class="btn small ghost" data-action="drive-banks">${icon('cloud',15)} Buscar no Drive</button><a class="btn small ghost" href="./docs/modelo-banco.json" download>Baixar modelo JSON ${icon('download',14)}</a></div>
     <div class="bank-format-help" aria-labelledby="bank-format-title"><div><h4 id="bank-format-title">Crie seus próprios bancos</h4><p>Consulte a estrutura do JSON, os campos das questões e exemplos para criar e importar seus bancos personalizados.</p></div><div class="bank-format-actions"><a class="btn small" data-foco-document href="./formato-json.html">Ler a documentação do formato ${icon('arrow',14)}</a><a class="text-link" href="./docs/questions.schema.json" download>Baixar JSON Schema</a></div></div></section>
-    <div class="banks-grid">${model.banks.map((bank,index)=>{const candidates=progressLinkCandidates(model,bank);return bankCardView(bank,{index,detailsOpen:expandedBankDetails.has(bank.id),association:candidates.length===1?candidates[0]:null});}).join('')}</div>
-    ${model.banks.length?'':empty('Seu primeiro banco','Use o modelo JSON para organizar seu conteúdo.')}`;
+    <div class="banks-grid">${cards.map((bank,index)=>{const candidates=progressLinkCandidates(model,bank);return bankCardView(bank,{index,detailsOpen:expandedBankDetails.has(bank.id),association:candidates.length===1?candidates[0]:null});}).join('')}</div>
+    ${cards.length?'':empty('Seu primeiro banco','Use o modelo JSON para organizar seu conteúdo.')}`;
 }
 function performanceRows(field,answers=model.answers){const rows=breakdown(answers,field);return rows.length?rows.map(r=>`<div class="perf-row"><div class="between"><span>${esc(r.label)}</span><strong>${r.accuracy}%</strong></div><div class="progress-track"><span class="${r.accuracy<60?'low':''}" style="width:${r.accuracy}%"></span></div><small>${r.correct} acertos · ${r.wrong} erros · ${r.total} tentativas</small></div>`).join(''):'<p class="muted" style="font-size:12px">Os resultados aparecerão após suas primeiras respostas.</p>';}
 function originPerformance(){return `<section class="origin-performance" aria-label="Desempenho por origem">${['system','personal'].map(source=>{const {stats}=performanceForBank(model,performanceBank,source);return `<article>${sourceTag({sourceType:source})}<strong>${stats.accuracy}%</strong><p>${stats.attempts} respostas · ${stats.correct} acertos · ${stats.wrong} erros</p></article>`;}).join('')}</section>`;}
@@ -226,6 +246,7 @@ function navigate(next){
   if(next!=='session')focusChange=focusMode.exit();
   else if(!desktopLayout.matches&&session&&!session.completed)focusChange=focusMode.enter({automatic:true});
   render();window.scrollTo(0,0);$('#main').focus({preventScroll:true});
+  if(next==='banks')void syncSystemCatalog();
   return focusChange;
 }
 async function leaveQuestionFocus(){
@@ -402,6 +423,7 @@ document.addEventListener('click',async event=>{
   if(action==='exit-focus'){await leaveQuestionFocus();return;}
   if(working)return;
   if(guest&&['connect-drive','disconnect-drive','sync','drive-banks','refresh-folder-banks','restore-progress','export-progress','migrate-legacy'].includes(action)){toast('Entre com Google para salvar ou recuperar seu progresso.');return;}
+  if(action==='refresh-system-banks'){try{await syncSystemCatalog({notify:true});}catch(error){failure(error);}return;}
   try{
     if(action==='guest'){working=true;await openGuest();return;}
     if(action==='guest-login'){await logout();return;}
@@ -430,11 +452,11 @@ document.addEventListener('click',async event=>{
       const open=target.getAttribute('aria-expanded')!=='true';
       if(open)expandedBankDetails.add(target.dataset.bank);else expandedBankDetails.delete(target.dataset.bank);
       panel.hidden=!open;target.setAttribute('aria-expanded',String(open));
-      const label=open?'Ocultar detalhes':'Ver mais detalhes',bank=model.banks.find(b=>b.id===target.dataset.bank);
+      const label=open?'Ocultar detalhes':'Ver mais detalhes',bank=bankCatalogCards(model).find(b=>b.id===target.dataset.bank);
       target.querySelector('.bank-details-label').textContent=label;
       target.setAttribute('aria-label',`${label} de ${bank?.name||'banco de questões'}`);return;
     }
-    if(action==='refresh-system-banks'){working=true;await loadSystemCatalog({force:true});render();if(systemCatalogError)toast(systemCatalogError);else toast('Catálogo atualizado.');return;}
+    if(action==='bank-history'){const bankId=target.dataset.bank,status=model.sessions.some(s=>!s.completed&&!s.abandoned&&s.queue.some(key=>key.startsWith(`${bankId}:`)))?'open':'completed';sessionFilters={status,bankId,type:'all',page:1};navigate('sessions');return;}
     if(action==='bank-rename'){await renamePersonalBank(target.dataset.bank);return;}
     if(action==='bank-associate'){await associatePersonalProgress(target.dataset.bank,target.dataset.target);return;}
     if(action==='bank-unlink'){await associatePersonalProgress(target.dataset.bank,null,true);return;}

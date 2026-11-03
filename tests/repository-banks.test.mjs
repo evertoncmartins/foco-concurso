@@ -46,7 +46,13 @@ test('recusa arquivo, ID, lei, JSON e gabarito inconsistentes com o arquivo iden
   const root=await directory(t);
   const cases=[['eca-8069.json',bank()],['lei-9394.json',{...bank(),id:'other-id'}],['lei-9394.json',{...bank(),name:'Lei nº 8.112/1990'}],['lei-9394.json','{invalid'],['lei-9394.json',{...bank(),questions:[{...bank().questions[0],correctOption:'C'}]}]];
   for(const [file,raw] of cases){await writeFile(join(root,file),typeof raw==='string'?raw:JSON.stringify(raw));assert.throws(()=>repositoryCatalog(root),error=>error.message.startsWith(`${file}:`));await unlink(join(root,file));}
-  await writeFile(join(root,'outside.txt'),JSON.stringify(bank()));await symlink(join(root,'outside.txt'),join(root,'lei-9394.json'));assert.throws(()=>repositoryCatalog(root),/lei-9394.json/);
+});
+
+test('recusa link simbólico no lugar de arquivo oficial',async t=>{
+  const root=await directory(t);await writeFile(join(root,'outside.txt'),JSON.stringify(bank()));
+  try{await symlink(join(root,'outside.txt'),join(root,'lei-9394.json'));}
+  catch(error){if(process.platform==='win32'&&error.code==='EPERM'){t.skip('O Windows exige permissão do sistema para criar links simbólicos.');return;}throw error;}
+  assert.throws(()=>repositoryCatalog(root),/lei-9394.json/);
 });
 
 test('build publica o catálogo descoberto e os JSONs com a mesma revisão automática',async t=>{

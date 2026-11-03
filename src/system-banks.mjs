@@ -50,7 +50,9 @@ export class SystemBanks{
           return bank;
         }));
         this.banks=banks;this.version=manifest.version||'';this.loaded=true;return banks;
-      }catch(error){failure=error;}
+      // After a successful load, keep that catalog on failure instead of
+      // replacing it with a potentially older copy bundled in a mirror.
+      }catch(error){failure=error;if(this.loaded)break;}
       throw failure;
     })();try{return await this.loading;}finally{this.loading=null;}
   }
