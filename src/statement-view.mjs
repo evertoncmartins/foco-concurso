@@ -6,29 +6,46 @@ function romanValue(value){
   return [...value].reduce((total,digit,index)=>total+(digits[digit]<digits[value[index+1]]?-digits[digit]:digits[digit]),0);
 }
 function romanAssertions(text){
-  const markers=[],candidates=[...text.matchAll(/(?<![\p{L}\p{N}_])(?:\(([IVXLCDM]+)\)|([IVXLCDM]+)[^\S\r\n]*[.)\-–—:])(?=\s*\S)/gu)];
+  const markers=[],candidates=[...text.matchAll(/(?<![\p{L}\p{N}_])(?:\(([IVXLCDM]+)\)|([IVXLCDM]+)[^\S\r\n]*[.,)\-–—:])(?=\s*\S)/gu)];
   for(const [index,match] of candidates.entries()){
     const value=romanValue(match[1]||match[2]);
     const body=text.slice(match.index+match[0].length,candidates[index+1]?.index??text.length).trim();
     if(!/[\p{L}\p{N}]/u.test(body)||/^(?:e|ou)[\s,;]*$/iu.test(body))continue;
     // References such as "inciso II." are prose, even inside an assertion.
     if(!value||/(?:incisos?|capítulos?|títulos?|anexos?|seç(?:ão|ões)|artigos?)\s+$/iu.test(text.slice(0,match.index)))continue;
-    markers.push({index:match.index,value});
+    markers.push({index:match.index,end:match.index+match[0].length,value});
   }
   // A sequence distinguishes assertion labels from isolated Roman references.
   return markers.filter((marker,i)=>markers[i-1]?.value===marker.value-1||markers[i+1]?.value===marker.value+1);
 }
+function normalizeLineFlow(text){
+  // Blank lines are paragraphs. A single PDF line ending is usually just a
+  // fixed-width wrap; let the browser wrap that sentence to the available width.
+  return text.split(/(\n[^\S\n]*\n(?:[^\S\n]*\n)*)/).map((part,index)=>{
+    if(index%2)return '\n\n';
+    return part.replace(/[^\S\n]*\n[^\S\n]*/g,(space,offset)=>{
+      const next=part.slice(offset+space.length);
+      if(/^(?:\d{1,3}[.)]|[a-hA-H][.)]|[•●–—-])[^\S\n]+/.test(next))return '\n';
+      if(/^(?:Assinale\b|Marque\b|Selecione\b|Quais\b|Qual (?:das?|dos?|é)(?=\s|$)|Considerando (?:essas?|estas?|as?|os?)\b|Estão\b|Está correto\b|É correto\b|Após a análise\b|Diante das? (?:afirmativas|assertivas)\b)/u.test(next))return '\n\n';
+      if(part.slice(0,offset).trimEnd().endsWith(':')&&/^(?:\([IVXLCDM]+\)|[IVXLCDM]+[^\S\n]*[.)\-–—:])/.test(next))return '\n\n';
+      return ' ';
+    });
+  }).join('').replace(/[^\S\n]+(?=\n|$)/g,'');
+}
 export function formatQuestionStatement(value){
-  const text=String(value??''),parts=[];
-  const starts=new Set([...text.matchAll(/\([^\S\r\n]*\)/g)].map(marker=>marker.index));
-  for(const marker of romanAssertions(text))starts.add(marker.index);
+  const text=String(value??'').replace(/\r\n?/g,'\n'),parts=[];
+  const starts=new Map([...text.matchAll(/\([^\S\n]*\)/g)].map(marker=>[marker.index,{index:marker.index,end:marker.index+marker[0].length}]));
+  for(const marker of romanAssertions(text))starts.set(marker.index,marker);
   let end=0;
-  for(const start of [...starts].sort((a,b)=>a-b)){
-    const prefix=text.slice(end,start).trimEnd();
+  for(const marker of [...starts.values()].sort((a,b)=>a.index-b.index)){
+    const prefix=text.slice(end,marker.index).trimEnd();
     parts.push(prefix);
     if(end||prefix)parts.push('\n\n');
-    end=start;
+    parts.push(text.slice(marker.index,marker.end),' ');
+    end=marker.end;
+    // Always separate the label from its text, including compact OCR such as I.a.
+    while(end<text.length&&/\s/.test(text[end]))end++;
   }
   parts.push(text.slice(end));
-  return parts.join('');
+  return normalizeLineFlow(parts.join(''));
 }

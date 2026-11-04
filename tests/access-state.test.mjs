@@ -438,11 +438,11 @@ test('assertivas romanas usam linhas próprias no Desktop e Mobile, no estudo e 
   for(const mobile of [true,false])for(const mode of ['smart','exam']){
     const app=runtime({mobile});app.auth.signOut();await app.click('guest');
     const raw=structuredClone(bank);raw.id='teste-romanos';raw.questions=raw.questions.slice(0,1);
-    const text='Analise: I.Primeira assertiva. II. Segunda com <strong>marcação</strong>. III. Terceira assertiva.';
+    const text='Analise: I.Primeira\nassertiva. II. Segunda com\n<strong>marcação</strong>. III. Terceira\nassertiva.';
     raw.questions[0].statement=text;
     await app.document.querySelector('#bank-file').onchange({target:{files:[{name:'romanos.json',text:async()=>JSON.stringify(raw)}]}});
     await app.value(`(async()=>{await newSession([model.questions.find(q=>q.bankId==='teste-romanos').key],'${mode}');await navigate('session');})()`);
-    const formatted='Analise:\n\nI.Primeira assertiva.\n\nII. Segunda com &lt;strong&gt;marcação&lt;/strong&gt;.\n\nIII. Terceira assertiva.';
+    const formatted='Analise:\n\nI. Primeira assertiva.\n\nII. Segunda com &lt;strong&gt;marcação&lt;/strong&gt;.\n\nIII. Terceira assertiva.';
     assert(app.html().includes(`<h1 class="question-statement">${formatted}</h1>`));
     const before=app.value('JSON.stringify(store.events)');await app.click('toggle-theme');
     assert.equal(app.value('JSON.stringify(store.events)'),before);
