@@ -248,3 +248,36 @@
 @media(max-width:380px){
   .question-actions .question-nav-label{display:none}
 }
+
+/* Session shortcuts remain outside the question scroller at every width. */
+.session-navigation{display:flex;align-items:center;gap:4px;margin-left:auto}
+.session-navigation .btn{min-height:44px;gap:6px;padding:6px 9px;color:var(--muted);font-size:11px}
+.session-navigation .btn:not(:disabled):hover{color:var(--text)}
+.session-navigation strong{font-variant-numeric:tabular-nums;font-size:10px}
+.question-navigator{display:flex;flex-direction:column;min-height:0;max-height:calc(100dvh - 104px)}
+.question-navigator .dialog-title,.question-status-legend,.question-navigator>.setting-note,.question-navigator>.dialog-actions{flex-shrink:0}
+.question-status-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-bottom:16px}
+.question-state{display:inline-flex;align-items:center;gap:5px;font-size:11px;white-space:nowrap;color:var(--muted)}
+.question-state.is-correct{color:var(--success)}
+.question-state.is-wrong{color:var(--error)}
+.question-state.is-skipped{color:var(--detail-amber)}
+.question-state.is-answered{color:var(--detail-blue)}
+.question-jump-list{display:grid;gap:6px;min-height:0;overflow-y:auto;overscroll-behavior:contain;list-style:none;padding:3px;margin:0 -3px;scrollbar-width:thin}
+.question-jump{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);text-align:left}
+.question-jump:hover{background:var(--surface2)}
+.question-jump[aria-current=step]{border-color:var(--accent);background:var(--tint)}
+.question-jump-number{display:grid;place-items:center;flex-shrink:0;min-width:30px;height:30px;padding:0 4px;border-radius:7px;background:var(--surface2);font-size:12px;font-variant-numeric:tabular-nums}
+.question-jump-topic{flex:1;min-width:0;overflow-wrap:anywhere;font-size:12px;line-height:1.5}
+.question-jump-topic small{display:block;color:var(--muted);font-size:10px}
+.question-jump .question-state{flex-shrink:0}
+.finish-unanswered{width:100%;min-height:44px}
+@media(max-width:700px){
+  .session .session-summary-bar{gap:4px 12px;margin-block:4px}
+  .session-navigation{justify-content:flex-end}
+  .session-navigation .btn{padding-inline:7px}
+  .question-navigator{max-height:calc(100dvh - 80px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+  .question-jump{gap:8px;padding-inline:9px}
+}
+@media(max-width:380px){
+  .session-navigation{width:100%;justify-content:center}
+}

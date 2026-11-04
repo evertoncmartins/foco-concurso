@@ -14,7 +14,8 @@ import {bankCardView,bankPresentation} from './bank-view.mjs';
 import {SystemBanks} from './system-banks.mjs';
 import {bankCatalogCards,catalogSyncButton} from './bank-catalog-view.mjs';
 import {sourceType,sourceTag,sourceLabel,questionSource,sessionQuestion,preparePersonalBank,studyPresentation} from './bank-source.mjs';
-import {createSession,chooseAnswer,moveSession,completeSession} from './session.mjs';
+import {createSession,chooseAnswer,moveSession,jumpSession,completeSession} from './session.mjs';
+import {sessionNavigationView,sessionQuestionListView,nextSkippedIndex} from './session-navigator.mjs';
 import {FocusMode} from './focus-mode.mjs';
 import {TemporaryStorage} from './temporary-storage.mjs';
 import {restoreProgress,resetSaveProgress} from './restore-progress.mjs';
@@ -220,7 +221,7 @@ function sessionView(){
   if(!q)return empty('Conteúdo não disponível','O banco desta questão foi removido. Você pode voltar e iniciar outra sessão.','<button class="btn" data-action="pause">Voltar ao início</button>');
   const answer=session.answers[key],answered=answer!=null,exam=session.mode==='exam',show=answered&&!exam,f=model.flags.get(key)||{},stats=model.answers.filter(a=>a.sessionId===session.id),mobile=!desktopLayout.matches,desktopFocus=desktopLayout.matches&&focusMode.active;
   prepareCuts(q);
-  return `<div class="session-container"><div class="session-header"><button class="btn ghost small" data-action="pause">${icon('back',15)} Pausar e voltar</button><span class="muted">${modes[session.mode]?.[0]||'Estudo'} · <strong>Questão ${session.index+1} de ${session.queue.length}</strong></span></div><div class="session-progress">${progressBar(session.index/session.queue.length*100)}</div>${mobile?questionPanel(q,f,{mobile:true}):''}<article class="question-card"><div class="question-body" data-question="${esc(key)}" tabindex="0" role="region" aria-label="Questão e alternativas">${mobile?'':questionPanel(q,f)}<h1 class="question-statement">${esc(formatQuestionStatement(q.statement))}</h1><div class="options" role="group" aria-label="Alternativas">${q.options.map(o=>optionView(o,{answer,answered,show,correctOption:q.correctOption})).join('')}</div>${show?feedback(q,answer):exam?'<p class="setting-note" style="margin-bottom:0">Modo simulado: comentários e gabarito aparecem somente ao concluir.</p>':''}</div>${questionActions(answered,{desktopFocus,mobile})}</article><div class="session-summary-bar">${exam?`<span>${Object.values(session.answers).filter(v=>v).length} respostas registradas</span>`:`<span><strong>${stats.filter(a=>a.correct).length}</strong> acertos</span><span><strong>${stats.filter(a=>!a.correct).length}</strong> erros</span><span><strong>${stats.length?Math.round(stats.filter(a=>a.correct).length/stats.length*100):0}%</strong> na sessão</span>`}<span class="keyboard-tip"><kbd>1</kbd>–<kbd>${q.options.length}</kbd> selecionar · <kbd>Enter</kbd> ${session.index===session.queue.length-1?'concluir sessão':!mobile&&answered?'próxima':'registrar'}${mobile?'':' · <kbd>T</kbd> riscar/restaurar · <kbd>←</kbd> anterior · <kbd>→</kbd> próxima'}</span></div></div>`;
+  return `<div class="session-container"><div class="session-header"><button class="btn ghost small" data-action="pause">${icon('back',15)} Pausar e voltar</button><span class="muted">${modes[session.mode]?.[0]||'Estudo'} · <strong>Questão ${session.index+1} de ${session.queue.length}</strong></span></div><div class="session-progress">${progressBar(session.index/session.queue.length*100)}</div>${mobile?questionPanel(q,f,{mobile:true}):''}<article class="question-card"><div class="question-body" data-question="${esc(key)}" tabindex="0" role="region" aria-label="Questão e alternativas">${mobile?'':questionPanel(q,f)}<h1 class="question-statement">${esc(formatQuestionStatement(q.statement))}</h1><div class="options" role="group" aria-label="Alternativas">${q.options.map(o=>optionView(o,{answer,answered,show,correctOption:q.correctOption})).join('')}</div>${show?feedback(q,answer):exam?'<p class="setting-note" style="margin-bottom:0">Modo simulado: comentários e gabarito aparecem somente ao concluir.</p>':''}</div>${questionActions(answered,{desktopFocus,mobile})}</article><div class="session-summary-bar">${exam?`<span>${Object.values(session.answers).filter(v=>v).length} respostas registradas</span>`:`<span><strong>${stats.filter(a=>a.correct).length}</strong> acertos</span><span><strong>${stats.filter(a=>!a.correct).length}</strong> erros</span><span><strong>${stats.length?Math.round(stats.filter(a=>a.correct).length/stats.length*100):0}%</strong> na sessão</span>`}${sessionNavigationView(session)}<span class="keyboard-tip"><kbd>1</kbd>–<kbd>${q.options.length}</kbd> selecionar · <kbd>Enter</kbd> ${session.index===session.queue.length-1?'concluir sessão':!mobile&&answered?'próxima':'registrar'}${mobile?'':' · <kbd>T</kbd> riscar/restaurar · <kbd>←</kbd> anterior · <kbd>→</kbd> próxima'}</span></div></div>`;
 }
 function resultView(){
   const source=currentResultSession();
@@ -349,21 +350,44 @@ async function newSession(queue,mode='smart'){
   await store.add([{type:'session',session:next}]);session=next;resultSessionId=null;resetCuts();config.activeSession=session.id;saveConfig();selected=null;
 }
 async function answer(){if(!selected||!session)return;const key=session.queue[session.index];if(session.answers[key])return;const q=sessionQuestion(model,session,key);const result=chooseAnswer(session,q,selected);await store.add(result.events);session=result.session;draftSelections.delete(draftKey());render();$('.feedback')?.scrollIntoView({behavior:'smooth',block:'nearest'});}
-async function move(direction){
+async function move(direction,{index}={}){
   if(view!=='session'||!session||session.completed)return;
-  const result=moveSession(session,direction);if(!result.events.length)return;
+  const result=index===undefined?moveSession(session,direction):jumpSession(session,index);if(!result.events.length)return;
   await store.add(result.events);session=result.session;selected=draftSelections.get(draftKey())||null;resetCuts();
   render();window.scrollTo(0,0);(sessionFinishButton()||$('.question-body'))?.focus({preventScroll:true});
+}
+function questionList(){
+  if(view!=='session'||!session||session.completed)return;
+  const sessionId=session.id,index=session.index;
+  const d=showDialog(sessionQuestionListView(session,model.answers,key=>sessionQuestion(model,session,key)?.topic));
+  const current=$('[aria-current=step]',d);current?.focus({preventScroll:true});current?.scrollIntoView({block:'nearest'});
+  d.addEventListener('close',()=>{if(view==='session'&&session?.id===sessionId&&session.index===index)$('[data-action=question-list]')?.focus({preventScroll:true});},{once:true});
+}
+function confirmSessionFinish(unanswered){
+  return new Promise(resolve=>{
+    const d=showDialog(`<div class="dialog-title"><h2 id="dialog-title">Concluir sessão?</h2><p>${unanswered} ${unanswered===1?'questão ainda não tem resposta registrada':'questões ainda não têm resposta registrada'}. Volte a essas questões ou conclua com as respostas já registradas.</p></div><button class="btn finish-unanswered" id="finish-unanswered">${icon('skip-back',17)} Ir para as não respondidas</button><div class="dialog-actions"><button class="btn" id="confirm-cancel">Cancelar</button><button class="btn primary" id="confirm-ok">Concluir sessão</button></div>`);
+    let settled=false;
+    const done=value=>{if(settled)return;settled=true;d.removeEventListener('cancel',cancel);closeDialog();resolve(value);};
+    const cancel=e=>{e.preventDefault();done('cancel');};
+    $('#finish-unanswered',d).onclick=()=>done('unanswered');
+    $('#confirm-cancel',d).onclick=()=>done('cancel');$('#confirm-ok',d).onclick=()=>done('finish');
+    d.addEventListener('cancel',cancel);$('#finish-unanswered',d).focus();
+  });
 }
 async function finish(){
   if(view!=='session'||!session||session.completed||finishingSession)return;
   finishingSession=true;
+  let returnedToQuestion=false;
   try{
     const unanswered=session.queue.filter(key=>!session.answers[key]).length;
-    if(unanswered&&!(await confirmDialog('Concluir sessão?',`${unanswered} ${unanswered===1?'questão ainda não tem resposta registrada':'questões ainda não têm resposta registrada'}. Você pode cancelar e continuar revisando antes de concluir.`,'Concluir sessão')))return;
+    if(unanswered){
+      const choice=await confirmSessionFinish(unanswered);
+      if(choice==='unanswered'){const skipped=nextSkippedIndex(session);await move(0,{index:skipped>=0?skipped:session.queue.findIndex(key=>!session.answers[key])});returnedToQuestion=true;$('.question-body')?.focus({preventScroll:true});return;}
+      if(choice!=='finish')return;
+    }
     const result=completeSession(session,session.queue.map(key=>sessionQuestion(model,session,key)).filter(Boolean));await store.add(result.events);session=result.session;resultSessionId=session.id;selected=null;clearSessionDrafts(session.id);resetCuts();config.activeSession=null;saveConfig();
     await navigate('result');if(drive.token)drive.sync().catch(()=>{});
-  }finally{finishingSession=false;sessionFinishButton()?.focus({preventScroll:true});}
+  }finally{finishingSession=false;if(!returnedToQuestion)sessionFinishButton()?.focus({preventScroll:true});}
 }
 function sessionFinishButton(){
   if(view!=='session'||!session||session.completed||session.index!==session.queue.length-1)return null;
@@ -484,6 +508,16 @@ document.addEventListener('click',async event=>{
     if(action==='flag'){working=true;await toggleFlag(target.dataset.flag);return;}
     if(action==='answer'){working=true;await answer();return;}
     if(action==='previous'||action==='next'){working=true;await move(action==='previous'?-1:1);return;}
+    if(action==='question-list'){questionList();return;}
+    if(action==='jump-question'){
+      if(view!=='session'||!session||session.completed||target.dataset.session!==session.id)return;
+      working=true;await move(0,{index:Number(target.dataset.index)});closeDialog();$('.question-body')?.focus({preventScroll:true});return;
+    }
+    if(action==='skipped'){
+      if(view!=='session'||!session||session.completed)return;
+      const index=nextSkippedIndex(session);if(index<0)return;
+      working=true;await move(0,{index});$('.question-body')?.focus({preventScroll:true});return;
+    }
     if(action==='finish'){working=true;await finish();return;}
     if(action==='connect-drive'){working=true;toast('Abrindo a autorização do Google…');await drive.connect();config.onboardingDone=true;saveConfig();if(view==='folder')view='home';render();toast('Pasta salva na sua conta Google e progresso sincronizado.');return;}
     if(action==='disconnect-drive'){drive.disconnect();render();return;}
