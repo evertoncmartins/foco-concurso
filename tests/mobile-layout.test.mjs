@@ -44,7 +44,7 @@ test('foco Mobile remove elementos periféricos sem ocultar controles essenciais
   assert.match(mobile,/\.session\.focus-mode \.topbar,\.session\.focus-mode \.session-header,\.session\.focus-mode \.guest-banner\{display:none/);
   assert.match(mobile,/\.session\.focus-mode \.focus-toolbar\{display:flex[^}]*safe-area-inset-top/);
   assert.match(mobile,/\.focus-mode \.focus-mobile-discipline\{display:block[^}]*white-space:normal;overflow-wrap:anywhere/);
-  assert.match(mobile,/\.session\.focus-mode \.question-statement\{font-size:18px/);
+  assert.match(mobile,/\.session\.focus-mode \.question-statement\{font-size:16px/);
   assert(!/\.session\.focus-mode \.(?:question-actions|session-summary-bar)\{[^}]*display:none/.test(mobile));
 });
 
