@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','session','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','session','session-navigator','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -606,7 +606,7 @@ test('setas navegam uma questão por vez no Desktop normal e foco, mantendo rasc
     assert.match(app.html(),/data-action="previous"[\s\S]*data-action="answer"[\s\S]*data-action="next"/);
     await app.click('toggle-focus');assert.match(app.html(),/class="question-nav-key">←<\/kbd>/);assert.match(app.html(),/class="question-nav-key">→<\/kbd>/);
     await app.click('select',{option:'B'});await app.click('toggle-cut',{option:'C'});app.document.querySelector('.question-body').scrollTop=260;
-    assert.equal((await app.keyEvent({key:'ArrowRight'})).defaultPrevented,true);assert.equal(app.value('session.index'),1);assert.equal(app.value('selected'),null);assert.equal(app.value('JSON.stringify(session.answers)'),'{}');assert.equal(app.value('model.stats.attempts'),0);
+    assert.equal((await app.keyEvent({key:'ArrowRight'})).defaultPrevented,true);assert.equal(app.value('session.index'),1);assert.equal(app.value('selected'),null);assert.equal(app.value('session.answers[session.queue[0]]'),null);assert.equal(app.value('model.stats.attempts'),0);
     assert.equal((await app.keyEvent({key:'ArrowRight',repeat:true})).defaultPrevented,true);assert.equal(app.value('session.index'),1);
     await app.keyEvent({key:'ArrowLeft'});assert.equal(app.value('session.index'),0);assert.equal(app.value('selected'),'B');
     await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),0);const answers=app.value('JSON.stringify(session.answers)'),attempts=app.value('model.stats.attempts');
@@ -687,6 +687,43 @@ test('falha ao salvar navegação conserva questão, seleção, leitura e respos
   const app=await studyRuntime();await app.click('select',{option:'B'});app.document.querySelector('.question-body').scrollTop=180;
   await app.value('failure=()=>{};store.add=async()=>{throw new Error("Falha simulada");};');const before=app.value('JSON.stringify(session)');
   await app.click('next');assert.equal(app.value('JSON.stringify(session)'),before);assert.equal(app.value('selected'),'B');assert.equal(app.document.querySelector('.question-body').scrollTop,180);assert(!app.value('working'));
+});
+
+test('lista e atalho de puladas navegam no Desktop e Mobile preservando seleção, respostas e sigilo do simulado',async()=>{
+  for(const mobile of [false,true])for(const mode of ['smart','exam']){
+    const app=await studyRuntime({mobile},mode),id=app.value('session.id');
+    assert.match(app.html(),/data-action="skipped"[^>]*disabled/);
+    await app.click('select',{option:'B'});await app.click('next');
+    const correct=app.value('sessionQuestion(model,session,session.queue[session.index]).correctOption');
+    await app.click('select',{option:correct});await app.click('answer');
+    await app.click('question-list');const dialog=app.document.querySelector('#dialog');
+    assert(dialog.open);assert.equal((dialog.innerHTML.match(/data-action="jump-question"/g)||[]).length,3);
+    assert.match(dialog.innerHTML,/Pulada: 1/);assert.match(dialog.innerHTML,/Pendente: 1/);
+    if(mode==='exam'){assert(!/is-correct|is-wrong/.test(dialog.innerHTML));assert.match(dialog.innerHTML,/Respondida: 1/);}
+    else assert.match(dialog.innerHTML,/Acerto: 1/);
+    const before=app.value('JSON.stringify(store.events)');
+    await app.keyEvent({key:'ArrowRight'});await app.keyEvent({key:'Enter'});assert.equal(app.value('JSON.stringify(store.events)'),before);
+    await app.click('jump-question',{session:'outra-sessao',index:'2'});assert.equal(app.value('session.index'),1);assert(dialog.open);
+    await app.click('jump-question',{session:id,index:'0'});assert(!dialog.open);assert.equal(app.value('session.index'),0);assert.equal(app.value('selected'),'B');
+    await app.click('question-list');await app.click('jump-question',{session:id,index:'2'});assert.equal(app.value('session.index'),2);
+    await app.click('skipped');assert.equal(app.value('session.index'),0);assert.equal(app.value('selected'),'B');
+    await app.click('answer');assert.equal(app.value('session.answers[session.queue[0]]'),'B');
+    await app.click('skipped');assert.equal(app.value('session.index'),2);assert.equal(app.value('model.stats.attempts'),mode==='exam'?0:2);
+    assert.equal(app.value('session.answers[session.queue[1]]'),correct);
+  }
+});
+
+test('aviso de conclusão leva às não respondidas sem concluir; falha no salto conserva sessão e libera controles',async()=>{
+  for(const mobile of [false,true]){
+    const app=await studyRuntime({mobile});await app.click('next');await app.click('next');
+    const pending=app.click('finish');await tick();const d=app.document.querySelector('#dialog');
+    assert.match(d.innerHTML,/Ir para as não respondidas/);d.querySelector('#finish-unanswered').onclick();await pending;
+    assert.equal(app.value('session.index'),0);assert(!app.value('session.completed'));assert.equal(app.value('view'),'session');assert.equal(app.value('model.stats.attempts'),0);assert.equal(app.document.focused,'.question-body');
+    await app.click('question-list');const id=app.value('session.id'),before=app.value('JSON.stringify(session)');
+    app.value('failure=()=>{};var originalJumpAdd=store.add.bind(store);store.add=async()=>{throw new Error("falha de salto");};');
+    await app.click('jump-question',{session:id,index:'2'});assert.equal(app.value('JSON.stringify(session)'),before);assert(d.open);assert(!app.value('working'));
+    app.value('store.add=originalJumpAdd;');await app.click('jump-question',{session:id,index:'2'});assert.equal(app.value('session.index'),2);assert(!d.open);
+  }
 });
 
 test('Ajustes descreve setas Desktop e Enter para registrar, sem o antigo atalho Pular',async()=>{
@@ -810,7 +847,6 @@ test('último botão alterna entre Próxima e Concluir na mesma posição, inclu
     assert(!app.html().includes('text-link session-finish'));
     await app.click('toggle-theme');assert.deepEqual(actions(),['previous','answer','finish']);
     if(!mobile){await app.click('toggle-focus');assert.match(app.html(),/<span>Concluir sessão<\/span><kbd class="question-nav-key">Enter<\/kbd>/);}
-    const before=app.value('JSON.stringify(session.answers)');
     if(count>1){
       await app.click('previous');assert.deepEqual(actions(),['previous','answer','next']);assert(!app.html().includes('data-action="finish"'));
       assert.equal(app.document.focused,'.question-body');
@@ -818,7 +854,8 @@ test('último botão alterna entre Próxima e Concluir na mesma posição, inclu
       await app.click('next');assert.deepEqual(actions(),['previous','answer','finish']);
       assert.equal(app.document.focused,app.document.querySelector('.question-actions [data-action=finish]'));
     }
-    assert.equal(app.value('JSON.stringify(session.answers)'),before);
+    assert.equal(app.value('Object.values(session.answers).filter(Boolean).length'),0);
+    assert.equal(app.value('Object.values(session.answers).filter(v=>v===null).length'),count>1?count:0);
   }
 });
 

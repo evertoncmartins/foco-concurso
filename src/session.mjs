@@ -14,8 +14,17 @@ export function chooseAnswer(session,q,chosen){
 export function moveSession(session,direction){
   if(session.completed)throw new Error('Esta sessão já foi concluída.');
   if(direction!==-1&&direction!==1)throw new Error('Navegue uma questão por vez.');
-  const next=structuredClone(session),index=next.index+direction;
-  if(index<0||index>=next.queue.length)return {session:next,events:[]};
+  const index=session.index+direction;
+  if(index<0||index>=session.queue.length)return {session:structuredClone(session),events:[]};
+  return jumpSession(session,index);
+}
+export function jumpSession(session,index){
+  if(session.completed)throw new Error('Esta sessão já foi concluída.');
+  if(!Number.isInteger(index)||index<0||index>=session.queue.length)throw new Error('Escolha uma questão válida da sessão.');
+  const next=structuredClone(session);
+  if(index===next.index)return {session:next,events:[]};
+  const key=next.queue[next.index];
+  if(!next.answers[key])next.answers[key]=null;
   next.index=index;
   return {session:next,events:[{type:'session',session:next}]};
 }
