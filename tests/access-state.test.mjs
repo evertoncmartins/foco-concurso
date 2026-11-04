@@ -434,6 +434,27 @@ test('afirmações com parênteses ganham linhas próprias no estudo e resultado
   }
 });
 
+test('assertivas romanas usam linhas próprias no Desktop e Mobile, no estudo e resultado, preservando banco e progresso',async()=>{
+  for(const mobile of [true,false])for(const mode of ['smart','exam']){
+    const app=runtime({mobile});app.auth.signOut();await app.click('guest');
+    const raw=structuredClone(bank);raw.id='teste-romanos';raw.questions=raw.questions.slice(0,1);
+    const text='Analise: I.Primeira assertiva. II. Segunda com <strong>marcação</strong>. III. Terceira assertiva.';
+    raw.questions[0].statement=text;
+    await app.document.querySelector('#bank-file').onchange({target:{files:[{name:'romanos.json',text:async()=>JSON.stringify(raw)}]}});
+    await app.value(`(async()=>{await newSession([model.questions.find(q=>q.bankId==='teste-romanos').key],'${mode}');await navigate('session');})()`);
+    const formatted='Analise:\n\nI.Primeira assertiva.\n\nII. Segunda com &lt;strong&gt;marcação&lt;/strong&gt;.\n\nIII. Terceira assertiva.';
+    assert(app.html().includes(`<h1 class="question-statement">${formatted}</h1>`));
+    const before=app.value('JSON.stringify(store.events)');await app.click('toggle-theme');
+    assert.equal(app.value('JSON.stringify(store.events)'),before);
+    assert.equal(app.value(`model.questions.find(q=>q.bankId==='teste-romanos').statement`),text);
+    await app.click('select',{option:raw.questions[0].correctOption});await app.click('answer');await app.finish();
+    assert.equal(app.value('view'),'result');assert(app.html().includes(`<p>${formatted}</p>`));
+    assert.equal(app.value('model.stats.attempts'),1);
+    const saved=JSON.parse(app.value('JSON.stringify(store.export())'));
+    assert.equal(saved.events.find(e=>e.type==='bank'&&e.bank.id===raw.id).bank.questions[0].statement,text);
+  }
+});
+
 test('comentários formatados aparecem no estudo e no resultado sem reimportação ou mudança do progresso',async()=>{
   for(const mobile of [true,false])for(const mode of ['smart','exam']){
     const app=runtime({mobile});app.auth.signOut();await app.click('guest');
