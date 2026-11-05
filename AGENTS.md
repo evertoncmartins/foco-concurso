@@ -21,6 +21,9 @@
 
 ## Origens e administração
 
+- Revise a transcrição de enunciados, alternativas e comentários ao atualizar bancos: procure palavras coladas, hífens perdidos, acentuação e numerais corrompidos pelo OCR. Corrija somente erros editoriais comprováveis; preserve o sentido dos distratores, IDs, gabaritos, snapshots e progresso.
+- Mantenha o comando final da pergunta em parágrafo próprio após as assertivas, inclusive quando vier na mesma linha do último item. Una quebras artificiais de PDF dentro das frases e mantenha espaços após os marcadores. Confira a questão inteira no Desktop e Mobile; uma revisão de formatação não pode transformar uma assertiva falsa em verdadeira.
+
 - Bancos nativos ficam em `public/data/question-banks/lei-NUMERO.json`. O build descobre os arquivos e gera `dist/data/question-banks/index.json`; não manter índice manual no código-fonte. Carregue-os sem depender do Drive ou do login. Nunca trate um JSON pessoal que declare Sistema como autoridade do catálogo.
 - Não embutir bancos de demonstração em `src/` ou nos assets públicos. Fixtures ficam em `tests/fixtures/`; os bancos nativos vêm exclusivamente da pasta oficial.
 - Preserve `bankId`, `sourceType` e `displayName` em sessões, questões e respostas. Não use nomes para relacionar progresso. IDs reservados pessoais antigos são traduzidos sem apagar o diário; não remapeie respostas novas explicitamente originadas do sistema.

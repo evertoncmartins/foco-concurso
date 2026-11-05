@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {formatQuestionStatement} from '../src/statement-view.mjs';
+import {formatQuestionStatement,formatQuestionText} from '../src/statement-view.mjs';
 
 test('separa a introdução e cada afirmação, mesmo quando vierem na mesma linha',()=>{
   const text='Analise as afirmativas e preencha os parênteses, de cima para baixo: ( ) Primeira afirmação. ( ) Segunda afirmação. ( ) Terceira afirmação.';
@@ -88,4 +88,40 @@ test('normaliza marcadores compactos e linhas de continuação sem alterar cita�
     assert.equal(formatQuestionStatement(expected),expected);
     assert.equal(expected.replace(/\s/g,''),text.replace(/\s/g,''));
   }
+});
+
+test('comando da questão da imagem fica fora do item IV, inclusive em snapshots com o erro antigo',async()=>{
+  const bank=JSON.parse(await readFile(new URL('../public/data/question-banks/lei-9394.json',import.meta.url),'utf8'));
+  const q=bank.questions.find(q=>q.id==='ldb-q713015'),command='Considerando as afirmativas acima, marque a alternativa correta:';
+  assert.equal(q.correctOption,'A');assert(q.statement.includes('histórico-políticos'));
+  const old=q.statement.replace('histórico-políticos','históricopolíticos');
+  const formatted=formatQuestionStatement(old),paragraphs=formatted.split('\n\n');
+  assert.equal(paragraphs.at(-1),command);
+  assert(paragraphs.at(-2).startsWith('IV. A compreensão dos fundamentos histórico-políticos'));
+  assert(paragraphs.at(-2).endsWith('no ensino de cada disciplina.'));
+  assert.equal(formatQuestionStatement(formatted),formatted);
+  assert.equal(formatQuestionStatement(q.statement),formatted);
+});
+
+test('comandos finais das outras leis se separam mesmo na mesma linha ou após continuação do PDF',()=>{
+  const prompts=['Considerando as afirmativas acima, marque a alternativa correta:','Após a análise dos itens acima, assinale a alternativa correta:','Diante das afirmativas, assinale a alternativa correta:','Com base nas afirmativas anteriores, marque a opção correta:','Sobre as alternativas é CORRETO afirmar que:','Está correto o que se afirma em:','Está INCORRETO o que se afirma em:','Está(ão) correto(s) o(s) itens:','Estão CORRETAS, apenas, as afirmativas','É correto o que está contido em','Quais afirmações estão corretas?','Qual sequência é correta?','Assinale a alternativa correta.','Marque a sequência correta:','A sequência CORRETA é:'];
+  for(const prompt of prompts){
+    const text=`Analise: I. Primeira afirmação. II. Segunda afirmação com\ncontinuação. ${prompt}`;
+    const expected=`Analise:\n\nI. Primeira afirmação.\n\nII. Segunda afirmação com continuação.\n\n${prompt}`;
+    assert.equal(formatQuestionStatement(text),expected,prompt);
+    assert.equal(formatQuestionStatement(expected),expected,prompt);
+  }
+  assert.equal(formatQuestionStatement('Analise: I. Está correto garantir o acesso. II. Considerando as necessidades do aluno, o ensino deve se adaptar.'),'Analise:\n\nI. Está correto garantir o acesso.\n\nII. Considerando as necessidades do aluno, o ensino deve se adaptar.');
+});
+
+test('correções editoriais são restritas e não inventam separações em palavras válidas ou mudam o distrator',()=>{
+  assert.equal(formatQuestionText('históricopolíticos, afrobrasileira, didáticoescolar, pósgraduação e sulamericano.'),'histórico-políticos, afro-brasileira, didático-escolar, pós-graduação e sul-americano.');
+  assert.equal(formatQuestionText('Averificação de Jovens eAdultos, Científica eTecnológica: vincularse, efetuandose e percebese.'),'A verificação de Jovens e Adultos, Científica e Tecnológica: vincular-se, efetuando-se e percebe-se.');
+  assert.equal(formatQuestionText('I, Ile III; |l, III e IV; pós- graduação; sendo- lhes.'),'I, II e III; II, III e IV; pós-graduação; sendo-lhes.');
+  const valid='socioeconômico, comunidade, administrativa, sobrepeso, multicampi e histórico-políticos.';
+  assert.equal(formatQuestionText(valid),valid);
+  assert.equal(formatQuestionText('HISTÓRICOPOLÍTICOS; Históricopolíticos'),'HISTÓRICO-POLÍTICOS; Histórico-políticos');
+  const bare='Finalidades:\nla consolidação do conhecimento; II a preparação para o trabalho; III o\naprimoramento humano; IV a compreensão dos processos.';
+  const fixed='Finalidades:\n\nI. a consolidação do conhecimento;\n\nII. a preparação para o trabalho;\n\nIII. o aprimoramento humano;\n\nIV. a compreensão dos processos.';
+  assert.equal(formatQuestionStatement(bare),fixed);assert.equal(formatQuestionStatement(fixed),fixed);
 });

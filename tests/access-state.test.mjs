@@ -455,6 +455,32 @@ test('assertivas romanas usam linhas próprias no Desktop e Mobile, no estudo e 
   }
 });
 
+test('revisão editorial aparece em sessões antigas no Desktop e Mobile sem regravar questões, respostas ou nota',async()=>{
+  for(const mobile of [true,false])for(const mode of ['smart','exam']){
+    const app=runtime({mobile});app.auth.signOut();await app.click('guest');
+    const raw=structuredClone(bank);raw.id='teste-revisao-editorial';raw.questions=raw.questions.slice(0,1);
+    const q=raw.questions[0];q.correctOption='A';
+    q.statement='Analise: I. Primeira afirmação. II. Fundamentos históricopolíticos. Considerando as afirmativas acima, marque a alternativa correta:';
+    q.options[0].text='Averificação considera a pósgraduação.';q.explanation='Há fundamentos históricopolíticos na afirmação.';
+    await app.document.querySelector('#bank-file').onchange({target:{files:[{name:'editorial.json',text:async()=>JSON.stringify(raw)}]}});
+    await app.value(`(async()=>{await newSession([model.questions.find(q=>q.bankId==='teste-revisao-editorial').key],'${mode}');await navigate('session');})()`);
+    const original=app.value('JSON.stringify(store.export().events)');
+    const shown='Analise:\n\nI. Primeira afirmação.\n\nII. Fundamentos histórico-políticos.\n\nConsiderando as afirmativas acima, marque a alternativa correta:';
+    assert(app.html().includes(`<h1 class="question-statement">${shown}</h1>`));
+    assert(app.html().includes('A verificação considera a pós-graduação.'));
+    await app.click('toggle-theme');assert.equal(app.value('JSON.stringify(store.export().events)'),original);
+    assert.equal(app.value("model.questions.find(q=>q.bankId==='teste-revisao-editorial').statement"),q.statement);
+    await app.click('select',{option:'A'});await app.click('answer');await app.finish();
+    assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('model.stats.correct'),1);
+    assert(app.html().includes(`<p>${shown}</p>`));assert(app.html().includes('Há fundamentos histórico-políticos na afirmação.'));
+    const saved=JSON.parse(app.value('JSON.stringify(store.export())'));
+    const source=saved.events.find(e=>e.type==='bank'&&e.bank.id===raw.id).bank.questions[0];
+    assert.equal(source.statement,q.statement);assert.equal(source.options[0].text,q.options[0].text);
+    const recorded=saved.events.find(e=>e.type==='answer');assert.equal(recorded.selected,'A');assert.equal(recorded.correctOption,'A');
+    assert.equal(recorded.questionSnapshot.statement,q.statement);
+  }
+});
+
 test('comentários formatados aparecem no estudo e no resultado sem reimportação ou mudança do progresso',async()=>{
   for(const mobile of [true,false])for(const mode of ['smart','exam']){
     const app=runtime({mobile});app.auth.signOut();await app.click('guest');

@@ -1,5 +1,6 @@
 import {icon} from './icons.mjs';
 import {questionSourceDetails} from './question-origin.mjs';
+import {formatQuestionText} from './statement-view.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 // A can also be a Portuguese article. Only a clear predicate identifies an
@@ -28,7 +29,7 @@ function markers(text,options){
 // Display-only formatting: the imported explanation, exports and progress are
 // never rewritten. Escape every source fragment; do not accept HTML from JSON.
 export function explanationView(value,options=[]){
-  const text=String(value??''),labels=markers(text,options),paragraphs=[];
+  const text=formatQuestionText(value),labels=markers(text,options),paragraphs=[];
   const paragraph=html=>`<p class="explanation-paragraph">${html}</p>`;
   const plain=content=>{
     for(const part of content.split(/\r?\n[ \t]*\r?\n/))if(part.trim())paragraphs.push(paragraph(escape(part.trim())));
@@ -47,7 +48,7 @@ export function explanationView(value,options=[]){
   return `<div class="feedback-explanation">${paragraphs.join('')}</div>`;
 }
 
-const paragraphs=value=>String(value??'').split(/\r?\n\s*\r?\n/).filter(s=>s.trim()).map(s=>`<p>${escape(s.trim())}</p>`).join('');
+const paragraphs=value=>formatQuestionText(value).split(/\r?\n\s*\r?\n/).filter(s=>s.trim()).map(s=>`<p>${escape(s.trim())}</p>`).join('');
 function safeReference(value){try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password?url.href:null;}catch{return null;}}
 export function questionFeedbackView(q,answer){
   const correct=answer===q.correctOption,outcome=correct?'Resposta correta. Bom trabalho!':answer?'Resposta incorreta. Vamos revisar.':'Questão não respondida.';
@@ -58,7 +59,7 @@ export function questionFeedbackView(q,answer){
     <section class="feedback-section"><h3>Explicação</h3>${explanationView(q.explanation,q.options)}</section>
     ${complete?`<section class="feedback-section"><h3>Análise das alternativas</h3><p class="feedback-analysis-note">A classificação considera a alternativa que atende ao enunciado.</p><ol class="feedback-options" aria-label="Justificativa de cada alternativa">${q.options.map(o=>{
       const right=o.id===q.correctOption,selected=o.id===answer;
-      return `<li class="feedback-option ${right?'is-correct':'is-incorrect'} ${selected?'is-selected':''}"><div class="feedback-option-heading"><strong>Alternativa ${escape(o.id)}</strong><span class="feedback-option-verdict">${icon(right?'check':'x',13)}${right?'Correta':'Incorreta'}</span>${selected?'<span class="feedback-selected">Sua resposta</span>':''}</div><p class="feedback-option-text">${escape(o.text)}</p>${paragraphs(q.optionExplanations[o.id])}</li>`;
+      return `<li class="feedback-option ${right?'is-correct':'is-incorrect'} ${selected?'is-selected':''}"><div class="feedback-option-heading"><strong>Alternativa ${escape(o.id)}</strong><span class="feedback-option-verdict">${icon(right?'check':'x',13)}${right?'Correta':'Incorreta'}</span>${selected?'<span class="feedback-selected">Sua resposta</span>':''}</div><p class="feedback-option-text">${escape(formatQuestionText(o.text))}</p>${paragraphs(q.optionExplanations[o.id])}</li>`;
     }).join('')}</ol></section>`:''}
     ${legal||q.reference?`<section class="feedback-section feedback-legal"><h3>${legal?'Fundamentação legal':'Referência'}</h3>${legal?paragraphs(legal):''}${q.reference?`<p class="feedback-reference-label">${escape(q.reference.label)}</p>${url?`<a class="feedback-law-link" href="${escape(url)}" target="_blank" rel="noopener noreferrer">${legal?'Consultar legislação':'Consultar fonte'} ${icon('arrow',13)}</a>`:''}`:''}</section>`:''}
     ${questionSourceDetails(q,{includeLegal:false})}
