@@ -41,6 +41,7 @@ test('cada questão aparece uma vez no assunto principal, mesmo quando cita dive
 
 test('banco misto e conteúdo desconhecido mantêm apresentação genérica, sem atribuir uma lei indevida',()=>{
   assert.equal(bankOverviewData({name:'Lei 8.112/1990 e ECA',questions:[]}).law,null);
+  assert.equal(bankOverviewData({name:'Lei 12.772/2012 e Lei 8.112/1990',questions:[]}).law,null);
   assert.equal(bankOverviewData({name:'Matemática',questions:[]}).law,null);
   assert.equal(bankOverviewData({name:'Lei nº 8.069/1990',questions:[]}).law.key,'8069');
 });
@@ -66,6 +67,16 @@ test('LDB usa o card de lei com assuntos temáticos, contagens e fonte oficial',
   assert(html.includes('Sobre a lei'));assert(html.includes('Ler a lei'));assert(html.includes('https://www.planalto.gov.br/ccivil_03/leis/l9394compilado.htm'));
   assert(!html.includes('Triagem de'));assert(!html.includes('Não é inventário'));assert(!html.includes('Fontes:'));
   for(const q of bank.questions)assert.equal(questionIdentity(q),questionIdentity({...q,subject:bank.name}));
+});
+
+test('Magistério Federal oferece a lei oficial no card sem alterar o banco',async()=>{
+  const bank={...validateBank(JSON.parse(await readFile(new URL('../public/data/question-banks/lei-12772.json',import.meta.url)))),sourceType:'system',enabled:true};
+  const before=JSON.stringify(bank),data=bankOverviewData(bank),html=bankCardView(bank,{detailsOpen:true});
+  assert.equal(data.law.key,'12772');assert.equal(data.title,'Lei nº 12.772/2012');
+  assert.equal(data.subtitle,'Carreiras e cargos do Magistério Federal');
+  assert(html.includes('Sobre a lei'));assert(html.includes('Ler a lei'));
+  assert(html.includes(`href="${bank.questions[0].reference.url}"`));
+  assert(html.includes(bank.description));assert.equal(JSON.stringify(bank),before);
 });
 
 test('bancos nativos apresentam contagens reais e não usam o nome da lei como assunto do card',async()=>{

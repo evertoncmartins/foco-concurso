@@ -19,6 +19,7 @@ No desenvolvimento com `npm run dev`, os bancos são lidos diretamente de `publi
 | `lei-8112.json` | `lei-8112` | `Lei nº 8.112/1990` | Servidores públicos federais |
 | `lei-8069.json` | `lei-8069` | `Lei nº 8.069/1990` | Estatuto da Criança e do Adolescente |
 | `lei-9394.json` | `lei-9394` | `Lei nº 9.394/1996` | Lei de Diretrizes e Bases da Educação Nacional |
+| `lei-12772.json` | `lei-12772` | `Lei nº 12.772/2012` | Carreiras e cargos do Magistério Federal |
 
 Use letras minúsculas, sem pontos ou ano no nome do arquivo e no ID. O ano aparece no título. Um arquivo representa uma lei; para juntar mais questões da mesma lei, atualize seu arquivo existente. O campo opcional `subtitle` guarda o nome descritivo. O sistema padroniza o título da lei; `displayName` não substitui esse título em bancos do Sistema.
 
