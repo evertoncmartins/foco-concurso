@@ -68,7 +68,7 @@ test('preserva citações romanas em prosa e referências dentro das assertivas'
 
 test('une continuação de assertivas, mantém parênteses vazios e deixa escape a cargo da exibição',()=>{
   const text='Analise: I. Texto\ncom continuação e <strong>marcação</strong>. II. ( ) Primeiro julgamento. ( ) Segundo julgamento.';
-  const expected='Analise:\n\nI. Texto com continuação e <strong>marcação</strong>.\n\nII.\n\n( ) Primeiro julgamento.\n\n( ) Segundo julgamento.';
+  const expected='Analise:\n\nI. Texto com continuação e <strong>marcação</strong>.\n\nII. ( ) Primeiro julgamento.\n\n( ) Segundo julgamento.';
   assert.equal(formatQuestionStatement(text),expected);
   assert.equal(formatQuestionStatement(expected),expected);
 });
@@ -124,4 +124,56 @@ test('correções editoriais são restritas e não inventam separações em pala
   const bare='Finalidades:\nla consolidação do conhecimento; II a preparação para o trabalho; III o\naprimoramento humano; IV a compreensão dos processos.';
   const fixed='Finalidades:\n\nI. a consolidação do conhecimento;\n\nII. a preparação para o trabalho;\n\nIII. o aprimoramento humano;\n\nIV. a compreensão dos processos.';
   assert.equal(formatQuestionStatement(bare),fixed);assert.equal(formatQuestionStatement(fixed),fixed);
+});
+
+test('cada afirmativa com parênteses ganha parágrafo sem modificar o marcador, inclusive ponto e barra do OCR',()=>{
+  const text='() Primeira afirmativa. () Segunda afirmativa. () Terceira afirmativa. () Quarta afirmativa.';
+  const expected='() Primeira afirmativa.\n\n() Segunda afirmativa.\n\n() Terceira afirmativa.\n\n() Quarta afirmativa.';
+  assert.equal(formatQuestionStatement(text),expected);assert.equal(formatQuestionStatement(expected),expected);
+  const mixed='Leia as afirmativas: () Primeira. (.) Segunda. (/) Terceira. ( . ) Quarta. ( / ) Quinta. ( ) Sexta.';
+  const formatted='Leia as afirmativas:\n\n() Primeira.\n\n(.) Segunda.\n\n(/) Terceira.\n\n( . ) Quarta.\n\n( / ) Quinta.\n\n( ) Sexta.';
+  assert.equal(formatQuestionStatement(mixed),formatted);
+  assert.equal(formatted.replace(/\s/g,''),mixed.replace(/\s/g,''));
+  assert.equal(formatQuestionStatement(formatted),formatted);
+});
+
+test('questão ldb-q584266 da imagem mostra quatro afirmativas e o comando, com os parênteses originais',async()=>{
+  const bank=JSON.parse(await readFile(new URL('../public/data/question-banks/lei-9394.json',import.meta.url),'utf8'));
+  const q=bank.questions.find(q=>q.id==='ldb-q584266'),before=structuredClone(q),text=formatQuestionStatement(q.statement);
+  const paragraphs=text.split('\n\n'),assertions=paragraphs.filter(p=>/^\([\s./]*\)/.test(p));
+  assert.equal(assertions.length,4);assert.deepEqual(assertions.map(p=>p.match(/^\([^)]*\)/)[0]),['()','()','(.)','(/)']);
+  assert(paragraphs.at(-1).startsWith('Assinale a alternativa que contemple'));
+  for(const assertion of assertions)assert(!assertion.includes('\n'));
+  assert.equal(text.replace(/\s/g,''),q.statement.replace(/\s/g,''));
+  assert.equal(formatQuestionStatement(text),text);assert.deepEqual(q,before);
+});
+
+test('parênteses em funções, matemática, citações, referências e lacunas posteriores não viram início de afirmativa',()=>{
+  const examples=[
+    'Calcule f() e g(). A soma será f() + g().',
+    'Resolva: () + () = 2. Calcule (2 + 3) × (4 + 5).',
+    'Na expressão: (.) representa multiplicação e (/) representa divisão.',
+    'Leia a citação: “() texto citado. () continuação da citação.”',
+    'O autor menciona afirmativas na citação: "() texto citado. () continuação."',
+    'Os parênteses () aparecem na citação e () no comentário.',
+    'Conforme a lei (art. 24), julgue os itens (I) e (II). Marque (V) ou (F).',
+    'Analise: I. Primeira afirmação. ( ) II. Segunda afirmação. (.) III. Terceira afirmação. (/)',
+  ];
+  for(const text of examples){
+    const formatted=formatQuestionStatement(text);
+    if(text.startsWith('Analise: I.')){
+      assert.equal(formatted,'Analise:\n\nI. Primeira afirmação. ( )\n\nII. Segunda afirmação. (.)\n\nIII. Terceira afirmação. (/)');
+    }else assert.equal(formatted,text);
+  }
+});
+
+test('rótulos romanos com parênteses ficam juntos e os exemplos de outros bancos mantêm uma afirmativa por parágrafo',async()=>{
+  for(const [file,id,count] of [['lei-11892.json','l11892-qc-095',5],['lei-11892.json','l11892-qc-142',3],['lei-8069.json','eca-qconcursos-q753205',5],['lei-9394.json','ldb-q753169',4]]){
+    const bank=JSON.parse(await readFile(new URL(`../public/data/question-banks/${file}`,import.meta.url),'utf8'));
+    const q=bank.questions.find(q=>q.id===id),text=formatQuestionStatement(q.statement);
+    assert.equal(text.split('\n\n').filter(p=>/^(?:[IVXLCDM]+[.)]?\s*)?\([\s./]*\)/.test(p)).length,count,id);
+    assert(!/\b[IVXLCDM]+\.\s*\n\n\(/.test(text),id);
+    assert.equal(text.replace(/\s/g,''),q.statement.replace(/\s/g,''),id);
+    assert.equal(formatQuestionStatement(text),text,id);
+  }
 });

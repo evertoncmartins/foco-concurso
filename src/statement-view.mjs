@@ -29,10 +29,10 @@ export function formatQuestionText(value){
     .replace(/([;.]\s+)(II|III|IV)\s+(?=a\s+preparação|o\s+aprimoramento|a\s+compreensão)/g,'$1$2. ')
     .replace(/nº\s+º(?=\s*\d)/g,'nº');
 }
-const closingPromptSource=String.raw`(?:Considerando\s+(?:essas?|estas?|as?|os?)\s+(?:afirmativas|assertivas|proposições|itens|critérios|enunciados)\b|Após\s+a\s+análise\b|Diante\s+d(?:as?|os?)\s+(?:afirmativas|assertivas|proposições|itens)\b|Com\s+base\s+n(?:as?|os?)\s+(?:afirmativas|assertivas|proposições|itens)\b|Sobre\s+as\s+(?:alternativas|afirmativas)\b|Assinale\b|Marque\b|Selecione\b|Escolha\b|Aponte\b|Quais\b|Qual\s+(?:das?|dos?|é|sequência)(?=\s|$)|(?:Est(?:á(?:\(ão\))?|ão)|É|São)\s+(?:in)?corret[oa](?:\(s\)|s)?(?=\s*(?:[,.:;]|apenas\b|somente\b|as?\b|os?\b|afirmar\b))|A\s+sequência\s+(?:correta|incorreta)\b)`;
+const closingPromptSource=String.raw`(?:Considerando\s+(?:essas?|estas?|as?|os?)\s+(?:afirmativas|assertivas|proposições|itens|critérios|enunciados)\b|Após\s+a\s+análise\b|Diante\s+d(?:as?|os?)\s+(?:afirmativas|assertivas|proposições|itens)\b|Com\s+base\s+n(?:as?|os?)\s+(?:afirmativas|assertivas|proposições|itens)\b|Sobre\s+as\s+(?:alternativas|afirmativas)\b|Assinale\b|Marque\b|Selecione\b|Escolha\b|Aponte\b|Quais\b|Qual\s+(?:das?|dos?|é|sequência)(?=\s|$)|(?:Est(?:á(?:\(ão\))?|ão)|É|São)\s+(?:in)?corret[oa](?:\(s\)|s)?(?=\s*(?:[,.:;]|apenas\b|somente\b|as?\b|os?\b|afirmar\b))|A\s+(?:sequência|ordem)\s+(?:correta|incorreta)\b|Usando\s+como\s+referência\b)`;
 const closingPromptAtStart=new RegExp(`^${closingPromptSource}`,'iu');
 function separateClosingPrompt(text){
-  const markers=[...romanAssertions(text),...[...text.matchAll(/\([^\S\n]*\)/g)].map(m=>({index:m.index,end:m.index+m[0].length}))].sort((a,b)=>a.index-b.index);
+  const markers=[...romanAssertions(text),...parenthesisAssertions(text)].sort((a,b)=>a.index-b.index);
   if(!markers.length)return text;
   const offset=markers.at(-1).end,tail=text.slice(offset);
   const pattern=new RegExp(`(?:[.!?;:]|\\n)\\s*(${closingPromptSource})`,'giu');
@@ -61,6 +61,33 @@ function romanAssertions(text){
   // A sequence distinguishes assertion labels from isolated Roman references.
   return markers.filter((marker,i)=>markers[i-1]?.value===marker.value-1||markers[i+1]?.value===marker.value+1);
 }
+function parenthesisAssertions(text){
+  // Dots and slashes occur inside otherwise empty answer boxes in PDF imports.
+  // Keep those characters; recognize a list from its prose and context instead
+  // of treating every pair of parentheses as an assertion boundary.
+  const candidates=[...text.matchAll(/\([^\S\n]*[./]?[^\S\n]*\)/g)],markers=[];
+  for(const [index,match] of candidates.entries()){
+    const end=match.index+match[0].length,before=text.slice(0,match.index);
+    const numbered=before.match(/(?:^|[.!?;:\n])([^\S\n]*([IVXLCDM]+)[.)\-–—:,]?[^\S\n]*)$/u);
+    const prefix=numbered&&romanValue(numbered[2])?numbered[1]:'';
+    if(!prefix&&/[\p{L}\p{N}_]/u.test(text[match.index-1]||''))continue; // f(), g(), etc.
+    const body=text.slice(end,candidates[index+1]?.index??text.length).trimStart();
+    if(!/^[\p{L}\p{N}“"'<]/u.test(body)||!/[\p{L}]/u.test(body))continue;
+    // A response box at the end of an item belongs to that item, not the next.
+    if(/^(?:[IVXLCDM]+[.)\-–—:]|\d+[.)])\s/u.test(body)||closingPromptAtStart.test(body))continue;
+    const start=prefix?match.index-prefix.trimStart().length:match.index;
+    markers.push({index:start,end});
+  }
+  if(markers.length<2)return [];
+  const before=text.slice(0,markers[0].index).trimEnd();
+  const listContext=/(?:afirmativ|assertiv|sentenças?|proposições|julgue|verdadeir|fals|preencha|relacione|associe|itens\s+(?:abaixo|a seguir))/iu.test(before);
+  const otherContext=/(?:express(?:ão|ões)|equaç(?:ão|ões)|fórmulas?|funç(?:ão|ões)|citaç(?:ão|ões)|referências?\s+(?:legais|bibliográficas)|símbolos?|operadores?)\b/iu.test(before);
+  let quoted=false;
+  for(const quote of before.match(/[“”"]/g)||[]){if(quote==='“')quoted=true;else if(quote==='”')quoted=false;else quoted=!quoted;}
+  if(quoted||otherContext&&!listContext)return [];
+  const boundary=!before||/[.!?:;]$/.test(before)||/(?:^|\n)[^\S\n]*$/.test(text.slice(0,markers[0].index));
+  return listContext||boundary?markers:[];
+}
 function normalizeLineFlow(text){
   // Blank lines are paragraphs. A single PDF line ending is usually just a
   // fixed-width wrap; let the browser wrap that sentence to the available width.
@@ -77,8 +104,9 @@ function normalizeLineFlow(text){
 }
 export function formatQuestionStatement(value){
   const text=formatQuestionText(value).replace(/\r\n?/g,'\n'),parts=[];
-  const starts=new Map([...text.matchAll(/\([^\S\n]*\)/g)].map(marker=>[marker.index,{index:marker.index,end:marker.index+marker[0].length}]));
-  for(const marker of romanAssertions(text))starts.set(marker.index,marker);
+  const starts=new Map(romanAssertions(text).map(marker=>[marker.index,marker]));
+  // A combined label such as "II. ()" stays together on the same line.
+  for(const marker of parenthesisAssertions(text))starts.set(marker.index,marker);
   let end=0;
   for(const marker of [...starts.values()].sort((a,b)=>a.index-b.index)){
     const prefix=text.slice(end,marker.index).trimEnd();

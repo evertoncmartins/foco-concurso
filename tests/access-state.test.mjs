@@ -434,6 +434,37 @@ test('afirmações com parênteses ganham linhas próprias no estudo e resultado
   }
 });
 
+test('questão da imagem importada preserva quatro marcadores e dados no Desktop e Mobile, normal e foco',async()=>{
+  const native=JSON.parse(await readFile(new URL('../public/data/question-banks/lei-9394.json',import.meta.url),'utf8'));
+  const question=native.questions.find(q=>q.id==='ldb-q584266');
+  for(const mobile of [false,true])for(const mode of ['smart','exam']){
+    const app=runtime({mobile});app.auth.signOut();await app.click('guest');
+    const raw={...structuredClone(native),id:'teste-parenteses',questions:[structuredClone(question)]};
+    await app.document.querySelector('#bank-file').onchange({target:{files:[{name:'parenteses.json',text:async()=>JSON.stringify(raw)}]}});
+    await app.value(`(async()=>{await newSession([model.questions.find(q=>q.bankId==='teste-parenteses').key],'${mode}');await navigate('session');})()`);
+    const original=app.value('JSON.stringify(store.events)');
+    for(const focus of [false,true]){
+      await app.value(focus?'focusMode.enter()':'focusMode.exit()');
+      const shown=app.html().match(/<h1 class="question-statement">([\s\S]*?)<\/h1>/)[1];
+      assert.equal((shown.match(/\n\n\(\)/g)||[]).length,2);
+      assert.equal((shown.match(/\n\n\(\.\)/g)||[]).length,1);
+      assert.equal((shown.match(/\n\n\(\/\)/g)||[]).length,1);
+      assert.match(shown,/\n\nAssinale a alternativa que contemple/);
+      assert.equal(shown.replace(/\s/g,''),question.statement.replace(/\s/g,''));
+      assert.equal(app.value('JSON.stringify(store.events)'),original);
+      if(mode==='exam')assert(!app.html().includes('Alternativa correta:'));
+    }
+    await app.click('select',{option:question.options[0].id});await app.click('answer');await app.finish();
+    assert.equal(app.value('model.stats.attempts'),1);
+    const exported=JSON.parse(app.value('JSON.stringify(store.export())'));
+    const saved=exported.events.find(e=>e.type==='bank'&&e.bank.id===raw.id).bank.questions[0];
+    assert.equal(saved.statement,question.statement);assert.deepEqual(saved.options,question.options);
+    assert.equal(saved.correctOption,question.correctOption);
+    const answer=exported.events.find(e=>e.type==='answer');assert.equal(answer.questionSnapshot.statement,question.statement);
+    assert.equal((app.html().match(/\n\n\(\.\)/g)||[]).length,1);
+  }
+});
+
 test('assertivas romanas usam linhas próprias no Desktop e Mobile, no estudo e resultado, preservando banco e progresso',async()=>{
   for(const mobile of [true,false])for(const mode of ['smart','exam']){
     const app=runtime({mobile});app.auth.signOut();await app.click('guest');
