@@ -77,6 +77,7 @@ function runtime(options={}){
   auth.prepareRedirect=async()=>{if(options.statusWait)await options.statusWait.promise;auth.redirectEnabled=options.redirectEnabled===true;return auth.redirectEnabled;};
   auth.restoreRedirect=async()=>{restores++;if(options.returnError)throw options.returnError;auth.profile=profile;auth.token='fixture';return authorization();};
   function authorization(){return {profile:auth.profile,token:auth.token,expires:auth.expires,canAppData:auth.canAppData,canDrive:auth.canDrive,...(options.pendingFolderId?{pendingFolderId:options.pendingFolderId}:{})};}
+  auth.ensureAccess=async()=>authorization();
   class Settings extends DriveSettings{
     async restore(){if(options.folderWait)await options.folderWait.promise;if(options.folderError)throw options.folderError;return options.folder===null?null:{folderId:'my-folder'};}
   }
@@ -103,8 +104,11 @@ function runtime(options={}){
       },{origin:'http://localhost:5173'});
     }
   }
+  class FixtureManagement extends imports.BankManagement{
+    constructor(){super(options.managementFetch||(async()=>Response.json({admin:false,tracking:false,deletion:false,banks:[]})),{origin:window.location.origin});}
+  }
   const Documents=options.realDocuments?class extends imports.PublicDocuments{constructor(settings){super({...settings,document,window});}}:class{constructor(options){this.options=options;}open(){this.context=this.options.getContext();}return(){return this.options.onReturn(this.context);}};
-  const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,PublicDocuments:Documents,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window,console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
+  const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,BankManagement:FixtureManagement,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,PublicDocuments:Documents,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window,console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
   const target=dataset=>({dataset,disabled:false,closest(selector){return selector==='[data-action]'||selector==='button'?this:null;},matches(){return false;}});
@@ -162,10 +166,34 @@ test('primeira sessão registra todas as leis antes dos snapshots e não grava e
 
 test('exclusão global confirma alcance, permite cancelar e descarta confirmação de outra conta',async()=>{
   const native=imports.validateSystemBank({...bank,id:'lei-12345',name:'Lei nº 12.345/2010'}),app=runtime({systemBanks:[native]});await app.start();
-  app.value('bankManagement.admin=true;bankManagement.tracking=true;bankManagement.deletion=true;bankManagement.banks.set("lei-12345",{id:"lei-12345",assigned:0});deleteCalls=0;bankManagement.remove=async()=>{deleteCalls++};');
+  app.value('bankManagement.admin=true;bankManagement.tracking=true;bankManagement.deletion=true;bankManagement.banks.set("lei-12345",{id:"lei-12345",assigned:0,protected:false});deleteCalls=0;bankManagement.remove=async()=>{deleteCalls++};');
   let pending=app.click('system-bank-delete',{bank:native.id});await tick();assert(app.document.querySelector('#dialog').innerHTML.includes('catálogo global'));app.confirm(false);await pending;assert.equal(app.value('deleteCalls'),0);
   pending=app.click('system-bank-delete',{bank:native.id});await tick();app.auth.generation++;app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),0);
   pending=app.click('system-bank-delete',{bank:native.id});await tick();app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),1);assert.equal(app.value('model.banks.length'),1);assert(app.document.querySelector('#toast').textContent.includes('Aguarde a publicação'));
+});
+
+test('lei antiga revisada registra atribuição antes da primeira sessão e bloqueia exclusão depois no Desktop e Mobile',async()=>{
+  const raw=JSON.parse(await readFile(new URL('../public/data/question-banks/lei-11892.json',import.meta.url)));raw.questions=raw.questions.slice(0,2);
+  const native=imports.validateSystemBank(raw);
+  for(const mobile of [false,true]){
+    let assigned=0,denied=true,app;
+    app=runtime({mobile,systemBanks:[native],managementFetch:async(url,settings)=>{
+      if(settings.method==='POST'){
+        assert.deepEqual(JSON.parse(settings.body),{action:'assign',bankIds:[native.id]});
+        assert.equal(app.value('store.events.some(e=>e.type==="session"||e.type==="system-bank-snapshot")'),false);
+        if(denied)return Response.json({message:'Atribuição recusada de teste.'},{status:409});
+        assigned=1;return Response.json({assigned:true});
+      }
+      return Response.json({admin:true,tracking:true,deletion:true,banks:[{id:native.id,protected:false,assigned,state:null}]});
+    }});
+    await app.start();
+    await app.value('bankManagement.inspect(auth)');assert.equal(app.value('bankManagement.presentation("lei-11892").canDelete'),true);
+    await assert.rejects(app.value('newSession([model.questions[0].key])'),/Atribuição recusada/);
+    assert.equal(app.value('store.events.some(e=>e.type==="session"||e.type==="system-bank-snapshot")'),false);
+    denied=false;await app.value('newSession([model.questions[0].key])');assert.equal(assigned,1);assert.equal(app.value('model.sessions.length'),1);
+    await app.value('bankManagement.inspect(auth)');assert.equal(app.value('bankManagement.presentation("lei-11892").canDelete'),false);
+    assert.match(app.value('bankManagement.presentation("lei-11892").reason'),/Atribuído a 1 usuário/);
+  }
 });
 
 async function studyRuntime(options={},mode='smart'){

@@ -17,7 +17,8 @@ const env={BANK_ADMIN_EMAILS:'admin@example.test',GOOGLE_CLIENT_ID:'fixture-clie
 const request=(body,headers={})=>new Request(url,{method:body?'POST':'GET',headers:{Authorization:'Bearer fixture-access',...(body?{'Content-Type':'application/json'}:{}),...headers},...(body?{body:JSON.stringify(body)}:{})});
 async function fixture(t,options={}){
   const directory=await mkdtemp(join(tmpdir(),'foco-management-'));t.after(()=>rm(directory,{recursive:true,force:true}));
-  await writeFile(join(directory,'lei-12345.json'),JSON.stringify(raw));
+  const source=options.bank||raw,currentBank=repositoryBank(source,`${source.id}.json`);
+  await writeFile(join(directory,`${source.id}.json`),JSON.stringify(source));
   const calls=[],state=new Map(),members=new Set();
   const registry={configured:options.configured??true,
     async status(ids){return ids.map(id=>({id,assigned:members.size,state:state.get(id)||null}));},
@@ -29,12 +30,12 @@ async function fixture(t,options={}){
     if(address.includes('tokeninfo'))return Response.json({aud:options.audience||'fixture-client',sub:'test-subject',expires_in:3600});
     if(address.includes('userinfo'))return Response.json({sub:options.subject||'test-subject',email:options.email||'admin@example.test',email_verified:options.verified??true});
     calls.push(['github',settings.method,address,settings.body&&JSON.parse(settings.body)]);
-    if(settings.method==='GET')return Response.json({type:'file',encoding:'base64',sha:'file-sha',content:Buffer.from(JSON.stringify(raw)).toString('base64')});
+    if(settings.method==='GET')return Response.json({type:'file',encoding:'base64',sha:'file-sha',content:Buffer.from(JSON.stringify(source)).toString('base64')});
     if(options.timeout)throw new Error('network timeout');
     return Response.json({commit:{sha:'delete-commit'}},{status:options.gitStatus||200});
   };
   const handler=createBankManagementHandler({env:{...env,...options.env},registry,directory,fetcher});
-  return {handler,calls,state,members};
+  return {handler,calls,state,members,bank:currentBank};
 }
 
 test('exclusão global valida conta, audiência, origem e papel no servidor',async t=>{
@@ -70,13 +71,30 @@ test('banco livre é removido do arquivo correto na main com SHA conferido e blo
   assert.equal((await app.handler(request({action:'delete',bankId:bank.id,revision:bank.revision}))).status,409);
 });
 
-test('estado sem configuração e bancos anteriores ao controle nunca liberam exclusão',async t=>{
+test('estado sem configuração e bancos anteriores ao controle sem revisão bloqueiam exclusão',async t=>{
   for(const options of [{configured:false},{env:{BANK_GITHUB_TOKEN:''}},{env:{BANK_PROTECTED_IDS:''}},{env:{BANK_PROTECTED_IDS:bank.id}}]){
     const app=await fixture(t,options),response=await app.handler(request({action:'delete',bankId:bank.id,revision:bank.revision}));
     assert([409,503].includes(response.status));assert.equal(app.calls.length,0);
   }
   const app=await fixture(t),response=await app.handler(request({action:'delete',bankId:'lei-8112',revision:'any'}));
   assert.equal(response.status,409);assert.equal(app.calls.length,0);
+});
+
+test('revisão expressa libera só a retenção antiga da lei escolhida e nunca ignora atribuições',async t=>{
+  const legacy=JSON.parse(await readFile(new URL('../public/data/question-banks/lei-11892.json',import.meta.url)));legacy.questions=legacy.questions.slice(0,2);
+  for(const settings of [{},{env:{BANK_REVIEWED_UNUSED_IDS:'lei-8112'}},{env:{BANK_REVIEWED_UNUSED_IDS:'*'}}]){
+    const app=await fixture(t,{bank:legacy,...settings});
+    const status=await (await app.handler(request())).json();assert.equal(status.banks[0].protected,true);
+    assert.equal((await app.handler(request({action:'delete',bankId:app.bank.id,revision:app.bank.revision}))).status,409);
+    assert(!app.calls.some(c=>c[0]==='github'));
+  }
+  const reviewed={bank:legacy,env:{BANK_REVIEWED_UNUSED_IDS:'lei-11892'}};
+  const app=await fixture(t,reviewed),status=await (await app.handler(request())).json();assert.equal(status.banks[0].protected,false);
+  assert.equal((await app.handler(request({action:'delete',bankId:app.bank.id,revision:app.bank.revision}))).status,200);
+  const used=await fixture(t,reviewed);
+  assert.equal((await used.handler(request({action:'assign',bankIds:[used.bank.id]}))).status,200);
+  assert.equal((await used.handler(request({action:'delete',bankId:used.bank.id,revision:used.bank.revision}))).status,409);
+  assert(!used.calls.some(c=>c[0]==='github'&&c[1]==='DELETE'));
 });
 
 test('revisão desatualizada e caminhos inválidos não chegam à exclusão',async t=>{
@@ -121,9 +139,22 @@ test('cliente distingue controle adiado de falha e não inicia atribuições sem
 
 test('conta trocada descarta resposta administrativa e não herda permissão ou atribuição',async()=>{
   let release;const pending=new Promise(resolve=>release=resolve);
-  const {manager,auth}=client(async()=>{await pending;return Response.json({admin:true,tracking:true,deletion:true,banks:[{id:bank.id,assigned:0}]});});
+  const {manager,auth}=client(async()=>{await pending;return Response.json({admin:true,tracking:true,deletion:true,banks:[{id:bank.id,assigned:0,protected:false}]});});
   const inspect=manager.inspect(auth);auth.generation++;auth.profile={sub:'another'};manager.reset();release();await inspect;
   assert.equal(manager.admin,false);assert.equal(manager.banks.size,0);assert.equal(manager.assigned.size,0);
+});
+
+test('cliente segue a revisão do servidor e registra a primeira sessão também em lei antiga',async()=>{
+  const calls=[],id='lei-11892',app=client(async(url,settings)=>{
+    calls.push(settings);
+    return Response.json(settings.method==='POST'?{assigned:true}:{admin:true,tracking:true,deletion:true,banks:[{id,protected:false,assigned:0,state:null}]});
+  });
+  await app.manager.inspect(app.auth);assert.equal(app.manager.presentation(id).canDelete,true);
+  app.manager.banks.get(id).assigned=1;assert.equal(app.manager.presentation(id).canDelete,false);
+  await app.manager.assign([id],app.auth);
+  assert.deepEqual(JSON.parse(calls.find(c=>c.method==='POST').body),{action:'assign',bankIds:[id]});
+  const count=calls.length;await app.manager.assign([id],app.auth);assert.equal(calls.length,count);
+  delete app.manager.banks.get(id).protected;assert.equal(app.manager.presentation(id).canDelete,false);
 });
 
 test('card mantém desativação e limita exclusão global à apresentação administrativa liberada',()=>{

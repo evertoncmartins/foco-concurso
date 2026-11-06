@@ -13,7 +13,10 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
   const allowed=new Set([ORIGIN,MIRROR]);
   const admins=new Set((env.BANK_ADMIN_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));
   const baseline=(env.BANK_PROTECTED_IDS||'').split(',').map(s=>s.trim()).filter(Boolean);
-  const protectedIds=new Set([...LEGACY_SYSTEM_BANK_IDS,...baseline]);
+  // An explicit owner review can release only the legacy hold. The permanent
+  // attribution set and the atomic deletion reservation still apply.
+  const reviewedUnusedIds=new Set((env.BANK_REVIEWED_UNUSED_IDS||'').split(',').map(s=>s.trim()).filter(validId));
+  const protectedIds=new Set([...LEGACY_SYSTEM_BANK_IDS,...baseline].filter(id=>!reviewedUnusedIds.has(id)));
   async function identity(request){
     const token=request.headers.get('authorization')?.match(/^Bearer ([^\s]{1,4096})$/)?.[1];
     if(!token)throw problem('Entre com Google para continuar.',401);

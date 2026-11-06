@@ -1,5 +1,5 @@
-// These banks predate central attribution. Absence of a record cannot prove
-// that nobody studied them, even after a progress reset or an offline restore.
+// Default legacy hold. Only the server may release a bank after an explicit
+// owner review; absence of a central record alone is not evidence of no use.
 export const LEGACY_SYSTEM_BANK_IDS=Object.freeze(['lei-11892','lei-12772','lei-8069','lei-8112','lei-9394']);
 
 export class BankManagement{
@@ -33,14 +33,14 @@ export class BankManagement{
   presentation(id){
     if(!this.admin)return null;
     const bank=this.banks.get(id);
-    const reason=LEGACY_SYSTEM_BANK_IDS.includes(id)||bank?.protected?'Não é possível confirmar que este banco nunca foi atribuído. Use Desativar banco.':
+    const reason=bank?.protected?'Uso anterior ainda não verificado. Use Desativar banco.':
       !this.tracking||!this.deletion?'Exclusão global aguardando configuração.':
-      !bank||!Number.isSafeInteger(bank.assigned)||bank.assigned<0?'Atribuições ainda não verificadas.':bank.state?'Exclusão em processamento.':
+      !bank||typeof bank.protected!=='boolean'||!Number.isSafeInteger(bank.assigned)||bank.assigned<0?'Atribuições ainda não verificadas.':bank.state?'Exclusão em processamento.':
       bank.assigned?`Atribuído a ${bank.assigned} ${bank.assigned===1?'usuário':'usuários'}. Use Desativar banco.`:'';
     return {admin:true,canDelete:!reason,reason};
   }
   async assign(ids,auth){
-    const required=[...new Set(ids)].filter(id=>!LEGACY_SYSTEM_BANK_IDS.includes(id)&&!this.assigned.has(id));
+    const required=[...new Set(ids)].filter(id=>!this.assigned.has(id));
     if(!required.length)return;
     const generation=this.generation;
     // Dormant mode is explicitly confirmed by the server. When enabling the
