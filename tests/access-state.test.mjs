@@ -173,7 +173,7 @@ test('exclusão global confirma alcance, permite cancelar e descarta confirmaç�
 });
 
 test('lei antiga revisada registra atribuição antes da primeira sessão e bloqueia exclusão depois no Desktop e Mobile',async()=>{
-  const raw=JSON.parse(await readFile(new URL('../public/data/question-banks/lei-11892.json',import.meta.url)));raw.questions=raw.questions.slice(0,2);
+  const raw=JSON.parse(await readFile(new URL('./fixtures/lei-11892.json',import.meta.url)));raw.questions=raw.questions.slice(0,2);
   const native=imports.validateSystemBank(raw);
   for(const mobile of [false,true]){
     let assigned=0,denied=true,app;

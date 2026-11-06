@@ -169,7 +169,8 @@ test('parênteses em funções, matemática, citações, referências e lacunas 
 
 test('rótulos romanos com parênteses ficam juntos e os exemplos de outros bancos mantêm uma afirmativa por parágrafo',async()=>{
   for(const [file,id,count] of [['lei-11892.json','l11892-qc-095',5],['lei-11892.json','l11892-qc-142',3],['lei-8069.json','eca-qconcursos-q753205',5],['lei-9394.json','ldb-q753169',4]]){
-    const bank=JSON.parse(await readFile(new URL(`../public/data/question-banks/${file}`,import.meta.url),'utf8'));
+    const path=file==='lei-11892.json'?`./fixtures/${file}`:`../public/data/question-banks/${file}`;
+    const bank=JSON.parse(await readFile(new URL(path,import.meta.url),'utf8'));
     const q=bank.questions.find(q=>q.id===id),text=formatQuestionStatement(q.statement);
     assert.equal(text.split('\n\n').filter(p=>/^(?:[IVXLCDM]+[.)]?\s*)?\([\s./]*\)/.test(p)).length,count,id);
     assert(!/\b[IVXLCDM]+\.\s*\n\n\(/.test(text),id);

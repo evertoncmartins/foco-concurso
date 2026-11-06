@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtemp,readFile,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+import {createHash} from 'node:crypto';
 import {createBankManagementHandler} from '../server/bank-management.mjs';
 import {repositoryBank} from '../server/repository-banks.mjs';
 import {BankAssignments,ASSIGN_SCRIPT,RESERVE_SCRIPT} from '../server/bank-assignments.mjs';
@@ -18,7 +19,10 @@ const request=(body,headers={})=>new Request(url,{method:body?'POST':'GET',heade
 async function fixture(t,options={}){
   const directory=await mkdtemp(join(tmpdir(),'foco-management-'));t.after(()=>rm(directory,{recursive:true,force:true}));
   const source=options.bank||raw,currentBank=repositoryBank(source,`${source.id}.json`);
-  await writeFile(join(directory,`${source.id}.json`),JSON.stringify(source));
+  const content=Buffer.from(`${options.bom?'\uFEFF':''}${options.serialized||JSON.stringify(source)}`);
+  const sha=createHash('sha1').update(`blob ${content.length}\0`).update(content).digest('hex');
+  const blob={sha,encoding:'base64',content:content.toString('base64')};
+  await writeFile(join(directory,`${source.id}.json`),content);
   const calls=[],state=new Map(),members=new Set();
   const registry={configured:options.configured??true,
     async status(ids){return ids.map(id=>({id,assigned:members.size,state:state.get(id)||null}));},
@@ -29,13 +33,17 @@ async function fixture(t,options={}){
   const fetcher=async(address,settings={})=>{
     if(address.includes('tokeninfo'))return Response.json({aud:options.audience||'fixture-client',sub:'test-subject',expires_in:3600});
     if(address.includes('userinfo'))return Response.json({sub:options.subject||'test-subject',email:options.email||'admin@example.test',email_verified:options.verified??true});
-    calls.push(['github',settings.method,address,settings.body&&JSON.parse(settings.body)]);
-    if(settings.method==='GET')return Response.json({type:'file',encoding:'base64',sha:'file-sha',content:Buffer.from(JSON.stringify(source)).toString('base64')});
+    calls.push(['github',settings.method,address,settings.body&&JSON.parse(settings.body),settings.headers.Accept]);
+    if(address.includes('/git/blobs/')){
+      assert(address.endsWith(`/git/blobs/${sha}`));
+      return Response.json({...blob,...options.blob},{status:options.blobStatus||200});
+    }
+    if(settings.method==='GET')return Response.json({type:'file',...blob,...(content.length>1024*1024?{encoding:'none',content:''}:{}),...options.file});
     if(options.timeout)throw new Error('network timeout');
     return Response.json({commit:{sha:'delete-commit'}},{status:options.gitStatus||200});
   };
   const handler=createBankManagementHandler({env:{...env,...options.env},registry,directory,fetcher});
-  return {handler,calls,state,members,bank:currentBank};
+  return {handler,calls,state,members,bank:currentBank,sha};
 }
 
 test('exclusão global valida conta, audiência, origem e papel no servidor',async t=>{
@@ -65,10 +73,44 @@ test('banco livre é removido do arquivo correto na main com SHA conferido e blo
   assert.equal(response.status,200);assert.equal((await response.json()).publishing,true);
   const mutation=app.calls.find(c=>c[0]==='github'&&c[1]==='DELETE');
   assert(mutation[2].endsWith('/evertoncmartins/foco-concurso/contents/public/data/question-banks/lei-12345.json'));
-  assert.equal(mutation[3].branch,'main');assert.equal(mutation[3].sha,'file-sha');
+  assert.equal(mutation[3].branch,'main');assert.equal(mutation[3].sha,app.sha);
   assert.equal(app.state.get(bank.id),'deleted');
   assert.equal((await app.handler(request({action:'assign',bankIds:[bank.id]}))).status,409);
   assert.equal((await app.handler(request({action:'delete',bankId:bank.id,revision:bank.revision}))).status,409);
+});
+
+test('banco acima de 1 MB usa o blob do SHA conferido antes da exclusão',async t=>{
+  const serialized=' '.repeat(1024*1024)+await readFile(new URL('./fixtures/lei-11892.json',import.meta.url),'utf8');
+  assert(Buffer.byteLength(serialized)>1024*1024);
+  const app=await fixture(t,{bank:JSON.parse(serialized),serialized,env:{BANK_REVIEWED_UNUSED_IDS:'lei-11892'}});
+  const response=await app.handler(request({action:'delete',bankId:app.bank.id,revision:app.bank.revision}));
+  assert.equal(response.status,200);
+  const reads=app.calls.filter(c=>c[0]==='github'&&c[1]==='GET');
+  assert.equal(reads.length,2);
+  assert(reads[0][2].endsWith('/contents/public/data/question-banks/lei-11892.json?ref=main'));
+  assert.equal(reads[0][4],'application/vnd.github.object+json');
+  assert(reads[1][2].endsWith(`/git/blobs/${app.sha}`));
+  assert.equal(reads[1][4],'application/vnd.github+json');
+  assert.equal(app.calls.find(c=>c[0]==='github'&&c[1]==='DELETE')[3].sha,app.sha);
+  assert.equal(app.state.get(app.bank.id),'deleted');
+});
+
+test('falha, conteúdo divergente e revisão antiga do blob não reservam nem excluem',async t=>{
+  for(const options of [{blobStatus:404},{blob:{sha:'a'.repeat(40)}},{blob:{content:Buffer.from('{}').toString('base64')}},{blob:{encoding:'none'}},{stale:true},{assigned:true}]){
+    const app=await fixture(t,{file:{encoding:'none',content:''},...options});
+    const response=await app.handler(request({action:'delete',bankId:app.bank.id,revision:options.stale?'old':app.bank.revision}));
+    assert.equal(response.status,options.stale||options.assigned?409:503);
+    assert.equal(app.state.size,0);
+    assert(!app.calls.some(c=>c[0]==='github'&&c[1]==='DELETE'));
+    if(!options.assigned)assert(!app.calls.some(c=>c[0]==='reserve'));
+  }
+  for(const file of [{type:'dir'},{sha:'../../other'},{encoding:'unknown'}]){
+    const app=await fixture(t,{file});
+    assert.equal((await app.handler(request({action:'delete',bankId:app.bank.id,revision:app.bank.revision}))).status,503);
+    assert.equal(app.calls.length,1);
+  }
+  const bom=await fixture(t,{bom:true});
+  assert.equal((await bom.handler(request({action:'delete',bankId:bom.bank.id,revision:bom.bank.revision}))).status,200);
 });
 
 test('estado sem configuração e bancos anteriores ao controle sem revisão bloqueiam exclusão',async t=>{
@@ -81,7 +123,7 @@ test('estado sem configuração e bancos anteriores ao controle sem revisão blo
 });
 
 test('revisão expressa libera só a retenção antiga da lei escolhida e nunca ignora atribuições',async t=>{
-  const legacy=JSON.parse(await readFile(new URL('../public/data/question-banks/lei-11892.json',import.meta.url)));legacy.questions=legacy.questions.slice(0,2);
+  const legacy=JSON.parse(await readFile(new URL('./fixtures/lei-11892.json',import.meta.url)));legacy.questions=legacy.questions.slice(0,2);
   for(const settings of [{},{env:{BANK_REVIEWED_UNUSED_IDS:'lei-8112'}},{env:{BANK_REVIEWED_UNUSED_IDS:'*'}}]){
     const app=await fixture(t,{bank:legacy,...settings});
     const status=await (await app.handler(request())).json();assert.equal(status.banks[0].protected,true);

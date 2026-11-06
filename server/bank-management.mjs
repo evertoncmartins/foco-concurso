@@ -1,4 +1,4 @@
-import {randomUUID} from 'node:crypto';
+import {createHash,randomUUID} from 'node:crypto';
 import publicConfig from '../public/app-config.json' with {type:'json'};
 import {LEGACY_SYSTEM_BANK_IDS} from '../src/bank-management.mjs';
 import {repositoryCatalog,repositoryBanksDirectory,repositoryBank} from './repository-banks.mjs';
@@ -30,9 +30,9 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
     if(profile.sub!==info.sub||profile.email_verified!==true||typeof profile.email!=='string')throw problem('Conta Google não verificada.',401);
     return {sub:profile.sub,admin:admins.has(profile.email.toLowerCase())};
   }
-  async function github(id,method='GET',body){
-    return fetcher(`https://api.github.com/repos/${REPOSITORY}/contents/${PATH}${id}.json${method==='GET'?'?ref=main':''}`,{
-      method,headers:{Authorization:`Bearer ${env.BANK_GITHUB_TOKEN}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2026-03-10',...(body?{'Content-Type':'application/json'}:{})},
+  async function github(path,method='GET',body,accept='application/vnd.github+json'){
+    return fetcher(`https://api.github.com/repos/${REPOSITORY}/${path}`,{
+      method,headers:{Authorization:`Bearer ${env.BANK_GITHUB_TOKEN}`,Accept:accept,'X-GitHub-Api-Version':'2026-03-10',...(body?{'Content-Type':'application/json'}:{})},
       ...(body?{body:JSON.stringify(body)}:{}),cache:'no-store',signal:AbortSignal.timeout(15000)});
   }
   return async request=>{
@@ -65,18 +65,31 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
       if(protectedIds.has(id))throw problem('Este banco é anterior ao controle de atribuições e está protegido.',409);
       if(!deletion)throw problem('A exclusão global ainda não foi configurada.');
       if(!ids.has(id))throw problem('Banco indisponível. Sincronize o catálogo.',409);
-      const remote=await github(id);
+      const path=`contents/${PATH}${id}.json`;
+      const remote=await github(`${path}?ref=main`,'GET',undefined,'application/vnd.github.object+json');
       if(!remote.ok)throw problem('Não foi possível conferir o arquivo no GitHub.');
       const file=await remote.json();
-      if(file.type!=='file'||file.encoding!=='base64'||typeof file.sha!=='string'||typeof file.content!=='string')throw problem('Arquivo do GitHub inválido.');
-      const bank=repositoryBank(JSON.parse(Buffer.from(file.content,'base64').toString('utf8')),`${id}.json`);
+      if(file.type!=='file'||!(/^[a-f0-9]{40}$/).test(file.sha))throw problem('Arquivo do GitHub inválido.');
+      let blob=file;
+      // Contents omits inline data above 1 MB. Read the immutable Git blob by
+      // the inspected SHA, so a concurrent main update cannot change this read.
+      if(file.encoding==='none'){
+        const response=await github(`git/blobs/${file.sha}`);
+        if(!response.ok)throw problem('Não foi possível ler o conteúdo do banco no GitHub.');
+        blob=await response.json();
+      }
+      if(blob.sha!==file.sha||blob.encoding!=='base64'||typeof blob.content!=='string')throw problem('Arquivo do GitHub inválido.');
+      const content=Buffer.from(blob.content,'base64');
+      const sha=createHash('sha1').update(`blob ${content.length}\0`).update(content).digest('hex');
+      if(sha!==file.sha)throw problem('O conteúdo do banco não corresponde ao arquivo conferido no GitHub.');
+      const bank=repositoryBank(JSON.parse(content.toString('utf8').replace(/^\uFEFF/,'')),`${id}.json`);
       if(bank.revision!==body.revision)throw problem('O banco foi atualizado. Sincronize antes de excluir.',409);
       const operation=randomUUID();
       if(!await registry.reserve(id,operation))throw problem('O banco já foi atribuído a um usuário ou está em exclusão. Use Desativar banco.',409);
       // The reservation has no TTL: a timed-out GitHub request may have committed.
       // Keep this bank closed until an operator reconciles an ambiguous result.
       let deleted;
-      try{deleted=await github(id,'DELETE',{message:`Exclui banco não atribuído ${id}`,sha:file.sha,branch:'main'});}catch{throw problem('A confirmação do GitHub ficou pendente. O banco permanece bloqueado para novas atribuições.');}
+      try{deleted=await github(path,'DELETE',{message:`Exclui banco não atribuído ${id}`,sha:file.sha,branch:'main'});}catch{throw problem('A confirmação do GitHub ficou pendente. O banco permanece bloqueado para novas atribuições.');}
       if(!deleted.ok){
         if([400,401,403,404,409,422].includes(deleted.status))await registry.finish(id,operation,{release:true});
         throw problem('O GitHub não confirmou a exclusão. Atualize o catálogo antes de tentar novamente.');

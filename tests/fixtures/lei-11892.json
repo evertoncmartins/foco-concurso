@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "id": "lei-11892",
+  "name": "Lei nº 11.892/2008",
+  "subtitle": "Rede Federal e Institutos Federais",
+  "description": "Questões sobre a organização da Rede Federal e dos Institutos Federais: natureza jurídica, criação, finalidades, oferta de cursos e vagas, autonomia, gestão, escolha de dirigentes, patrimônio e servidores.",
+  "questions": [
+    {
+      "id": "l11892-qc-001",
+      "instituicao": "IFSC",
+      "ano": 2024,
+      "tag": "IFSC-2024",
+      "banca": "FUNDATEC",
+      "subject": "Finalidades e características",
+      "topic": "Ensino de ciências e investigação empírica",
+      "discipline": "Legislação da Educação",
+      "difficulty": "easy",
+      "statement": "A Lei nº 11.892/2008 instituiu a Rede Federal de Educação Profissional, Científica e Tecnológica. Conforme a referida Lei, assinale a alternativa que apresenta corretamente uma das finalidades dos Institutos Federais.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Elaborar insumos de pesquisa tecnológica para tornar o Estado brasileiro pioneiro na inovação em inteligência artificial."
+        },
+        {
+          "id": "B",
+          "text": "Criar mecanismos de aprendizados tradicionais e reconhecidamente eficientes a fim de preparar os alunos para o ingresso nas melhores universidades do país."
+        },
+        {
+          "id": "C",
+          "text": "Ser referência na promoção de educação privada, desenvolvendo pesquisa e produção cultural."
+        },
+        {
+          "id": "D",
+          "text": "Constituir-se em centro de excelência na oferta do ensino de ciências, em geral, e de ciências aplicadas, em particular, estimulando o desenvolvimento de espírito crítico, voltado à investigação empírica."
+        },
+        {
+          "id": "E",
+          "text": "Promover a cooperação científica voltada para valores sociais, excetuando-se o empreendedorismo, por vedação legal, visto tratar-se de instituição pública sem fins lucrativos."
+        }
+      ],
+      "correctOption": "D",
+      "tipo": "Questão original",
+      "tags": [
+        "Lei nº 11.892/2008",
+        "IFSC-2024",
+        "Finalidades e características"
+      ],
+      "reference": {
+        "label": "Lei nº 11.892/2008 — texto atualizado oficial; consulta em 02/11/2026",
+        "url": "https://www2.camara.leg.br/legin/fed/lei/2008/lei-11892-29-dezembro-2008-585085-normaatualizada-pl.html"
+      },
+      "fonte": {
+        "paginaProva": 1,
+        "gabaritoOriginal": "D",
+        "consultaEm": "2026-11-02",
+        "statusGabarito": "Gabarito do PDF fornecido do Qconcursos; sem confirmação oficial independente",
+        "observacao": "PDF fornecido pelo usuário: 1_merged_compressed.pdf, página 1, questão 1, identificador Q3011428. Metadados transcritos do cabeçalho: Ano: 2024 Banca: FUNDATEC Órgão: IF-SC Provas: FUNDATEC - 2024 - IF-SC - Professor - Português ...\n\nA mesma questão foi novamente impressa na parte final do PDF, páginas 97–113 (repetição da questão 1); foi conservado um único registro. Fonte adicional consolidada: 1_merged_compressed(1).pdf, p. 39, questão impressa 1, Q3011428; resposta D, tabela p. 81. Fonte adicional consolidada: 1_merged_compressed(1).pdf, p. 41, questão impressa 2, Q3011328; resposta D, tabela p. 81. Fonte adicional consolidada: 1_merged_compressed(1).pdf, p. 212, questão impressa 87, Q3011428; resposta D, tabela p. 232."
+      },
+      "cargo": "Professor - Português",
+      "nivelCargo": "Superior",
+      "fundamentoLegal": "Lei nº 11.892/2008 — art. 6º, I, V, VI e VIII.",
+      "explanation": "Os Institutos Federais articulam formação profissional, ciência e desenvolvimento social. O art. 6º, V, prevê expressamente a excelência no ensino de ciências e o estímulo ao espírito crítico voltado à investigação empírica.",
+      "optionExplanations": {
+        "A": "A pesquisa tecnológica integra a atuação dos IFs, mas o art. 6º não estabelece como finalidade específica tornar o Brasil pioneiro em inteligência artificial. A alternativa substitui o conteúdo legal por um objetivo restrito.",
+        "B": "O art. 6º, I, orienta a formação para a atuação profissional e o desenvolvimento socioeconômico. Não reduz a missão institucional à preparação para ingresso em outras universidades nem à repetição de métodos tradicionais.",
+        "C": "O art. 6º, VI, estabelece apoio ao ensino de ciências nas instituições públicas de ensino e formação de seus docentes. Não define promoção da educação privada como finalidade dos IFs.",
+        "D": "Reproduz a finalidade do art. 6º, V: excelência no ensino de ciências e de ciências aplicadas, com espírito crítico e investigação empírica. Por isso atende ao comando da questão.",
+        "E": "Não existe essa vedação ao empreendedorismo. O art. 6º, VIII, determina justamente realizar e estimular pesquisa aplicada, produção cultural, empreendedorismo e cooperativismo."
+      }
+    },
+    {
+      "id": "l11892-qc-002",
+      "instituicao": "IFSULDEMINAS",
+      "ano": 2024,
+      "tag": "IFSULDEMINAS-2024",
+      "banca": "FUNDATEC",
+      "subject": "Finalidades e características",
+      "topic": "Pesquisa, empreendedorismo e extensão",
+      "discipline": "Legislação da Educação",
+      "difficulty": "medium",
+      "statement": "Com base na Lei nº 11.892/2008, que institui a Rede Federal de Educação Profissional, Científica e Tecnológica e cria os Institutos Federais, estes têm por finalidades e características:\n\nI. Desenvolver jovens aptos para a pesquisa científica voltada ao serviço militar.\n\nII. Estimular o empreendedorismo internacional com foco no Mercosul e América Latina.\n\nIII. Constituir-se em centro de excelência na oferta do ensino de ciências, em geral, e de ciências aplicadas, em particular, estimulando o desenvolvimento de espírito crítico, voltado à investigação empírica.\n\nIV. Desenvolver programas de extensão e de divulgação científica e tecnológica. Quais estão corretas?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Apenas I e II."
+        },
+        {
+          "id": "B",
+          "text": "Apenas II e III."
+        },
+        {
+          "id": "C",
+          "text": "Apenas II e IV."
+        },
+        {
+          "id": "D",
+          "text": "Apenas III e IV."
+        },
+        {
+          "id": "E",
+          "text": "Apenas I, III e IV."
+        }
+      ],
+      "correctOption": "D",
+      "tipo": "Questão original",
+      "tags": [
+        "Lei nº 11.892/2008",
+        "IFSULDEMINAS-2024",
+        "Finalidades e características"
+      ],
+      "reference": {
+        "label": "Lei nº 11.892/2008 — texto atualizado oficial; consulta em 02/11/2026",
+        "url": "https://www2.camara.leg.br/legin/fed/lei/2008/lei-11892-29-dezembro-2008-585085-normaatualizada-pl.html"
+      },
+      "fonte": {
+        "paginaProva": 1,
+        "gabaritoOriginal": "D",
+        "consultaEm": "2026-11-02",
+        "statusGabarito": "Gabarito do PDF fornecido do Qconcursos; sem confirmação oficial independente",
+        "observacao": "PDF fornecido pelo usuário: 1_merged_compressed.pdf, página 1, questão 2. Metadados transcritos do cabeçalho: Ano: 2024 Banca: FUNDATEC Órgão: IF Sul- MG Provas: FUNDATEC - 2024 - IF Sul - MG - Professor de Ensino Básico, Técnico e Tecnológico: Letras ...\n\nA mesma questão foi novamente impressa na parte final do PDF, páginas 97–113 (repetição da questão 2); foi conservado um único registro. Fonte adicional consolidada: 1_merged_compressed(1).pdf, p. 214, questão impressa 88, Q2560695; resposta D, tabela p. 232."
+      },
+      "cargo": "Professor de Ensino Básico, Técnico e Tecnológico: Letras",
+      "nivelCargo": "Superior",
+      "fundamentoLegal": "Lei nº 11.892/2008 — art. 6º, V, VII e VIII.",
+      "explanation": "I — Falsa. O art. 6º não restringe a pesquisa à preparação de jovens para o serviço militar; a formação e a investigação atendem a demandas sociais e profissionais amplas.\n\nII — Falsa. O art. 6º, VIII, prevê empreendedorismo, mas não fixa um programa de empreendedorismo internacional centrado no Mercosul e na América Latina.\n\nIII — Verdadeira. O art. 6º, V, prevê excelência no ensino de ciências e investigação empírica.\n\nIV — Verdadeira. Desenvolver programas de extensão e de divulgação científica e tecnológica é finalidade expressa no art. 6º, VII.",
+      "optionExplanations": {
+        "A": "Inclui I, que é falsa: O art. 6º não restringe a pesquisa à preparação de jovens para o serviço militar; a formação e a investigação atendem a demandas sociais e profissionais amplas. Inclui II, que é falsa: O art. 6º, VIII, prevê empreendedorismo, mas não fixa um programa de empreendedorismo internacional centrado no Mercosul e na América Latina. Omite III, que é verdadeira: O art. 6º, V, prevê excelência no ensino de ciências e investigação empírica. Omite IV, que é verdadeira: Desenvolver programas de extensão e de divulgação científica e tecnológica é finalidade expressa no art. 6º, VII.",
+        "B": "Inclui II, que é falsa: O art. 6º, VIII, prevê empreendedorismo, mas não fixa um programa de empreendedorismo internacional centrado no Mercosul e na América Latina. Omite IV, que é verdadeira: Desenvolver programas de extensão e de divulgação científica e tecnológica é finalidade expressa no art. 6º, VII.",
+        "C": "Inclui II, que é falsa: O art. 6º, VIII, prevê empreendedorismo, mas não fixa um programa de empreendedorismo internacional centrado no Mercosul e na América Latina. Omite III, que é verdadeira: O art. 6º, V, prevê excelência no ensino de ciências e investigação empírica.",
+        "D": "A combinação corresponde exatamente às assertivas corretas: III, IV. III: O art. 6º, V, prevê excelência no ensino de ciências e investigação empírica. IV: Desenvolver programas de extensão e de divulgação científica e tecnológica é finalidade expressa no art. 6º, VII.",
+        "E": "Inclui I, que é falsa: O art. 6º não restringe a pesquisa à preparação de jovens para o serviço militar; a formação e a investigação atendem a demandas sociais e profissionais amplas."
+      }
+    },
+    {
+      "id": "l11892-qc-095",
+      "instituicao": "IFPI",
+      "ano": 2016,
+      "tag": "IFPI-2016",
+      "banca": "IF-PI",
+      "subject": "Disposições de implantação e patrimônio",
+      "topic": "Bolsas, orçamento e patrimônio",
+      "discipline": "Legislação da Educação",
+      "difficulty": "medium",
+      "statement": "Analise os itens abaixo sobre a Lei que Institui a Rede Federal de Educação Profissional, Científica e Tecnológica e cria os Institutos Federais de Educação, Ciência e Tecnologia (Lei Nº 11.892/2008) e escreva (F) para Falso ou (V) para Verdadeiro e, em seguida, marque a sequência CORRETA.\n\nI. () Dentre as instituições que compõem a Rede Federal de Educação Profissional, Científica e Tecnológica estão as Escolas Técnicas vinculadas às Universidades Federais.\n\nII. () Cada Instituto Federal é organizado em estrutura multicampi, com proposta orçamentária anual identificada para cada campus e a reitoria, exceto no que diz respeito a pessoal, encargos sociais e benefícios aos servidores. III() A reitoria, como órgão de administração central, não poderá ser instalada em espaço físico distinto de qualquer dos campi que integram o Instituto Federal. IV.(.) Os Institutos Federais não poderão conceder bolsas de pesquisa, desenvolvimento, inovação e intercâmbio a alunos, docentes e pesquisadores externos ou de empresas, a serem regulamentadas por órgão técnico competente do Ministério da Educação.\n\nV. () Os bens e direitos do Instituto Federal serão utilizados ou aplicados, exclusivamente, para a consecução de seus objetivos, não podendo ser alienados, a não ser nos casos e condições permitidos em lei. A sequência CORRETA é:",
+      "options": [
+        {
+          "id": "A",
+          "text": "V, V, F, V, F."
+        },
+        {
+          "id": "B",
+          "text": "V, F, V, F, V."
+        },
+        {
+          "id": "C",
+          "text": "V, V, F, F, V."
+        },
+        {
+          "id": "D",
+          "text": "F, V, V, F, F."
+        },
+        {
+          "id": "E",
+          "text": "F, V, F, F, V."
+        }
+      ],
+      "correctOption": "C",
+      "tipo": "Questão original",
+      "tags": [
+        "Lei nº 11.892/2008",
+        "IFPI-2016",
+        "Disposições de implantação e patrimônio"
+      ],
+      "reference": {
+        "label": "Lei nº 11.892/2008 — texto atualizado oficial; consulta em 02/11/2026",
+        "url": "https://www2.camara.leg.br/legin/fed/lei/2008/lei-11892-29-dezembro-2008-585085-normaatualizada-pl.html"
+      },
+      "fonte": {
+        "paginaProva": 45,
+        "gabaritoOriginal": "C",
+        "consultaEm": "2026-11-02",
+        "statusGabarito": "Gabarito do PDF fornecido do Qconcursos; sem confirmação oficial independente",
+        "observacao": "PDF fornecido pelo usuário: 1_merged_compressed.pdf, página 45, questão 95. Metadados transcritos do cabeçalho: Ano: 2016 Banca: IF-PI Órgão: IF-PI | Provas: IFPI - 2016 - IF-PI - Professor - Administração ...\n\nOrigem adicional do mesmo conteúdo, agrupada para evitar repetição: PDF fornecido pelo usuário: 1_merged_compressed.pdf, página 87, questão 177, identificador Q2712949. Metadados transcritos do cabeçalho: Ano: 2016 Banca: IF-PI Órgão: IF-PI | Provas: IF-PI - 2016 - IF-PI - Professor - Mecânica ..."
+      },
+      "cargo": "Professor - Administração",
+      "nivelCargo": "Superior",
+      "fundamentoLegal": "Lei nº 11.892/2008 — arts. 1º, IV; 5º, § 6º; 9º; 11, § 2º; e 17, parágrafo único.",
+      "explanation": "1ª afirmação — Verdadeira. As escolas técnicas vinculadas às universidades federais integram a Rede pelo art. 1º, IV.\n\n2ª afirmação — Verdadeira. O art. 9º prevê identificação orçamentária por campus e Reitoria e a exceção de pessoal, encargos e benefícios.\n\n3ª afirmação — Falsa. O art. 11, § 2º, permite espaço distinto dos campi, com previsão estatutária e aprovação do MEC.\n\n4ª afirmação — Falsa. O art. 5º, § 6º, autoriza bolsas. A redação atual, da Lei nº 14.695/2023, abrange pesquisa, desenvolvimento, inovação, intercâmbio, com os beneficiários e condições legais.\n\n5ª afirmação — Verdadeira. O art. 17, parágrafo único, vincula os bens e direitos aos objetivos e admite alienação somente nas condições legais.",
+      "optionExplanations": {
+        "A": "A 4ª afirmação deveria ser falsa: O art. 5º, § 6º, autoriza bolsas. A redação atual, da Lei nº 14.695/2023, abrange pesquisa, desenvolvimento, inovação, intercâmbio, com os beneficiários e condições legais. A 5ª afirmação deveria ser verdadeira: O art. 17, parágrafo único, vincula os bens e direitos aos objetivos e admite alienação somente nas condições legais.",
+        "B": "A 2ª afirmação deveria ser verdadeira: O art. 9º prevê identificação orçamentária por campus e Reitoria e a exceção de pessoal, encargos e benefícios. A 3ª afirmação deveria ser falsa: O art. 11, § 2º, permite espaço distinto dos campi, com previsão estatutária e aprovação do MEC.",
+        "C": "A sequência V – V – F – F – V avalia corretamente todas as afirmações. As escolas técnicas vinculadas às universidades federais integram a Rede pelo art. 1º, IV. O art. 9º prevê identificação orçamentária por campus e Reitoria e a exceção de pessoal, encargos e benefícios. O art. 11, § 2º, permite espaço distinto dos campi, com previsão estatutária e aprovação do MEC. O art. 5º, § 6º, autoriza bolsas. A redação atual, da Lei nº 14.695/2023, abrange pesquisa, desenvolvimento, inovação, intercâmbio, com os beneficiários e condições legais. O art. 17, parágrafo único, vincula os bens e direitos aos objetivos e admite alienação somente nas condições legais.",
+        "D": "A 1ª afirmação deveria ser verdadeira: As escolas técnicas vinculadas às universidades federais integram a Rede pelo art. 1º, IV. A 3ª afirmação deveria ser falsa: O art. 11, § 2º, permite espaço distinto dos campi, com previsão estatutária e aprovação do MEC. A 5ª afirmação deveria ser verdadeira: O art. 17, parágrafo único, vincula os bens e direitos aos objetivos e admite alienação somente nas condições legais.",
+        "E": "A 1ª afirmação deveria ser verdadeira: As escolas técnicas vinculadas às universidades federais integram a Rede pelo art. 1º, IV."
+      }
+    },
+    {
+      "id": "l11892-qc-142",
+      "instituicao": "IFPR",
+      "ano": 2014,
+      "tag": "IFPR-2014",
+      "banca": "CETRO",
+      "subject": "Finalidades e características",
+      "topic": "Classificação das finalidades e objetivos",
+      "discipline": "Legislação da Educação",
+      "difficulty": "medium",
+      "statement": "Com base na Lei nº 11.892/2008, sobre as finalidades, as características e os objetivos dos Institutos Federais, marque V para verdadeiro ou F para falso e, em seguida, assinale a alternativa que apresenta a sequência correta. (.) Promover a integração e a verticalização da educação básica à educação profissional e educação superior, otimizando a infraestrutura física, os quadros de pessoal e os recursos de gestão é um dos objetivos dos Institutos Federais. ( ) Estimular e apoiar processos educativos que levem à geração de trabalho e renda e à emancipação do cidadão na perspectiva do desenvolvimento socioeconômico local e regional é uma das finalidades dos Institutos Federais. ( ) Ofertar educação profissional e tecnológica, em todos os seus níveis e modalidades, formando e qualificando cidadãos com vistas na atuação profissional nos diversos setores da economia, com ênfase no desenvolvimento socioeconômico local, regional e nacional compreende uma das finalidades e características dos Institutos Federais.",
+      "options": [
+        {
+          "id": "A",
+          "text": "V / F / V."
+        },
+        {
+          "id": "B",
+          "text": "F / F / V."
+        },
+        {
+          "id": "C",
+          "text": "F / V / F."
+        },
+        {
+          "id": "D",
+          "text": "F / F / F."
+        },
+        {
+          "id": "E",
+          "text": "V / V / F."
+        }
+      ],
+      "correctOption": "B",
+      "tipo": "Questão original",
+      "tags": [
+        "Lei nº 11.892/2008",
+        "IFPR-2014",
+        "Finalidades e características"
+      ],
+      "reference": {
+        "label": "Lei nº 11.892/2008 — texto atualizado oficial; consulta em 02/11/2026",
+        "url": "https://www2.camara.leg.br/legin/fed/lei/2008/lei-11892-29-dezembro-2008-585085-normaatualizada-pl.html"
+      },
+      "fonte": {
+        "paginaProva": 68,
+        "gabaritoOriginal": "B",
+        "consultaEm": "2026-11-02",
+        "statusGabarito": "Gabarito do PDF fornecido do Qconcursos; sem confirmação oficial independente",
+        "observacao": "PDF fornecido pelo usuário: 1_merged_compressed.pdf, página 68, questão 142, identificador Q449339. Metadados transcritos do cabeçalho: Ano:2014 Banca: CETRO Órgão: IF-PR Provas: CETRO - 2014 - IF-PR - Assistente de Alunos ..."
+      },
+      "cargo": "Assistente de Alunos",
+      "nivelCargo": "Médio/técnico",
+      "fundamentoLegal": "Lei nº 11.892/2008 — arts. 6º, I e III; e 7º, V.",
+      "explanation": "1ª afirmação — Falsa. Integração e verticalização são finalidade e característica do art. 6º, III, e não o objetivo assim classificado na afirmação.\n\n2ª afirmação — Falsa. Trabalho, renda e emancipação integram os objetivos do art. 7º, V. A classificação como finalidade está errada.\n\n3ª afirmação — Verdadeira. A oferta em todos os níveis e modalidades, com desenvolvimento local, regional e nacional, é finalidade do art. 6º, I.",
+      "optionExplanations": {
+        "A": "A 1ª afirmação deveria ser falsa: Integração e verticalização são finalidade e característica do art. 6º, III, e não o objetivo assim classificado na afirmação.",
+        "B": "A sequência F – F – V avalia corretamente todas as afirmações. Integração e verticalização são finalidade e característica do art. 6º, III, e não o objetivo assim classificado na afirmação. Trabalho, renda e emancipação integram os objetivos do art. 7º, V. A classificação como finalidade está errada. A oferta em todos os níveis e modalidades, com desenvolvimento local, regional e nacional, é finalidade do art. 6º, I.",
+        "C": "A 2ª afirmação deveria ser falsa: Trabalho, renda e emancipação integram os objetivos do art. 7º, V. A classificação como finalidade está errada. A 3ª afirmação deveria ser verdadeira: A oferta em todos os níveis e modalidades, com desenvolvimento local, regional e nacional, é finalidade do art. 6º, I.",
+        "D": "A 3ª afirmação deveria ser verdadeira: A oferta em todos os níveis e modalidades, com desenvolvimento local, regional e nacional, é finalidade do art. 6º, I.",
+        "E": "A 1ª afirmação deveria ser falsa: Integração e verticalização são finalidade e característica do art. 6º, III, e não o objetivo assim classificado na afirmação. A 2ª afirmação deveria ser falsa: Trabalho, renda e emancipação integram os objetivos do art. 7º, V. A classificação como finalidade está errada. A 3ª afirmação deveria ser verdadeira: A oferta em todos os níveis e modalidades, com desenvolvimento local, regional e nacional, é finalidade do art. 6º, I."
+      }
+    }
+  ]
+}
