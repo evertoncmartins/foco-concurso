@@ -6,13 +6,15 @@
 
 Essa pasta é a fonte dos bancos do Sistema. Para disponibilizar um banco a todos, envie seu JSON diretamente nessa pasta, na branch `main`, pelo botão **Add file → Upload files**, e confirme o commit. A integração GitHub/Vercel executa a validação e publica a atualização automaticamente. Aguarde a implantação terminar; a simples seleção do arquivo na tela de upload não publica o banco.
 
+Desde a 1.23.0, a conta administrativa confirmada `ecmdigital@gmail.com` também pode usar **Banco de questões → Enviar JSON do Sistema**. O seletor aceita um JSON por envio, até 3 MB, valida o perfil nativo e confirma o alcance público. O servidor cria o arquivo na mesma pasta da `main`, sem sobrescrever uma lei existente. Depois da publicação, use **Sincronizar**. **Importar JSON pessoal** e arrastar arquivos continuam criando bancos somente na conta atual, inclusive para o administrador.
+
 Não é necessário editar um catálogo, cadastrar o arquivo no código ou configurar armazenamento. O build descobre todos os arquivos de banco e gera `dist/data/question-banks/index.json`. Esse índice é um resultado da publicação e não deve ser enviado ou mantido manualmente. Um `index.json` antigo na pasta de origem é ignorado.
 
 Ao abrir **Banco de questões**, o Foco consulta novamente os arquivos publicados e sinaliza nos cards as questões novas, alteradas e removidas. **Sincronizar banco** aplica a atualização daquela lei; **Sincronizar**, no topo, aplica o catálogo inteiro. Bancos novos também aguardam essa confirmação. O botão de sincronização do Drive consulta as atualizações do sistema e avisa quando houver pendências no Banco de questões.
 
 Depois de sincronizar, bancos removidos saem da lista. Para quem tem respostas ou sessões consultáveis daquela lei na etapa atual de estudos, o card permanece como **Indisponível**, com acesso às sessões e aos detalhes históricos, sem habilitar novos estudos. A sincronização não altera respostas, notas, sessões, bancos pessoais ou preferências. Se a consulta falhar, o último catálogo carregado e os avisos já confirmados são mantidos.
 
-No desenvolvimento com `npm run dev`, os bancos são lidos diretamente de `public/data/question-banks/` a cada consulta, sem refazer o build para adicionar, atualizar ou remover uma lei. No endereço publicado, é necessário enviar a mudança à branch `main` do GitHub e aguardar a publicação terminar. O botão consulta os arquivos publicados; ele não envia arquivos locais ao servidor.
+No desenvolvimento com `npm run dev`, os bancos são lidos diretamente de `public/data/question-banks/` a cada consulta, sem refazer o build para adicionar, atualizar ou remover uma lei. No endereço publicado, é necessário enviar a mudança à branch `main` do GitHub, diretamente ou pelo envio administrativo, e aguardar a publicação terminar. O botão **Sincronizar** consulta os arquivos publicados.
 
 ## Padrão obrigatório
 
@@ -45,7 +47,7 @@ Quem já estiver com o Foco aberto pode usar **Banco de questões → Atualizar 
 
 ## Sistema e Pessoal
 
-Os bancos do Sistema são públicos e carregam sem login ou Drive. Usuários podem estudar, exportar e ativar/desativar esses bancos em seu perfil. O conteúdo continua sendo publicado pelo GitHub, sem upload administrativo ou renomeação na interface. A API `/api/question-banks` continua somente leitura e não consulta Google UserInfo nem armazenamento externo. A rota separada `/api/bank-management` prepara a exclusão global descrita abaixo.
+Os bancos do Sistema são públicos e carregam sem login ou Drive. Usuários podem estudar e exportar esses bancos. Enviar, ativar/desativar para todos e excluir são ações exclusivas da administração, verificadas no servidor. O conteúdo continua versionado pelo GitHub. A API `/api/question-banks` permanece somente leitura, sem Google UserInfo ou armazenamento externo; as operações administrativas usam `/api/bank-management`.
 
 Os bancos enviados pelo importador do Foco ou pela pasta do Drive continuam **Pessoais**, mesmo que declarem `sourceType: system`. Podem ser renomeados e removidos pelo próprio usuário. Bancos pessoais, preferências, sessões e respostas continuam no arquivo principal de progresso da conta; não são enviados ao GitHub. Sessões podem combinar as duas origens, identificadas pelas tags Sistema/Pessoal.
 
@@ -65,7 +67,7 @@ Os testes cobrem descoberta de arquivos adicionados e removidos sem índice, val
 
 ## Exclusão global e atribuições — 1.22.0
 
-**Ativação solicitada pelo usuário em 05/11/2026.** O registro central utiliza o recurso Upstash `foco-bank-assignments`, conectado exclusivamente à produção do projeto `foco-concurso`, no plano gratuito, com `eviction=false` e `autoUpgrade=false`. A conta administradora e os IDs protegidos ficam nas variáveis de produção; o segredo de atribuições nunca é versionado. A exclusão global permanece bloqueada enquanto faltar qualquer pré-requisito abaixo. Desativar continua sendo uma preferência da conta. Bancos pessoais mantêm a exclusão anterior, preservando o histórico.
+**Ativação solicitada pelo usuário em 05/11/2026.** O registro central utiliza o recurso Upstash `foco-bank-assignments`, conectado exclusivamente à produção do projeto `foco-concurso`, no plano gratuito, com `eviction=false` e `autoUpgrade=false`. A conta administradora e os IDs protegidos ficam nas variáveis de produção; o segredo de atribuições nunca é versionado. A exclusão global permanece bloqueada enquanto faltar qualquer pré-requisito abaixo. Desde a 1.23.0, desativar um banco do Sistema é uma ação administrativa global. Bancos pessoais mantêm seus controles individuais e a exclusão anterior, preservando o histórico.
 
 A primeira sessão autenticada em uma lei registra sua atribuição antes de salvar a sessão. Essa atribuição é permanente: desativar, excluir sessões ou zerar progresso não autoriza a exclusão global. Visitantes não representam contas atribuídas. O registro central guarda somente um pseudônimo HMAC do identificador Google por lei, sem nome, e-mail, respostas, questões ou progresso; não vai para o GitHub. A API exige token Google válido para este cliente OAuth e verifica a conta e o e-mail confirmado no servidor.
 
@@ -87,6 +89,14 @@ Uma confirmação expressa do proprietário de que **ninguém iniciou sessões e
 5. Publique novamente e confira o controle com uma lei nova ainda não estudada. O preview local não escreve atribuições nem habilita exclusões globais. Se o registro ativo ficar indisponível, bancos novos não iniciam sessões sem verificação; os bancos protegidos e o histórico continuam disponíveis.
 
 Quando a resposta do GitHub é inconclusiva (por exemplo, timeout após o envio), a reserva **não expira automaticamente**. O banco fica bloqueado. Um operador deve conferir o commit e a existência do arquivo na `main` antes de reconciliar a chave `foco:bank-attribution:v1:lei-NUMERO:state`. Se o arquivo foi removido, mantenha `deleted`. Só libere uma reserva pendente após confirmar que a requisição terminou sem exclusão. Nunca apague a chave `:users`. Reintroduzir o mesmo ID não limpa atribuições nem autoriza reutilizá-lo para outra lei.
+
+### Disponibilidade global e republicação — 1.23.0
+
+**Ativar banco para todos** e **Desativar banco para todos** aparecem apenas à administração. A alteração grava `active` no JSON oficial com o SHA e a revisão conferidos. Ausência de `active` equivale a `true`; `false` mantém o banco visível, mas fora de novas filas. Preferências pessoais antigas de ativação do Sistema permanecem no diário como compatibilidade, sem sobrepor a disponibilidade global. A desativação de bancos pessoais continua isolada por conta.
+
+O registro central usa `:disabled` para impedir novas sessões autenticadas imediatamente após confirmar a alteração, inclusive em uma página com catálogo anterior. Cada nova sessão verifica a disponibilidade, mesmo quando a conta já tem atribuição. Sessões em andamento podem ser retomadas e resultados anteriores continuam consultáveis. Visitantes e dispositivos desconectados só recebem a disponibilidade atual quando conseguem consultar o catálogo publicado.
+
+Envios e alterações reservam `:state` atomicamente, sem apagar `:users`. Um ID ausente no GitHub pode ser republicado para a mesma lei após uma exclusão confirmada: o estado `deleted` só é liberado depois de criar e confirmar o novo arquivo, preservando todas as atribuições. Um arquivo existente ou uma operação em andamento bloqueia o envio. Falhas conclusivas restauram o estado anterior; um resultado ambíguo mantém a reserva até conferência operacional. Para reconciliar uma publicação confirmada, confira também `active` e ajuste `:disabled` antes de liberar a reserva.
 
 ## Feedback completo obrigatório — 1.20.0
 

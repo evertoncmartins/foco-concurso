@@ -301,6 +301,11 @@
         },
         {
           "properties": {
+            "active": {
+              "type": "boolean",
+              "default": true,
+              "description": "Disponibilidade global para novas sessões, controlada pela administração."
+            },
             "questions": {
               "type": "array",
               "items": {

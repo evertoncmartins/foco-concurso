@@ -81,4 +81,6 @@ Bancos importados pelo usuário são sempre Pessoal, mesmo que o JSON declare `s
 
 ## Publicar um banco do Sistema pelo GitHub
 
+A administração pode usar **Enviar JSON do Sistema** em **Banco de questões**, com um arquivo de até 3 MB por envio e confirmação antes de publicar para todos. O arquivo precisa passar pelo mesmo perfil nativo abaixo; um banco existente não é sobrescrito. **Importar JSON pessoal** continua disponível a cada usuário e não publica seu conteúdo no catálogo global. O campo nativo opcional `active` aceita `true` ou `false`; ausente, o banco está ativo. Só a administração controla essa disponibilidade global.
+
 Envie o JSON em `public/data/question-banks/lei-NUMERO.json`. O `id` deve coincidir com o nome do arquivo sem a extensão e `name` deve identificar a mesma lei, por exemplo `Lei nº 9.394/1996`. Use `subtitle` para a descrição curta. Use o perfil de feedback completo descrito acima e no schema em #/$defs/nativeBank. Os demais campos seguem o mesmo formato. Catálogo e revisões são automáticos; não envie `index.json`. Atualizações devem preservar IDs de questões que mantêm o mesmo conteúdo. Veja [BANCOS_SISTEMA.md](BANCOS_SISTEMA.md). A importação pessoal pelo Drive ou pelo aplicativo não exige esse padrão de nome.

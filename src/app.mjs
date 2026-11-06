@@ -11,8 +11,8 @@ import {loginView,folderView,loadingView} from './access-views.mjs';
 import {icon} from './icons.mjs';
 import {homeView} from './home-view.mjs';
 import {bankCardView,bankPresentation} from './bank-view.mjs';
-import {SystemBanks} from './system-banks.mjs';
-import {BankManagement} from './bank-management.mjs';
+import {SystemBanks,validateSystemBank,requireNativeFeedback} from './system-banks.mjs';
+import {BankManagement,SYSTEM_BANK_UPLOAD_LIMIT} from './bank-management.mjs';
 import {bankCatalogCards,catalogSyncButton} from './bank-catalog-view.mjs';
 import {sourceType,sourceTag,sourceLabel,questionSource,sessionQuestion,preparePersonalBank,studyPresentation} from './bank-source.mjs';
 import {createSession,chooseAnswer,moveSession,jumpSession,completeSession} from './session.mjs';
@@ -129,7 +129,7 @@ function shell(content){
   <div class="workspace"><header class="topbar"><div class="topbar-heading"></div><div class="mobile-logo"><span class="brand-mark">f.</span>foco</div><div class="flex">${guest?`<button class="guest-status" data-action="guest-login" aria-label="Modo visitante, sem salvar progresso. Voltar ao login" title="Entrar para salvar seus estudos">${icon('clock',16)}<span>Visitante · sem salvar</span></button>`:`<button class="sync-label" aria-label="Google Drive: ${syncText[drive.status]}" data-status="${drive.status}" data-action="nav" data-view="settings" title="${esc(drive.message||'Configurar sincronização com o Google Drive')}">${syncIcon()}<span>${syncText[drive.status]}</span></button>`}<button class="icon-btn" data-action="toggle-theme" aria-label="Alternar tema claro e escuro" title="Alternar tema">${icon(document.documentElement.dataset.theme==='dark'?'sun':'moon',17)}</button><button class="icon-btn" data-action="logout" aria-label="${guest?'Voltar ao login':'Sair da conta'}" title="${guest?'Voltar ao login':'Sair da conta'}">${icon('logout',17)}</button>${view==='session'&&session&&!session.completed?`<button class="icon-btn focus-toggle" data-action="toggle-focus" aria-label="Ativar modo foco em tela cheia" title="Modo foco em tela cheia" aria-pressed="false">${icon('maximize',19)}</button>`:''}</div></header>${focusToolbar()}
   <main class="content" id="main" tabindex="-1">${guest?`<div class="guest-banner" role="status"><span>${icon('clock',16)} Modo visitante. Seu progresso será perdido ao sair ou recarregar.</span><button class="text-link" data-action="guest-login">Entrar com Google ${icon('arrow',13)}</button></div>`:''}${content}</main></div>
   <nav class="mobile-nav" aria-label="Navegação no celular">${[['home','Início','home'],['study','Estudar','play'],['banks','Questões','book'],['performance','Desempenho','chart'],['settings','Ajustes','settings']].map(([k,l,i])=>`<button data-action="nav" data-view="${k}" aria-label="${k==='banks'?'Banco de questões':l}" class="${view===k||k==='study'&&view==='sessions'?'selected':''}" ${view===k||k==='study'&&view==='sessions'?'aria-current="page"':''}>${icon(i)}<span>${l}</span></button>`).join('')}</nav>
-  <input type="file" id="bank-file" accept=".json,application/json" class="hidden" multiple><input type="file" id="progress-file" accept=".json,application/json" class="hidden"></div>`;
+  <input type="file" id="bank-file" accept=".json,application/json" class="hidden" multiple>${!guest&&bankManagement.admin?'<input type="file" id="system-bank-file" accept=".json,application/json" class="hidden">':''}<input type="file" id="progress-file" accept=".json,application/json" class="hidden"></div>`;
 }
 function focusToolbar(){
   const counter=session?`Questão ${session.index+1} de ${session.queue.length}`:'Modo foco';
@@ -178,7 +178,7 @@ function home(){return homeView({model,config,resume:resumeSession(),driveConnec
 function study(){return heading('O que vamos estudar?','Escolha seu objetivo. O resto é uma questão de prática.',`<button class="btn small" data-action="nav" data-view="sessions">${icon('clock',15)} Minhas sessões</button>`)+`<div class="mode-grid">${Object.entries(modes).map(([key,[name,description,i]])=>`<button class="mode-card" data-action="start" data-mode="${key}">${icon(i,25)}<h3>${name}</h3><p>${description}</p><span class="badge">${filterQuestions(model,{mode:key}).length} questões disponíveis ${icon('arrow',12)}</span></button>`).join('')}</div><p class="study-tip">As sessões não repetem questões. As recomendadas equilibram conteúdo novo e revisão, com intervalos maiores após acertos consecutivos.</p>`;}
 function banks(){
   const cards=bankCatalogCards(model,systemCatalog.updates);
-  return heading('Banco de questões','Seu conteúdo, organizado do seu jeito.',`<div class="bank-heading-actions">${catalogSyncButton(systemCatalogSyncing,systemCatalog.updates.size)}<button class="btn primary" data-action="import">${icon('plus',16)} Importar JSON</button></div>`)+`
+  return heading('Banco de questões','Seu conteúdo, organizado do seu jeito.',`<div class="bank-heading-actions">${catalogSyncButton(systemCatalogSyncing,systemCatalog.updates.size)}${!guest&&bankManagement.admin?`<button class="btn" data-action="system-bank-import" ${!bankManagement.publication||systemCatalogSyncing?'disabled':''}>${icon('upload',16)} Enviar JSON do Sistema</button>`:''}<button class="btn primary" data-action="import">${icon('plus',16)} Importar JSON pessoal</button></div>`)+`
     ${systemCatalogError?`<p class="system-catalog-error" role="status">${esc(systemCatalogError)} Os bancos carregados e seu histórico foram mantidos. Tente sincronizar novamente.</p>`:''}<p class="system-catalog-note" role="status">${systemCatalogSyncing?'Buscando atualizações dos bancos do sistema…':`Bancos do sistema disponíveis para todos. ${sourceTag({sourceType:'personal'})} identifica os seus arquivos.`}</p><section class="import-zone" id="drop-zone"><div class="flex">${icon('upload',25)}<h3>Um novo conteúdo começa aqui.</h3></div><p>Selecione ou arraste arquivos JSON. Não é preciso alterar o código.</p><div class="flex"><button class="btn small" data-action="import">Escolher arquivos</button><button class="btn small ghost" data-action="drive-banks">${icon('cloud',15)} Buscar no Drive</button><a class="btn small ghost" href="./docs/modelo-banco.json" download>Baixar modelo JSON ${icon('download',14)}</a></div>
     <div class="bank-format-help" aria-labelledby="bank-format-title"><div><h4 id="bank-format-title">Crie seus próprios bancos</h4><p>Consulte a estrutura do JSON, os campos das questões e exemplos para criar e importar seus bancos personalizados.</p></div><div class="bank-format-actions"><a class="btn small" data-foco-document href="./formato-json.html">Ler a documentação do formato ${icon('arrow',14)}</a><a class="text-link" href="./docs/questions.schema.json" download>Baixar JSON Schema</a></div></div></section>
     <div class="banks-grid">${cards.map((bank,index)=>{const candidates=progressLinkCandidates(model,bank);return bankCardView(bank,{index,syncing:systemCatalogSyncing,management:sourceType(bank)==='system'?bankManagement.presentation(bank.id):null,detailsOpen:expandedBankDetails.has(bank.id),association:candidates.length===1?candidates[0]:null});}).join('')}</div>
@@ -437,7 +437,7 @@ async function importBank(raw){const bank=preparePersonalBank(validateBank(raw))
 async function deleteSystemBank(id){
   const bank=model.banks.find(b=>b.id===id&&sourceType(b)==='system'),owner=store,generation=auth?.generation;
   if(!bank||!bankManagement.presentation(id)?.canDelete)throw new Error('Este banco não está liberado para exclusão global.');
-  if(!await confirmDialog('Excluir banco para todos?',`“${bankPresentation(bank).title}” será removido do catálogo global. A exclusão só será concluída se nenhum usuário tiver iniciado uma sessão nessa lei. Desativar banco continua disponível apenas para sua conta.`,'Excluir para todos'))return;
+  if(!await confirmDialog('Excluir banco para todos?',`“${bankPresentation(bank).title}” será removido do catálogo global. A exclusão só será concluída se nenhum usuário tiver iniciado uma sessão nessa lei. Para suspender novas sessões e preservar o banco, use Desativar banco para todos.`,'Excluir para todos'))return;
   if(store!==owner||auth?.generation!==generation)return;
   working=true;
   try{
@@ -447,6 +447,37 @@ async function deleteSystemBank(id){
     toast('Exclusão enviada ao GitHub. Aguarde a publicação e sincronize o catálogo.');
   }finally{working=false;}
 }
+async function publishSystemBank(file){
+  const owner=store,generation=auth?.generation,subject=auth?.profile?.sub,managementGeneration=bankManagement.generation;
+  const current=()=>store===owner&&auth?.generation===generation&&auth?.profile?.sub===subject&&bankManagement.generation===managementGeneration&&!guest;
+  if(!current()||!bankManagement.admin||!bankManagement.publication)throw new Error('Somente a administração pode enviar bancos do Sistema.');
+  if(file.size>SYSTEM_BANK_UPLOAD_LIMIT)throw new Error('O envio do Sistema aceita até 3 MB por JSON. A importação pessoal continua disponível para arquivos maiores.');
+  const raw=await readJSON(file);
+  if(!current())return;
+  const bank=requireNativeFeedback(validateSystemBank(raw));
+  if(new Blob([JSON.stringify({action:'create',bank:raw})]).size>SYSTEM_BANK_UPLOAD_LIMIT)throw new Error('O envio do Sistema aceita até 3 MB por JSON.');
+  if(!await confirmDialog('Publicar banco para todos?',`“${bankPresentation(bank).title}” · ${bank.questions.length} questões. O banco ficará visível para todos os usuários do Foco. Um banco existente não será substituído.`,'Publicar para todos'))return;
+  if(!current())return;
+  working=true;
+  try{
+    await bankManagement.publish(raw,auth);
+    if(!current())return;
+    render();toast('Banco enviado. Aguarde a publicação e sincronize o catálogo para vê-lo.');
+  }finally{working=false;}
+}
+async function toggleSystemBank(id){
+  const bank=model.banks.find(b=>b.id===id&&sourceType(b)==='system'),owner=store,generation=auth?.generation;
+  if(!bank||guest||!bankManagement.presentation(id)?.canToggle)throw new Error('Somente a administração pode alterar bancos do Sistema.');
+  const active=bank.active===false;
+  if(!await confirmDialog(active?'Ativar banco para todos?':'Desativar banco para todos?',`“${bankPresentation(bank).title}” ${active?'voltará a aceitar novas sessões para todos.':'deixará de aceitar novas sessões para todos. O card, as sessões já iniciadas e o histórico serão preservados.'}`,active?'Ativar para todos':'Desativar para todos'))return;
+  if(store!==owner||auth?.generation!==generation)return;
+  working=true;
+  try{
+    await bankManagement.setActive(bank,active,auth);
+    if(store!==owner||auth?.generation!==generation)return;
+    await bankManagement.inspect(auth);render();toast('Alteração enviada. Aguarde a publicação e sincronize o catálogo.');
+  }finally{working=false;}
+}
 async function renamePersonalBank(id){
   const bank=model.banks.find(b=>b.id===id&&sourceType(b)==='personal');if(!bank){toast('Apenas bancos pessoais podem ser renomeados.');return;}
   const ownStore=store,d=showDialog(`<form id="rename-bank-form"><div class="dialog-title"><h2 id="dialog-title">Renomear banco pessoal</h2><p>Escolha o nome que prefere usar nos seus estudos.</p></div><div class="field"><label for="bank-display-name">Nome do banco</label><input id="bank-display-name" name="displayName" value="${esc(bank.displayName||bank.name)}" required autofocus></div><p class="setting-note">Questões, respostas e sessões continuam associadas a este banco.</p><div class="dialog-actions"><button class="btn" type="button" data-action="close-dialog">Cancelar</button><button class="btn primary" type="submit">Salvar nome</button></div></form>`);
@@ -454,6 +485,7 @@ async function renamePersonalBank(id){
 }
 function bindFiles(){
   $('#bank-file').onchange=async event=>{const files=[...event.target.files];for(const file of files){try{if(await importBank(await readJSON(file)))toast(`Banco importado: ${file.name}`);}catch(e){failure(e);}}navigate('banks');};
+  const systemFile=$('#system-bank-file');if(systemFile)systemFile.onchange=async event=>{const file=event.target.files[0];event.target.value='';if(!file||working)return;try{await publishSystemBank(file);}catch(error){failure(error);}};
   $('#progress-file').onchange=async event=>{const file=event.target.files[0];if(!file)return;try{const doc=await readJSON(file);assertProgressOwner(doc,auth.profile.sub);const events=validateEvents(doc);await store.merge(events);render();toast('Históricos unidos. Seu progresso foi recuperado.');}catch(e){failure(e);}};
   const zone=$('#drop-zone');if(zone){zone.ondragover=e=>{e.preventDefault();zone.classList.add('drag');};zone.ondragleave=()=>zone.classList.remove('drag');zone.ondrop=async e=>{e.preventDefault();zone.classList.remove('drag');for(const f of e.dataTransfer.files){try{if(await importBank(await readJSON(f)))toast(`Banco importado: ${f.name}`);}catch(error){failure(error);}}render();};}
 }
@@ -495,6 +527,7 @@ document.addEventListener('click',async event=>{
     if(action==='change-photo'&&!guest){$('#profile-photo-file')?.click();return;}
     if(action==='remove-photo'&&!guest){saveProfilePhoto(config,accountStorage,'');render();toast('Foto removida.');return;}
     if(action==='import'){$('#bank-file').click();return;}
+    if(action==='system-bank-import'){if(guest||!bankManagement.admin||!bankManagement.publication)throw new Error('Somente a administração pode enviar bancos do Sistema.');$('#system-bank-file')?.click();return;}
     if(action==='restore-progress'){$('#progress-file').click();return;}
     if(action==='export-progress'){download(`foco-progresso-exportado-${localDay(Date.now())}.json`,store.export());return;}
     if(action==='reset-progress'){await resetPersonalProgress();return;}
@@ -513,7 +546,8 @@ document.addEventListener('click',async event=>{
     if(action==='bank-rename'){await renamePersonalBank(target.dataset.bank);return;}
     if(action==='bank-associate'){await associatePersonalProgress(target.dataset.bank,target.dataset.target);return;}
     if(action==='bank-unlink'){await associatePersonalProgress(target.dataset.bank,null,true);return;}
-    if(action==='bank-toggle'){const b=model.banks.find(b=>b.id===target.dataset.bank);await store.add([{type:sourceType(b)==='system'?'system-bank-state':'bank-state',bankId:b.id,value:b.enabled?'disabled':'enabled'}]);render();return;}
+    if(action==='bank-toggle'){const b=model.banks.find(b=>b.id===target.dataset.bank);if(!b||sourceType(b)!=='personal')throw new Error('A disponibilidade dos bancos do Sistema é gerenciada pela administração.');await store.add([{type:'bank-state',bankId:b.id,value:b.enabled?'disabled':'enabled'}]);render();return;}
+    if(action==='system-bank-toggle'){await toggleSystemBank(target.dataset.bank);return;}
     if(action==='bank-delete'){const b=model.banks.find(b=>b.id===target.dataset.bank);if(!b||sourceType(b)!=='personal'){toast('Apenas bancos pessoais podem ser excluídos.');return;}const warning=progressLinkCandidates(model,b).length?' Este progresso ainda está separado do Sistema. Para continuar os mesmos estudos no banco nativo, cancele e use Associar progresso primeiro.':'';if(await confirmDialog('Excluir este banco?',`“${b.displayName||b.name}” sairá da lista de estudos. Seu histórico será preservado. Você poderá importar o banco novamente.${warning}`, 'Excluir banco')){await store.add([{type:'bank-state',bankId:b.id,value:'deleted'}]);render();toast('Banco removido da lista.');}return;}
     if(action==='system-bank-delete'){await deleteSystemBank(target.dataset.bank);return;}
     if(action==='resume'||action==='session-resume'){await resumeStudy(target.dataset.session);return;}

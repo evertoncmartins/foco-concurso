@@ -56,7 +56,7 @@ function runtime(options={}){
   const document={documentElement:{dataset:{theme:'light'}},fullscreenElement:null,addEventListener(name,fn){(listeners[name]??=[]).push(fn);},querySelector(selector){
     if(['.sync-label','.connection-card'].includes(selector))return node('#app').innerHTML.includes('class="'+selector.slice(1)+'"')?node(selector):null;
     if(selector==='.question-body'||selector==='.question-actions [data-action=finish]'||selector.startsWith('[data-option-row='))return nodes.get(selector)||null;
-    if(['#app','#toast','#dialog','#main','#bank-file','#progress-file','#profile-photo-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
+    if(['#app','#toast','#dialog','#main','#bank-file','#system-bank-file','#progress-file','#profile-photo-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
     if(selector==='dialog[open],[aria-modal="true"]:not([hidden])'&&options.otherModal)return element();
     return null;
   },async emit(name,event){for(const fn of listeners[name]??[])await fn(event);}};
@@ -194,6 +194,52 @@ test('lei antiga revisada registra atribuição antes da primeira sessão e bloq
     await app.value('bankManagement.inspect(auth)');assert.equal(app.value('bankManagement.presentation("lei-11892").canDelete'),false);
     assert.match(app.value('bankManagement.presentation("lei-11892").reason'),/Atribuído a 1 usuário/);
   }
+});
+
+test('admin publica e desativa para todos com confirmação, cancelamento e isolamento de conta no Desktop e Mobile',async()=>{
+  const raw=JSON.parse(await readFile(new URL('./fixtures/lei-11892.json',import.meta.url))),native=imports.validateSystemBank(raw);
+  for(const mobile of [false,true]){
+    const calls=[],app=runtime({mobile,systemBanks:[native],managementFetch:async(url,settings)=>{
+      if(settings.method==='POST'){calls.push(JSON.parse(settings.body));return Response.json({publishing:true});}
+      return Response.json({admin:true,tracking:true,deletion:true,publication:true,banks:[{id:native.id,assigned:1,protected:true,state:null}]});
+    }});
+    await app.start();await app.value('bankManagement.inspect(auth)');app.value('view="banks";render()');
+    assert(app.html().includes('Enviar JSON do Sistema'));assert(app.html().includes('data-action="system-bank-toggle"'));
+    const before=app.value('JSON.stringify(store.events)');
+    const upload=()=>app.value(`publishSystemBank({name:'banco.json',size:10,text:async()=>${JSON.stringify(JSON.stringify(raw))}})`);
+    let pending=upload();await tick();assert(app.document.querySelector('#dialog').innerHTML.includes('visível para todos'));app.confirm(false);await pending;assert.equal(calls.length,0);
+    pending=upload();await tick();app.confirm(true);await pending;assert.equal(calls[0].action,'create');assert.equal(calls[0].bank.id,native.id);
+    pending=app.click('system-bank-toggle',{bank:native.id});await tick();app.confirm(false);await pending;assert.equal(calls.length,1);
+    pending=app.click('system-bank-toggle',{bank:native.id});await tick();app.confirm(true);await pending;
+    assert.deepEqual(calls[1],{action:'set-active',bankId:native.id,revision:native.revision,active:false});
+    assert.equal(app.value('JSON.stringify(store.events)'),before);
+    pending=upload();await tick();app.auth.generation++;app.confirm(true);await pending;assert.equal(calls.length,2);
+    assert.equal(app.value('working'),false);
+    await assert.rejects(app.value('publishSystemBank({name:"grande.json",size:SYSTEM_BANK_UPLOAD_LIMIT+1})'),/3 MB/);
+  }
+});
+
+test('conta comum mantém importação e exclusão pessoal e não recebe ações administrativas nem pode forjá-las',async()=>{
+  const raw=JSON.parse(await readFile(new URL('./fixtures/lei-11892.json',import.meta.url))),native=imports.validateSystemBank(raw),app=runtime({systemBanks:[native]});
+  await app.start();await app.value('bankManagement.inspect(auth)');app.value('view="banks";render()');
+  assert(!app.html().includes('data-action="system-bank-import"'));assert(!app.html().includes('data-action="system-bank-toggle"'));assert(!app.html().includes('data-action="system-bank-delete"'));
+  assert(app.html().includes('data-action="import"'));
+  const before=app.value('JSON.stringify(store.events)');
+  await assert.rejects(app.value('toggleSystemBank("lei-11892")'),/administração/);
+  await assert.rejects(app.value('publishSystemBank({name:"outro.json",size:1})'),/administração/);
+  await app.click('bank-toggle',{bank:native.id});assert.equal(app.value('JSON.stringify(store.events)'),before);
+  await app.value(`importBank(${JSON.stringify(raw)})`);app.value('render()');
+  const personalId=app.value('model.personalBanks[0].id');assert(app.html().includes('data-action="bank-delete"'));
+  await app.click('bank-toggle',{bank:personalId});assert.equal(app.value('model.personalBanks[0].enabled'),false);
+  const deletion=app.click('bank-delete',{bank:personalId});await tick();app.confirm(true);await deletion;assert.equal(app.value('model.personalBanks.length'),0);assert.equal(app.value('model.systemBanks.length'),1);
+});
+
+test('falha do envio e troca de conta durante leitura não publicam JSON nem deixam a interface bloqueada',async()=>{
+  const raw=JSON.parse(await readFile(new URL('./fixtures/lei-11892.json',import.meta.url))),app=runtime();await app.start();
+  app.value('bankManagement.admin=true;bankManagement.publication=true;publishCalls=0;bankManagement.publish=async()=>{publishCalls++;throw new Error("falha de envio")};');
+  const upload=app.value(`publishSystemBank({name:'banco.json',size:10,text:async()=>${JSON.stringify(JSON.stringify(raw))}})`);await tick();app.confirm(true);await assert.rejects(upload,/falha de envio/);assert.equal(app.value('working'),false);
+  const pending=app.value('publishSystemBank({name:"banco.json",size:10,text:()=>new Promise(resolve=>releaseJSON=resolve)})');await tick();app.auth.generation++;
+  app.value(`releaseJSON(${JSON.stringify(JSON.stringify(raw))})`);await pending;assert.equal(app.value('publishCalls'),1);
 });
 
 async function studyRuntime(options={},mode='smart'){

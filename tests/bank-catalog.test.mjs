@@ -66,12 +66,13 @@ test('resposta antiga sem snapshot ainda identifica a lei e não inventa contage
   const html=bankCardView(cards[0]);assert(html.includes('Lei nº 9.394/1996'));assert(html.includes('<dt>Questões</dt><dd>—</dd>'));
 });
 
-test('sincronização preserva desativação e importações pessoais, sem duplicar card histórico',async()=>{
+test('sincronização segue disponibilidade global, preserva importações e não duplica card histórico',async()=>{
   const store=new Store(new TemporaryStorage());await study(store);
   await store.add([{type:'bank',bank:{...native,id:'my-bank',displayName:'Meus estudos'}},{type:'system-bank-state',bankId:native.id,value:'disabled'}]);
   store.setSystemBanks([]);assert.equal(bankCatalogCards(store.model()).length,2);
   store.setSystemBanks([native,other]);const cards=bankCatalogCards(store.model());assert.equal(cards.length,3);
-  assert.equal(cards.find(b=>b.id===native.id).enabled,false);assert.equal(cards.find(b=>b.id==='my-bank').sourceType,'personal');
+  assert.equal(cards.find(b=>b.id===native.id).enabled,true);assert.equal(cards.find(b=>b.id==='my-bank').sourceType,'personal');
+  store.setSystemBanks([{...native,active:false},other]);assert.equal(bankCatalogCards(store.model()).find(b=>b.id===native.id).enabled,false);
   assert(!cards.some(b=>b.unavailable));
 });
 

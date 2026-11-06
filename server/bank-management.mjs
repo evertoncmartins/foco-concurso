@@ -1,6 +1,6 @@
 import {createHash,randomUUID} from 'node:crypto';
 import publicConfig from '../public/app-config.json' with {type:'json'};
-import {LEGACY_SYSTEM_BANK_IDS} from '../src/bank-management.mjs';
+import {LEGACY_SYSTEM_BANK_IDS,SYSTEM_BANK_UPLOAD_LIMIT} from '../src/bank-management.mjs';
 import {repositoryCatalog,repositoryBanksDirectory,repositoryBank} from './repository-banks.mjs';
 import {BankAssignments} from './bank-assignments.mjs';
 
@@ -35,6 +35,41 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
       method,headers:{Authorization:`Bearer ${env.BANK_GITHUB_TOKEN}`,Accept:accept,'X-GitHub-Api-Version':'2026-03-10',...(body?{'Content-Type':'application/json'}:{})},
       ...(body?{body:JSON.stringify(body)}:{}),cache:'no-store',signal:AbortSignal.timeout(15000)});
   }
+  async function readBank(id){
+    const path=`contents/${PATH}${id}.json`;
+    const remote=await github(`${path}?ref=main`,'GET',undefined,'application/vnd.github.object+json');
+    if(!remote.ok)throw problem('Não foi possível conferir o arquivo no GitHub.');
+    const file=await remote.json();
+    if(file.type!=='file'||!(/^[a-f0-9]{40}$/).test(file.sha))throw problem('Arquivo do GitHub inválido.');
+    let blob=file;
+    // Contents omits inline data above 1 MB. Pin the read to its immutable SHA.
+    if(file.encoding==='none'){
+      const response=await github(`git/blobs/${file.sha}`);
+      if(!response.ok)throw problem('Não foi possível ler o conteúdo do banco no GitHub.');
+      blob=await response.json();
+    }
+    if(blob.sha!==file.sha||blob.encoding!=='base64'||typeof blob.content!=='string')throw problem('Arquivo do GitHub inválido.');
+    const content=Buffer.from(blob.content,'base64');
+    const sha=createHash('sha1').update(`blob ${content.length}\0`).update(content).digest('hex');
+    if(sha!==file.sha)throw problem('O conteúdo do banco não corresponde ao arquivo conferido no GitHub.');
+    const raw=JSON.parse(content.toString('utf8').replace(/^\uFEFF/,''));
+    return {path,file,raw,bank:repositoryBank(raw,`${id}.json`)};
+  }
+  async function publishBank(id,raw,{create=false,sha}={}){
+    const operation=randomUUID(),reservation=await registry.reservePublication(id,operation,{create});
+    if(!reservation.reserved)throw problem('Este banco tem uma alteração em processamento. Sincronize o catálogo antes de continuar.',409);
+    let response;
+    try{response=await github(`contents/${PATH}${id}.json`,'PUT',{message:create?`Publica banco do Sistema ${id}`:`${raw.active===false?'Desativa':'Ativa'} banco do Sistema ${id}`,content:Buffer.from(JSON.stringify(raw,null,2)+'\n').toString('base64'),branch:'main',...(sha?{sha}:{})});}
+    catch{throw problem('A confirmação do envio ficou pendente. O banco permanece bloqueado para novas sessões até a conferência.');}
+    if(!response.ok){
+      if([400,401,403,404,409,422].includes(response.status))await registry.finish(id,operation,{release:!reservation.previousDeleted});
+      throw problem([409,422].includes(response.status)?'O banco mudou ou já existe no catálogo. Sincronize antes de continuar.':'O GitHub não confirmou a publicação.',[409,422].includes(response.status)?409:503);
+    }
+    const result=await response.json();
+    if(!result.commit?.sha)throw problem('A confirmação da publicação ficou pendente.');
+    await registry.finishPublication(id,operation,raw.active!==false);
+    return {bankId:id,commit:result.commit.sha,publishing:true};
+  }
   return async request=>{
     const origin=request.headers.get('origin'),headers={'Cache-Control':'no-store, private','X-Content-Type-Options':'nosniff',Vary:'Origin',Allow:'GET, POST, OPTIONS'};
     const reply=(data,status=200)=>Response.json(data,{status,headers});
@@ -43,20 +78,42 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
     if(request.method==='OPTIONS'){headers['Access-Control-Allow-Methods']='GET, POST, OPTIONS';headers['Access-Control-Allow-Headers']='Authorization, Content-Type';return new Response(null,{status:204,headers});}
     if(!['GET','POST'].includes(request.method))return reply({message:'Método não permitido.'},405);
     try{
-      const user=await identity(request),tracking=registry.configured,deletion=tracking&&!!env.BANK_GITHUB_TOKEN&&baseline.length>0;
+      const user=await identity(request),tracking=registry.configured,deletion=tracking&&!!env.BANK_GITHUB_TOKEN&&baseline.length>0,publication=deletion;
       const {banks}=repositoryCatalog(directory),ids=new Set(banks.map(b=>b.id));
-      if(request.method==='GET')return reply({admin:user.admin,tracking,deletion,banks:user.admin?(tracking?await registry.status([...ids]):[...ids].map(id=>({id}))).map(bank=>({...bank,protected:protectedIds.has(bank.id)})):[]});
-      if(Number(request.headers.get('content-length'))>8192)throw problem('Solicitação muito grande.',413);
-      const text=await request.text();if(text.length>8192)throw problem('Solicitação muito grande.',413);
+      if(request.method==='GET')return reply({admin:user.admin,tracking,deletion,publication:user.admin&&publication,banks:user.admin?(tracking?await registry.status([...ids]):[...ids].map(id=>({id}))).map(bank=>({...bank,protected:protectedIds.has(bank.id)})):[]});
+      const limit=user.admin?SYSTEM_BANK_UPLOAD_LIMIT:8192;
+      if(Number(request.headers.get('content-length'))>limit)throw problem('Solicitação muito grande. O envio do Sistema aceita até 3 MB.',413);
+      const text=await request.text();if(Buffer.byteLength(text)>limit)throw problem('Solicitação muito grande. O envio do Sistema aceita até 3 MB.',413);
       let body;try{body=JSON.parse(text);}catch{throw problem('Solicitação inválida.',400);}
       if(!body||typeof body!=='object'||Array.isArray(body))throw problem('Solicitação inválida.',400);
+      if(body.action==='create'){
+        if(!user.admin)throw problem('Somente a administração pode enviar bancos do Sistema.',403);
+        if(!publication)throw problem('A publicação do Sistema ainda não foi configurada.');
+        if(!validId(body.bank?.id))throw problem('Use um ID de banco no formato lei-NUMERO.',400);
+        let bank;try{bank=repositoryBank(body.bank,`${body.bank.id}.json`);}catch(error){throw problem(error.message,400);}
+        const existing=await github(`contents/${PATH}${bank.id}.json?ref=main`,'GET',undefined,'application/vnd.github.object+json');
+        if(existing.ok)throw problem('Já existe um banco desta lei no Sistema. O envio não substitui bancos existentes.',409);
+        if(existing.status!==404)throw problem('Não foi possível verificar se o banco já existe no GitHub.');
+        const document={schemaVersion:bank.schemaVersion,id:bank.id,name:bank.name,subtitle:bank.subtitle,description:bank.description,questions:bank.questions,publishedAt:typeof body.bank.publishedAt==='string'&&Number.isFinite(Date.parse(body.bank.publishedAt))?bank.publishedAt:new Date().toISOString(),...(bank.active===false?{active:false}:{})};
+        return reply({created:true,...await publishBank(bank.id,document,{create:true})});
+      }
+      if(Buffer.byteLength(text)>8192)throw problem('Solicitação muito grande.',413);
       if(body.action==='assign'){
         if(!Array.isArray(body.bankIds)||!body.bankIds.length||body.bankIds.length>50||body.bankIds.some(id=>!validId(id)))throw problem('Bancos inválidos.',400);
         const requested=[...new Set(body.bankIds)];
         if(requested.some(id=>!ids.has(id)))throw problem('Um banco saiu do catálogo. Sincronize antes de estudar.',409);
+        if(banks.some(bank=>requested.includes(bank.id)&&bank.active===false))throw problem('Este banco foi desativado pela administração. Suas sessões existentes continuam disponíveis.',409);
         if(!tracking)throw problem('O controle de atribuições ainda não foi ativado.');
-        if(!await registry.assign(requested,user.sub))throw problem('Um banco está em exclusão. Sincronize antes de estudar.',409);
+        if(!await registry.assign(requested,user.sub))throw problem('Um banco foi desativado ou está em alteração. Sincronize antes de estudar.',409);
         return reply({assigned:true});
+      }
+      if(body.action==='set-active'){
+        if(!user.admin)throw problem('Somente a administração pode ativar ou desativar bancos do Sistema.',403);
+        if(!publication)throw problem('A publicação do Sistema ainda não foi configurada.');
+        if(!validId(body.bankId)||typeof body.revision!=='string'||body.revision.length>128||typeof body.active!=='boolean')throw problem('Banco, revisão ou estado inválido.',400);
+        const {raw,file,bank}=await readBank(body.bankId);
+        if(bank.revision!==body.revision)throw problem('O banco foi atualizado. Sincronize antes de continuar.',409);
+        return reply({updated:true,active:body.active,...await publishBank(bank.id,{...raw,active:body.active},{sha:file.sha})});
       }
       if(body.action!=='delete')throw problem('Ação inválida.',400);
       if(!user.admin)throw problem('Somente a administração pode excluir bancos do sistema.',403);
@@ -65,24 +122,7 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
       if(protectedIds.has(id))throw problem('Este banco é anterior ao controle de atribuições e está protegido.',409);
       if(!deletion)throw problem('A exclusão global ainda não foi configurada.');
       if(!ids.has(id))throw problem('Banco indisponível. Sincronize o catálogo.',409);
-      const path=`contents/${PATH}${id}.json`;
-      const remote=await github(`${path}?ref=main`,'GET',undefined,'application/vnd.github.object+json');
-      if(!remote.ok)throw problem('Não foi possível conferir o arquivo no GitHub.');
-      const file=await remote.json();
-      if(file.type!=='file'||!(/^[a-f0-9]{40}$/).test(file.sha))throw problem('Arquivo do GitHub inválido.');
-      let blob=file;
-      // Contents omits inline data above 1 MB. Read the immutable Git blob by
-      // the inspected SHA, so a concurrent main update cannot change this read.
-      if(file.encoding==='none'){
-        const response=await github(`git/blobs/${file.sha}`);
-        if(!response.ok)throw problem('Não foi possível ler o conteúdo do banco no GitHub.');
-        blob=await response.json();
-      }
-      if(blob.sha!==file.sha||blob.encoding!=='base64'||typeof blob.content!=='string')throw problem('Arquivo do GitHub inválido.');
-      const content=Buffer.from(blob.content,'base64');
-      const sha=createHash('sha1').update(`blob ${content.length}\0`).update(content).digest('hex');
-      if(sha!==file.sha)throw problem('O conteúdo do banco não corresponde ao arquivo conferido no GitHub.');
-      const bank=repositoryBank(JSON.parse(content.toString('utf8').replace(/^\uFEFF/,'')),`${id}.json`);
+      const {path,file,bank}=await readBank(id);
       if(bank.revision!==body.revision)throw problem('O banco foi atualizado. Sincronize antes de excluir.',409);
       const operation=randomUUID();
       if(!await registry.reserve(id,operation))throw problem('O banco já foi atribuído a um usuário ou está em exclusão. Use Desativar banco.',409);
@@ -98,6 +138,6 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
       if(!result.commit?.sha)throw problem('A confirmação da exclusão ficou pendente.');
       await registry.finish(id,operation);
       return reply({deleted:true,bankId:id,commit:result.commit.sha,publishing:true});
-    }catch(error){return reply({message:error.status?error.message:'Não foi possível verificar o banco. Nenhuma exclusão foi liberada.'},error.status||503);}
+    }catch(error){return reply({message:error.status?error.message:'Não foi possível concluir a verificação do banco. Tente sincronizar novamente.'},error.status||503);}
   };
 }

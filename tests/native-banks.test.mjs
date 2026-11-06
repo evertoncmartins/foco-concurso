@@ -69,6 +69,22 @@ test('bancos nativos não são removidos ou renomeados por eventos pessoais e a 
   assert.throws(()=>validateEvents({schemaVersion:1,events:[event('delete','system-bank-state',{bankId:native.id,value:'deleted'})]}),/Estado/);
 });
 
+test('desativação publicada impede novas filas e preserva sessões, resultados, favoritos e preferências pessoais',async()=>{
+  const store=new Store(new TemporaryStorage());store.setSystemBanks([native]);await store.add([{type:'bank',bank:personal},{type:'bank-state',bankId:personal.id,value:'disabled'},{type:'system-bank-state',bankId:native.id,value:'disabled'}]);
+  assert.equal(store.model().systemBanks[0].enabled,true);
+  const q=store.model().questions.find(q=>q.sourceType==='system'),session=createSession([q.key]);
+  session.questionSources={[q.key]:questionSource(q)};
+  await store.add([{type:'session',session},{type:'flag',key:q.key,flag:'favorite',value:true}]);
+  const before=JSON.stringify(store.events);
+  store.setSystemBanks([validateSystemBank({...native,active:false})]);
+  const model=store.model();
+  assert.equal(model.systemBanks[0].enabled,false);assert.equal(model.personalBanks[0].enabled,false);
+  assert.equal(model.questions.some(q=>q.enabled),false);
+  assert.equal(model.sessions[0].id,session.id);assert.equal(sessionQuestion(model,session,q.key).statement,q.statement);
+  assert(model.flags.get(q.key).favorite);assert.equal(JSON.stringify(store.events),before);
+  store.setSystemBanks([validateSystemBank({...native,active:true})]);assert.equal(store.model().systemBanks[0].enabled,true);
+});
+
 test('uma cópia histórica pessoal não substitui a questão oficial da revisão atualmente publicada',()=>{
   const forged=structuredClone(native);forged.questions[0].statement='Conteúdo forjado';
   const model=derive([event('forged-snapshot','system-bank-snapshot',{bank:forged,revision:native.revision})],Date.now(),[native]),q=model.questions[0],session=createSession([q.key]);session.questionSources={[q.key]:questionSource(q)};

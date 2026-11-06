@@ -35,6 +35,15 @@ test('padroniza o título sem aceitar displayName arbitrário nos bancos do Sist
   const root=await directory(t);await save(root,{...bank(),name:'LDB — Lei 9.394/1996',subtitle:'Lei de Diretrizes e Bases da Educação Nacional',displayName:'Nome livre pessoal'});
   const published=repositoryCatalog(root).banks[0];assert.equal(published.name,'Lei nº 9.394/1996');assert.equal(published.displayName,published.name);assert.equal(published.subtitle,'Lei de Diretrizes e Bases da Educação Nacional');
 });
+
+test('disponibilidade global muda revisão sem alterar questões e ausência de active preserva a revisão anterior',async t=>{
+  const root=await directory(t),raw=bank();await save(root,raw);
+  const initial=repositoryCatalog(root).banks[0];await save(root,{...raw,active:true});
+  assert.equal(repositoryCatalog(root).banks[0].revision,initial.revision);
+  await save(root,{...raw,active:false});const disabled=repositoryCatalog(root).banks[0];
+  assert.equal(disabled.active,false);assert.notEqual(disabled.revision,initial.revision);assert.deepEqual(disabled.questions,initial.questions);
+  await save(root,{...raw,active:'false'});assert.throws(()=>repositoryCatalog(root),/active/);
+});
 test('publicação de qualquer novo banco recusa feedback incompleto e referência de terceiros',async t=>{
   const root=await directory(t);
   for(const change of [q=>delete q.optionExplanations,q=>q.reference.url='https://terceiro.example/lei']){

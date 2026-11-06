@@ -6,8 +6,8 @@ import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {createBankManagementHandler} from '../server/bank-management.mjs';
 import {repositoryBank} from '../server/repository-banks.mjs';
-import {BankAssignments,ASSIGN_SCRIPT,RESERVE_SCRIPT} from '../server/bank-assignments.mjs';
-import {BankManagement} from '../src/bank-management.mjs';
+import {BankAssignments,ASSIGN_SCRIPT,RESERVE_SCRIPT,PUBLISH_SCRIPT,ACTIVATE_SCRIPT} from '../server/bank-assignments.mjs';
+import {BankManagement,SYSTEM_BANK_UPLOAD_LIMIT} from '../src/bank-management.mjs';
 import {bankCardView} from '../src/bank-view.mjs';
 
 const url='https://foco-concurso-wine.vercel.app/api/bank-management';
@@ -23,12 +23,14 @@ async function fixture(t,options={}){
   const sha=createHash('sha1').update(`blob ${content.length}\0`).update(content).digest('hex');
   const blob={sha,encoding:'base64',content:content.toString('base64')};
   await writeFile(join(directory,`${source.id}.json`),content);
-  const calls=[],state=new Map(),members=new Set();
+  const calls=[],state=new Map(),members=new Set(),disabled=new Set();
   const registry={configured:options.configured??true,
-    async status(ids){return ids.map(id=>({id,assigned:members.size,state:state.get(id)||null}));},
-    async assign(ids,sub){calls.push(['assign',ids,sub]);if(ids.some(id=>state.has(id)))return false;members.add(sub);return true;},
+    async status(ids){return ids.map(id=>({id,assigned:members.size,state:state.get(id)||null,disabled:disabled.has(id)}));},
+    async assign(ids,sub){calls.push(['assign',ids,sub]);if(ids.some(id=>state.has(id)||disabled.has(id)))return false;members.add(sub);return true;},
     async reserve(id,operation){calls.push(['reserve',id]);if(members.size||state.has(id)||options.assigned)return false;state.set(id,operation);return true;},
-    async finish(id,operation,{release=false}={}){calls.push(['finish',release]);assert.equal(state.get(id),operation);if(release)state.delete(id);else state.set(id,'deleted');}
+    async finish(id,operation,{release=false}={}){calls.push(['finish',release]);assert.equal(state.get(id),operation);if(release)state.delete(id);else state.set(id,'deleted');},
+    async reservePublication(id,operation,{create=false}={}){calls.push(['reservePublication',id]);const before=state.get(id);if(before&&!(create&&before==='deleted'))return {reserved:false};state.set(id,operation);return {reserved:true,previousDeleted:before==='deleted'};},
+    async finishPublication(id,operation,active){calls.push(['finishPublication',active]);assert.equal(state.get(id),operation);if(active)disabled.delete(id);else disabled.add(id);state.delete(id);}
   };
   const fetcher=async(address,settings={})=>{
     if(address.includes('tokeninfo'))return Response.json({aud:options.audience||'fixture-client',sub:'test-subject',expires_in:3600});
@@ -38,12 +40,13 @@ async function fixture(t,options={}){
       assert(address.endsWith(`/git/blobs/${sha}`));
       return Response.json({...blob,...options.blob},{status:options.blobStatus||200});
     }
-    if(settings.method==='GET')return Response.json({type:'file',...blob,...(content.length>1024*1024?{encoding:'none',content:''}:{}),...options.file});
+    if(settings.method==='GET')return Response.json({type:'file',...blob,...(content.length>1024*1024?{encoding:'none',content:''}:{}),...options.file},{status:options.fileStatus||200});
     if(options.timeout)throw new Error('network timeout');
+    if(settings.method==='PUT'&&options.putWait)await options.putWait;
     return Response.json({commit:{sha:'delete-commit'}},{status:options.gitStatus||200});
   };
   const handler=createBankManagementHandler({env:{...env,...options.env},registry,directory,fetcher});
-  return {handler,calls,state,members,bank:currentBank,sha};
+  return {handler,calls,state,members,disabled,bank:currentBank,sha};
 }
 
 test('exclusão global valida conta, audiência, origem e papel no servidor',async t=>{
@@ -159,7 +162,7 @@ test('conflito confirmado do GitHub libera reserva; timeout ambíguo mantém ban
 test('adapter usa operação atômica e pseudônimo em vez do identificador Google no armazenamento',async()=>{
   const calls=[],registry=new BankAssignments({env:{UPSTASH_REDIS_REST_URL:'https://redis.example.test',UPSTASH_REDIS_REST_TOKEN:'fixture',BANK_ASSIGNMENT_SECRET:'s'.repeat(32)},fetcher:async(url,options)=>{calls.push(JSON.parse(options.body));return Response.json({result:1});}});
   assert(await registry.assign([bank.id,'lei-99999'],'private-google-subject'));
-  assert.equal(calls[0][0],'EVAL');assert.equal(calls[0][1],ASSIGN_SCRIPT);assert.equal(calls[0][2],4);
+  assert.equal(calls[0][0],'EVAL');assert.equal(calls[0][1],ASSIGN_SCRIPT);assert.equal(calls[0][2],6);
   assert(!JSON.stringify(calls).includes('private-google-subject'));assert.match(calls[0].at(-1),/^[a-f0-9]{64}$/);
   assert(await registry.reserve(bank.id,'operation'));assert.equal(calls[1][1],RESERVE_SCRIPT);
 });
@@ -195,15 +198,85 @@ test('cliente segue a revisão do servidor e registra a primeira sessão também
   app.manager.banks.get(id).assigned=1;assert.equal(app.manager.presentation(id).canDelete,false);
   await app.manager.assign([id],app.auth);
   assert.deepEqual(JSON.parse(calls.find(c=>c.method==='POST').body),{action:'assign',bankIds:[id]});
-  const count=calls.length;await app.manager.assign([id],app.auth);assert.equal(calls.length,count);
+  const count=calls.length;await app.manager.assign([id],app.auth);assert.equal(calls.length,count+2);
   delete app.manager.banks.get(id).protected;assert.equal(app.manager.presentation(id).canDelete,false);
 });
 
-test('card mantém desativação e limita exclusão global à apresentação administrativa liberada',()=>{
+test('card do Sistema reserva desativação e exclusão à administração e mantém ações pessoais',()=>{
   for(const management of [null,{admin:true,canDelete:false,reason:'Já atribuído.'},{admin:true,canDelete:true}]){
     const html=bankCardView({...bank,enabled:true},{detailsOpen:true,management});
-    assert(html.includes('data-action="bank-toggle"'));
+    assert(!html.includes('data-action="bank-toggle"'));
+    assert.equal(html.includes('data-action="system-bank-toggle"'),!!management);
     assert.equal(html.includes('data-action="system-bank-delete"'),!!management);
     if(management&&!management.canDelete)assert.match(html,/data-action="system-bank-delete"[^>]*disabled/);
   }
+  const personal=bankCardView({...raw,id:'my-bank',sourceType:'personal',enabled:true},{detailsOpen:true});
+  assert(personal.includes('data-action="bank-toggle"'));assert(personal.includes('data-action="bank-delete"'));
+});
+
+test('envio do Sistema valida privilégio e conteúdo, cria na main sem sobrescrever e preserva atribuições antigas',async t=>{
+  const app=await fixture(t,{fileStatus:404}),upload={...raw,token:'never-publish',events:[{secret:'never-publish'}]};
+  app.state.set(raw.id,'deleted');app.members.add('old-member');
+  const response=await app.handler(request({action:'create',bank:upload}));
+  assert.equal(response.status,200);assert.equal((await response.json()).created,true);
+  const mutation=app.calls.find(c=>c[0]==='github'&&c[1]==='PUT');
+  assert(mutation[2].endsWith(`/contents/public/data/question-banks/${raw.id}.json`));
+  assert.equal(mutation[3].branch,'main');assert(!('sha' in mutation[3]));
+  const stored=JSON.parse(Buffer.from(mutation[3].content,'base64'));
+  assert.equal(repositoryBank(stored,`${raw.id}.json`).id,raw.id);
+  assert(!JSON.stringify(stored).includes('never-publish'));assert.equal(app.state.has(raw.id),false);assert.equal(app.members.size,1);
+  for(const settings of [{email:'another@example.test'},{verified:false},{audience:'other-client'},{configured:false},{env:{BANK_GITHUB_TOKEN:''}},{env:{BANK_PROTECTED_IDS:''}}]){
+    const denied=await fixture(t,{fileStatus:404,...settings});
+    assert([401,403,503].includes((await denied.handler(request({action:'create',bank:raw}))).status));
+    assert(!denied.calls.some(c=>c[0]==='github'));
+  }
+  for(const change of [value=>value.id='../other',value=>value.name='Lei nº 9.394/1996',value=>delete value.questions[0].optionExplanations,value=>value.active='false',value=>value.questions[0].reference.url='https://example.test']){
+    const value=structuredClone(raw);change(value);const invalid=await fixture(t,{fileStatus:404});
+    assert.equal((await invalid.handler(request({action:'create',bank:value}))).status,400);assert.equal(invalid.calls.length,0);
+  }
+});
+
+test('banco existente, concorrência, limites em bytes e falhas de publicação não liberam alterações inseguras',async t=>{
+  const existing=await fixture(t);
+  assert.equal((await existing.handler(request({action:'create',bank:raw}))).status,409);
+  assert(!existing.calls.some(c=>c[0]==='reservePublication'));
+  const oversized={...raw,description:'á'.repeat(SYSTEM_BANK_UPLOAD_LIMIT/2)};
+  assert.equal((await existing.handler(request({action:'create',bank:oversized}))).status,413);
+  let release;const pending=new Promise(resolve=>release=resolve),app=await fixture(t,{fileStatus:404,putWait:pending});
+  const first=app.handler(request({action:'create',bank:raw}));await new Promise(resolve=>setImmediate(resolve));
+  assert.equal((await app.handler(request({action:'create',bank:raw}))).status,409);release();assert.equal((await first).status,200);
+  for(const settings of [{gitStatus:409},{timeout:true}]){
+    const failed=await fixture(t,{fileStatus:404,...settings});failed.state.set(raw.id,'deleted');
+    assert([409,503].includes((await failed.handler(request({action:'create',bank:raw}))).status));
+    assert.equal(failed.state.get(raw.id)==='deleted',!settings.timeout);
+    assert(!failed.calls.some(c=>c[0]==='finishPublication'));
+  }
+});
+
+test('admin desativa globalmente mesmo banco atribuído, bloqueia novas sessões e pode reativar sem apagar usuários',async t=>{
+  const app=await fixture(t);app.members.add('registered-account');
+  const before=JSON.stringify(raw);
+  assert.equal((await app.handler(request({action:'set-active',bankId:bank.id,revision:bank.revision,active:false}))).status,200);
+  assert(app.disabled.has(bank.id));assert.equal(app.members.size,1);assert.equal(JSON.stringify(raw),before);
+  const mutation=app.calls.find(c=>c[0]==='github'&&c[1]==='PUT');
+  assert.equal(mutation[3].sha,app.sha);assert.equal(JSON.parse(Buffer.from(mutation[3].content,'base64')).active,false);
+  assert.equal((await app.handler(request({action:'assign',bankIds:[bank.id]}))).status,409);
+  assert.equal((await app.handler(request({action:'set-active',bankId:bank.id,revision:bank.revision,active:true}))).status,200);
+  assert(!app.disabled.has(bank.id));assert.equal(app.members.size,1);
+  assert.equal((await app.handler(request({action:'assign',bankIds:[bank.id]}))).status,200);
+  const inactive=await fixture(t,{bank:{...raw,active:false}});
+  assert.equal((await inactive.handler(request({action:'assign',bankIds:[bank.id]}))).status,409);
+  assert(!inactive.calls.some(c=>c[0]==='assign'));
+  for(const settings of [{email:'user@example.test'},{stale:true}]){
+    const denied=await fixture(t,settings),res=await denied.handler(request({action:'set-active',bankId:bank.id,revision:settings.stale?'old':bank.revision,active:false}));
+    assert.equal(res.status,settings.stale?409:403);assert(!denied.calls.some(c=>c[0]==='reservePublication'));
+  }
+});
+
+test('adapter publica e altera disponibilidade com operações atômicas, mantendo o conjunto de usuários',async()=>{
+  const calls=[],registry=new BankAssignments({env:{KV_REST_API_URL:'https://redis.example.test',KV_REST_API_TOKEN:'fixture',BANK_ASSIGNMENT_SECRET:'s'.repeat(32)},fetcher:async(url,options)=>{const command=JSON.parse(options.body);calls.push(command);return Response.json({result:command[1]===PUBLISH_SCRIPT?2:1});}});
+  assert.deepEqual(await registry.reservePublication(bank.id,'operation',{create:true}),{reserved:true,previousDeleted:true});
+  await registry.finishPublication(bank.id,'operation',false);
+  assert.equal(calls[0][1],PUBLISH_SCRIPT);assert.equal(calls[1][1],ACTIVATE_SCRIPT);
+  assert.equal(calls[1].at(-1),'disabled');assert(!JSON.stringify(calls).includes(':users'));
 });

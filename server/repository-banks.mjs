@@ -12,7 +12,7 @@ export function repositoryBank(raw,file){
   const bank=validateSystemBank(raw);
   if(file!==`${bank.id}.json`)throw new Error(`O ID deve ser ${file.slice(0,-5)}, igual ao nome do arquivo.`);
   requireNativeFeedback(bank);
-  const content={schemaVersion:bank.schemaVersion,id:bank.id,name:bank.name,displayName:bank.displayName,subtitle:bank.subtitle,description:bank.description,questions:bank.questions,publishedAt:bank.publishedAt};
+  const content={schemaVersion:bank.schemaVersion,id:bank.id,name:bank.name,displayName:bank.displayName,subtitle:bank.subtitle,description:bank.description,questions:bank.questions,publishedAt:bank.publishedAt,...(bank.active===false?{active:false}:{})};
   return {...bank,revision:`repo-${digest(content).slice(0,24)}`};
 }
 

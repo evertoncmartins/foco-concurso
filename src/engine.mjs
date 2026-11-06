@@ -102,7 +102,7 @@ export function mergeEvents(...collections) {
   return [...map.values()].sort((a,b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id));
 }
 export function derive(events, now = Date.now(), systemBanks=[]) {
-  const banks = new Map(), states = new Map(), metadata=new Map(), systemStates=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], flagEvents=[],bankHistory=[], sessionUpdatedAt=new Map();
+  const banks = new Map(), states = new Map(), metadata=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], flagEvents=[],bankHistory=[], sessionUpdatedAt=new Map();
   const ordered=mergeEvents(events),progressEpoch=ordered.findLast(e=>e.type==='progress-reset')?.id??null;
   // Deletion wins over later/offline session snapshots and old backups. Keep
   // answers in the progress journal; this operation removes only the session.
@@ -115,7 +115,6 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
     if (e.type === 'bank') {const id=aliases.get(e.bank.id)||e.bank.id,bank={...e.bank,id,bankId:id,sourceType:'personal',editable:true,removable:true};banks.set(id,bank);bankHistory.push({...e,bank});}
     if(e.type==='system-bank-snapshot')bankHistory.push({...e,bank:{...e.bank,bankId:e.bank.id,sourceType:'system'}});
     if (e.type === 'bank-state') states.set(aliases.get(e.bankId)||e.bankId, e.value);
-    if(e.type==='system-bank-state')systemStates.set(e.bankId,e.value);
     if(e.type==='bank-metadata')metadata.set(aliases.get(e.bankId)||e.bankId,e.displayName);
     if (e.type === 'session') {const s=structuredClone(e.session),sources=s.questionSources||{};s.queue=s.queue.map(k=>keyAlias(k,sources[k]?.sourceType));s.answers=Object.fromEntries(Object.entries(s.answers).map(([k,v])=>[keyAlias(k,sources[k]?.sourceType),v]));if(s.questionSources)s.questionSources=Object.fromEntries(Object.entries(sources).map(([k,v])=>[keyAlias(k,v.sourceType),v]));sessions.set(s.id,s);sessionUpdatedAt.set(s.id,e.at);}
     if (e.type === 'flag') flagEvents.push({...e,key:keyAlias(e.key,e.sourceType)});
@@ -139,7 +138,9 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
   }
   const personal=[...banks.values()].filter(b => states.get(b.id) !== 'deleted').map(b=>({...b,displayName:metadata.get(b.id)||bankPresentation(b).title,enabled:!links.banks.has(b.id)&&states.get(b.id)!=='disabled',linkedTo:links.banks.get(b.id)||null}));
   for(const event of bankHistory){const custom=metadata.get(event.bank.id);if(custom)event.bank={...event.bank,displayName:custom};}
-  const native=systemBanks.map(b=>({...b,bankId:b.id,sourceType:'system',editable:false,removable:false,enabled:systemStates.get(b.id)!=='disabled'}));
+  // Legacy per-account state events stay in the journal. System availability
+  // now follows the administrator's published catalog for every account.
+  const native=systemBanks.map(b=>({...b,bankId:b.id,sourceType:'system',editable:false,removable:false,enabled:b.active!==false}));
   const visibleBanks=[...native,...personal];
   const questions = visibleBanks.flatMap(b => b.questions.map(q => ({...q, key:questionKey(b.id,q.id), bankId:b.id, bankName:b.displayName||b.name, displayName:b.displayName||b.name,sourceType:b.sourceType,bankRevision:b.revision||null,enabled:b.enabled})));
   const available=new Set(questions.map(q=>q.key)),needed=new Set([...sessions.values()].filter(s=>!s.completed&&!s.abandoned).flatMap(s=>s.queue));

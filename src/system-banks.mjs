@@ -18,12 +18,13 @@ export function requireNativeFeedback(bank){
 }
 export function validateSystemBank(raw){
   const bank=validateBank(raw);
+  if(raw.active!==undefined&&typeof raw.active!=='boolean')throw new Error('active deve ser verdadeiro ou falso.');
   if(!/^lei-[1-9]\d*$/.test(bank.id))throw new Error('Bancos do sistema devem usar ID lei-NUMERO.');
   const presentation=bankPresentation({...bank,displayName:undefined});
   const number=presentation.title.match(/^Lei nº ([\d.]+)\/\d{4}$/)?.[1]?.replace(/\./g,'');
   if(bank.id!==`lei-${number}`)throw new Error('O nome deve identificar a mesma lei do ID lei-NUMERO.');
   const publishedAt=typeof raw.publishedAt==='string'&&Number.isFinite(Date.parse(raw.publishedAt))?new Date(raw.publishedAt).toISOString():'2026-10-16T00:00:00.000Z';
-  return {...bank,name:presentation.title,sourceType:'system',displayName:presentation.title,subtitle:bank.subtitle||presentation.subtitle,revision:typeof raw.revision==='string'?raw.revision:'1',publishedAt,editable:false,removable:false};
+  return {...bank,name:presentation.title,sourceType:'system',displayName:presentation.title,subtitle:bank.subtitle||presentation.subtitle,revision:typeof raw.revision==='string'?raw.revision:'1',publishedAt,active:raw.active!==false,editable:false,removable:false};
 }
 export class SystemBanks{
   constructor(fetcher=globalThis.fetch,{origin=globalThis.location?.origin}={}){this.fetcher=fetcher.bind(globalThis);this.origin=origin;this.banks=[];this.version='';this.loading=null;this.loaded=false;this.updates=new Map();this.available=null;this.checking=null;}
