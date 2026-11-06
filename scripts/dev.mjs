@@ -9,6 +9,11 @@ const server=createServer(async(req,res)=>{
   try{
     if(!['GET','HEAD'].includes(req.method)){res.writeHead(405).end();return;}
     const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+    // Preview never grants global administration or writes attribution data.
+    if(pathname==='/api/bank-management'){
+      res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});
+      res.end(req.method==='HEAD'?undefined:JSON.stringify({admin:false,tracking:false,deletion:false,banks:[]}));return;
+    }
     // Local development discovers changes directly in the official folder,
     // including deletions, even when dist still contains an earlier build.
     const asset=pathname.match(/^\/data\/question-banks\/(index|lei-[1-9]\d*)\.json$/);

@@ -1,4 +1,4 @@
-import {validateBank} from './engine.mjs';
+import {validateBank,canonicalJSON} from './engine.mjs';
 import {bankPresentation} from './bank-names.mjs';
 
 const PRIMARY_ORIGIN='https://foco-concurso-wine.vercel.app';
@@ -26,7 +26,41 @@ export function validateSystemBank(raw){
   return {...bank,name:presentation.title,sourceType:'system',displayName:presentation.title,subtitle:bank.subtitle||presentation.subtitle,revision:typeof raw.revision==='string'?raw.revision:'1',publishedAt,editable:false,removable:false};
 }
 export class SystemBanks{
-  constructor(fetcher=globalThis.fetch,{origin=globalThis.location?.origin}={}){this.fetcher=fetcher.bind(globalThis);this.origin=origin;this.banks=[];this.version='';this.loading=null;this.loaded=false;}
+  constructor(fetcher=globalThis.fetch,{origin=globalThis.location?.origin}={}){this.fetcher=fetcher.bind(globalThis);this.origin=origin;this.banks=[];this.version='';this.loading=null;this.loaded=false;this.updates=new Map();this.available=null;this.checking=null;}
+  async check(){
+    if(this.checking)return this.checking;
+    this.checking=(async()=>{
+      if(this.loading)await this.loading;
+      const candidate=new SystemBanks(this.fetcher,{origin:this.origin});
+      candidate.loaded=this.loaded;
+      await candidate.load({force:true});
+      const current=new Map(this.banks.map(b=>[b.id,b])),latest=new Map(candidate.banks.map(b=>[b.id,b])),updates=new Map();
+      for(const id of new Set([...current.keys(),...latest.keys()])){
+        const before=current.get(id),bank=latest.get(id);
+        if(before&&bank&&canonicalJSON(before)===canonicalJSON(bank))continue;
+        const oldQuestions=new Map((before?.questions||[]).map(q=>[q.id,q])),newQuestions=new Map((bank?.questions||[]).map(q=>[q.id,q]));
+        updates.set(id,{kind:!before?'added':!bank?'removed':'updated',bank,
+          added:[...newQuestions.keys()].filter(id=>!oldQuestions.has(id)).length,
+          removed:[...oldQuestions.keys()].filter(id=>!newQuestions.has(id)).length,
+          changed:[...newQuestions].filter(([id,q])=>oldQuestions.has(id)&&canonicalJSON(oldQuestions.get(id))!==canonicalJSON(q)).length});
+      }
+      this.available=candidate;this.updates=updates;return updates;
+    })();
+    try{return await this.checking;}finally{this.checking=null;}
+  }
+  apply(bankId){
+    if(!this.available)return this.banks;
+    if(!bankId){this.banks=this.available.banks;this.updates.clear();}
+    else{
+      const bank=this.available.banks.find(b=>b.id===bankId),exists=this.banks.some(b=>b.id===bankId);
+      this.banks=this.banks.flatMap(b=>b.id===bankId?(bank?[bank]:[]):[b]);
+      if(bank&&!exists)this.banks.push(bank);
+      this.updates.delete(bankId);
+    }
+    this.loaded=true;
+    if(!this.updates.size){this.version=this.available.version;this.available=null;}
+    return this.banks;
+  }
   async load({force=false}={}){
     if(this.loading)return this.loading;if(this.loaded&&!force)return this.banks;
     this.loading=(async()=>{
@@ -49,7 +83,7 @@ export class SystemBanks{
           if(bank.id!==item.id||item.revision&&bank.revision!==item.revision)throw new Error('O arquivo não corresponde à versão do catálogo. Atualize a lista.');
           return bank;
         }));
-        this.banks=banks;this.version=manifest.version||'';this.loaded=true;return banks;
+        this.banks=banks;this.version=manifest.version||'';this.loaded=true;this.updates.clear();this.available=null;return banks;
       // After a successful load, keep that catalog on failure instead of
       // replacing it with a potentially older copy bundled in a mirror.
       }catch(error){failure=error;if(this.loaded)break;}

@@ -4,6 +4,7 @@ dist/
 .env.*
 !.env.example
 .sites-runtime/
+.vercel/
 *.log
 coverage/
 playwright-report/

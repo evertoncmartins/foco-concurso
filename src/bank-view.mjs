@@ -52,7 +52,7 @@ export function bankOverviewData(bank){
   return {...presentation,institutions:counts(institutions),subjects:counts(subjects),disciplines,firstYear,lastYear,period,missingInstitutions,missingYears,total:bank.questions.length};
 }
 
-export function bankCardView(bank,{detailsOpen=false,index=0,association=null}={}){
+export function bankCardView(bank,{detailsOpen=false,index=0,association=null,syncing=false,management=null}={}){
   const panelId=`bank-details-${index}`,overview=bankOverviewData(bank);
   const {law,institutions,subjects,disciplines,total,period,missingInstitutions,missingYears}=overview;
   const detailLabel=detailsOpen?'Ocultar detalhes':'Ver mais detalhes';
@@ -61,7 +61,7 @@ export function bankCardView(bank,{detailsOpen=false,index=0,association=null}={
   const enabled=bank.enabled&&!bank.unavailable;
   return `<article class="card bank-card ${enabled?'':'disabled'}" aria-label="${esc(bank.displayName||bank.name)}">
     <header class="bank-heading">
-      <div class="bank-heading-top"><span class="bank-symbol">${icon('book',20)}</span>${sourceTag(bank)}<span class="bank-status ${enabled?'is-active':''}"><span aria-hidden="true"></span>${bank.unavailable?'Indisponível':enabled?'Ativo':'Desativado'}</span></div>
+      <div class="bank-heading-top"><span class="bank-symbol">${icon('book',20)}</span>${sourceTag(bank)}<span class="bank-status ${enabled?'is-active':''}"><span aria-hidden="true"></span>${bank.pendingActivation?'A sincronizar':bank.unavailable?'Indisponível':enabled?'Ativo':'Desativado'}</span></div>
       <div class="bank-title"><h3 title="${esc(bank.displayName||bank.name)}">${esc(title)}</h3><p>${esc(subtitle)}</p></div>
     </header>
     <dl class="bank-stats" aria-label="Resumo do conteúdo">
@@ -69,6 +69,11 @@ export function bankCardView(bank,{detailsOpen=false,index=0,association=null}={
       <div><dt>${plural(institutions.length,'Instituição','Instituições')}</dt><dd>${institutions.length||'—'}</dd></div>
       <div class="bank-period"><dt>Provas</dt><dd>${period==='Não informado'?'—':esc(period)}</dd></div>
     </dl>
+    ${bank.pendingUpdate?`<div class="bank-update" role="status"><p><strong>${bank.pendingUpdate.kind==='added'?'Novo banco disponível':bank.pendingUpdate.kind==='removed'?'Banco retirado do catálogo':'Atualização disponível'}</strong><span>${bank.pendingUpdate.kind==='removed'?'Sincronize para atualizar sua lista.':[
+      bank.pendingUpdate.added?`${bank.pendingUpdate.added} ${plural(bank.pendingUpdate.added,'questão nova','questões novas')}`:'',
+      bank.pendingUpdate.changed?`${bank.pendingUpdate.changed} ${plural(bank.pendingUpdate.changed,'questão alterada','questões alteradas')}`:'',
+      bank.pendingUpdate.removed?`${bank.pendingUpdate.removed} ${plural(bank.pendingUpdate.removed,'questão removida','questões removidas')}`:''
+    ].filter(Boolean).join(' · ')||'Informações do banco atualizadas.'}</span></p><button class="btn small" data-action="sync-system-bank" data-bank="${esc(bank.id)}" ${syncing?'disabled':''}>${icon('repeat',14)} Sincronizar banco</button></div>`:''}
     ${bank.unavailable?'<p class="bank-unavailable-note">Este banco saiu do catálogo. Seus estudos e resultados continuam no histórico.</p>':''}
     <div class="bank-primary-actions">
       ${bank.unavailable?`<button class="btn small" data-action="bank-history" data-bank="${esc(bank.id)}">Ver sessões ${icon('clock',14)}</button>`:`<button class="btn small primary" data-action="start" data-bank="${esc(bank.id)}" ${enabled?'':'disabled'}>Estudar ${icon('arrow',14)}</button>`}
@@ -85,9 +90,10 @@ export function bankCardView(bank,{detailsOpen=false,index=0,association=null}={
         <div class="bank-file-actions">
           ${sourceType(bank)==='personal'?`<button class="btn small" data-action="bank-rename" data-bank="${esc(bank.id)}">Renomear</button>`:''}
           <button class="icon-btn" data-action="bank-export" data-bank="${esc(bank.id)}" aria-label="Exportar ${esc(bank.displayName||bank.name)}" title="Exportar JSON">${icon('download',17)}<span class="bank-action-label">Exportar</span></button>
-          ${sourceType(bank)==='personal'?`<button class="icon-btn" data-action="bank-delete" data-bank="${esc(bank.id)}" aria-label="Excluir ${esc(bank.displayName||bank.name)}" title="Excluir banco">${icon('trash',17)}<span class="bank-action-label">Excluir</span></button>`:''}
+          ${sourceType(bank)==='personal'||management?.admin?`<button class="icon-btn" data-action="${sourceType(bank)==='personal'?'bank-delete':'system-bank-delete'}" data-bank="${esc(bank.id)}" aria-label="Excluir ${esc(bank.displayName||bank.name)}" title="${esc(sourceType(bank)==='personal'?'Excluir banco':management.reason||'Excluir banco para todos')}" ${sourceType(bank)==='system'&&(!management.canDelete||syncing)?'disabled':''}>${icon('trash',17)}<span class="bank-action-label">Excluir</span></button>`:''}
         </div>
       </div>`}
+      ${management?.admin&&management.reason?`<p class="bank-section-note">${esc(management.reason)}</p>`:''}
     </div>
   </article>`;
 }

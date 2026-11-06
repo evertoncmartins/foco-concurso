@@ -22,6 +22,9 @@ test('servidor local sincroniza adição, atualização e remoção da pasta sem
     child.stdout.on('data',data=>{output+=data;const url=output.match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];if(url){clearTimeout(timer);resolve(url);}});
   });
   const catalog=new SystemBanks((url,options)=>fetch(new URL(url,origin),options),{origin});
+  const administration=await fetch(`${origin}/api/bank-management`);
+  assert.deepEqual(await administration.json(),{admin:false,tracking:false,deletion:false,banks:[]});
+  assert.equal((await fetch(`${origin}/api/bank-management`,{method:'POST',body:'{}'})).status,405);
   assert.deepEqual(await catalog.load(),[]);
   await writeFile(join(directory,'lei-9394.json'),JSON.stringify(raw));
   await catalog.load({force:true});assert.equal(catalog.banks.length,1);const revision=catalog.banks[0].revision;

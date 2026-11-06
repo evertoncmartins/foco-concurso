@@ -8,6 +8,14 @@ import {validateSystemBank,requireNativeFeedback} from '../src/system-banks.mjs'
 export const repositoryBanksDirectory=fileURLToPath(new URL('../public/data/question-banks/',import.meta.url));
 const digest=value=>createHash('sha256').update(canonicalJSON(value)).digest('hex');
 
+export function repositoryBank(raw,file){
+  const bank=validateSystemBank(raw);
+  if(file!==`${bank.id}.json`)throw new Error(`O ID deve ser ${file.slice(0,-5)}, igual ao nome do arquivo.`);
+  requireNativeFeedback(bank);
+  const content={schemaVersion:bank.schemaVersion,id:bank.id,name:bank.name,displayName:bank.displayName,subtitle:bank.subtitle,description:bank.description,questions:bank.questions,publishedAt:bank.publishedAt};
+  return {...bank,revision:`repo-${digest(content).slice(0,24)}`};
+}
+
 // The directory is the source of truth. No hand-maintained index or storage service.
 export function repositoryCatalog(directory=repositoryBanksDirectory){
   const banks=[];
@@ -17,11 +25,7 @@ export function repositoryCatalog(directory=repositoryBanksDirectory){
     try{
       if(!entry.isFile()||!/^lei-[1-9]\d*\.json$/.test(file))throw new Error('Use um arquivo lei-NUMERO.json, sem pontos ou ano no nome.');
       const raw=JSON.parse(readFileSync(join(directory,file),'utf8').replace(/^\uFEFF/,''));
-      const bank=validateSystemBank(raw);
-      if(file!==`${bank.id}.json`)throw new Error(`O ID deve ser ${file.slice(0,-5)}, igual ao nome do arquivo.`);
-      requireNativeFeedback(bank);
-      const content={schemaVersion:bank.schemaVersion,id:bank.id,name:bank.name,displayName:bank.displayName,subtitle:bank.subtitle,description:bank.description,questions:bank.questions,publishedAt:bank.publishedAt};
-      banks.push({...bank,revision:`repo-${digest(content).slice(0,24)}`});
+      banks.push(repositoryBank(raw,file));
     }catch(error){throw new Error(`${file}: ${error.message}`,{cause:error});}
   }
   const entries=banks.map(bank=>({id:bank.id,file:`${bank.id}.json`,revision:bank.revision}));

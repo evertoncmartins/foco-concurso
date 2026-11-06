@@ -12,6 +12,7 @@ import {icon} from './icons.mjs';
 import {homeView} from './home-view.mjs';
 import {bankCardView,bankPresentation} from './bank-view.mjs';
 import {SystemBanks} from './system-banks.mjs';
+import {BankManagement} from './bank-management.mjs';
 import {bankCatalogCards,catalogSyncButton} from './bank-catalog-view.mjs';
 import {sourceType,sourceTag,sourceLabel,questionSource,sessionQuestion,preparePersonalBank,studyPresentation} from './bank-source.mjs';
 import {createSession,chooseAnswer,moveSession,jumpSession,completeSession} from './session.mjs';
@@ -36,24 +37,33 @@ let finishingSession=false;
 const draftSelections=new Map();
 const expandedBankDetails=new Set();
 const systemCatalog=new SystemBanks();
+const bankManagement=new BankManagement();
 let systemCatalogError='',systemCatalogSyncing=false;
-async function loadSystemCatalog({force=false}={}){
+async function loadSystemCatalog({force=false,checkOnly=false,bankId}={}){
   const owner=store;
-  try{await systemCatalog.load({force});if(store===owner)systemCatalogError='';}
+  try{
+    if(checkOnly||bankId){await systemCatalog.check();if(bankId)systemCatalog.apply(bankId);}
+    else await systemCatalog.load({force});
+    if(store===owner)systemCatalogError='';
+  }
   catch(error){if(store===owner)systemCatalogError=error.message;}
   if(store===owner&&owner)owner.setSystemBanks(systemCatalog.banks);
 }
-async function syncSystemCatalog({notify=false}={}){
+async function syncSystemCatalog({notify=false,apply=true,bankId}={}){
   if(systemCatalogSyncing||!store)return;
-  const owner=store;systemCatalogSyncing=true;render();
-  try{await loadSystemCatalog({force:true});}
+  const owner=store,documentSequence=publicDocuments.sequence;systemCatalogSyncing=true;render();
+  try{await loadSystemCatalog({force:true,checkOnly:!apply,bankId});if(!guest&&store===owner)await bankManagement.inspect(auth);}
   finally{
     systemCatalogSyncing=false;
-    if(store&&view==='banks'){
+    if(store===owner&&view==='banks'&&publicDocuments.sequence===documentSequence&&!publicDocuments.dialog){
       const focused=$('[data-action=refresh-system-banks]')===document.activeElement;
       render();if(focused)$('[data-action=refresh-system-banks]')?.focus({preventScroll:true});
+    }else if(store===owner&&view==='banks'){
+      const button=$('[data-action=refresh-system-banks]');
+      if(button){button.disabled=false;button.setAttribute('aria-busy','false');const label=button.querySelector('span');if(label)label.textContent=systemCatalog.updates.size?`Sincronizar (${systemCatalog.updates.size})`:'Sincronizar';}
+      for(const button of document.querySelectorAll?.('[data-action=sync-system-bank]')||[])button.disabled=false;
     }
-    if(notify&&store===owner)toast(systemCatalogError?'Não foi possível sincronizar. Os bancos e o histórico foram mantidos.':'Catálogo sincronizado.');
+    if(notify&&store===owner)toast(systemCatalogError?'Não foi possível sincronizar. Os bancos e o histórico foram mantidos.':systemCatalog.updates.size?'Há atualizações disponíveis. Sincronize os bancos sinalizados.':'Catálogo sincronizado.');
   }
 }
 let sessionFilters={status:'open',bankId:'',type:'all',page:1},performanceBank='',performanceOrigin='all',resultSessionId=null;
@@ -167,11 +177,11 @@ function weekChart(answers=model.answers){
 function home(){return homeView({model,config,resume:resumeSession(),driveConnected:!!drive.token,driveStatus:drive.status,driveMessage:drive.message,guest});}
 function study(){return heading('O que vamos estudar?','Escolha seu objetivo. O resto é uma questão de prática.',`<button class="btn small" data-action="nav" data-view="sessions">${icon('clock',15)} Minhas sessões</button>`)+`<div class="mode-grid">${Object.entries(modes).map(([key,[name,description,i]])=>`<button class="mode-card" data-action="start" data-mode="${key}">${icon(i,25)}<h3>${name}</h3><p>${description}</p><span class="badge">${filterQuestions(model,{mode:key}).length} questões disponíveis ${icon('arrow',12)}</span></button>`).join('')}</div><p class="study-tip">As sessões não repetem questões. As recomendadas equilibram conteúdo novo e revisão, com intervalos maiores após acertos consecutivos.</p>`;}
 function banks(){
-  const cards=bankCatalogCards(model);
-  return heading('Banco de questões','Seu conteúdo, organizado do seu jeito.',`<div class="bank-heading-actions">${catalogSyncButton(systemCatalogSyncing)}<button class="btn primary" data-action="import">${icon('plus',16)} Importar JSON</button></div>`)+`
+  const cards=bankCatalogCards(model,systemCatalog.updates);
+  return heading('Banco de questões','Seu conteúdo, organizado do seu jeito.',`<div class="bank-heading-actions">${catalogSyncButton(systemCatalogSyncing,systemCatalog.updates.size)}<button class="btn primary" data-action="import">${icon('plus',16)} Importar JSON</button></div>`)+`
     ${systemCatalogError?`<p class="system-catalog-error" role="status">${esc(systemCatalogError)} Os bancos carregados e seu histórico foram mantidos. Tente sincronizar novamente.</p>`:''}<p class="system-catalog-note" role="status">${systemCatalogSyncing?'Buscando atualizações dos bancos do sistema…':`Bancos do sistema disponíveis para todos. ${sourceTag({sourceType:'personal'})} identifica os seus arquivos.`}</p><section class="import-zone" id="drop-zone"><div class="flex">${icon('upload',25)}<h3>Um novo conteúdo começa aqui.</h3></div><p>Selecione ou arraste arquivos JSON. Não é preciso alterar o código.</p><div class="flex"><button class="btn small" data-action="import">Escolher arquivos</button><button class="btn small ghost" data-action="drive-banks">${icon('cloud',15)} Buscar no Drive</button><a class="btn small ghost" href="./docs/modelo-banco.json" download>Baixar modelo JSON ${icon('download',14)}</a></div>
     <div class="bank-format-help" aria-labelledby="bank-format-title"><div><h4 id="bank-format-title">Crie seus próprios bancos</h4><p>Consulte a estrutura do JSON, os campos das questões e exemplos para criar e importar seus bancos personalizados.</p></div><div class="bank-format-actions"><a class="btn small" data-foco-document href="./formato-json.html">Ler a documentação do formato ${icon('arrow',14)}</a><a class="text-link" href="./docs/questions.schema.json" download>Baixar JSON Schema</a></div></div></section>
-    <div class="banks-grid">${cards.map((bank,index)=>{const candidates=progressLinkCandidates(model,bank);return bankCardView(bank,{index,detailsOpen:expandedBankDetails.has(bank.id),association:candidates.length===1?candidates[0]:null});}).join('')}</div>
+    <div class="banks-grid">${cards.map((bank,index)=>{const candidates=progressLinkCandidates(model,bank);return bankCardView(bank,{index,syncing:systemCatalogSyncing,management:sourceType(bank)==='system'?bankManagement.presentation(bank.id):null,detailsOpen:expandedBankDetails.has(bank.id),association:candidates.length===1?candidates[0]:null});}).join('')}</div>
     ${cards.length?'':empty('Seu primeiro banco','Use o modelo JSON para organizar seu conteúdo.')}`;
 }
 function performanceRows(field,answers=model.answers){const rows=breakdown(answers,field);return rows.length?rows.map(r=>`<div class="perf-row"><div class="between"><span>${esc(r.label)}</span><strong>${r.accuracy}%</strong></div><div class="progress-track"><span class="${r.accuracy<60?'low':''}" style="width:${r.accuracy}%"></span></div><small>${r.correct} acertos · ${r.wrong} erros · ${r.total} tentativas</small></div>`).join(''):'<p class="muted" style="font-size:12px">Os resultados aparecerão após suas primeiras respostas.</p>';}
@@ -247,7 +257,7 @@ function navigate(next){
   if(next!=='session')focusChange=focusMode.exit();
   else if(!desktopLayout.matches&&session&&!session.completed)focusChange=focusMode.enter({automatic:true});
   render();window.scrollTo(0,0);$('#main').focus({preventScroll:true});
-  if(next==='banks')void syncSystemCatalog();
+  if(next==='banks')void syncSystemCatalog({apply:false});
   return focusChange;
 }
 async function leaveQuestionFocus(){
@@ -338,8 +348,13 @@ function startDialog(mode='smart',bankId=''){
   };
 }
 async function newSession(queue,mode='smart'){
+  const owner=store,generation=auth?.generation;
   const questions=new Map(model.questions.map(q=>[q.key,q]));
   const selectedBanks=new Set(queue.map(key=>questions.get(key)?.bankId));
+  if(!guest){
+    await bankManagement.assign(model.banks.filter(bank=>bank.sourceType==='system'&&selectedBanks.has(bank.id)).map(bank=>bank.id),auth);
+    if(store!==owner||auth?.generation!==generation)throw new Error('A conta conectada mudou. Inicie a sessão novamente.');
+  }
   const snapshots=model.banks.filter(bank=>bank.sourceType==='system'&&selectedBanks.has(bank.id)&&!store.events.some(e=>e.type==='system-bank-snapshot'&&e.bank.id===bank.id&&e.revision===(bank.revision||'1')));
   if(snapshots.length)await store.add(snapshots.map(bank=>({
     id:`system-snapshot-${bank.id}-${bank.revision||'1'}`,at:bank.publishedAt||'2026-10-16T00:00:00.000Z',type:'system-bank-snapshot',revision:bank.revision||'1',
@@ -419,6 +434,19 @@ async function associatePersonalProgress(id,targetId,unlink=false){
 }
 async function readJSON(file){const content=await file.text();try{return JSON.parse(content.replace(/^\uFEFF/,''));}catch{throw new Error(`${file.name}: JSON inválido. Confira vírgulas, aspas e colchetes.`);}}
 async function importBank(raw){const bank=preparePersonalBank(validateBank(raw)),old=model.banks.find(b=>b.id===bank.id&&sourceType(b)==='personal');if(old&&!(await confirmDialog('Atualizar banco?',`Já existe “${old.displayName||old.name}” com este ID. O conteúdo será atualizado, preservando seu histórico de respostas. Mantenha IDs existentes apenas para as mesmas questões.`,'Atualizar')))return false;await store.add([{type:'bank',bank},{type:'bank-state',bankId:bank.id,value:'enabled'}]);refreshModel();return true;}
+async function deleteSystemBank(id){
+  const bank=model.banks.find(b=>b.id===id&&sourceType(b)==='system'),owner=store,generation=auth?.generation;
+  if(!bank||!bankManagement.presentation(id)?.canDelete)throw new Error('Este banco não está liberado para exclusão global.');
+  if(!await confirmDialog('Excluir banco para todos?',`“${bankPresentation(bank).title}” será removido do catálogo global. A exclusão só será concluída se nenhum usuário tiver iniciado uma sessão nessa lei. Desativar banco continua disponível apenas para sua conta.`,'Excluir para todos'))return;
+  if(store!==owner||auth?.generation!==generation)return;
+  working=true;
+  try{
+    await bankManagement.remove(bank,auth);
+    if(store!==owner||auth?.generation!==generation)return;
+    await bankManagement.inspect(auth);render();
+    toast('Exclusão enviada ao GitHub. Aguarde a publicação e sincronize o catálogo.');
+  }finally{working=false;}
+}
 async function renamePersonalBank(id){
   const bank=model.banks.find(b=>b.id===id&&sourceType(b)==='personal');if(!bank){toast('Apenas bancos pessoais podem ser renomeados.');return;}
   const ownStore=store,d=showDialog(`<form id="rename-bank-form"><div class="dialog-title"><h2 id="dialog-title">Renomear banco pessoal</h2><p>Escolha o nome que prefere usar nos seus estudos.</p></div><div class="field"><label for="bank-display-name">Nome do banco</label><input id="bank-display-name" name="displayName" value="${esc(bank.displayName||bank.name)}" required autofocus></div><p class="setting-note">Questões, respostas e sessões continuam associadas a este banco.</p><div class="dialog-actions"><button class="btn" type="button" data-action="close-dialog">Cancelar</button><button class="btn primary" type="submit">Salvar nome</button></div></form>`);
@@ -448,6 +476,7 @@ document.addEventListener('click',async event=>{
   if(working)return;
   if(guest&&['connect-drive','disconnect-drive','sync','drive-banks','refresh-folder-banks','restore-progress','export-progress','migrate-legacy'].includes(action)){toast('Entre com Google para salvar ou recuperar seu progresso.');return;}
   if(action==='refresh-system-banks'){try{await syncSystemCatalog({notify:true});}catch(error){failure(error);}return;}
+  if(action==='sync-system-bank'){try{await syncSystemCatalog({notify:true,bankId:target.dataset.bank});}catch(error){failure(error);}return;}
   try{
     if(action==='guest'){working=true;await openGuest();return;}
     if(action==='guest-login'){await logout();return;}
@@ -486,6 +515,7 @@ document.addEventListener('click',async event=>{
     if(action==='bank-unlink'){await associatePersonalProgress(target.dataset.bank,null,true);return;}
     if(action==='bank-toggle'){const b=model.banks.find(b=>b.id===target.dataset.bank);await store.add([{type:sourceType(b)==='system'?'system-bank-state':'bank-state',bankId:b.id,value:b.enabled?'disabled':'enabled'}]);render();return;}
     if(action==='bank-delete'){const b=model.banks.find(b=>b.id===target.dataset.bank);if(!b||sourceType(b)!=='personal'){toast('Apenas bancos pessoais podem ser excluídos.');return;}const warning=progressLinkCandidates(model,b).length?' Este progresso ainda está separado do Sistema. Para continuar os mesmos estudos no banco nativo, cancele e use Associar progresso primeiro.':'';if(await confirmDialog('Excluir este banco?',`“${b.displayName||b.name}” sairá da lista de estudos. Seu histórico será preservado. Você poderá importar o banco novamente.${warning}`, 'Excluir banco')){await store.add([{type:'bank-state',bankId:b.id,value:'deleted'}]);render();toast('Banco removido da lista.');}return;}
+    if(action==='system-bank-delete'){await deleteSystemBank(target.dataset.bank);return;}
     if(action==='resume'||action==='session-resume'){await resumeStudy(target.dataset.session);return;}
     if(action==='session-delete'){await deleteStudySession(target.dataset.session);return;}
     if(action==='session-result'){
@@ -521,7 +551,7 @@ document.addEventListener('click',async event=>{
     if(action==='finish'){working=true;await finish();return;}
     if(action==='connect-drive'){working=true;toast('Abrindo a autorização do Google…');await drive.connect();config.onboardingDone=true;saveConfig();if(view==='folder')view='home';render();toast('Pasta salva na sua conta Google e progresso sincronizado.');return;}
     if(action==='disconnect-drive'){drive.disconnect();render();return;}
-    if(action==='sync'){await drive.sync();render();toast('Históricos sincronizados com o Drive.');return;}
+    if(action==='sync'){await drive.sync();await syncSystemCatalog({apply:false});render();toast(systemCatalog.updates.size?'Drive sincronizado. Há atualizações no Banco de questões.':'Históricos sincronizados com o Drive.');return;}
     if(action==='drive-banks'){await driveBanks();return;}
   }catch(error){if(action==='connect-drive')render();failure(error);}finally{working=false;if(!auth?.profile&&!guest&&!restoration)renderLogin();}
 });
@@ -615,6 +645,7 @@ function renderLogin(){
   const form=$('#oauth-preview-form');if(form)form.onsubmit=e=>{e.preventDefault();const id=form.elements.namedItem('clientId').value.trim();if(!validClientId(id)){loginErrorCode='';loginError='Informe apenas o ID público de um cliente OAuth Google Web.';renderLogin();return;}localStorage.setItem('foco:oauth-preview',id);auth.clientId=id;loginError='';renderLogin();void loadGoogleForLogin();};
 }
 async function openAccount(result){
+  bankManagement.reset();
   guest=false;resetHistoryUI();restoreAuthorization=result;restoration=restoreProgress(null,{stage:'profile'});renderLoading();
   const profile=result.profile;accountStorage?.close?.();accountStorage=await openAccountStorage(localStorage,profile.sub);
   const ownStorage=accountStorage;
@@ -673,6 +704,7 @@ async function handleRestorationAction(action){
   finally{working=false;}
 }
 async function openGuest(){
+  bankManagement.reset();
   await auth.signOut();resetHistoryUI();guest=true;legacyAvailable=false;accountStorage=new TemporaryStorage();
   config={...defaults,name:'Visitante',onboardingDone:true,theme:localStorage.getItem('foco:appearance')||'light'};
   applyTheme();restoration=restoreProgress(null,{stage:'profile'});renderLoading();
@@ -686,7 +718,7 @@ async function openGuest(){
 async function logout(){
   if(drive?.busy||drive?.connecting){toast('Aguarde a sincronização terminar para sair.');return;}
   if(drive?.token&&drive.status==='pending'){working=true;try{await drive.sync();}catch{toast('O envio não foi concluído. O progresso local desta conta foi preservado.');}}
-  await focusMode.exit();drive?.close();await auth.signOut();guest=false;restoration=null;restoreAuthorization=null;closeDialog();store=null;model=null;drive=null;accountStorage?.close?.();accountStorage=null;session=null;selected=null;draftSelections.clear();resetCuts();resetHistoryUI();expandedBankDetails.clear();view='home';legacyAvailable=false;working=false;loginError='';loginErrorCode='';config={...defaults,theme:localStorage.getItem('foco:appearance')||'light'};applyTheme();renderLogin();window.scrollTo(0,0);
+  await focusMode.exit();drive?.close();await auth.signOut();bankManagement.reset();guest=false;restoration=null;restoreAuthorization=null;closeDialog();store=null;model=null;drive=null;accountStorage?.close?.();accountStorage=null;session=null;selected=null;draftSelections.clear();resetCuts();resetHistoryUI();expandedBankDetails.clear();view='home';legacyAvailable=false;working=false;loginError='';loginErrorCode='';config={...defaults,theme:localStorage.getItem('foco:appearance')||'light'};applyTheme();renderLogin();window.scrollTo(0,0);
 }
 async function migrateLegacy(){
   if(!legacyAvailable)return;

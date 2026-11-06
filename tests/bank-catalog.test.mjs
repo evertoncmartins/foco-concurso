@@ -102,3 +102,34 @@ test('botão de sincronizar comunica carregamento e impede cliques repetidos',()
   assert(busy.includes('Sincronizando…'));assert(busy.includes('aria-busy="true" disabled'));
   assert(idle.includes('Sincronizar'));assert(!idle.includes('disabled'));
 });
+
+test('consulta sinaliza inclusões, alterações e exclusões sem aplicar antes da sincronização por banco',async()=>{
+  let banks=[native,other];
+  const catalog=new SystemBanks(async url=>Response.json(url.includes('index.json')?{schemaVersion:1,version:'latest',banks:banks.map(b=>({id:b.id,revision:b.revision}))}:banks.find(b=>url.includes(`${b.id}.json`))),{origin:'http://localhost:5173'});
+  await catalog.load();
+  const store=new Store(new TemporaryStorage()),session=await study(store),journal=JSON.stringify(store.events),report=sessionReport(session,store.model());
+  const changed=structuredClone(native);changed.revision='test-two';changed.questions[0].explanation+=' Revisão editorial.';
+  changed.questions[1]={...changed.questions[1],id:'nova-questao'};banks=[changed];
+  await catalog.check();store.setSystemBanks(catalog.banks);
+  assert.equal(catalog.banks[0].revision,'test-one');
+  assert.deepEqual({...catalog.updates.get(native.id),bank:undefined},{kind:'updated',bank:undefined,added:1,removed:1,changed:1});
+  const cards=bankCatalogCards(store.model(),catalog.updates),html=bankCardView(cards.find(b=>b.id===native.id));
+  for(const label of ['Atualização disponível','1 questão nova','1 questão alterada','1 questão removida','Sincronizar banco'])assert(html.includes(label));
+  assert(bankCardView(cards.find(b=>b.id===other.id)).includes('Banco retirado do catálogo'));
+  catalog.apply(native.id);store.setSystemBanks(catalog.banks);
+  assert.equal(store.model().systemBanks.find(b=>b.id===native.id).revision,'test-two');
+  assert.equal(catalog.updates.size,1);assert(catalog.banks.some(b=>b.id===other.id));
+  assert.equal(JSON.stringify(store.events),journal);assert.equal(sessionReport(session,store.model()).correct,report.correct);
+  catalog.apply();assert(!catalog.banks.some(b=>b.id===other.id));assert.equal(catalog.version,'latest');
+});
+
+test('novos bancos aguardam sincronização e falha na consulta preserva aviso e versão aplicada',async()=>{
+  let banks=[],offline=false;
+  const catalog=new SystemBanks(async url=>{if(offline)throw new Error('offline');return Response.json(url.includes('index.json')?{schemaVersion:1,banks:banks.map(b=>({id:b.id}))}:native);});
+  await catalog.load();banks=[native];await catalog.check();
+  const store=new Store(new TemporaryStorage()),cards=bankCatalogCards(store.model(),catalog.updates);
+  assert.equal(cards.length,1);assert.equal(cards[0].pendingActivation,true);assert.equal(store.model().banks.length,0);
+  assert(bankCardView(cards[0]).includes('Novo banco disponível'));
+  offline=true;await assert.rejects(catalog.check(),/offline/);assert.equal(catalog.updates.size,1);assert.equal(catalog.banks.length,0);
+  catalog.apply(native.id);assert.equal(catalog.banks.length,1);assert.equal(catalog.updates.size,0);
+});

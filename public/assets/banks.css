@@ -89,6 +89,11 @@
 .bank-progress-link{margin:14px 0 0;padding:13px 0 0;border-top:1px solid var(--border);display:flex;flex-direction:column;align-items:flex-start;gap:10px}
 .bank-progress-link p{margin:0;font-size:12px;line-height:1.7;color:var(--muted)}
 .bank-progress-link strong{font-weight:600;color:var(--text)}
+.bank-update{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);color:var(--accent)}
+.bank-update p{margin:0;min-width:0;font-size:12px;line-height:1.7}
+.bank-update strong,.bank-update span{display:block}
+.bank-update span{color:var(--muted);font-size:11px;overflow-wrap:anywhere}
+.bank-update .btn{min-height:44px;white-space:normal}
 @media(max-width:700px){.bank-progress-link .btn{min-height:44px;white-space:normal;text-align:left}}
 @media(max-width:1000px){.bank-format-help{flex-direction:column;align-items:stretch;gap:14px}.bank-format-actions{flex-shrink:1}}
 @media(max-width:700px){.bank-format-actions .btn{min-height:44px}.bank-format-actions .text-link{display:inline-flex;align-items:center;min-height:44px}}

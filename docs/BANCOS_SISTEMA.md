@@ -8,7 +8,9 @@ Essa pasta é a fonte dos bancos do Sistema. Para disponibilizar um banco a todo
 
 Não é necessário editar um catálogo, cadastrar o arquivo no código ou configurar armazenamento. O build descobre todos os arquivos de banco e gera `dist/data/question-banks/index.json`. Esse índice é um resultado da publicação e não deve ser enviado ou mantido manualmente. Um `index.json` antigo na pasta de origem é ignorado.
 
-Ao abrir **Banco de questões**, o Foco consulta novamente o catálogo. O botão **Sincronizar** permite repetir essa consulta e mostra **Sincronizando…** enquanto busca e valida os arquivos. Novos bancos ganham um card automaticamente; bancos removidos saem da lista. Para quem tem respostas ou sessões consultáveis daquela lei na etapa atual de estudos, o card permanece como **Indisponível**, com acesso às sessões e aos detalhes históricos, sem habilitar novos estudos. A sincronização não altera respostas, notas, sessões, bancos pessoais ou preferências. Se a consulta falhar, o último catálogo carregado é mantido.
+Ao abrir **Banco de questões**, o Foco consulta novamente os arquivos publicados e sinaliza nos cards as questões novas, alteradas e removidas. **Sincronizar banco** aplica a atualização daquela lei; **Sincronizar**, no topo, aplica o catálogo inteiro. Bancos novos também aguardam essa confirmação. O botão de sincronização do Drive consulta as atualizações do sistema e avisa quando houver pendências no Banco de questões.
+
+Depois de sincronizar, bancos removidos saem da lista. Para quem tem respostas ou sessões consultáveis daquela lei na etapa atual de estudos, o card permanece como **Indisponível**, com acesso às sessões e aos detalhes históricos, sem habilitar novos estudos. A sincronização não altera respostas, notas, sessões, bancos pessoais ou preferências. Se a consulta falhar, o último catálogo carregado e os avisos já confirmados são mantidos.
 
 No desenvolvimento com `npm run dev`, os bancos são lidos diretamente de `public/data/question-banks/` a cada consulta, sem refazer o build para adicionar, atualizar ou remover uma lei. No endereço publicado, é necessário enviar a mudança à branch `main` do GitHub e aguardar a publicação terminar. O botão consulta os arquivos publicados; ele não envia arquivos locais ao servidor.
 
@@ -43,7 +45,7 @@ Quem já estiver com o Foco aberto pode usar **Banco de questões → Atualizar 
 
 ## Sistema e Pessoal
 
-Os bancos do Sistema são públicos e carregam sem login ou Drive. Usuários podem estudar, exportar e ativar/desativar esses bancos em seu perfil. A interface não oferece renomeação, exclusão global ou upload administrativo de bancos do Sistema. O acesso de escrita ao repositório determina quem pode publicá-los. A API `/api/question-banks` é somente leitura, inclusive para a conta administradora, e não consulta Google UserInfo nem armazenamento externo.
+Os bancos do Sistema são públicos e carregam sem login ou Drive. Usuários podem estudar, exportar e ativar/desativar esses bancos em seu perfil. O conteúdo continua sendo publicado pelo GitHub, sem upload administrativo ou renomeação na interface. A API `/api/question-banks` continua somente leitura e não consulta Google UserInfo nem armazenamento externo. A rota separada `/api/bank-management` prepara a exclusão global descrita abaixo.
 
 Os bancos enviados pelo importador do Foco ou pela pasta do Drive continuam **Pessoais**, mesmo que declarem `sourceType: system`. Podem ser renomeados e removidos pelo próprio usuário. Bancos pessoais, preferências, sessões e respostas continuam no arquivo principal de progresso da conta; não são enviados ao GitHub. Sessões podem combinar as duas origens, identificadas pelas tags Sistema/Pessoal.
 
@@ -59,7 +61,27 @@ A prova da associação referencia a versão importada e um snapshot da versão 
 
 ## Verificação
 
-Os testes cobrem descoberta de arquivos adicionados e removidos sem índice, validação antes de substituir o build, revisão automática, consistência entre catálogo e arquivos publicados, API somente leitura, carregamento remoto pelo espelho, fallback, sessões mistas, renomeação pessoal e resultados históricos após atualização. Login Google e Drive mantêm sua infraestrutura anterior; esta mudança não exige Blob nem novas variáveis da Vercel.
+Os testes cobrem descoberta de arquivos adicionados e removidos sem índice, validação antes de substituir o build, revisão automática, consistência entre catálogo e arquivos publicados, API pública somente leitura, carregamento remoto pelo espelho, fallback, avisos e aplicação de atualização por banco, sessões mistas, renomeação pessoal e resultados históricos após atualização. Login Google e Drive mantêm sua infraestrutura anterior. Os avisos de sincronização não exigem novas variáveis; a exclusão global opcional exige a configuração abaixo.
+
+## Exclusão global e atribuições — 1.22.0
+
+**Preparado, com ativação adiada pelo usuário em 05/11/2026.** Sem configuração, não há exclusão global. Desativar continua sendo uma preferência da conta. Bancos pessoais mantêm a exclusão anterior, preservando o histórico.
+
+A primeira sessão autenticada em uma lei registra sua atribuição antes de salvar a sessão. Essa atribuição é permanente: desativar, excluir sessões ou zerar progresso não autoriza a exclusão global. Visitantes não representam contas atribuídas. O registro central guarda somente um pseudônimo HMAC do identificador Google por lei, sem nome, e-mail, respostas, questões ou progresso; não vai para o GitHub. A API exige token Google válido para este cliente OAuth e verifica a conta e o e-mail confirmado no servidor.
+
+Nos detalhes do card, apenas contas em `BANK_ADMIN_EMAILS` recebem **Excluir** para o Sistema. O servidor confere novamente as atribuições, mesmo que o botão tenha sido habilitado antes de outra pessoa iniciar um estudo. A reserva de exclusão e a atribuição usam operações Lua atômicas no mesmo Redis. Após a reserva, novas sessões naquela lei são recusadas. A exclusão remove apenas `public/data/question-banks/lei-NUMERO.json` no GitHub, na `main`, com o SHA vigente e a revisão conferida. A publicação normal da Vercel retira o card após sincronizar; respostas e snapshots existentes não são apagados.
+
+Não é possível provar ausência de estudos anteriores ao registro central, inclusive em dispositivos offline. Por isso os cinco bancos já publicados estão permanentemente protegidos em `LEGACY_SYSTEM_BANK_IDS`. Ao ativar, proteja também **todos os bancos publicados durante o período em que o controle ficou desligado**; não interprete ausência de registro como ausência de usuários. Dispositivos com versões antigas precisam carregar a versão com o controle antes de usar bancos novos.
+
+### Configuração para ativação futura
+
+1. Aceite os termos do Upstash e conecte um Redis pelo Marketplace da Vercel, preferencialmente no plano gratuito, com `eviction=false` e `autoUpgrade=false`. Use uma base durável exclusiva; não apague registros de atribuição ou restaure backups que os omitam.
+2. Configure na Vercel, somente no servidor: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` (ou as equivalentes `KV_REST_API_URL` e `KV_REST_API_TOKEN`) e `BANK_ASSIGNMENT_SECRET`, um segredo aleatório estável com pelo menos 32 caracteres. Não rotacione esse segredo sem migrar os pseudônimos.
+3. Antes de ativar, confira todas as leis já publicadas e preencha `BANK_PROTECTED_IDS` com seus IDs separados por vírgula. Capture os IDs com `node --input-type=module -e "import {repositoryCatalog} from './server/repository-banks.mjs'; console.log(repositoryCatalog().banks.map(b=>b.id).join(','))"`. Nunca retire IDs dessa lista para liberar uma lei já utilizada.
+4. Preencha `BANK_ADMIN_EMAILS` com os e-mails administrativos separados por vírgula. Adicione `BANK_GITHUB_TOKEN` como segredo: token fino limitado a `evertoncmartins/foco-concurso`, com **Contents: Read and write**, sem acesso a outros repositórios. Não envie o token pelo chat, em arquivos versionados ou ao frontend.
+5. Publique novamente e confira o controle com uma lei nova ainda não estudada. O preview local não escreve atribuições nem habilita exclusões globais. Se o registro ativo ficar indisponível, bancos novos não iniciam sessões sem verificação; os bancos protegidos e o histórico continuam disponíveis.
+
+Quando a resposta do GitHub é inconclusiva (por exemplo, timeout após o envio), a reserva **não expira automaticamente**. O banco fica bloqueado. Um operador deve conferir o commit e a existência do arquivo na `main` antes de reconciliar a chave `foco:bank-attribution:v1:lei-NUMERO:state`. Se o arquivo foi removido, mantenha `deleted`. Só libere uma reserva pendente após confirmar que a requisição terminou sem exclusão. Nunca apague a chave `:users`. Reintroduzir o mesmo ID não limpa atribuições nem autoriza reutilizá-lo para outra lei.
 
 ## Feedback completo obrigatório — 1.20.0
 

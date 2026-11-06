@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','session','session-navigator','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','bank-management','session','session-navigator','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -94,7 +94,15 @@ function runtime(options={}){
     }
   }
   class FixtureStore extends Store{constructor(storage){super(storage);if(!this.events.length&&!options.systemBanks){this.storage.setItem('foco:v1:event:builtin-lei-8112-v1',JSON.stringify({id:'builtin-lei-8112-v1',at:'2026-10-08T00:00:00.000Z',type:'bank',bank}));this.load();}}}
-  class FixtureCatalog{constructor(){this.banks=options.systemBanks||[];}async load(settings){if(options.catalogLoad)this.banks=await options.catalogLoad(settings);return this.banks;}}
+  class FixtureCatalog extends imports.SystemBanks{
+    constructor(){
+      let latest=options.systemBanks||[];
+      super(async url=>{
+        if(url.includes('index.json')){if(options.catalogLoad)latest=await options.catalogLoad();return Response.json({schemaVersion:1,banks:latest.map(b=>({id:b.id,revision:b.revision}))});}
+        return Response.json(latest.find(b=>url.includes(`${b.id}.json`)));
+      },{origin:'http://localhost:5173'});
+    }
+  }
   const Documents=options.realDocuments?class extends imports.PublicDocuments{constructor(settings){super({...settings,document,window});}}:class{constructor(options){this.options=options;}open(){this.context=this.options.getContext();}return(){return this.options.onReturn(this.context);}};
   const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,PublicDocuments:Documents,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window,console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
@@ -124,7 +132,7 @@ test('catálogo sincroniza na abertura e no botão com loading, remoções e his
     wait.resolve();await refresh;assert(app.html().includes('Indisponível'));assert(!app.html().includes('Lei nº 12.345/2010'));
     assert.equal(app.value('model.banks.length'),0);assert.equal(app.value('JSON.stringify(store.events)'),journal);
     await app.click('bank-history',{bank:native.id});assert.equal(app.value('view'),'sessions');assert.equal(app.value('sessionFilters.bankId'),native.id);assert.equal(app.value('sessionFilters.status'),'open');
-    wait=null;response=[native];await app.click('nav',{view:'banks'});await tick();assert(!app.html().includes('Indisponível'));
+    wait=null;response=[native];await app.click('nav',{view:'banks'});await tick();assert(app.html().includes('Novo banco disponível'));await app.click('sync-system-bank',{bank:native.id});assert(!app.html().includes('Indisponível'));
     offline=true;await app.click('refresh-system-banks');assert(app.html().includes('Falha de consulta de teste.'));assert(app.html().includes('Lei nº 8.112/1990'));assert(!app.html().includes('Sincronizando…'));
     assert.equal(app.value('JSON.stringify(store.events)'),journal);
   }
@@ -137,6 +145,27 @@ test('consulta pendente não aplica resultado à conta encerrada nem interrompe 
   const refresh=app.click('refresh-system-banks');await tick();app.value('working=true');wait.resolve();await refresh;assert.equal(app.value('working'),true);
   app.value('working=false');wait=deferred();const pending=app.click('refresh-system-banks');await tick();await app.click('logout');wait.resolve();await pending;
   assert.equal(app.value('store'),null);assert.equal(app.value('systemCatalogSyncing'),false);assert(!app.html().includes('Banco de questões'));
+});
+
+test('primeira sessão registra todas as leis antes dos snapshots e não grava estudos em falha ou troca de conta',async()=>{
+  const native=imports.validateSystemBank({...bank,id:'lei-12345',name:'Lei nº 12.345/2010'});
+  const app=runtime({systemBanks:[native]});await app.start();
+  app.value('assignmentCalls=[];bankManagement.assign=async ids=>{assignmentCalls.push(ids);await new Promise(resolve=>releaseAssignment=resolve)};');
+  const before=app.value('JSON.stringify(store.events)'),pending=app.value('newSession([model.questions[0].key])');await tick();
+  assert.equal(app.value('assignmentCalls[0][0]'),native.id);assert.equal(app.value('JSON.stringify(store.events)'),before);
+  app.auth.generation++;app.value('releaseAssignment()');await assert.rejects(pending,/conta conectada mudou/);assert.equal(app.value('JSON.stringify(store.events)'),before);
+  app.value('bankManagement.assign=async()=>{throw new Error("atribuição recusada")};');
+  await assert.rejects(app.value('newSession([model.questions[0].key])'),/atribuição recusada/);assert.equal(app.value('JSON.stringify(store.events)'),before);
+  app.value('bankManagement.assign=async()=>{};');await app.value('newSession([model.questions[0].key])');
+  assert.equal(app.value('model.sessions.length'),1);assert(app.value('store.events.some(e=>e.type==="system-bank-snapshot")'));
+});
+
+test('exclusão global confirma alcance, permite cancelar e descarta confirmação de outra conta',async()=>{
+  const native=imports.validateSystemBank({...bank,id:'lei-12345',name:'Lei nº 12.345/2010'}),app=runtime({systemBanks:[native]});await app.start();
+  app.value('bankManagement.admin=true;bankManagement.tracking=true;bankManagement.deletion=true;bankManagement.banks.set("lei-12345",{id:"lei-12345",assigned:0});deleteCalls=0;bankManagement.remove=async()=>{deleteCalls++};');
+  let pending=app.click('system-bank-delete',{bank:native.id});await tick();assert(app.document.querySelector('#dialog').innerHTML.includes('catálogo global'));app.confirm(false);await pending;assert.equal(app.value('deleteCalls'),0);
+  pending=app.click('system-bank-delete',{bank:native.id});await tick();app.auth.generation++;app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),0);
+  pending=app.click('system-bank-delete',{bank:native.id});await tick();app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),1);assert.equal(app.value('model.banks.length'),1);assert(app.document.querySelector('#toast').textContent.includes('Aguarde a publicação'));
 });
 
 async function studyRuntime(options={},mode='smart'){

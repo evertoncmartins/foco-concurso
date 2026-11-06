@@ -37,6 +37,9 @@
   "functions": {
     "api/question-banks.js": {
       "includeFiles": "public/data/question-banks/**"
+    },
+    "api/bank-management.js": {
+      "includeFiles": "public/data/question-banks/**"
     }
   }
 }
