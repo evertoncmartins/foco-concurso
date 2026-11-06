@@ -65,7 +65,7 @@ Os testes cobrem descoberta de arquivos adicionados e removidos sem índice, val
 
 ## Exclusão global e atribuições — 1.22.0
 
-**Preparado, com ativação adiada pelo usuário em 05/11/2026.** Sem configuração, não há exclusão global. Desativar continua sendo uma preferência da conta. Bancos pessoais mantêm a exclusão anterior, preservando o histórico.
+**Ativação solicitada pelo usuário em 05/11/2026.** O registro central utiliza o recurso Upstash `foco-bank-assignments`, conectado exclusivamente à produção do projeto `foco-concurso`, no plano gratuito, com `eviction=false` e `autoUpgrade=false`. A conta administradora e os IDs protegidos ficam nas variáveis de produção; o segredo de atribuições nunca é versionado. A exclusão global permanece bloqueada enquanto faltar qualquer pré-requisito abaixo. Desativar continua sendo uma preferência da conta. Bancos pessoais mantêm a exclusão anterior, preservando o histórico.
 
 A primeira sessão autenticada em uma lei registra sua atribuição antes de salvar a sessão. Essa atribuição é permanente: desativar, excluir sessões ou zerar progresso não autoriza a exclusão global. Visitantes não representam contas atribuídas. O registro central guarda somente um pseudônimo HMAC do identificador Google por lei, sem nome, e-mail, respostas, questões ou progresso; não vai para o GitHub. A API exige token Google válido para este cliente OAuth e verifica a conta e o e-mail confirmado no servidor.
 
@@ -73,7 +73,7 @@ Nos detalhes do card, apenas contas em `BANK_ADMIN_EMAILS` recebem **Excluir** p
 
 Não é possível provar ausência de estudos anteriores ao registro central, inclusive em dispositivos offline. Por isso os cinco bancos já publicados estão permanentemente protegidos em `LEGACY_SYSTEM_BANK_IDS`. Ao ativar, proteja também **todos os bancos publicados durante o período em que o controle ficou desligado**; não interprete ausência de registro como ausência de usuários. Dispositivos com versões antigas precisam carregar a versão com o controle antes de usar bancos novos.
 
-### Configuração para ativação futura
+### Configuração da ativação
 
 1. Aceite os termos do Upstash e conecte um Redis pelo Marketplace da Vercel, preferencialmente no plano gratuito, com `eviction=false` e `autoUpgrade=false`. Use uma base durável exclusiva; não apague registros de atribuição ou restaure backups que os omitam.
 2. Configure na Vercel, somente no servidor: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` (ou as equivalentes `KV_REST_API_URL` e `KV_REST_API_TOKEN`) e `BANK_ASSIGNMENT_SECRET`, um segredo aleatório estável com pelo menos 32 caracteres. Não rotacione esse segredo sem migrar os pseudônimos.
