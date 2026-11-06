@@ -59,7 +59,9 @@ export class BankManagement{
   }
   async remove(bank,auth){
     if(!this.presentation(bank.id)?.canDelete)throw new Error('Este banco não está liberado para exclusão global.');
-    return this.request(auth,{method:'POST',body:{action:'delete',bankId:bank.id,revision:bank.revision}});
+    const result=await this.request(auth,{method:'POST',body:{action:'delete',bankId:bank.id,revision:bank.revision}});
+    if(result.deleted!==true||result.bankId!==bank.id||typeof result.commit!=='string'||!result.commit)throw new Error('A exclusão ainda não foi confirmada. Sincronize o catálogo antes de tentar novamente.');
+    return result;
   }
   async publish(bank,auth){
     if(!this.admin||!this.publication)throw new Error('O envio de bancos do Sistema está disponível somente para a administração.');

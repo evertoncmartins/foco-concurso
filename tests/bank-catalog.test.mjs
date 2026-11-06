@@ -5,7 +5,7 @@ import {Store} from '../src/store.mjs';
 import {TemporaryStorage} from '../src/temporary-storage.mjs';
 import {AccountStorage} from '../src/account.mjs';
 import {validateSystemBank,SystemBanks} from '../src/system-banks.mjs';
-import {bankCatalogCards,catalogSyncButton} from '../src/bank-catalog-view.mjs';
+import {bankCatalogCards,catalogSyncButton,bankLayoutToggle} from '../src/bank-catalog-view.mjs';
 import {bankCardView} from '../src/bank-view.mjs';
 import {questionSource} from '../src/bank-source.mjs';
 import {createSession,chooseAnswer,completeSession} from '../src/session.mjs';
@@ -133,4 +133,33 @@ test('novos bancos aguardam sincronização e falha na consulta preserva aviso e
   assert(bankCardView(cards[0]).includes('Novo banco disponível'));
   offline=true;await assert.rejects(catalog.check(),/offline/);assert.equal(catalog.updates.size,1);assert.equal(catalog.banks.length,0);
   catalog.apply(native.id);assert.equal(catalog.banks.length,1);assert.equal(catalog.updates.size,0);
+});
+
+test('exclusão confirmada retira só a revisão antiga mesmo durante leitura e descobre republicação posterior',async()=>{
+  let banks=[native,other],release;
+  const catalog=new SystemBanks(async url=>{
+    if(url.includes('index.json'))return Response.json({schemaVersion:1,banks:banks.map(b=>({id:b.id,revision:b.revision}))});
+    if(release)await new Promise(resolve=>release=resolve);
+    return Response.json(banks.find(b=>url.includes(`${b.id}.json`)));
+  });
+  await catalog.load();catalog.retire(native.id,native.revision);assert.deepEqual(catalog.banks.map(b=>b.id),[other.id]);
+  await catalog.load({force:true});assert(!catalog.banks.some(b=>b.id===native.id));
+  await catalog.check();assert(!catalog.updates.has(native.id));catalog.apply();assert(!catalog.banks.some(b=>b.id===native.id));
+  banks=[{...native,revision:'republished'},other];await catalog.check();assert.equal(catalog.updates.get(native.id).kind,'added');
+  catalog.apply(native.id);assert.equal(catalog.banks.find(b=>b.id===native.id).revision,'republished');
+  banks=[native];catalog.revive(native.id);await catalog.load({force:true});
+  release=true;const reading=catalog.check();await new Promise(resolve=>setImmediate(resolve));catalog.retire(native.id,native.revision);release();release=null;
+  await reading;catalog.apply();assert.equal(catalog.banks.length,0);
+});
+
+test('bancos ativos vêm antes dos desativados e históricos; o histórico fica discreto sem perder os detalhes',async()=>{
+  const store=new Store(new TemporaryStorage());await study(store);store.setSystemBanks([{...other,active:false},native]);
+  let cards=bankCatalogCards(store.model());assert.equal(cards[0].id,native.id);assert.equal(cards[1].id,other.id);
+  assert(bankCardView(cards[1]).includes('bank-muted'));assert(!bankCardView(cards[0]).includes('bank-muted'));
+  store.setSystemBanks([other]);cards=bankCatalogCards(store.model());assert(cards.at(-1).unavailable);
+  const html=bankCardView(cards.at(-1),{detailsOpen:true});assert(html.includes('bank-muted'));assert(html.includes('Assuntos abordados'));assert(html.includes('Ver sessões'));
+  for(const layout of ['cards','list']){
+    const control=bankLayoutToggle(layout);assert.match(control,new RegExp(`data-layout="${layout}" aria-pressed="true"`));
+    assert(control.includes('Exibir em cards'));assert(control.includes('Exibir em lista'));
+  }
 });

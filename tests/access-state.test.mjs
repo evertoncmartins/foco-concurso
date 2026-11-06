@@ -166,10 +166,56 @@ test('primeira sessão registra todas as leis antes dos snapshots e não grava e
 
 test('exclusão global confirma alcance, permite cancelar e descarta confirmação de outra conta',async()=>{
   const native=imports.validateSystemBank({...bank,id:'lei-12345',name:'Lei nº 12.345/2010'}),app=runtime({systemBanks:[native]});await app.start();
-  app.value('bankManagement.admin=true;bankManagement.tracking=true;bankManagement.deletion=true;bankManagement.banks.set("lei-12345",{id:"lei-12345",assigned:0,protected:false});deleteCalls=0;bankManagement.remove=async()=>{deleteCalls++};');
+  app.value('bankManagement.admin=true;bankManagement.tracking=true;bankManagement.deletion=true;bankManagement.banks.set("lei-12345",{id:"lei-12345",assigned:0,protected:false});deleteCalls=0;bankManagement.remove=async()=>{deleteCalls++;return {deleted:true,bankId:"lei-12345",commit:"confirmed-delete"}};');
   let pending=app.click('system-bank-delete',{bank:native.id});await tick();assert(app.document.querySelector('#dialog').innerHTML.includes('catálogo global'));app.confirm(false);await pending;assert.equal(app.value('deleteCalls'),0);
   pending=app.click('system-bank-delete',{bank:native.id});await tick();app.auth.generation++;app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),0);
-  pending=app.click('system-bank-delete',{bank:native.id});await tick();app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),1);assert.equal(app.value('model.banks.length'),1);assert(app.document.querySelector('#toast').textContent.includes('Aguarde a publicação'));
+  pending=app.click('system-bank-delete',{bank:native.id});await tick();app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),1);assert.equal(app.value('model.banks.length'),0);assert(app.document.querySelector('#toast').textContent.includes('Banco excluído'));
+  await app.value('loadSystemCatalog({force:true})');assert.equal(app.value('store.model().banks.length'),0,'a publicação anterior não pode recriar o card excluído');
+});
+
+test('abrir bancos retira lei removida sem sincronização manual e conserva só o histórico discreto no Desktop e Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const native=imports.validateSystemBank({...bank,id:'lei-12345',name:'Lei nº 12.345/2010'});let response=[native];
+    const app=runtime({mobile,systemBanks:[native],catalogLoad:async()=>response});await app.start();
+    const before=app.value('JSON.stringify(store.events)');response=[];
+    await app.click('nav',{view:'banks'});await tick();
+    assert(!app.html().includes('Lei nº 12.345/2010'));assert.equal(app.value('model.systemBanks.length'),0);
+    assert.equal(app.value('JSON.stringify(store.events)'),before);
+    response=[native];await app.value('(async()=>{await loadSystemCatalog({force:true});refreshModel()})()');
+    await app.value('newSession([model.questions[0].key],"exam")');
+    const studied=app.value('JSON.stringify(store.events)');response=[];
+    await app.click('nav',{view:'banks'});await tick();
+    assert(app.html().includes('Lei nº 12.345/2010'));assert(app.html().includes('bank-muted'));assert(app.html().includes('Ver sessões'));
+    assert(!app.html().includes('data-action="start" data-bank="lei-12345"'));
+    assert.equal(app.value('JSON.stringify(store.events)'),studied);assert.equal(app.value('model.answers.length'),0);
+  }
+});
+
+test('exclusão recusada ou retorno de outra conta não retira card nem altera sessões',async()=>{
+  const native=imports.validateSystemBank({...bank,id:'lei-12345',name:'Lei nº 12.345/2010'}),app=runtime({systemBanks:[native]});await app.start();
+  const allow='bankManagement.admin=true;bankManagement.tracking=true;bankManagement.deletion=true;bankManagement.banks.set("lei-12345",{id:"lei-12345",assigned:0,protected:false});';
+  app.value(allow+'bankManagement.remove=async()=>{throw new Error("exclusão recusada")};');
+  let pending=app.value('deleteSystemBank("lei-12345")');await tick();app.confirm(true);await assert.rejects(pending,/recusada/);assert.equal(app.value('store.model().banks.length'),1);
+  app.value('bankManagement.remove=()=>new Promise(resolve=>releaseDelete=resolve)');pending=app.value('deleteSystemBank("lei-12345")');await tick();app.confirm(true);await tick();
+  app.auth.generation++;app.value('releaseDelete({deleted:true,bankId:"lei-12345",commit:"confirmed-delete"})');await pending;
+  assert.equal(app.value('store.model().banks.length'),1);assert.equal(app.value('working'),false);
+});
+
+test('visualização em cards ou lista mantém ações e detalhes e salva preferência por conta no Desktop e Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const app=runtime({mobile});await app.start();await app.click('nav',{view:'banks'});await tick();
+    assert(app.html().includes('aria-label="Visualização dos bancos"'));assert(!app.html().includes('banks-grid banks-list'));
+    app.value('expandedBankDetails.add(model.banks[0].id);render()');const journal=app.value('JSON.stringify(store.events)');
+    await app.click('banks-layout',{layout:'list'});assert(app.html().includes('banks-grid banks-list'));assert(app.html().includes('Ocultar detalhes'));
+    for(const action of ['bank-export','bank-toggle','bank-delete'])assert(app.html().includes(`data-action="${action}"`));
+    assert.equal(JSON.parse(app.browserStorage.getItem('foco:user:111:foco:config')).bankLayout,'list');
+    assert.equal(app.value('JSON.stringify(store.events)'),journal);
+    await app.value('openAccount(authorization())');await app.click('nav',{view:'banks'});await tick();assert(app.html().includes('banks-grid banks-list'));
+    app.auth.generation++;app.auth.profile={sub:'another-account',email:'another@example.test',name:'Outra conta'};
+    await app.value('openAccount(authorization())');await app.click('nav',{view:'banks'});await tick();assert(!app.html().includes('banks-grid banks-list'));
+    await app.click('banks-layout',{layout:'cards'});assert.equal(app.value('config.bankLayout'),'cards');
+    await app.click('banks-layout',{layout:'invalid'});assert.equal(app.value('config.bankLayout'),'cards');
+  }
 });
 
 test('lei antiga revisada registra atribuição antes da primeira sessão e bloqueia exclusão depois no Desktop e Mobile',async()=>{

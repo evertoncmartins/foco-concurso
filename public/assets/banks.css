@@ -54,6 +54,36 @@
 .bank-file-actions .icon-btn{width:40px;height:40px}
 .bank-action-label{display:none}
 .bank-card.disabled{opacity:1}
+.bank-card.bank-muted{background:var(--bg);border-style:dashed;box-shadow:none}
+.bank-muted .bank-symbol{background:var(--surface2);color:var(--muted)}
+.bank-muted .bank-title h3{font-size:16px;color:var(--muted)}
+.bank-muted .bank-stats dd{font-size:18px;color:var(--muted)}
+.bank-muted .bank-stats .bank-period dd{font-size:13px}
+.bank-layout-toggle{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--border);border-radius:9px;background:var(--surface)}
+.bank-layout-toggle button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:7px 11px;border:0;border-radius:6px;background:transparent;color:var(--muted);font:inherit;font-size:12px;cursor:pointer}
+.bank-layout-toggle button[aria-pressed=true]{background:var(--tint);color:var(--accent);font-weight:600}
+.bank-layout-toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.banks-grid.banks-list{grid-template-columns:minmax(0,1fr);gap:12px}
+.banks-list .bank-card{padding:19px 22px}
+.banks-list .bank-heading-top{justify-content:flex-start;margin-bottom:10px}
+.banks-list .bank-status{margin-left:auto}
+.banks-list .bank-symbol{width:30px;height:30px;border-radius:8px}
+.banks-list .bank-symbol svg{width:17px;height:17px}
+.banks-list .bank-title h3{font-size:17px}
+.banks-list .bank-stats{margin-top:14px}
+.banks-list .bank-stats dd{font-size:19px}
+.banks-list .bank-stats .bank-period dd{font-size:13px}
+.banks-list .bank-primary-actions{margin-top:14px}
+@media(min-width:1100px){
+  .banks-list .bank-card{display:grid;grid-template-columns:minmax(210px,1.25fr) minmax(220px,1fr) auto;align-items:center;column-gap:24px}
+  .banks-list .bank-heading{grid-column:1;grid-row:1}
+  .banks-list .bank-stats{grid-column:2;grid-row:1;margin:0}
+  .banks-list .bank-primary-actions{grid-column:3;grid-row:1;flex-direction:column;align-items:stretch;gap:0;margin:0}
+  .banks-list .bank-primary-actions .btn{padding-inline:13px}
+  .banks-list .bank-details-panel,.banks-list .bank-update,.banks-list .bank-unavailable-note,.banks-list .bank-progress-link{grid-column:1/-1}
+  .banks-list .bank-unavailable-note{margin-top:10px}
+  .banks-list .bank-details-panel{min-width:0}
+}
 @media(max-width:700px){
   .banks-grid{gap:14px}
   .bank-card{padding:20px}
@@ -76,6 +106,18 @@
   .bank-action-label{display:inline;font-size:12px}
   .bank-details-toggle{font-size:11px}
   .bank-details-panel{padding-top:19px;margin-top:18px}
+  .bank-layout-toggle button{min-height:44px}
+  .banks-list .bank-card{padding:16px}
+  .banks-list .bank-title h3{font-size:16px}
+  .banks-list .bank-heading-top{margin-bottom:8px}
+  .banks-list .bank-stats{display:flex;flex-wrap:wrap;gap:5px 13px;margin-top:10px}
+  .banks-list .bank-stats>div{flex-direction:row;align-items:baseline;gap:5px}
+  .banks-list .bank-stats>div+div{border:0;padding:0}
+  .banks-list .bank-stats dt{font-size:10px}
+  .banks-list .bank-stats dd,.banks-list .bank-stats .bank-period dd{font-size:12px;line-height:1.6;white-space:nowrap}
+  .banks-list .bank-primary-actions{margin-top:10px}
+  .bank-card.bank-muted .bank-title h3{font-size:16px}
+  .bank-card.bank-muted .bank-stats .bank-period dd{font-size:12px;white-space:nowrap}
 }
 @media(prefers-reduced-motion:reduce){.bank-details-chevron{transition:none}}
 

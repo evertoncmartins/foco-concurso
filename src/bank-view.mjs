@@ -59,7 +59,8 @@ export function bankCardView(bank,{detailsOpen=false,index=0,association=null,sy
   const {title,subtitle}=overview;
   const description=sourceType(bank)==='system'&&bank.description?.trim()?bank.description:law?.description||`Questões ${disciplines.length?`de ${disciplines.join(' e ')}`:'para concursos públicos'} para praticar e revisar os assuntos apresentados abaixo.`;
   const enabled=bank.enabled&&!bank.unavailable;
-  return `<article class="card bank-card ${enabled?'':'disabled'}" aria-label="${esc(bank.displayName||bank.name)}">
+  const muted=bank.unavailable||sourceType(bank)==='system'&&bank.active===false;
+  return `<article class="card bank-card ${enabled?'':'disabled'}${muted?' bank-muted':''}" aria-label="${esc(bank.displayName||bank.name)}">
     <header class="bank-heading">
       <div class="bank-heading-top"><span class="bank-symbol">${icon('book',20)}</span>${sourceTag(bank)}<span class="bank-status ${enabled?'is-active':''}"><span aria-hidden="true"></span>${bank.pendingActivation?'A sincronizar':bank.unavailable?'Indisponível':enabled?'Ativo':'Desativado'}</span></div>
       <div class="bank-title"><h3 title="${esc(bank.displayName||bank.name)}">${esc(title)}</h3><p>${esc(subtitle)}</p></div>

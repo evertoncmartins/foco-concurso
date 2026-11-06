@@ -18,6 +18,8 @@
 - Use o card da Lei nº 8.112/1990 como referência para cada novo banco: descrição curta sobre conteúdo/recorte, link oficial da lei, assuntos com contagens reais, instituições e período. Não coloque relatórios de pesquisa na descrição do card; preserve fontes e ressalvas em `fonte`.
 - Preencha `subject` com um assunto principal temático e `topic` com o conteúdo específico. Não use apenas o nome da lei como assunto de todas as questões. Cada questão entra uma vez na contagem, e a soma dos assuntos deve corresponder ao total do banco. Confira `bankOverviewData` e o card de detalhes ao adicionar um banco.
 - Na configuração de uma sessão, reutilize os mesmos títulos e subtítulos dos cards. Não exponha os nomes técnicos originais no seletor de bancos nem altere IDs para padronizar a apresentação.
+- Banco de questões oferece Cards e Lista, reutilizando o mesmo componente e as mesmas ações. Salve `bankLayout` na configuração isolada da conta. Exiba bancos ativos primeiro; desativados e indisponíveis ficam ao final, com aparência discreta e texto legível.
+- Após exclusão global confirmada, retire imediatamente a revisão do catálogo local, sem permitir que a publicação anterior recrie o card. A consulta do catálogo aplica remoções automaticamente; adições e revisões de conteúdo continuam aguardando sincronização. Sem estudos consultáveis da conta atual, o card some; com histórico, preserve-o como Indisponível, em menor destaque. Não apague eventos, snapshots, progresso ou bancos pessoais para ocultar um card.
 
 ## Origens e administração
 

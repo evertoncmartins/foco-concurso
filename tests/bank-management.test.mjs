@@ -189,6 +189,16 @@ test('conta trocada descarta resposta administrativa e não herda permissão ou 
   assert.equal(manager.admin,false);assert.equal(manager.banks.size,0);assert.equal(manager.assigned.size,0);
 });
 
+test('cliente exige confirmação inequívoca antes de retirar card de um banco excluído',async()=>{
+  for(const result of [{deleted:false,bankId:bank.id,commit:'commit'},{deleted:true,bankId:'lei-99999',commit:'commit'},{deleted:true,bankId:bank.id}]){
+    const app=client(async()=>Response.json(result));app.manager.admin=true;app.manager.tracking=true;app.manager.deletion=true;app.manager.banks.set(bank.id,{id:bank.id,assigned:0,protected:false});
+    await assert.rejects(app.manager.remove(bank,app.auth),/não foi confirmada/);
+  }
+  const result={deleted:true,bankId:bank.id,commit:'confirmed-commit'},app=client(async()=>Response.json(result));
+  app.manager.admin=true;app.manager.tracking=true;app.manager.deletion=true;app.manager.banks.set(bank.id,{id:bank.id,assigned:0,protected:false});
+  assert.deepEqual(await app.manager.remove(bank,app.auth),result);
+});
+
 test('cliente segue a revisão do servidor e registra a primeira sessão também em lei antiga',async()=>{
   const calls=[],id='lei-11892',app=client(async(url,settings)=>{
     calls.push(settings);

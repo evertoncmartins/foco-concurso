@@ -27,7 +27,15 @@ export function validateSystemBank(raw){
   return {...bank,name:presentation.title,sourceType:'system',displayName:presentation.title,subtitle:bank.subtitle||presentation.subtitle,revision:typeof raw.revision==='string'?raw.revision:'1',publishedAt,active:raw.active!==false,editable:false,removable:false};
 }
 export class SystemBanks{
-  constructor(fetcher=globalThis.fetch,{origin=globalThis.location?.origin}={}){this.fetcher=fetcher.bind(globalThis);this.origin=origin;this.banks=[];this.version='';this.loading=null;this.loaded=false;this.updates=new Map();this.available=null;this.checking=null;}
+  constructor(fetcher=globalThis.fetch,{origin=globalThis.location?.origin}={}){this.fetcher=fetcher.bind(globalThis);this.origin=origin;this.banks=[];this.version='';this.loading=null;this.loaded=false;this.updates=new Map();this.available=null;this.checking=null;this.retired=new Map();}
+  // A confirmed deletion must not reappear while the previous deployment is
+  // still serving. A later publication with a new revision remains discoverable.
+  withoutRetired(banks){return banks.filter(bank=>this.retired.get(bank.id)!==bank.revision);}
+  retire(id,revision){
+    this.retired.set(id,revision);this.banks=this.banks.filter(bank=>bank.id!==id);this.updates.delete(id);
+    if(this.available)this.available.banks=this.available.banks.filter(bank=>bank.id!==id);
+  }
+  revive(id){this.retired.delete(id);}
   async check(){
     if(this.checking)return this.checking;
     this.checking=(async()=>{
@@ -35,6 +43,7 @@ export class SystemBanks{
       const candidate=new SystemBanks(this.fetcher,{origin:this.origin});
       candidate.loaded=this.loaded;
       await candidate.load({force:true});
+      candidate.banks=this.withoutRetired(candidate.banks);
       const current=new Map(this.banks.map(b=>[b.id,b])),latest=new Map(candidate.banks.map(b=>[b.id,b])),updates=new Map();
       for(const id of new Set([...current.keys(),...latest.keys()])){
         const before=current.get(id),bank=latest.get(id);
@@ -84,7 +93,7 @@ export class SystemBanks{
           if(bank.id!==item.id||item.revision&&bank.revision!==item.revision)throw new Error('O arquivo não corresponde à versão do catálogo. Atualize a lista.');
           return bank;
         }));
-        this.banks=banks;this.version=manifest.version||'';this.loaded=true;this.updates.clear();this.available=null;return banks;
+        this.banks=this.withoutRetired(banks);this.version=manifest.version||'';this.loaded=true;this.updates.clear();this.available=null;return this.banks;
       // After a successful load, keep that catalog on failure instead of
       // replacing it with a potentially older copy bundled in a mirror.
       }catch(error){failure=error;if(this.loaded)break;}
