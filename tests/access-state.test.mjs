@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','bank-management','session','session-navigator','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','bank-management','bank-publication','session','session-navigator','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -82,6 +82,7 @@ function runtime(options={}){
     async restore(){if(options.folderWait)await options.folderWait.promise;if(options.folderError)throw options.folderError;return options.folder===null?null:{folderId:'my-folder'};}
   }
   class Drive extends DriveSync{
+    async sync(){if(options.sync)await options.sync(this);else this.status='synced';}
     async useAuthorization(result,{folderId}={}){
       this.connecting=true;this.token=result.token;
       try{
@@ -246,7 +247,7 @@ test('admin publica e desativa para todos com confirmação, cancelamento e isol
   const raw=JSON.parse(await readFile(new URL('./fixtures/lei-11892.json',import.meta.url))),native=imports.validateSystemBank(raw);
   for(const mobile of [false,true]){
     const calls=[],app=runtime({mobile,systemBanks:[native],managementFetch:async(url,settings)=>{
-      if(settings.method==='POST'){calls.push(JSON.parse(settings.body));return Response.json({publishing:true});}
+      if(settings.method==='POST'){calls.push(JSON.parse(settings.body));return Response.json({created:true,revision:native.revision,publishing:true});}
       return Response.json({admin:true,tracking:true,deletion:true,publication:true,banks:[{id:native.id,assigned:1,protected:true,state:null}]});
     }});
     await app.start();await app.value('bankManagement.inspect(auth)');app.value('view="banks";render()');
@@ -286,6 +287,42 @@ test('falha do envio e troca de conta durante leitura não publicam JSON nem dei
   const upload=app.value(`publishSystemBank({name:'banco.json',size:10,text:async()=>${JSON.stringify(JSON.stringify(raw))}})`);await tick();app.confirm(true);await assert.rejects(upload,/falha de envio/);assert.equal(app.value('working'),false);
   const pending=app.value('publishSystemBank({name:"banco.json",size:10,text:()=>new Promise(resolve=>releaseJSON=resolve)})');await tick();app.auth.generation++;
   app.value(`releaseJSON(${JSON.stringify(JSON.stringify(raw))})`);await pending;assert.equal(app.value('publishCalls'),1);
+});
+
+test('card indisponível pode sair da lista sem apagar diário, sessões ou filtros, com confirmação e isolamento por conta',async()=>{
+  for(const mobile of [false,true]){
+    const native=imports.validateSystemBank({...bank,id:'lei-12345',name:'Lei nº 12.345/2010'}),app=runtime({mobile,systemBanks:[native]});await app.start();
+    await app.value('newSession([model.questions[0].key],"exam")');
+    app.value('systemCatalog.banks=[];store.setSystemBanks([]);view="banks";render()');
+    const journal=app.value('JSON.stringify(store.events)');assert(app.html().includes('Remover card'));
+    let pending=app.click('bank-hide',{bank:native.id});await tick();app.confirm(false);await pending;assert(app.html().includes('Lei nº 12.345/2010'));
+    pending=app.click('bank-hide',{bank:native.id});await tick();app.confirm(true);await pending;
+    assert(!app.html().includes('Lei nº 12.345/2010'));assert.equal(app.value('JSON.stringify(store.events)'),journal);assert.equal(app.value('model.sessions.length'),1);
+    assert.equal(app.value('sessionBankCatalog(model).some(b=>b.id==="lei-12345")'),true);
+    app.value('render()');assert(!app.html().includes('Lei nº 12.345/2010'));
+    app.value(`store.setSystemBanks([${JSON.stringify(native)}]);render()`);assert(app.html().includes('Lei nº 12.345/2010'),'republicação volta a aparecer como banco disponível');
+    app.auth.generation++;app.auth.profile={sub:'another-account',name:'Outra conta',email:'another@example.test'};
+    await app.value('openAccount(authorization())');assert.equal(app.value('config.hiddenBankCards'),undefined);
+  }
+});
+
+test('envio mantém loading até publicação e sincronização; falha e conta encerrada liberam a operação',async()=>{
+  const raw=JSON.parse(await readFile(new URL('./fixtures/lei-11892.json',import.meta.url))),native=imports.validateSystemBank({...raw,revision:'new'}),wait=deferred();let delay=false;
+  const app=runtime({systemBanks:[],catalogLoad:async()=>{if(delay)await wait.promise;return delay?[native]:[];},managementFetch:async(url,settings)=>Response.json({admin:true,tracking:true,deletion:true,publication:true,banks:[{id:native.id,assigned:0,protected:false,state:null}]})});
+  await app.start();app.value('bankManagement.admin=true;bankManagement.publication=true;bankManagement.publish=async()=>({created:true,revision:"new"})');delay=true;
+  const upload=app.value(`publishSystemBank({name:'banco.json',size:10,text:async()=>${JSON.stringify(JSON.stringify(raw))}})`);await tick();app.confirm(true);await tick();
+  assert(app.html().includes('Preparando seu banco.'));assert(app.html().includes('Aguardando a publicação'));assert.equal(app.value('working'),true);
+  await app.click('nav',{view:'home'});assert(app.html().includes('Preparando seu banco.'));
+  wait.resolve();await upload;assert.equal(app.value('bankUploading'),null);assert.equal(app.value('working'),false);assert(app.html().includes('Lei nº 11.892/2008'));assert(app.html().includes('data-action="start"'));assert.equal(app.value('model.banks[0].enabled'),true);
+});
+
+test('importação pessoal mantém loading durante salvamento e Drive e preserva banco local em falha',async()=>{
+  const wait=deferred();let fail=false;
+  const app=runtime({sync:async drive=>{await wait.promise;if(fail)throw new Error('envio recusado');drive.status='synced';}});await app.start();
+  const upload=app.value(`importBank(${JSON.stringify({...bank,id:'personal-upload'})})`);await tick();assert(app.html().includes('Sincronizando com o Drive'));assert.equal(app.value('working'),true);
+  wait.resolve();assert.equal(await upload,true);assert.equal(app.value('bankUploading'),null);assert.equal(app.value('working'),false);
+  fail=true;await assert.rejects(app.value(`importBank(${JSON.stringify({...bank,id:'personal-failure'})})`),/Banco importado e pronto neste dispositivo/);
+  assert.equal(app.value('model.personalBanks.some(b=>b.id==="personal-failure"&&b.enabled)'),true);assert.equal(app.value('bankUploading'),null);assert.equal(app.value('working'),false);
 });
 
 async function studyRuntime(options={},mode='smart'){

@@ -228,11 +228,12 @@ test('envio do Sistema valida privilégio e conteúdo, cria na main sem sobrescr
   const app=await fixture(t,{fileStatus:404}),upload={...raw,token:'never-publish',events:[{secret:'never-publish'}]};
   app.state.set(raw.id,'deleted');app.members.add('old-member');
   const response=await app.handler(request({action:'create',bank:upload}));
-  assert.equal(response.status,200);assert.equal((await response.json()).created,true);
+  assert.equal(response.status,200);const result=await response.json();assert.equal(result.created,true);
   const mutation=app.calls.find(c=>c[0]==='github'&&c[1]==='PUT');
   assert(mutation[2].endsWith(`/contents/public/data/question-banks/${raw.id}.json`));
   assert.equal(mutation[3].branch,'main');assert(!('sha' in mutation[3]));
   const stored=JSON.parse(Buffer.from(mutation[3].content,'base64'));
+  assert.equal(result.revision,repositoryBank(stored,`${raw.id}.json`).revision);
   assert.equal(repositoryBank(stored,`${raw.id}.json`).id,raw.id);
   assert(!JSON.stringify(stored).includes('never-publish'));assert.equal(app.state.has(raw.id),false);assert.equal(app.members.size,1);
   for(const settings of [{email:'another@example.test'},{verified:false},{audience:'other-client'},{configured:false},{env:{BANK_GITHUB_TOKEN:''}},{env:{BANK_PROTECTED_IDS:''}}]){

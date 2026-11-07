@@ -20,6 +20,7 @@
 - Na configuração de uma sessão, reutilize os mesmos títulos e subtítulos dos cards. Não exponha os nomes técnicos originais no seletor de bancos nem altere IDs para padronizar a apresentação.
 - Banco de questões oferece Cards e Lista, reutilizando o mesmo componente e as mesmas ações. Salve `bankLayout` na configuração isolada da conta. Exiba bancos ativos primeiro; desativados e indisponíveis ficam ao final, com aparência discreta e texto legível.
 - Após exclusão global confirmada, retire imediatamente a revisão do catálogo local, sem permitir que a publicação anterior recrie o card. A consulta do catálogo aplica remoções automaticamente; adições e revisões de conteúdo continuam aguardando sincronização. Sem estudos consultáveis da conta atual, o card some; com histórico, preserve-o como Indisponível, em menor destaque. Não apague eventos, snapshots, progresso ou bancos pessoais para ocultar um card.
+- Por solicitação de 07/11/2026, cards Indisponíveis oferecem Remover card, com confirmação, como preferência local isolada por conta e revisão. Preserve sessões, respostas, snapshots e filtros históricos; uma republicação disponível volta a aparecer. No envio de JSON, mantenha loading até o banco estar salvo, habilitado e sincronizado. Para o Sistema, confira a revisão publicada e a disponibilidade administrativa antes de liberar; em falha ou demora, libere com mensagem clara, sem orientar reenvio de publicação já recebida.
 
 ## Origens e administração
 

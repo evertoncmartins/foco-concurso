@@ -68,7 +68,7 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
     const result=await response.json();
     if(!result.commit?.sha)throw problem('A confirmação da publicação ficou pendente.');
     await registry.finishPublication(id,operation,raw.active!==false);
-    return {bankId:id,commit:result.commit.sha,publishing:true};
+    return {bankId:id,revision:repositoryBank(raw,`${id}.json`).revision,commit:result.commit.sha,publishing:true};
   }
   return async request=>{
     const origin=request.headers.get('origin'),headers={'Cache-Control':'no-store, private','X-Content-Type-Options':'nosniff',Vary:'Origin',Allow:'GET, POST, OPTIONS'};
