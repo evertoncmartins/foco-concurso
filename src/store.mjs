@@ -41,7 +41,7 @@ export class Store extends EventTarget {
     const revision=target.revision||'1',snapshot=model.bankHistory.some(e=>e.type==='system-bank-snapshot'&&e.bank.id===target.id&&e.revision===revision);
     const events=[];
     if(!snapshot)events.push({type:'system-bank-snapshot',revision,bank:target});
-    if(!target.enabled)events.push({type:'system-bank-state',bankId:target.id,value:'enabled'});
+    if(target.personalState&&target.personalState!=='enabled')events.push({type:'system-bank-preference',bankId:target.id,value:'enabled'});
     events.push({type:'bank-progress-link',...plan,fromEventId:from.id,toRevision:revision});
     await this.add(events);return true;
   }

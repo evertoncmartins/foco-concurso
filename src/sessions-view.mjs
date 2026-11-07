@@ -11,7 +11,7 @@ function bankFilterId(model,id){
   return target&&model.systemBanks?.some(bank=>bank.id===target)?target:id;
 }
 export function sessionBankCatalog(model){
-  const currentIds=new Set(model.banks.map(b=>b.id)),studiedIds=new Set(model.sessions.filter(s=>!s.abandoned).flatMap(sessionBankIds));
+  const currentIds=new Set([...model.banks,...(model.systemBanks||[])].map(b=>b.id)),studiedIds=new Set(model.sessions.filter(s=>!s.abandoned).flatMap(sessionBankIds));
   const banks=new Map((model.bankHistory||[]).map(e=>[e.bank.id,e.bank]));
   for(const bank of model.banks)banks.set(bank.id,bank);
   for(const answer of model.answers)studiedIds.add(answer.key.split(':')[0]);

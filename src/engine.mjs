@@ -69,6 +69,7 @@ export function validateEvents(document) {
     if (e.type === 'bank') return {...e, bank: validateBank(e.bank)};
     if(e.type==='system-bank-snapshot'){const bank=validateBank(e.bank);if(!/^lei-[1-9]\d*$/.test(bank.id)||typeof e.revision!=='string'||!e.revision)throw new Error('Versão histórica de banco inválida.');return {...e,bank:{...bank,revision:e.revision,sourceType:'system'}};}
     if (e.type === 'bank-state'||e.type==='system-bank-state') { if (typeof e.bankId !== 'string' || !(e.type==='system-bank-state'?['enabled','disabled']:['enabled','disabled','deleted']).includes(e.value)) throw new Error('Estado de banco inválido.'); }
+    else if(e.type==='system-bank-preference'){if(typeof e.bankId!=='string'||!/^lei-[1-9]\d*$/.test(e.bankId)||!['enabled','disabled','hidden'].includes(e.value))throw new Error('Preferência pessoal de banco inválida.');}
     else if(e.type==='bank-metadata'){text(e.bankId,'Banco');text(e.displayName,'Nome de exibição');}
     else if(e.type==='bank-progress-link'||e.type==='bank-progress-unlink'){
       if(typeof e.fromBankId!=='string'||!/^[\w-]{1,120}$/.test(e.fromBankId))throw new Error('Banco de origem da associação inválido.');
@@ -102,7 +103,7 @@ export function mergeEvents(...collections) {
   return [...map.values()].sort((a,b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id));
 }
 export function derive(events, now = Date.now(), systemBanks=[]) {
-  const banks = new Map(), states = new Map(), metadata=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], flagEvents=[],bankHistory=[], sessionUpdatedAt=new Map();
+  const banks = new Map(), states = new Map(), nativePreferences=new Map(), metadata=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], flagEvents=[],bankHistory=[], sessionUpdatedAt=new Map();
   const ordered=mergeEvents(events),progressEpoch=ordered.findLast(e=>e.type==='progress-reset')?.id??null;
   // Deletion wins over later/offline session snapshots and old backups. Keep
   // answers in the progress journal; this operation removes only the session.
@@ -115,6 +116,7 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
     if (e.type === 'bank') {const id=aliases.get(e.bank.id)||e.bank.id,bank={...e.bank,id,bankId:id,sourceType:'personal',editable:true,removable:true};banks.set(id,bank);bankHistory.push({...e,bank});}
     if(e.type==='system-bank-snapshot')bankHistory.push({...e,bank:{...e.bank,bankId:e.bank.id,sourceType:'system'}});
     if (e.type === 'bank-state') states.set(aliases.get(e.bankId)||e.bankId, e.value);
+    if(e.type==='system-bank-preference')nativePreferences.set(e.bankId,e.value);
     if(e.type==='bank-metadata')metadata.set(aliases.get(e.bankId)||e.bankId,e.displayName);
     if (e.type === 'session') {const s=structuredClone(e.session),sources=s.questionSources||{};s.queue=s.queue.map(k=>keyAlias(k,sources[k]?.sourceType));s.answers=Object.fromEntries(Object.entries(s.answers).map(([k,v])=>[keyAlias(k,sources[k]?.sourceType),v]));if(s.questionSources)s.questionSources=Object.fromEntries(Object.entries(sources).map(([k,v])=>[keyAlias(k,v.sourceType),v]));sessions.set(s.id,s);sessionUpdatedAt.set(s.id,e.at);}
     if (e.type === 'flag') flagEvents.push({...e,key:keyAlias(e.key,e.sourceType)});
@@ -140,9 +142,9 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
   for(const event of bankHistory){const custom=metadata.get(event.bank.id);if(custom)event.bank={...event.bank,displayName:custom};}
   // Legacy per-account state events stay in the journal. System availability
   // now follows the administrator's published catalog for every account.
-  const native=systemBanks.map(b=>({...b,bankId:b.id,sourceType:'system',editable:false,removable:false,enabled:b.active!==false}));
-  const visibleBanks=[...native,...personal];
-  const questions = visibleBanks.flatMap(b => b.questions.map(q => ({...q, key:questionKey(b.id,q.id), bankId:b.id, bankName:b.displayName||b.name, displayName:b.displayName||b.name,sourceType:b.sourceType,bankRevision:b.revision||null,enabled:b.enabled})));
+  const native=systemBanks.map(b=>({...b,bankId:b.id,sourceType:'system',editable:false,removable:false,personalState:nativePreferences.get(b.id)||'enabled',enabled:b.active!==false&&(!nativePreferences.has(b.id)||nativePreferences.get(b.id)==='enabled')}));
+  const visibleBanks=[...native.filter(b=>b.personalState!=='hidden'),...personal];
+  const questions = [...native,...personal].flatMap(b => b.questions.map(q => ({...q, key:questionKey(b.id,q.id), bankId:b.id, bankName:b.displayName||b.name, displayName:b.displayName||b.name,sourceType:b.sourceType,bankRevision:b.revision||null,enabled:b.enabled})));
   const available=new Set(questions.map(q=>q.key)),needed=new Set([...sessions.values()].filter(s=>!s.completed&&!s.abandoned).flatMap(s=>s.queue));
   for(const e of [...bankHistory].reverse())if(e.type==='system-bank-snapshot')for(const q of e.bank.questions){const key=questionKey(e.bank.id,q.id);if(needed.has(key)&&!available.has(key)){questions.push({...q,key,bankId:e.bank.id,bankName:e.bank.displayName||e.bank.name,displayName:e.bank.displayName||e.bank.name,sourceType:'system',bankRevision:e.revision,enabled:false});available.add(key);}}
   for(const [key,link] of links.keys)if(needed.has(key)&&!available.has(key)){questions.push({...link.question,key,bankId:link.bank.id,bankName:link.bank.displayName||link.bank.name,displayName:link.bank.displayName||link.bank.name,sourceType:'personal',enabled:false});available.add(key);}

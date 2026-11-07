@@ -14,6 +14,7 @@ import {bankCardView,bankPresentation} from './bank-view.mjs';
 import {SystemBanks,validateSystemBank,requireNativeFeedback} from './system-banks.mjs';
 import {BankManagement,SYSTEM_BANK_UPLOAD_LIMIT} from './bank-management.mjs';
 import {bankUploadView,waitForPublishedBank,syncImportedBank} from './bank-publication.mjs';
+import {bankScopeView} from './bank-scope.mjs';
 import {bankCatalogCards,catalogSyncButton,bankLayoutToggle} from './bank-catalog-view.mjs';
 import {sourceType,sourceTag,sourceLabel,questionSource,sessionQuestion,preparePersonalBank,studyPresentation} from './bank-source.mjs';
 import {createSession,chooseAnswer,moveSession,jumpSession,completeSession} from './session.mjs';
@@ -137,7 +138,7 @@ function shell(content){
   <div class="workspace"><header class="topbar"><div class="topbar-heading"></div><div class="mobile-logo"><span class="brand-mark">f.</span>foco</div><div class="flex">${guest?`<button class="guest-status" data-action="guest-login" aria-label="Modo visitante, sem salvar progresso. Voltar ao login" title="Entrar para salvar seus estudos">${icon('clock',16)}<span>Visitante · sem salvar</span></button>`:`<button class="sync-label" aria-label="Google Drive: ${syncText[drive.status]}" data-status="${drive.status}" data-action="nav" data-view="settings" title="${esc(drive.message||'Configurar sincronização com o Google Drive')}">${syncIcon()}<span>${syncText[drive.status]}</span></button>`}<button class="icon-btn" data-action="toggle-theme" aria-label="Alternar tema claro e escuro" title="Alternar tema">${icon(document.documentElement.dataset.theme==='dark'?'sun':'moon',17)}</button><button class="icon-btn" data-action="logout" aria-label="${guest?'Voltar ao login':'Sair da conta'}" title="${guest?'Voltar ao login':'Sair da conta'}">${icon('logout',17)}</button>${view==='session'&&session&&!session.completed?`<button class="icon-btn focus-toggle" data-action="toggle-focus" aria-label="Ativar modo foco em tela cheia" title="Modo foco em tela cheia" aria-pressed="false">${icon('maximize',19)}</button>`:''}</div></header>${focusToolbar()}
   <main class="content" id="main" tabindex="-1">${guest?`<div class="guest-banner" role="status"><span>${icon('clock',16)} Modo visitante. Seu progresso será perdido ao sair ou recarregar.</span><button class="text-link" data-action="guest-login">Entrar com Google ${icon('arrow',13)}</button></div>`:''}${content}</main></div>
   <nav class="mobile-nav" aria-label="Navegação no celular">${[['home','Início','home'],['study','Estudar','play'],['banks','Questões','book'],['performance','Desempenho','chart'],['settings','Ajustes','settings']].map(([k,l,i])=>`<button data-action="nav" data-view="${k}" aria-label="${k==='banks'?'Banco de questões':l}" class="${view===k||k==='study'&&view==='sessions'?'selected':''}" ${view===k||k==='study'&&view==='sessions'?'aria-current="page"':''}>${icon(i)}<span>${l}</span></button>`).join('')}</nav>
-  <input type="file" id="bank-file" accept=".json,application/json" class="hidden" multiple>${!guest&&bankManagement.admin?'<input type="file" id="system-bank-file" accept=".json,application/json" class="hidden">':''}<input type="file" id="progress-file" accept=".json,application/json" class="hidden"></div>`;
+  <input type="file" id="bank-file" accept=".json,application/json" class="hidden" multiple><input type="file" id="progress-file" accept=".json,application/json" class="hidden"></div>`;
 }
 function focusToolbar(){
   const counter=session?`Questão ${session.index+1} de ${session.queue.length}`:'Modo foco';
@@ -189,10 +190,11 @@ function banks(){
   const layout=config.bankLayout==='list'?'list':'cards';
   return heading('Banco de questões','Seu conteúdo, organizado do seu jeito.')+`
     <div class="bank-toolbar"><span class="bank-count">${cards.length} ${cards.length===1?'banco':'bancos'}</span><div class="bank-heading-actions">${bankLayoutToggle(layout)}${catalogSyncButton(systemCatalogSyncing,systemCatalog.updates.size)}</div></div>
-    ${systemCatalogError?`<p class="system-catalog-error" role="status">${esc(systemCatalogError)} Os bancos carregados e seu histórico foram mantidos. Tente sincronizar novamente.</p>`:''}<p class="system-catalog-note" role="status">${systemCatalogSyncing?'Buscando atualizações dos bancos do sistema…':`Bancos do sistema disponíveis para todos. ${sourceTag({sourceType:'personal'})} identifica os seus arquivos.`}</p><details class="import-zone bank-import" id="drop-zone"><summary><span>${icon('plus',19)} Adicionar banco de questões</span>${icon('chevron',16)}</summary><div class="bank-import-body"><p>Importe um JSON pessoal ou busque seus arquivos no Drive.</p><div class="bank-import-actions"><button class="btn small primary" data-action="import">${icon('upload',15)} Importar JSON pessoal</button><button class="btn small" data-action="drive-banks">${icon('cloud',15)} Buscar no Drive</button>${!guest&&bankManagement.admin?`<button class="btn small bank-system-upload" data-action="system-bank-import" ${!bankManagement.publication||systemCatalogSyncing?'disabled':''}>${icon('upload',16)} Enviar JSON do Sistema</button>`:''}</div>
+    ${systemCatalogError?`<p class="system-catalog-error" role="status">${esc(systemCatalogError)} Os bancos carregados e seu histórico foram mantidos. Tente sincronizar novamente.</p>`:''}<p class="system-catalog-note" role="status">${systemCatalogSyncing?'Buscando atualizações dos bancos do sistema…':`Bancos do sistema disponíveis para todos. ${sourceTag({sourceType:'personal'})} identifica os seus arquivos.`}</p><details class="import-zone bank-import" id="drop-zone"><summary><span>${icon('plus',19)} Adicionar banco de questões</span>${icon('chevron',16)}</summary><div class="bank-import-body"><p>${!guest&&bankManagement.admin?'Envie um JSON e escolha entre uso Pessoal ou Sistema.':'Importe um JSON pessoal ou busque seus arquivos no Drive.'}</p><div class="bank-import-actions"><button class="btn small primary" data-action="import">${icon('upload',15)} ${!guest&&bankManagement.admin?'Enviar JSON':'Importar JSON pessoal'}</button><button class="btn small" data-action="drive-banks">${icon('cloud',15)} Buscar no Drive</button></div>
     <div class="bank-format-help" aria-labelledby="bank-format-title"><div><h4 id="bank-format-title">Crie seus próprios bancos</h4><p>Consulte a estrutura do JSON, os campos e exemplos para preparar seu arquivo.</p></div><div class="bank-format-actions"><a class="btn small" href="./docs/modelo-banco.json" download>Baixar modelo JSON ${icon('download',14)}</a><a class="text-link" data-foco-document href="./formato-json.html">Ler a documentação do formato ${icon('arrow',14)}</a><a class="text-link" href="./docs/questions.schema.json" download>Baixar JSON Schema</a></div></div></div></details>
     <div class="banks-grid${layout==='list'?' banks-list':''}">${cards.map((bank,index)=>{const candidates=progressLinkCandidates(model,bank);return bankCardView(bank,{index,syncing:systemCatalogSyncing,management:sourceType(bank)==='system'?bankManagement.presentation(bank.id):null,detailsOpen:expandedBankDetails.has(bank.id),association:candidates.length===1?candidates[0]:null});}).join('')}</div>
-    ${cards.length?'':empty('Seu primeiro banco','Use o modelo JSON para organizar seu conteúdo.')}`;
+    ${cards.length?'':empty('Seu primeiro banco','Use o modelo JSON para organizar seu conteúdo.')}
+    ${model.systemBanks.some(b=>b.personalState==='hidden')?`<details class="bank-hidden-list"><summary>Bancos ocultos por você (${model.systemBanks.filter(b=>b.personalState==='hidden').length})</summary>${model.systemBanks.filter(b=>b.personalState==='hidden').map(b=>`<div class="bank-hidden-row"><span>${esc(bankPresentation(b).title)}</span><button class="btn small" data-action="bank-personal-restore" data-bank="${esc(b.id)}">Restaurar na minha lista</button></div>`).join('')}</details>`:''}`;
 }
 function performanceRows(field,answers=model.answers){const rows=breakdown(answers,field);return rows.length?rows.map(r=>`<div class="perf-row"><div class="between"><span>${esc(r.label)}</span><strong>${r.accuracy}%</strong></div><div class="progress-track"><span class="${r.accuracy<60?'low':''}" style="width:${r.accuracy}%"></span></div><small>${r.correct} acertos · ${r.wrong} erros · ${r.total} tentativas</small></div>`).join(''):'<p class="muted" style="font-size:12px">Os resultados aparecerão após suas primeiras respostas.</p>';}
 function originPerformance(){return `<section class="origin-performance" aria-label="Desempenho por origem">${['system','personal'].map(source=>{const {stats}=performanceForBank(model,performanceBank,source);return `<article>${sourceTag({sourceType:source})}<strong>${stats.accuracy}%</strong><p>${stats.attempts} respostas · ${stats.correct} acertos · ${stats.wrong} erros</p></article>`;}).join('')}</section>`;}
@@ -277,6 +279,31 @@ async function leaveQuestionFocus(){
 function showDialog(html){const dialog=$('#dialog');dialog.innerHTML=html;dialog.showModal();return dialog;}
 function closeDialog(){const d=$('#dialog');if(d.open)d.close();}
 function confirmDialog(title,description,label='Confirmar',{danger=false}={}){return new Promise(resolve=>{const d=showDialog(`<div class="dialog-title"><h2 id="dialog-title">${esc(title)}</h2><p>${esc(description)}</p></div><div class="dialog-actions"><button class="btn" id="confirm-cancel">Cancelar</button><button class="btn ${danger?'danger':'primary'}" id="confirm-ok">${esc(label)}</button></div>`);let settled=false;const done=value=>{if(settled)return;settled=true;d.removeEventListener('cancel',cancel);closeDialog();resolve(value);};const cancel=e=>{e.preventDefault();done(false);};$('#confirm-cancel',d).onclick=()=>done(false);$('#confirm-ok',d).onclick=()=>done(true);d.addEventListener('cancel',cancel);if(danger)$('#confirm-cancel',d).focus();});}
+async function selectBankScope(options={}){
+  if(working)return null;
+  working=true;
+  try{
+  const initialOwner=store,initialGeneration=auth?.generation;
+  if(!guest&&!bankManagement.known&&!bankManagement.admin){
+    await bankManagement.inspect(auth);
+    if(store!==initialOwner||auth?.generation!==initialGeneration)return null;
+    if(!bankManagement.known&&auth?.profile?.email?.toLowerCase()==='ecmdigital@gmail.com')throw new Error('Não foi possível conferir suas permissões administrativas. Tente novamente antes de escolher o alcance do banco.');
+  }
+  if(guest||!bankManagement.admin)return 'personal';
+  if(options.requiresPublication&&!bankManagement.publication)options={...options,systemReason:'A publicação do Sistema está indisponível. Você pode importar para uso pessoal.'};
+  const owner=store,generation=auth?.generation,managementGeneration=bankManagement.generation;
+    const scope=await new Promise(resolve=>{
+      const d=showDialog(bankScopeView(options));let settled=false;
+      const done=value=>{if(settled)return;settled=true;d.removeEventListener('cancel',cancel);d.removeEventListener('close',closed);closeDialog();resolve(value);};
+      const cancel=event=>{event.preventDefault();done(null);},closed=()=>done(null);
+      $('#bank-scope-personal',d).onclick=()=>done('personal');
+      $('#bank-scope-system',d).onclick=()=>{if(!options.systemReason)done('system');};
+      $('#bank-scope-cancel',d).onclick=()=>done(null);
+      d.addEventListener('cancel',cancel);d.addEventListener('close',closed);$('#bank-scope-personal',d).focus();
+    });
+    return store===owner&&auth?.generation===generation&&bankManagement.generation===managementGeneration&&bankManagement.admin?scope:null;
+  }finally{working=false;}
+}
 function progressResetPanel(){
   return `<section class="card progress-reset" aria-labelledby="progress-reset-title"><div><h3 id="progress-reset-title">Recomeçar seus estudos</h3><p>Zere o progresso de todos os bancos: respostas, estatísticas, favoritos, revisões e sessões. Sua conta, nome, preferências e bancos de questões serão mantidos.</p></div><button type="button" class="btn danger" data-action="reset-progress">${icon('repeat',16)} Zerar progresso</button></section>`;
 }
@@ -443,6 +470,58 @@ async function associatePersonalProgress(id,targetId,unlink=false){
   }finally{working=false;}
 }
 async function readJSON(file){const content=await file.text();try{return JSON.parse(content.replace(/^\uFEFF/,''));}catch{throw new Error(`${file.name}: JSON inválido. Confira vírgulas, aspas e colchetes.`);}}
+async function receiveBank(raw,{name='banco.json',size}={}){
+  validateBank(raw);
+  const owner=store,generation=auth?.generation;
+  const scope=await selectBankScope({title:'Como deseja usar este banco?',personal:'Importar para sua conta. Somente você terá acesso a esta cópia.',system:'Publicar e ativar para todos os usuários do Foco.',requiresPublication:true});
+  if(!scope||store!==owner||auth?.generation!==generation)return false;
+  if(scope==='personal')return importBank(raw);
+  const content=JSON.stringify(raw);
+  return publishSystemBank({name,size:size??new Blob([content]).size,text:async()=>content});
+}
+async function deletePersonalBank(bank){
+  const owner=store,generation=auth?.generation;
+  const warning=progressLinkCandidates(model,bank).length?' Este progresso ainda está separado do Sistema. Para continuar os mesmos estudos no banco nativo, cancele e use Associar progresso primeiro.':'';
+  if(!await confirmDialog('Excluir banco pessoal?',`“${bank.displayName||bank.name}” sairá apenas da sua lista. Seu histórico será preservado. Você poderá importar o banco novamente.${warning}`,'Excluir da minha conta'))return;
+  if(store!==owner||auth?.generation!==generation)return;
+  await owner.add([{type:'bank-state',bankId:bank.id,value:'deleted'}]);render();toast('Banco pessoal removido da sua lista.');
+}
+async function manageBank(action,id){
+  const owner=store,generation=auth?.generation;
+  const bank=model.banks.find(b=>b.id===id)||model.systemBanks.find(b=>b.id===id)||bankCatalogCards(model).find(b=>b.id===id);
+  if(!bank)return;
+  if(sourceType(bank)==='system'&&!bankManagement.admin&&action!=='export'&&action!=='hide')throw new Error('A disponibilidade dos bancos do Sistema é gerenciada pela administração.');
+  const candidates=progressLinkCandidates(model,bank);
+  const native=sourceType(bank)==='system'&&!bank.unavailable?bank:bank.linkedTo?model.systemBanks.find(b=>b.id===bank.linkedTo.toBankId):candidates.length===1?candidates[0]:null;
+  const permission=native?bankManagement.presentation(native.id):null;
+  const titles={delete:'Onde deseja excluir o banco?',toggle:'Onde alterar a disponibilidade?',rename:'Onde deseja renomear?',export:'Qual versão deseja exportar?',hide:'Onde remover este card?',restore:'Onde restaurar este banco?'};
+  const systemReason=['rename','hide','restore'].includes(action)?'Esta ação é uma preferência pessoal. O título e a disponibilidade pública permanecem sob os controles do Sistema.':
+    !native?'Este banco não tem uma versão correspondente no catálogo do Sistema. Envie o JSON para publicá-lo.':
+    action==='delete'&&!permission?.canDelete?permission?.reason||'Exclusão global indisponível.':action==='toggle'&&!permission?.canToggle?'A alteração do Sistema está indisponível.':'';
+  const scope=await selectBankScope({title:titles[action],personal:action==='delete'||action==='hide'?'Remover apenas da sua lista, preservando sessões e resultados.':action==='toggle'?'Ativar ou desativar somente para seus estudos.':action==='export'?'Baixar uma cópia para uso pessoal.':'Aplicar somente na sua conta.',system:action==='delete'?'Excluir do catálogo público para todos os usuários.':action==='toggle'?'Ativar ou desativar novas sessões para todos os usuários.':action==='export'?'Baixar a versão pública do Sistema.':'Aplicar ao banco público para todos os usuários.',systemReason});
+  if(!scope)return;
+  if(scope==='system'){
+    if(systemReason||!native)throw new Error(systemReason||'Banco do Sistema indisponível.');
+    if(action==='delete')return deleteSystemBank(native.id);
+    if(action==='toggle')return toggleSystemBank(native.id);
+    if(action==='export'){download(`${native.id}.json`,native);return;}
+  }
+  if(action==='export'){const {enabled,personalState,...raw}=bank;download(`${bank.id}.json`,bankManagement.admin?preparePersonalBank(raw):raw);return;}
+  if(action==='hide')return hideUnavailableBank(id);
+  if(action==='rename')return renamePersonalBank(id);
+  if(sourceType(bank)==='personal'){
+    if(action==='delete')return deletePersonalBank(bank);
+    if(action==='toggle'){await store.add([{type:'bank-state',bankId:id,value:bank.enabled?'disabled':'enabled'}]);render();return;}
+  }
+  if(sourceType(bank)==='system'){
+    if(action==='delete'&&!await confirmDialog('Remover apenas para você?',`“${bankPresentation(bank).title}” sairá da sua lista. O banco continuará disponível aos demais usuários, e seu histórico será preservado.`,'Remover da minha lista'))return;
+    if(store!==owner||auth?.generation!==generation)return;
+    // Scope selection grants no catalog authority. These preferences only
+    // restrict this account, and can never reactivate a globally disabled bank.
+    const value=action==='delete'?'hidden':action==='restore'?'enabled':bank.personalState==='disabled'?'enabled':'disabled';
+    await store.add([{type:'system-bank-preference',bankId:id,value}]);render();toast(value==='hidden'?'Banco removido apenas da sua lista.':'Preferência pessoal atualizada.');
+  }
+}
 async function importBank(raw){
   const owner=store,generation=auth?.generation,ownDrive=drive,bank=preparePersonalBank(validateBank(raw)),old=model.banks.find(b=>b.id===bank.id&&sourceType(b)==='personal');
   const current=()=>store===owner&&auth?.generation===generation;
@@ -502,6 +581,7 @@ async function publishSystemBank(file){
     if(!published||!current())return;
     owner.setSystemBanks(systemCatalog.banks);refreshModel();systemCatalogError='';view='banks';
     toast('Banco publicado, ativado e sincronizado. Pronto para estudar.');
+    return true;
   }finally{bankUploading=null;working=false;if(current())render();}
 }
 async function hideUnavailableBank(id){
@@ -533,10 +613,9 @@ async function renamePersonalBank(id){
   const form=$('#rename-bank-form',d);form.onsubmit=async event=>{event.preventDefault();const displayName=form.elements.namedItem('displayName').value.trim();if(!displayName||store!==ownStore)return;const button=form.querySelector('[type=submit]');button.disabled=true;try{await store.add([{type:'bank-metadata',bankId:id,displayName}]);closeDialog();render();toast('Nome atualizado.');}catch(error){failure(error);}finally{button.disabled=false;}};
 }
 function bindFiles(){
-  $('#bank-file').onchange=async event=>{const files=[...event.target.files];for(const file of files){try{if(await importBank(await readJSON(file)))toast(`Banco importado: ${file.name}`);}catch(e){failure(e);}}navigate('banks');};
-  const systemFile=$('#system-bank-file');if(systemFile)systemFile.onchange=async event=>{const file=event.target.files[0];event.target.value='';if(!file||working)return;try{await publishSystemBank(file);}catch(error){failure(error);}};
+  $('#bank-file').onchange=async event=>{const files=[...event.target.files],owner=store,generation=auth?.generation;event.target.value='';if(working)return;for(const file of files){try{const raw=await readJSON(file);if(store!==owner||auth?.generation!==generation)return;if(await receiveBank(raw,file))toast(`Banco importado e pronto: ${file.name}`);}catch(e){failure(e);}}if(store===owner&&auth?.generation===generation)navigate('banks');};
   $('#progress-file').onchange=async event=>{const file=event.target.files[0];if(!file)return;try{const doc=await readJSON(file);assertProgressOwner(doc,auth.profile.sub);const events=validateEvents(doc);await store.merge(events);render();toast('Históricos unidos. Seu progresso foi recuperado.');}catch(e){failure(e);}};
-  const zone=$('#drop-zone');if(zone){zone.ondragover=e=>{e.preventDefault();zone.open=true;zone.classList.add('drag');};zone.ondragleave=()=>zone.classList.remove('drag');zone.ondrop=async e=>{e.preventDefault();zone.classList.remove('drag');if(working)return;for(const f of e.dataTransfer.files){try{if(await importBank(await readJSON(f)))toast(`Banco importado: ${f.name}`);}catch(error){failure(error);}}render();};}
+  const zone=$('#drop-zone');if(zone){zone.ondragover=e=>{e.preventDefault();zone.open=true;zone.classList.add('drag');};zone.ondragleave=()=>zone.classList.remove('drag');zone.ondrop=async e=>{e.preventDefault();zone.classList.remove('drag');if(working)return;const owner=store,generation=auth?.generation;for(const file of e.dataTransfer.files){try{const raw=await readJSON(file);if(store!==owner||auth?.generation!==generation)return;if(await receiveBank(raw,file))toast(`Banco importado e pronto: ${file.name}`);}catch(error){failure(error);}}if(store===owner&&auth?.generation===generation)render();};}
 }
 function bindForms(){
   const photoInput=$('#profile-photo-file');if(photoInput)photoInput.onchange=async event=>{
@@ -546,7 +625,7 @@ function bindForms(){
   const profile=$('#profile-form');if(profile)profile.onsubmit=e=>{e.preventDefault();config.name=profile.elements.namedItem('name').value.trim()||'Estudante';config.dailyGoal=clamp(profile.elements.namedItem('goal').value,1,200);saveConfig();render();toast('Preferências salvas.');};
   for(const id of ['drive-form','folder-form']){const form=$(`#${id}`);if(!form)continue;form.onsubmit=async e=>{e.preventDefault();if(working)return;working=true;const button=form.querySelector('[type=submit]');button.disabled=true;try{const folder=parseFolder(form.elements.namedItem('folderId').value);await drive.connect(folder);config.onboardingDone=true;saveConfig();navigate(id==='folder-form'?'home':'settings');toast('Pasta salva na sua conta Google e progresso sincronizado.');}catch(error){if(id==='folder-form')$('#folder-error').textContent=error.message;else failure(error);}finally{working=false;button.disabled=false;}};}
 }
-async function driveBanks(){if(!drive.token){navigate('settings');toast('Conecte o Google Drive para buscar bancos na pasta.');return;}toast('Buscando arquivos JSON na pasta…');const files=await drive.bankFiles();if(!files.length){toast('Nenhum banco JSON encontrado na pasta.');return;}const d=showDialog(`<div class="dialog-title"><h2 id="dialog-title">Bancos no Google Drive</h2><p>Escolha um arquivo para importar.</p></div><div class="stack">${files.map(f=>`<button class="btn drive-file" data-id="${esc(f.id)}">${icon('file',17)} ${esc(f.name)}</button>`).join('')}</div><div class="dialog-actions"><button class="btn" data-action="close-dialog">Fechar</button></div>`);for(const b of d.querySelectorAll('.drive-file'))b.onclick=async()=>{b.disabled=true;try{const f=files.find(f=>f.id===b.dataset.id);const raw=await drive.readFile(f);closeDialog();if(await importBank(raw)){navigate('banks');toast('Banco do Drive importado.');}}catch(e){failure(e);b.disabled=false;}};}
+async function driveBanks(){if(!drive.token){navigate('settings');toast('Conecte o Google Drive para buscar bancos na pasta.');return;}const owner=store,generation=auth?.generation;toast('Buscando arquivos JSON na pasta…');const files=await drive.bankFiles();if(store!==owner||auth?.generation!==generation)return;if(!files.length){toast('Nenhum banco JSON encontrado na pasta.');return;}const d=showDialog(`<div class="dialog-title"><h2 id="dialog-title">Bancos no Google Drive</h2><p>Escolha um arquivo para importar.</p></div><div class="stack">${files.map(f=>`<button class="btn drive-file" data-id="${esc(f.id)}">${icon('file',17)} ${esc(f.name)}</button>`).join('')}</div><div class="dialog-actions"><button class="btn" data-action="close-dialog">Fechar</button></div>`);for(const b of d.querySelectorAll('.drive-file'))b.onclick=async()=>{b.disabled=true;try{const f=files.find(f=>f.id===b.dataset.id);const raw=await drive.readFile(f);if(store!==owner||auth?.generation!==generation)return;closeDialog();if(await receiveBank(raw,{name:f.name})){navigate('banks');toast('Banco do Drive pronto para uso.');}}catch(e){failure(e);b.disabled=false;}};}
 document.addEventListener('click',async event=>{
   if(resetSaving||bankUploading)return;
   const target=event.target.closest('[data-action]');if(!target||target.disabled)return;const action=target.dataset.action;
@@ -569,7 +648,7 @@ document.addEventListener('click',async event=>{
     if(action==='fullscreen-help'){fullscreenHelp();return;}
     if(action==='skip-folder'){config.onboardingDone=true;saveConfig();navigate('home');return;}
     if(action==='migrate-legacy'){await migrateLegacy();return;}
-    if(action==='refresh-folder-banks'){if(!drive.token)throw new Error('Autorize sua pasta primeiro.');const result=await drive.importNewBanks();render();toast(`${result.imported} novos bancos importados.`);return;}
+    if(action==='refresh-folder-banks'){if(!drive.token)throw new Error('Autorize sua pasta primeiro.');if(bankManagement.admin){await driveBanks();return;}const result=await drive.importNewBanks();render();toast(`${result.imported} novos bancos importados.`);return;}
     if(action==='nav'){navigate(target.dataset.view);return;}
     if(action==='banks-layout'&&view==='banks'){
       if(!['cards','list'].includes(target.dataset.layout))return;
@@ -580,11 +659,11 @@ document.addEventListener('click',async event=>{
     if(action==='change-photo'&&!guest){$('#profile-photo-file')?.click();return;}
     if(action==='remove-photo'&&!guest){saveProfilePhoto(config,accountStorage,'');render();toast('Foto removida.');return;}
     if(action==='import'){$('#bank-file').click();return;}
-    if(action==='system-bank-import'){if(guest||!bankManagement.admin||!bankManagement.publication)throw new Error('Somente a administração pode enviar bancos do Sistema.');$('#system-bank-file')?.click();return;}
+    if(action==='system-bank-import'){if(guest||!bankManagement.admin)throw new Error('Somente a administração pode enviar bancos do Sistema.');$('#bank-file')?.click();return;}
     if(action==='restore-progress'){$('#progress-file').click();return;}
     if(action==='export-progress'){download(`foco-progresso-exportado-${localDay(Date.now())}.json`,store.export());return;}
     if(action==='reset-progress'){await resetPersonalProgress();return;}
-    if(action==='bank-export'){const b=model.banks.find(b=>b.id===target.dataset.bank);const {enabled,...raw}=b;download(`${b.id}.json`,raw);return;}
+    if(action==='bank-export'){await manageBank('export',target.dataset.bank);return;}
     if(action==='bank-details'){
       const panel=document.getElementById(target.getAttribute('aria-controls'));
       if(!panel)return;
@@ -596,14 +675,15 @@ document.addEventListener('click',async event=>{
       target.setAttribute('aria-label',`${label} de ${bank?.name||'banco de questões'}`);return;
     }
     if(action==='bank-history'){const bankId=target.dataset.bank,status=model.sessions.some(s=>!s.completed&&!s.abandoned&&s.queue.some(key=>key.startsWith(`${bankId}:`)))?'open':'completed';sessionFilters={status,bankId,type:'all',page:1};navigate('sessions');return;}
-    if(action==='bank-hide'){await hideUnavailableBank(target.dataset.bank);return;}
-    if(action==='bank-rename'){await renamePersonalBank(target.dataset.bank);return;}
-    if(action==='bank-associate'){await associatePersonalProgress(target.dataset.bank,target.dataset.target);return;}
-    if(action==='bank-unlink'){await associatePersonalProgress(target.dataset.bank,null,true);return;}
-    if(action==='bank-toggle'){const b=model.banks.find(b=>b.id===target.dataset.bank);if(!b||sourceType(b)!=='personal')throw new Error('A disponibilidade dos bancos do Sistema é gerenciada pela administração.');await store.add([{type:'bank-state',bankId:b.id,value:b.enabled?'disabled':'enabled'}]);render();return;}
-    if(action==='system-bank-toggle'){await toggleSystemBank(target.dataset.bank);return;}
-    if(action==='bank-delete'){const b=model.banks.find(b=>b.id===target.dataset.bank);if(!b||sourceType(b)!=='personal'){toast('Apenas bancos pessoais podem ser excluídos.');return;}const warning=progressLinkCandidates(model,b).length?' Este progresso ainda está separado do Sistema. Para continuar os mesmos estudos no banco nativo, cancele e use Associar progresso primeiro.':'';if(await confirmDialog('Excluir este banco?',`“${b.displayName||b.name}” sairá da lista de estudos. Seu histórico será preservado. Você poderá importar o banco novamente.${warning}`, 'Excluir banco')){await store.add([{type:'bank-state',bankId:b.id,value:'deleted'}]);render();toast('Banco removido da lista.');}return;}
-    if(action==='system-bank-delete'){await deleteSystemBank(target.dataset.bank);return;}
+    if(action==='bank-hide'){await manageBank('hide',target.dataset.bank);return;}
+    if(action==='bank-rename'){await manageBank('rename',target.dataset.bank);return;}
+    if(action==='bank-personal-restore'){await manageBank('restore',target.dataset.bank);return;}
+    if(action==='bank-associate'||action==='bank-unlink'){
+      const scope=await selectBankScope({title:'Onde aplicar a associação?',personal:'Associar ou separar somente o seu progresso, preservando as sessões.',system:'Alterar o banco público para todos.',systemReason:'Associações pertencem ao seu progresso pessoal e não alteram o catálogo público.'});
+      if(scope==='personal')await associatePersonalProgress(target.dataset.bank,action==='bank-unlink'?null:target.dataset.target,action==='bank-unlink');return;
+    }
+    if(action==='bank-toggle'||action==='system-bank-toggle'){await manageBank('toggle',target.dataset.bank);return;}
+    if(action==='bank-delete'||action==='system-bank-delete'){await manageBank('delete',target.dataset.bank);return;}
     if(action==='resume'||action==='session-resume'){await resumeStudy(target.dataset.session);return;}
     if(action==='session-delete'){await deleteStudySession(target.dataset.session);return;}
     if(action==='session-result'){

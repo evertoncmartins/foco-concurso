@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','bank-management','bank-publication','session','session-navigator','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','bank-management','bank-publication','bank-scope','session','session-navigator','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -118,7 +118,7 @@ function runtime(options={}){
     const event={key:' ',code:overrides?.key?'':'Space',target:{dataset:{},closest(){return null;},matches(){return false;}},defaultPrevented:false,preventDefault(){this.defaultPrevented=true;},altKey:false,ctrlKey:false,metaKey:false,shiftKey:false,repeat:false,isComposing:false,...overrides};
     await document.emit('keydown',event);return event;
   };
-  return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),confirm:accepted=>node(accepted?'#confirm-ok':'#confirm-cancel').onclick(),finish:async()=>{const pending=document.emit('click',{target:target({action:'finish'})});await tick();if(node('#dialog').open)node('#confirm-ok').onclick();await pending;},key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
+  return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),scope:choice=>node(`#bank-scope-${choice||'cancel'}`).onclick(),confirm:accepted=>node(accepted?'#confirm-ok':'#confirm-cancel').onclick(),finish:async()=>{const pending=document.emit('click',{target:target({action:'finish'})});await tick();if(node('#dialog').open)node('#confirm-ok').onclick();await pending;},key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
 }
 
 test('catálogo sincroniza na abertura e no botão com loading, remoções e histórico no Desktop e Mobile',async()=>{
@@ -168,9 +168,9 @@ test('primeira sessão registra todas as leis antes dos snapshots e não grava e
 test('exclusão global confirma alcance, permite cancelar e descarta confirmação de outra conta',async()=>{
   const native=imports.validateSystemBank({...bank,id:'lei-12345',name:'Lei nº 12.345/2010'}),app=runtime({systemBanks:[native]});await app.start();
   app.value('bankManagement.admin=true;bankManagement.tracking=true;bankManagement.deletion=true;bankManagement.banks.set("lei-12345",{id:"lei-12345",assigned:0,protected:false});deleteCalls=0;bankManagement.remove=async()=>{deleteCalls++;return {deleted:true,bankId:"lei-12345",commit:"confirmed-delete"}};');
-  let pending=app.click('system-bank-delete',{bank:native.id});await tick();assert(app.document.querySelector('#dialog').innerHTML.includes('catálogo global'));app.confirm(false);await pending;assert.equal(app.value('deleteCalls'),0);
-  pending=app.click('system-bank-delete',{bank:native.id});await tick();app.auth.generation++;app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),0);
-  pending=app.click('system-bank-delete',{bank:native.id});await tick();app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),1);assert.equal(app.value('model.banks.length'),0);assert(app.document.querySelector('#toast').textContent.includes('Banco excluído'));
+  let pending=app.click('system-bank-delete',{bank:native.id});await tick();app.scope('system');await tick();assert(app.document.querySelector('#dialog').innerHTML.includes('catálogo global'));app.confirm(false);await pending;assert.equal(app.value('deleteCalls'),0);
+  pending=app.click('system-bank-delete',{bank:native.id});await tick();app.scope('system');await tick();app.auth.generation++;app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),0);
+  pending=app.click('system-bank-delete',{bank:native.id});await tick();app.scope('system');await tick();app.confirm(true);await pending;assert.equal(app.value('deleteCalls'),1);assert.equal(app.value('model.banks.length'),0);assert(app.document.querySelector('#toast').textContent.includes('Banco excluído'));
   await app.value('loadSystemCatalog({force:true})');assert.equal(app.value('store.model().banks.length'),0,'a publicação anterior não pode recriar o card excluído');
 });
 
@@ -251,13 +251,13 @@ test('admin publica e desativa para todos com confirmação, cancelamento e isol
       return Response.json({admin:true,tracking:true,deletion:true,publication:true,banks:[{id:native.id,assigned:1,protected:true,state:null}]});
     }});
     await app.start();await app.value('bankManagement.inspect(auth)');app.value('view="banks";render()');
-    assert(app.html().includes('Enviar JSON do Sistema'));assert(app.html().includes('data-action="system-bank-toggle"'));
+    assert(app.html().includes('Envie um JSON e escolha entre uso Pessoal ou Sistema.'));assert(app.html().includes('data-action="system-bank-toggle"'));
     const before=app.value('JSON.stringify(store.events)');
     const upload=()=>app.value(`publishSystemBank({name:'banco.json',size:10,text:async()=>${JSON.stringify(JSON.stringify(raw))}})`);
     let pending=upload();await tick();assert(app.document.querySelector('#dialog').innerHTML.includes('visível para todos'));app.confirm(false);await pending;assert.equal(calls.length,0);
     pending=upload();await tick();app.confirm(true);await pending;assert.equal(calls[0].action,'create');assert.equal(calls[0].bank.id,native.id);
-    pending=app.click('system-bank-toggle',{bank:native.id});await tick();app.confirm(false);await pending;assert.equal(calls.length,1);
-    pending=app.click('system-bank-toggle',{bank:native.id});await tick();app.confirm(true);await pending;
+    pending=app.click('system-bank-toggle',{bank:native.id});await tick();app.scope('system');await tick();app.confirm(false);await pending;assert.equal(calls.length,1);
+    pending=app.click('system-bank-toggle',{bank:native.id});await tick();app.scope('system');await tick();app.confirm(true);await pending;
     assert.deepEqual(calls[1],{action:'set-active',bankId:native.id,revision:native.revision,active:false});
     assert.equal(app.value('JSON.stringify(store.events)'),before);
     pending=upload();await tick();app.auth.generation++;app.confirm(true);await pending;assert.equal(calls.length,2);
@@ -279,6 +279,46 @@ test('conta comum mantém importação e exclusão pessoal e não recebe ações
   const personalId=app.value('model.personalBanks[0].id');assert(app.html().includes('data-action="bank-delete"'));
   await app.click('bank-toggle',{bank:personalId});assert.equal(app.value('model.personalBanks[0].enabled'),false);
   const deletion=app.click('bank-delete',{bank:personalId});await tick();app.confirm(true);await deletion;assert.equal(app.value('model.personalBanks.length'),0);assert.equal(app.value('model.systemBanks.length'),1);
+});
+
+test('admin escolhe Pessoal ou Sistema em cada envio; cancelar ou trocar de conta não importa nem publica',async()=>{
+  for(const mobile of [false,true]){
+    const raw=JSON.parse(await readFile(new URL('./fixtures/lei-11892.json',import.meta.url))),app=runtime({mobile,systemBanks:[]});await app.start();
+    app.value('bankManagement.admin=true;bankManagement.publication=true;publishCalls=0;publishSystemBank=async file=>{publishCalls++;publishedJSON=await readJSON(file);return true}');
+    const upload=()=>app.value(`receiveBank(${JSON.stringify(raw)})`),before=app.value('JSON.stringify(store.events)');
+    let pending=upload();await tick();assert(app.document.querySelector('#dialog').innerHTML.includes('Somente você'));app.scope(null);assert.equal(await pending,false);assert.equal(app.value('JSON.stringify(store.events)'),before);
+    pending=upload();await tick();app.scope('personal');assert.equal(await pending,true);assert.equal(app.value('publishCalls'),0);assert.equal(app.value('model.personalBanks.length'),1);assert.equal(app.value('model.personalBanks[0].sourceType'),'personal');
+    const personal=app.value('JSON.stringify(store.events)');pending=upload();await tick();app.scope('system');assert.equal(await pending,true);assert.equal(app.value('publishCalls'),1);assert.equal(app.value('publishedJSON.id'),raw.id);assert.equal(app.value('JSON.stringify(store.events)'),personal);
+    pending=upload();await tick();app.auth.generation++;app.scope('system');assert.equal(await pending,false);assert.equal(app.value('publishCalls'),1);assert.equal(app.value('working'),false);
+  }
+});
+
+test('admin remove banco do Sistema só da própria lista, restaura e alterna preferência sem tocar em atribuições ou histórico',async()=>{
+  for(const mobile of [false,true]){
+    const native=imports.validateSystemBank({...bank,id:'lei-12345',name:'Lei nº 12.345/2010'}),app=runtime({mobile,systemBanks:[native]});await app.start();
+    await app.value('newSession([model.questions[0].key],"exam")');
+    app.value('bankManagement.admin=true;bankManagement.publication=true;bankManagement.tracking=true;bankManagement.deletion=true;bankManagement.banks.set("lei-12345",{assigned:1,protected:false});deleteCalls=0;bankManagement.remove=async()=>{deleteCalls++};view="banks";render()');
+    const before=app.value('store.events.length');let pending=app.click('system-bank-delete',{bank:native.id});await tick();
+    assert.match(app.document.querySelector('#dialog').innerHTML,/id="bank-scope-system"[^>]*disabled/);assert(app.document.querySelector('#dialog').innerHTML.includes('Atribuído a 1 usuário'));
+    app.scope('system');await tick();assert.equal(app.value('deleteCalls'),0);app.scope('personal');await tick();app.confirm(true);await pending;
+    assert.equal(app.value('model.banks.length'),0);assert(app.html().includes('Restaurar na minha lista'));assert.equal(app.value('model.sessions.length'),1);assert.equal(app.value('store.events.length'),before+1);assert.equal(app.value('deleteCalls'),0);
+    pending=app.click('bank-personal-restore',{bank:native.id});await tick();app.scope('personal');await pending;assert.equal(app.value('model.banks[0].enabled'),true);
+    pending=app.click('system-bank-toggle',{bank:native.id});await tick();app.scope('personal');await pending;assert.equal(app.value('model.banks[0].enabled'),false);assert.equal(app.value('systemCatalog.banks[0].active'),true);
+    pending=app.click('system-bank-delete',{bank:native.id});await tick();app.scope('personal');await tick();app.auth.generation++;app.confirm(true);await pending;assert.equal(app.value('model.banks.length'),1);
+  }
+});
+
+test('seletor de alcance permite Escape e só é oferecido após privilégio administrativo confirmado pelo servidor',async()=>{
+  const app=runtime();await app.start();app.auth.profile.email='ecmdigital@gmail.com';
+  assert.equal(await app.value(`receiveBank(${JSON.stringify({...bank,id:'private-only'})})`),true);assert.equal(app.document.querySelector('#dialog').open,false);assert.equal(app.value('bankManagement.admin'),false);
+  app.value('bankManagement.admin=true;bankManagement.publication=true');const pending=app.value('selectBankScope()');await tick();app.document.querySelector('#dialog').emit('cancel',{preventDefault(){}});assert.equal(await pending,null);assert.equal(app.value('working'),false);
+});
+
+test('primeiro envio após login verifica administração antes de escolher; falha de verificação não importa silenciosamente para o administrador',async()=>{
+  const app=runtime({managementFetch:async()=>Response.json({admin:true,tracking:true,deletion:true,publication:true,banks:[]})});await app.start();
+  assert.equal(app.value('bankManagement.known'),false);const pending=app.value(`receiveBank(${JSON.stringify({...bank,id:'new-bank'})})`);await tick();assert(app.document.querySelector('#dialog').innerHTML.includes('bank-scope-system'));app.scope(null);await pending;assert.equal(app.value('model.personalBanks.length'),1);
+  const failed=runtime({managementFetch:async()=>{throw new Error('offline')}});await failed.start();failed.auth.profile.email='ecmdigital@gmail.com';const before=failed.value('JSON.stringify(store.events)');
+  await assert.rejects(failed.value(`receiveBank(${JSON.stringify({...bank,id:'not-imported'})})`),/permissões administrativas/);assert.equal(failed.value('JSON.stringify(store.events)'),before);
 });
 
 test('falha do envio e troca de conta durante leitura não publicam JSON nem deixam a interface bloqueada',async()=>{

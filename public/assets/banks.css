@@ -12,6 +12,18 @@
 .bank-import-body{border-top:1px solid var(--border);padding:8px 20px 20px}
 .bank-import-actions{display:flex;flex-wrap:wrap;gap:9px}
 .bank-system-upload{margin-left:auto}
+.bank-scope-options{display:grid;gap:12px;margin-top:22px}
+.bank-scope-option{display:flex;align-items:center;gap:14px;text-align:left;padding:17px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);width:100%;min-height:84px}
+.bank-scope-option>svg{flex-shrink:0;color:var(--accent)}
+.bank-scope-option>span{flex:1;min-width:0}
+.bank-scope-option strong{display:block;font-size:14px}
+.bank-scope-option small{display:block;margin-top:5px;font-size:12px;line-height:1.65;color:var(--muted)}
+.bank-scope-option:hover:not(:disabled){background:var(--tint);border-color:var(--accent)}
+.bank-scope-option:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.bank-scope-option:disabled{cursor:not-allowed;opacity:.65}
+.bank-hidden-list{margin-top:22px;color:var(--muted);font-size:12px}
+.bank-hidden-list>summary{cursor:pointer;padding:12px 0;min-height:44px}
+.bank-hidden-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
 .bank-import .bank-format-help{gap:16px;margin-top:18px;padding-top:16px}
 .bank-import .bank-format-actions{flex-flow:row wrap;align-items:center;gap:8px 14px;flex-shrink:1}
 .bank-remove-card{display:inline-flex;align-items:center;gap:6px;margin-top:10px;color:var(--muted);min-height:36px}

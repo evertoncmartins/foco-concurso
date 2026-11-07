@@ -7,7 +7,7 @@ import {icon} from './icons.mjs';
 export function bankCatalogCards(model,updates=new Map(),hidden={}){
   const unavailable=sessionBankCatalog(model).filter(bank=>bank.removed&&sourceType(bank)==='system'&&hidden?.[bank.id]!==String(bank.revision||'1'));
   const cards=[...model.banks,...unavailable.map(bank=>({...bank,enabled:false,unavailable:true}))];
-  for(const [id,update] of updates)if(update.kind==='added'&&!cards.some(b=>b.id===id))cards.push({...update.bank,enabled:false,pendingActivation:true});
+  for(const [id,update] of updates)if(update.kind==='added'&&!cards.some(b=>b.id===id)&&!model.systemBanks?.some(b=>b.id===id&&b.personalState==='hidden'))cards.push({...update.bank,enabled:false,pendingActivation:true});
   const rank=bank=>bank.unavailable?3:sourceType(bank)==='system'&&bank.active===false?2:!bank.enabled&&!bank.pendingActivation?1:0;
   return cards.map(bank=>sourceType(bank)==='system'?{...bank,pendingUpdate:updates.get(bank.id)}:bank).sort((a,b)=>rank(a)-rank(b));
 }

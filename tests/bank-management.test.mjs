@@ -218,7 +218,7 @@ test('card do Sistema reserva desativação e exclusão à administração e man
     assert(!html.includes('data-action="bank-toggle"'));
     assert.equal(html.includes('data-action="system-bank-toggle"'),!!management);
     assert.equal(html.includes('data-action="system-bank-delete"'),!!management);
-    if(management&&!management.canDelete)assert.match(html,/data-action="system-bank-delete"[^>]*disabled/);
+    if(management&&!management.canDelete)assert.doesNotMatch(html,/data-action="system-bank-delete"[^>]*disabled/,'a escolha pessoal continua disponível; só a opção Sistema será bloqueada');
   }
   const personal=bankCardView({...raw,id:'my-bank',sourceType:'personal',enabled:true},{detailsOpen:true});
   assert(personal.includes('data-action="bank-toggle"'));assert(personal.includes('data-action="bank-delete"'));
