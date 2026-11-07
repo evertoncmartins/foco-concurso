@@ -1,0 +1,2602 @@
+{
+  "reviewedAt": "2026-11-07",
+  "baselineCommit": "885fc94f9139f7f72f160eeee5569e2e5a779b23",
+  "inputCount": 266,
+  "outputCount": 265,
+  "excludedCount": 1,
+  "answerKeysChanged": 0,
+  "inputFileSHA256": "cf29d56f149d6680ba1af4690bd433b8e562b15352f38b73fc629c01d4b4b8e0",
+  "decisions": [
+    {
+      "n": 1,
+      "id": "l11892-qc-001",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I, V, VI e VIII.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 2,
+      "id": "l11892-qc-002",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 6º, V, VII e VIII.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 3,
+      "id": "l11892-qc-003",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I, V e VI.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 4,
+      "id": "l11892-qc-004",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 2º, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 5,
+      "id": "l11892-qc-005",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I a IV e IX.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 6,
+      "id": "l11892-qc-006",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 10, §§ 2º e 3º; 11, caput e § 1º; e 12, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 7,
+      "id": "l11892-qc-007",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 12, § 1º, caput e incisos I e II.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 8,
+      "id": "l11892-qc-008",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 6º, VII; art. 7º, IV.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 9,
+      "id": "l11892-qc-009",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 12, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 10,
+      "id": "l11892-qc-010",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único; 2º; 8º; e 14, § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 11,
+      "id": "l11892-qc-015",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, I, III e V; e 7º, I.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 12,
+      "id": "l11892-qc-018",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 6º, II a V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 13,
+      "id": "l11892-qc-019",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, V; 2º, § 3º; e 6º, VIII.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 14,
+      "id": "l11892-qc-020",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 11, § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 15,
+      "id": "l11892-qc-021",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 2º, § 2º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 16,
+      "id": "l11892-qc-022",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I e VI, a a e; e 8º, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 17,
+      "id": "l11892-qc-023",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 7º, II, III, V e VI, a.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 18,
+      "id": "l11892-qc-024",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 1º; 2º; 3º; e 4º-A.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 19,
+      "id": "l11892-qc-026",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 2º; 3º; 4º-A; 6º, II; e 7º, I e VI, a.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 20,
+      "id": "l11892-qc-027",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 14, caput e §§ 1º a 3º; e 15.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 21,
+      "id": "l11892-qc-028",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 9º; 10, §§ 2º e 3º; e 11, caput e § 2º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 22,
+      "id": "l11892-qc-030",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 2º, §§ 1º a 3º; art. 7º, I.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 23,
+      "id": "l11892-qc-031",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I, III e VII a IX.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 24,
+      "id": "l11892-qc-032",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 25,
+      "id": "l11892-qc-033",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I e VI, b; e 8º, caput e § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "options.A",
+          "before": "%e",
+          "after": "% e"
+        },
+        {
+          "field": "options.D",
+          "before": "%e",
+          "after": "% e"
+        },
+        {
+          "field": "options.E",
+          "before": "%e",
+          "after": "% e"
+        }
+      ]
+    },
+    {
+      "n": 26,
+      "id": "l11892-qc-034",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, VI; 7º, I e VI, e; 10, § 1º; e 12, § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 27,
+      "id": "l11892-qc-035",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I, II e VI, d.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 28,
+      "id": "l11892-qc-036",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 29,
+      "id": "l11892-qc-037",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 5º, XXXVIII; e 6º, I, VII e IX.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 30,
+      "id": "l11892-qc-038",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, IX; 8º; 9º; 10, I e II; e 11, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "statement",
+          "before": "Lei nº º",
+          "after": "Lei nº"
+        },
+        {
+          "field": "statement",
+          "before": "eTecnológica",
+          "after": "e Tecnológica"
+        },
+        {
+          "field": "statement",
+          "before": "A Lei nº 11.892, de 29 de dezembro de 2008, instituiu a Rede Federal de Educação Profissional, Científica e Tecnológica, e criou os Institutos Federais de Educação, Ciência e Tecnologia, que possuem finalidades, características, objetivos e estrutura organizacional próprias. Isso posto, julgue os itens a seguir:\n\nI. Os Institutos Federais têm por finalidades e características, promover a produção, o desenvolvimento e a transferência de tecnologias sociais, notadamente as voltadas à preservação do meio ambiente.\n\nII. No desenvolvimento da sua ação acadêmica, o Instituto Federal, em cada exercício, deverá garantir o mínimo de 50% (cinquenta por cento) de suas vagas para ministrar educação profissional técnica de nível médio, prioritariamente na forma de cursos integrados, para os concluintes do ensino fundamental e para o público da educação de jovens e adultos, e o mínimo de 20% (vinte por cento) de suas vagas para ministrar em nível de educação superior cursos de licenciatura, bem como programas especiais de formação pedagógica, com vistas na formação de professores para a educação básica, sobretudo nas áreas de ciências e matemática, e para a educação profissional.\n\nIII. Cada Instituto Federal é organizado em estrutura multicampi, com proposta orçamentária anual identificada para cada campus e a reitoria, exceto no que diz respeito a pessoal, encargos sociais e benefícios aos servidores.\n\nIV. A administração dos Institutos Federais terá como órgãos superiores o Colégio de Docentes e o Conselho Universitário.\n\nV. Os Institutos Federais terão como órgão executivo a reitoria, composta por 1 (um) Reitor, 1 (um) Vice-Reitor e 4 (quatro) Pró-Reitores. Após a análise dos itens acima, assinale a alternativa correta:",
+          "after": "A Lei nº 11.892, de 29 de dezembro de 2008, instituiu a Rede Federal de Educação Profissional, Científica e Tecnológica, e criou os Institutos Federais de Educação, Ciência e Tecnologia, que possuem finalidades, características, objetivos e estrutura organizacional próprias. Isso posto, julgue os itens a seguir:\n\nI. Os Institutos Federais têm por finalidades e características, promover a produção, o desenvolvimento e a transferência de tecnologias sociais, notadamente as voltadas à preservação do meio ambiente.\n\nII. No desenvolvimento da sua ação acadêmica, o Instituto Federal, em cada exercício, deverá garantir o mínimo de 50% (cinquenta por cento) de suas vagas para ministrar educação profissional técnica de nível médio, prioritariamente na forma de cursos integrados, para os concluintes do ensino fundamental e para o público da educação de jovens e adultos, e o mínimo de 20% (vinte por cento) de suas vagas para ministrar em nível de educação superior cursos de licenciatura, bem como programas especiais de formação pedagógica, com vistas na formação de professores para a educação básica, sobretudo nas áreas de ciências e matemática, e para a educação profissional.\n\nIII. Cada Instituto Federal é organizado em estrutura multicampi, com proposta orçamentária anual identificada para cada campus e a reitoria, exceto no que diz respeito a pessoal, encargos sociais e benefícios aos servidores.\n\nIV. A administração dos Institutos Federais terá como órgãos superiores o Colégio de Docentes e o Conselho Universitário.\n\nV. Os Institutos Federais terão como órgão executivo a reitoria, composta por 1 (um) Reitor, 1 (um) Vice-Reitor e 4 (quatro) Pró-Reitores.\n\nApós a análise dos itens acima, assinale a alternativa correta:"
+        }
+      ]
+    },
+    {
+      "n": 31,
+      "id": "l11892-qc-039",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 9º; 10; e 12, caput e § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 32,
+      "id": "l11892-qc-040",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único; e 2º, caput e § 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 33,
+      "id": "l11892-qc-041",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, VIII; e 7º, I, III, V e VI, e.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 34,
+      "id": "l11892-qc-042",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I e VI, b; e 8º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "options.A",
+          "before": "le III",
+          "after": "I e III"
+        },
+        {
+          "field": "options.C",
+          "before": "Esto corretas",
+          "after": "Estão corretas"
+        },
+        {
+          "field": "statement",
+          "before": ". Das afirmativas propostas:",
+          "after": ".\n\nDas afirmativas propostas:"
+        },
+        {
+          "field": "statement",
+          "before": "De acordo com o disposto nos artigos 7º e 8º da Lei nº 11.892 de 29 de dezembro de 2008 - Institui a Rede Federal de Educação Profissional, Científica e Tecnológica, cria os Institutos Federais de Educação, Ciência e Tecnologia, e dá outras providências, o Instituto Federal, em cada exercício, deverá garantir o mínimo de: I. 30% (trinta por cento) de suas vagas para atender à educação profissional técnica de nível médio, prioritariamente na forma de cursos integrados, para os concluintes do ensino fundamental e para o público da educação de jovens e adultos.\n\nII. 50% (cinquenta por cento) de suas vagas para atender à educação profissional técnica de nível médio, prioritariamente na forma de cursos integrados, para os concluintes do ensino fundamental e para o público da educação de jovens e adultos.\n\nIII. 20% (vinte por cento) de suas vagas para atender aos cursos de licenciatura, bem como programas especiais de formação pedagógica, com vistas na formação de professores para a educação básica, sobretudo nas áreas de ciências e matemática, e para a educação profissional.\n\nIV. 20% (vinte por cento) de suas vagas para atender aos cursos superiores de tecnologia visando à formação de profissionais para os diferentes setores da economia.\n\nDas afirmativas propostas:",
+          "after": "De acordo com o disposto nos artigos 7º e 8º da Lei nº 11.892 de 29 de dezembro de 2008 - Institui a Rede Federal de Educação Profissional, Científica e Tecnológica, cria os Institutos Federais de Educação, Ciência e Tecnologia, e dá outras providências, o Instituto Federal, em cada exercício, deverá garantir o mínimo de:\n\nI. 30% (trinta por cento) de suas vagas para atender à educação profissional técnica de nível médio, prioritariamente na forma de cursos integrados, para os concluintes do ensino fundamental e para o público da educação de jovens e adultos.\n\nII. 50% (cinquenta por cento) de suas vagas para atender à educação profissional técnica de nível médio, prioritariamente na forma de cursos integrados, para os concluintes do ensino fundamental e para o público da educação de jovens e adultos.\n\nIII. 20% (vinte por cento) de suas vagas para atender aos cursos de licenciatura, bem como programas especiais de formação pedagógica, com vistas na formação de professores para a educação básica, sobretudo nas áreas de ciências e matemática, e para a educação profissional.\n\nIV. 20% (vinte por cento) de suas vagas para atender aos cursos superiores de tecnologia visando à formação de profissionais para os diferentes setores da economia.\n\nDas afirmativas propostas:"
+        }
+      ]
+    },
+    {
+      "n": 35,
+      "id": "l11892-qc-043",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 10, §§ 1º a 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "statement",
+          "before": "presidéncias",
+          "after": "presidências"
+        },
+        {
+          "field": "statement",
+          "before": "Com base na Lei 11.892/2008, analise as afirmativas a seguir:\n\nI. As presidências do Colégio de Dirigentes e do Conselho Superior serão exercidas pelo Reitor do Instituto Federal.\n\nII. O Colégio de Dirigentes, de caráter consultivo, será composto pelo Reitor, pelos Pró-Reitores e pelo Diretor-Geral de cada um dos campi que integram o Instituto Federal.\n\nIII. O Conselho Superior, de caráter consultivo e deliberativo, será composto por representantes dos docentes, dos estudantes, dos servidores técnico-administrativos, dos egressos da instituição, da sociedade civil, do Ministério da Educação e do Colégio de Dirigentes do Instituto Federal, assegurando-se a representação paritária dos segmentos que compõem a comunidade acadêmica. Assinale",
+          "after": "Com base na Lei 11.892/2008, analise as afirmativas a seguir:\n\nI. As presidências do Colégio de Dirigentes e do Conselho Superior serão exercidas pelo Reitor do Instituto Federal.\n\nII. O Colégio de Dirigentes, de caráter consultivo, será composto pelo Reitor, pelos Pró-Reitores e pelo Diretor-Geral de cada um dos campi que integram o Instituto Federal.\n\nIII. O Conselho Superior, de caráter consultivo e deliberativo, será composto por representantes dos docentes, dos estudantes, dos servidores técnico-administrativos, dos egressos da instituição, da sociedade civil, do Ministério da Educação e do Colégio de Dirigentes do Instituto Federal, assegurando-se a representação paritária dos segmentos que compõem a comunidade acadêmica.\n\nAssinale"
+        }
+      ]
+    },
+    {
+      "n": 36,
+      "id": "l11892-qc-044",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, I a III; e 7º, V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 37,
+      "id": "l11892-qc-045",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I a IV e VI.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 38,
+      "id": "l11892-qc-046",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 2º, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 39,
+      "id": "l11892-qc-047",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I a III, V e VI, a a c.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 40,
+      "id": "l11892-qc-048",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 10, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "fundamentoLegal",
+          "before": "Lei nº 11.892/2008 — art. 10, I e II.",
+          "after": "Lei nº 11.892/2008 — art. 10, caput."
+        }
+      ]
+    },
+    {
+      "n": 41,
+      "id": "l11892-qc-049",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I, II e VI, e.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 42,
+      "id": "l11892-qc-050",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 1º a 4º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "statement",
+          "before": "Colégio Pedro\n\nII.",
+          "after": "Colégio Pedro II."
+        }
+      ]
+    },
+    {
+      "n": 43,
+      "id": "l11892-qc-051",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I, II e VI.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 44,
+      "id": "l11892-qc-052",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I, II e VI.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 45,
+      "id": "l11892-qc-053",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I, III e VII a IX.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 46,
+      "id": "l11892-qc-054",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I a V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 47,
+      "id": "l11892-qc-055",
+      "status": "excluída",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008, art. 13, § 1º; Lei nº 15.367/2026",
+      "note": "O enunciado ainda exige cargo técnico-administrativo de nível superior para candidatura a Diretor-Geral. O art. 13, § 1º, na redação da Lei nº 15.367/2026, exige formação em nível superior do servidor, sem restringir a candidatura ao nível de classificação do cargo. A premissa reproduz redação superada.",
+      "editorial": []
+    },
+    {
+      "n": 48,
+      "id": "l11892-qc-057",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, II, IV, VII e IX; e 7º, III.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 49,
+      "id": "l11892-qc-058",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 17, caput e incisos I a III.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 50,
+      "id": "l11892-qc-059",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, II; 10, caput e § 1º; 11; e 13-A.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 51,
+      "id": "l11892-qc-060",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 1º e 5º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 52,
+      "id": "l11892-qc-061",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, III e V; 11, § 1º; 12, § 1º; e 13-A.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 53,
+      "id": "l11892-qc-062",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, VI, a a e; art. 13, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 54,
+      "id": "l11892-qc-063",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 55,
+      "id": "l11892-qc-064",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 13, caput e § 1º, I e II; art. 12, § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 56,
+      "id": "l11892-qc-065",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I e VI, b; e 8º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 57,
+      "id": "l11892-qc-066",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 1º e 2º, caput; art. 7º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 58,
+      "id": "l11892-qc-067",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, II, III e VIII; 7º, I e III; 8º; e 12, § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 59,
+      "id": "l11892-qc-068",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, V; 9º; 10; 11, § 1º; e 12, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 60,
+      "id": "l11892-qc-069",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 2º, §§ 1º a 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 61,
+      "id": "l11892-qc-070",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I; e 8º, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 62,
+      "id": "l11892-qc-071",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 6º, III a V e VII a IX.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 63,
+      "id": "l11892-qc-072",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 12, § 1º, I e II.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 64,
+      "id": "l11892-qc-073",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 1º; 6º; 8º; e 12, § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 65,
+      "id": "l11892-qc-074",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 11, § 1º, com redação da Lei nº 12.772/2012.",
+      "note": "Mantida: o art. 11, § 1º, admite técnico-administrativo com formação superior; não exige cargo classificado no nível E.",
+      "editorial": []
+    },
+    {
+      "n": 66,
+      "id": "l11892-qc-075",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único; 2º, § 3º; 6º, VIII; e 10, §§ 2º e 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "statement",
+          "before": "Colégio Pedro\n\nII.",
+          "after": "Colégio Pedro II."
+        },
+        {
+          "field": "statement",
+          "before": "Considere as seguintes assertivas a respeito da Lei nº 11.892/2008:\n\nI. Os Institutos Federais possuem a natureza jurídica de autarquia, exceto o Colégio Pedro II.\n\nII. Os Institutos Federais não possuem autonomia para registrar diplomas dos cursos por eles oferecidos.\n\nIII. Estimular o empreendedorismo é uma das finalidades e características dos Institutos Federais.\n\nIV. O Colégio de Dirigentes e o Conselho Superior são órgãos superiores dos Institutos Federais, e ambos possuem o caráter consultivo e deliberativo. Está correto o que se afirma APENAS em:",
+          "after": "Considere as seguintes assertivas a respeito da Lei nº 11.892/2008:\n\nI. Os Institutos Federais possuem a natureza jurídica de autarquia, exceto o Colégio Pedro II.\n\nII. Os Institutos Federais não possuem autonomia para registrar diplomas dos cursos por eles oferecidos.\n\nIII. Estimular o empreendedorismo é uma das finalidades e características dos Institutos Federais.\n\nIV. O Colégio de Dirigentes e o Conselho Superior são órgãos superiores dos Institutos Federais, e ambos possuem o caráter consultivo e deliberativo.\n\nEstá correto o que se afirma APENAS em:"
+        }
+      ]
+    },
+    {
+      "n": 67,
+      "id": "l11892-qc-076",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 9º a 12.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 68,
+      "id": "l11892-qc-077",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único; 5º, XXIX a XXXI; 7º, VI, d e e; 10, § 1º; e 12.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 69,
+      "id": "l11892-qc-078",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 10, §§ 2º e 3º; e 11, §§ 1º e 2º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 70,
+      "id": "l11892-qc-079",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 11, § 1º, com redação da Lei nº 12.772/2012; art. 12, § 3º.",
+      "note": "Mantida: o servidor de cargo nível C com graduação satisfaz a condição de formação superior para Pró-Reitor, além do tempo de exercício descrito.",
+      "editorial": []
+    },
+    {
+      "n": 71,
+      "id": "l11892-qc-080",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, § 3º; 6º, I; 7º, II; 10; e 11.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 72,
+      "id": "l11892-qc-083",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 1º, parágrafo único.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 73,
+      "id": "l11892-qc-084",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, IV e V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "options.B",
+          "before": "traba lho",
+          "after": "trabalho"
+        }
+      ]
+    },
+    {
+      "n": 74,
+      "id": "l11892-qc-086",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 11, caput e § 1º; e 12, caput e §§ 1º e 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 75,
+      "id": "l11892-qc-087",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 12, § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 76,
+      "id": "l11892-qc-088",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, VIII; e 7º, I, V e VI.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 77,
+      "id": "l11892-qc-089",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 9º; 10; 11, § 2º; e 12, § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 78,
+      "id": "l11892-qc-090",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, I e VI; 7º, I, II e VI, a; e 8º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 79,
+      "id": "l11892-qc-091",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 10; 11; e 12, caput e §§ 1º e 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 80,
+      "id": "l11892-qc-093",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I a III, VIII e IX.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 81,
+      "id": "l11892-qc-094",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 2º, §§ 1º a 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 82,
+      "id": "l11892-qc-095",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, IV; 5º, § 6º; 9º; 11, § 2º; e 17, parágrafo único.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "statement",
+          "before": "III()",
+          "after": "III ()"
+        },
+        {
+          "field": "statement",
+          "before": "IV.(.)",
+          "after": "IV. (.)"
+        },
+        {
+          "field": "statement",
+          "before": "Analise os itens abaixo sobre a Lei que Institui a Rede Federal de Educação Profissional, Científica e Tecnológica e cria os Institutos Federais de Educação, Ciência e Tecnologia (Lei Nº 11.892/2008) e escreva (F) para Falso ou (V) para Verdadeiro e, em seguida, marque a sequência CORRETA.\n\nI. () Dentre as instituições que compõem a Rede Federal de Educação Profissional, Científica e Tecnológica estão as Escolas Técnicas vinculadas às Universidades Federais.\n\nII. () Cada Instituto Federal é organizado em estrutura multicampi, com proposta orçamentária anual identificada para cada campus e a reitoria, exceto no que diz respeito a pessoal, encargos sociais e benefícios aos servidores. III () A reitoria, como órgão de administração central, não poderá ser instalada em espaço físico distinto de qualquer dos campi que integram o Instituto Federal. IV. (.) Os Institutos Federais não poderão conceder bolsas de pesquisa, desenvolvimento, inovação e intercâmbio a alunos, docentes e pesquisadores externos ou de empresas, a serem regulamentadas por órgão técnico competente do Ministério da Educação.\n\nV. () Os bens e direitos do Instituto Federal serão utilizados ou aplicados, exclusivamente, para a consecução de seus objetivos, não podendo ser alienados, a não ser nos casos e condições permitidos em lei. A sequência CORRETA é:",
+          "after": "Analise os itens abaixo sobre a Lei que Institui a Rede Federal de Educação Profissional, Científica e Tecnológica e cria os Institutos Federais de Educação, Ciência e Tecnologia (Lei Nº 11.892/2008) e escreva (F) para Falso ou (V) para Verdadeiro e, em seguida, marque a sequência CORRETA.\n\nI. () Dentre as instituições que compõem a Rede Federal de Educação Profissional, Científica e Tecnológica estão as Escolas Técnicas vinculadas às Universidades Federais.\n\nII. () Cada Instituto Federal é organizado em estrutura multicampi, com proposta orçamentária anual identificada para cada campus e a reitoria, exceto no que diz respeito a pessoal, encargos sociais e benefícios aos servidores.\n\nIII () A reitoria, como órgão de administração central, não poderá ser instalada em espaço físico distinto de qualquer dos campi que integram o Instituto Federal.\n\nIV. (.) Os Institutos Federais não poderão conceder bolsas de pesquisa, desenvolvimento, inovação e intercâmbio a alunos, docentes e pesquisadores externos ou de empresas, a serem regulamentadas por órgão técnico competente do Ministério da Educação.\n\nV. () Os bens e direitos do Instituto Federal serão utilizados ou aplicados, exclusivamente, para a consecução de seus objetivos, não podendo ser alienados, a não ser nos casos e condições permitidos em lei.\n\nA sequência CORRETA é:"
+        }
+      ]
+    },
+    {
+      "n": 83,
+      "id": "l11892-qc-096",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 2º; 10, §§ 1º e 3º; e 11, § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 84,
+      "id": "l11892-qc-097",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 2º; 6º, I; 9º; e 11.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 85,
+      "id": "l11892-qc-098",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 12, caput e §§ 1º a 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 86,
+      "id": "l11892-qc-100",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 12, caput e §§ 1º e 2º; e 13, caput e § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 87,
+      "id": "l11892-qc-102",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, § 3º; 7º; 9º; e 10.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 88,
+      "id": "l11892-qc-104",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 1º; 2º; 6º, V; 8º; e 9º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 89,
+      "id": "l11892-qc-105",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 10, caput e § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 90,
+      "id": "l11892-qc-107",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I a IV e VIII.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 91,
+      "id": "l11892-qc-108",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 6º, III e V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 92,
+      "id": "l11892-qc-109",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, VI, VII e IX; 7º, II e VI, a; e 8º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 93,
+      "id": "l11892-qc-110",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 2º; 6º, V; 11; e 12.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 94,
+      "id": "l11892-qc-111",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 1º; 2º; 6º, IV; 7º, I e VI; 8º; e 11.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 95,
+      "id": "l11892-qc-112",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, I, II e VIII; e 7º, VI.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 96,
+      "id": "l11892-qc-113",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 2º; 6º; 7º, VI; e 8º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 97,
+      "id": "l11892-qc-114",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, V; e 7º, I, III, V e VI, d.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 98,
+      "id": "l11892-qc-115",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 1º, parágrafo único.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 99,
+      "id": "l11892-qc-116",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 9º a 11.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 100,
+      "id": "l11892-qc-117",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 12, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 101,
+      "id": "l11892-qc-118",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, § 3º; 6º, IX; 7º, III; 9º; e 10, § 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 102,
+      "id": "l11892-qc-119",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 1º; 2º; 6º, I; e 7º, I.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 103,
+      "id": "l11892-qc-120",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 9º; 10, §§ 3º e 4º; e 12, § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "statement",
+          "before": "Acerca da Lei 11.892, de 29 de dezembro de 2008, que institui a Rede Federal de Educação Profissional, Científica e Tecnológica, cria os Institutos Federais de Educação, Ciência e Tecnologia, e dá outras providências, do ponto de vista da estrutura organizacional, os Institutos Federais\n\nI- dispõem da carta de serviços, que versa sobre a estruturação, as competências e as normas de funcionamento do Colégio de Dirigentes e do Conselho Superior.\n\nII- poderão ter como Reitor os docentes pertencentes ao Quadro de Pessoal Ativo Permanente de qualquer dos campi que o integram, desde que atendam aos requisitos pré-estabelecidos.\n\nIII- são organizados em estrutura unicampi, com proposta orçamentária anual identificada para cada campus e a reitoria, exceto no que diz respeito a pessoal, encargos sociais e benefícios aos servidores. IV-têm o Conselho Superior composto por representantes dos docentes, dos estudantes, dos servidores técnico- administrativos, dos egressos da instituição, da sociedade civil, do MEC e do Colégio de Dirigentes. Estão corretas as afirmativas",
+          "after": "Acerca da Lei 11.892, de 29 de dezembro de 2008, que institui a Rede Federal de Educação Profissional, Científica e Tecnológica, cria os Institutos Federais de Educação, Ciência e Tecnologia, e dá outras providências, do ponto de vista da estrutura organizacional, os Institutos Federais\n\nI- dispõem da carta de serviços, que versa sobre a estruturação, as competências e as normas de funcionamento do Colégio de Dirigentes e do Conselho Superior.\n\nII- poderão ter como Reitor os docentes pertencentes ao Quadro de Pessoal Ativo Permanente de qualquer dos campi que o integram, desde que atendam aos requisitos pré-estabelecidos.\n\nIII- são organizados em estrutura unicampi, com proposta orçamentária anual identificada para cada campus e a reitoria, exceto no que diz respeito a pessoal, encargos sociais e benefícios aos servidores.\n\nIV- têm o Conselho Superior composto por representantes dos docentes, dos estudantes, dos servidores técnico- administrativos, dos egressos da instituição, da sociedade civil, do MEC e do Colégio de Dirigentes.\n\nEstão corretas as afirmativas"
+        }
+      ]
+    },
+    {
+      "n": 104,
+      "id": "l11892-qc-121",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 10, §§ 1º a 4º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 105,
+      "id": "l11892-qc-122",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 1º; e 2º, caput e §§ 1º e 2º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 106,
+      "id": "l11892-qc-123",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 1º, I, II, IV e V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 107,
+      "id": "l11892-qc-124",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 10, caput e § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 108,
+      "id": "l11892-qc-125",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 11, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 109,
+      "id": "l11892-qc-126",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 13, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 110,
+      "id": "l11892-qc-127",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 1º, parágrafo único.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 111,
+      "id": "l11892-qc-128",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 7º, VI, a a e.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 112,
+      "id": "l11892-qc-132",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, §§ 2º e 3º; 10; e 12, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 113,
+      "id": "l11892-qc-133",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, § 3º; 6º, I; e 7º, VI, e.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 114,
+      "id": "l11892-qc-134",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 115,
+      "id": "l11892-qc-135",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, III, V, VII e IX; e 7º, III.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 116,
+      "id": "l11892-qc-136",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 2º; 6º, I, II, IV, VII e IX; e 7º, V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 117,
+      "id": "l11892-qc-139",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, VI a IX; e 7º, I.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 118,
+      "id": "l11892-qc-140",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único; e 2º, caput e §§ 1º a 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 119,
+      "id": "l11892-qc-141",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 8º, caput e §§ 1º e 2º; art. 7º, I e VI, b.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 120,
+      "id": "l11892-qc-142",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, I e III; e 7º, V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "statement",
+          "before": "Com base na Lei nº 11.892/2008, sobre as finalidades, as características e os objetivos dos Institutos Federais, marque V para verdadeiro ou F para falso e, em seguida, assinale a alternativa que apresenta a sequência correta. (.) Promover a integração e a verticalização da educação básica à educação profissional e educação superior, otimizando a infraestrutura física, os quadros de pessoal e os recursos de gestão é um dos objetivos dos Institutos Federais. ( ) Estimular e apoiar processos educativos que levem à geração de trabalho e renda e à emancipação do cidadão na perspectiva do desenvolvimento socioeconômico local e regional é uma das finalidades dos Institutos Federais. ( ) Ofertar educação profissional e tecnológica, em todos os seus níveis e modalidades, formando e qualificando cidadãos com vistas na atuação profissional nos diversos setores da economia, com ênfase no desenvolvimento socioeconômico local, regional e nacional compreende uma das finalidades e características dos Institutos Federais.",
+          "after": "Com base na Lei nº 11.892/2008, sobre as finalidades, as características e os objetivos dos Institutos Federais, marque V para verdadeiro ou F para falso e, em seguida, assinale a alternativa que apresenta a sequência correta.\n\n(.) Promover a integração e a verticalização da educação básica à educação profissional e educação superior, otimizando a infraestrutura física, os quadros de pessoal e os recursos de gestão é um dos objetivos dos Institutos Federais.\n\n( ) Estimular e apoiar processos educativos que levem à geração de trabalho e renda e à emancipação do cidadão na perspectiva do desenvolvimento socioeconômico local e regional é uma das finalidades dos Institutos Federais.\n\n( ) Ofertar educação profissional e tecnológica, em todos os seus níveis e modalidades, formando e qualificando cidadãos com vistas na atuação profissional nos diversos setores da economia, com ênfase no desenvolvimento socioeconômico local, regional e nacional compreende uma das finalidades e características dos Institutos Federais."
+        }
+      ]
+    },
+    {
+      "n": 121,
+      "id": "l11892-qc-143",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 9º; 10, § 3º; e 12, caput e §§ 1º e 2º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 122,
+      "id": "l11892-qc-144",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 8º, caput e § 2º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 123,
+      "id": "l11892-qc-145",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 7º, II e VI, e.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 124,
+      "id": "l11892-qc-146",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, §§ 1º e 3º; 4º-A, parágrafo único; e 5º, § 2º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 125,
+      "id": "l11892-qc-147",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, III; e 7º, I, II e V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 126,
+      "id": "l11892-qc-148",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 10; 11, § 2º; e 12, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 127,
+      "id": "l11892-qc-149",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, I, IV, VII e IX; e 7º, IV.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 128,
+      "id": "l11892-qc-153",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, caput; 6º, II; e 7º, I.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 129,
+      "id": "l11892-qc-154",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I, III e V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 130,
+      "id": "l11892-qc-156",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 2º, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 131,
+      "id": "l11892-qc-157",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 2º, caput e §§ 2º e 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 132,
+      "id": "l11892-qc-158",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 2º; 6º, II e III; e 7º, I e V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 133,
+      "id": "l11892-qc-159",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 1º, I, II, IV e V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 134,
+      "id": "l11892-qc-160",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, caput e parágrafo único; 5º, XXIV; e 17.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 135,
+      "id": "l11892-qc-176",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I a III e VI, b.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 136,
+      "id": "l11892-qc-183",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 9º a 12.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 137,
+      "id": "l11892-qc-188",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, V; e 7º, I a IV.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 138,
+      "id": "l11892-qc-190",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, I, III e IV; e 8º, caput e § 1º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 139,
+      "id": "l11892-qc-191",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I, II, V e VI.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 140,
+      "id": "l11892-qc-192",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I a V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 141,
+      "id": "l11892-qc-193",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I a IV e VII.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 142,
+      "id": "l11892-qc-194",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I, III e V.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 143,
+      "id": "l11892-qc-195",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I a III e IX.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 144,
+      "id": "l11892-qc-196",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 2º, §§ 1º a 3º; art. 12, § 3º.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 145,
+      "id": "l11892-qc-197",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 10, caput.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 146,
+      "id": "ifsuldeminas-2024-assistente-admin-q20",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 12, § 1º, I e II; art. 13, § 1º, II e III.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 147,
+      "id": "ifpe-2025-prof-admin-q10",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 2º, caput; art. 7º, I, II e VI.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 148,
+      "id": "l11892-q4398388",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 6º, III",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 149,
+      "id": "l11892-q4398390",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 9º a 12",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 150,
+      "id": "l11892-q4398814",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, 6º, I, 7º, VI, 10, § 1º, e 11",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 151,
+      "id": "l11892-q4402219",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 2º, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 152,
+      "id": "l11892-q4402241",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I e VI, b, e 8º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 153,
+      "id": "l11892-q4302081",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, V, 9º e 13",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 154,
+      "id": "l11892-q4305558",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, IX, 7º, III, 10, § 1º, 12, § 1º, e 15",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 155,
+      "id": "l11892-q4305612",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, VI, d, e 11",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 156,
+      "id": "l11892-q4338299",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, § 1º, 7º, I, e 12",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 157,
+      "id": "l11892-q4341890",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I e VIII",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 158,
+      "id": "l11892-q4344700",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 5º, XXXIV e XXXV",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 159,
+      "id": "l11892-q4344701",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I e VI, b, e 8º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 160,
+      "id": "l11892-q4344861",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 2º, § 1º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 161,
+      "id": "l11892-q4085830",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 17, caput e parágrafo único",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 162,
+      "id": "l11892-q4088955",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 5º, § 6º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 163,
+      "id": "l11892-q4088956",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 11, § 2º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 164,
+      "id": "l11892-q4218369",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I a VI",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 165,
+      "id": "l11892-q4218615",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 2º e 6º, II e III",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 166,
+      "id": "l11892-q4218624",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, III, e 7º, I e VI",
+      "note": "Mantida: integrado e concomitante permanecem distintos na LDB, art. 36-C: matrícula única no integrado e matrículas distintas no concomitante.",
+      "editorial": []
+    },
+    {
+      "n": 167,
+      "id": "l11892-q4219168",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, 6º, I a III, e 7º, I",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 168,
+      "id": "l11892-q4219199",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, 2º, 6º e 7º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 169,
+      "id": "l11892-q4219340",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 13, § 1º, I a III",
+      "note": "Mantida: a descrição de servidor técnico-administrativo de cargo de nível superior é hipótese compatível com a lei, sem afirmar exclusividade dessa classificação.",
+      "editorial": []
+    },
+    {
+      "n": 170,
+      "id": "l11892-q4008505",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, III, VII e VIII, e 7º, I",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 171,
+      "id": "l11892-q4008506",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 10 e 11",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 172,
+      "id": "l11892-q4023946",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 2º e 6º, III",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 173,
+      "id": "l11892-q4026074",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, 6º, VII, 10 e 11",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 174,
+      "id": "l11892-q4026356",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 12, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 175,
+      "id": "l11892-q4026805",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único, 2º, § 1º, e 8º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 176,
+      "id": "l11892-q4031769",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I a IV e VIII",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 177,
+      "id": "l11892-q4033953",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 9º a 12",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 178,
+      "id": "l11892-q4092754",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I a III, V a VII",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 179,
+      "id": "l11892-q3875152",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único, 2º, § 3º, 7º, III, e 12, § 3º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 180,
+      "id": "l11892-q3891621",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, II, IV e V, e 4º-A",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 181,
+      "id": "l11892-q3781665",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, III, e 7º, I a VI",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 182,
+      "id": "l11892-q3987509",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 12, § 1º, I",
+      "note": "Mantida: a hipótese pressupõe professor efetivo regularmente investido. O art. 12 não acrescenta requisito de nacionalidade brasileira; a admissão de estrangeiros no magistério tem previsão constitucional e legal. Não abrange professor visitante ou contratação temporária.",
+      "editorial": []
+    },
+    {
+      "n": 183,
+      "id": "l11892-q3753151",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 1º, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 184,
+      "id": "l11892-q3680150",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 6º, VII",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 185,
+      "id": "l11892-q3688641",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 9º; Constituição Federal, art. 165, III e § 5º, I",
+      "note": "Mantida: a inclusão dos orçamentos das entidades da administração indireta na LOA decorre também do art. 165, III e § 5º, I, da Constituição.",
+      "editorial": []
+    },
+    {
+      "n": 186,
+      "id": "l11892-q3688679",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, 2º, 11 e 12",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 187,
+      "id": "l11892-q3689583",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 13, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 188,
+      "id": "l11892-q3697329",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 12, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 189,
+      "id": "l11892-q3891015",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único, 5º, 7º, VI, e, e 17",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 190,
+      "id": "l11892-q3563832",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 6º e 7º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 191,
+      "id": "l11892-q3563841",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, §§ 1º e 3º, 6º, V e VII, e 8º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 192,
+      "id": "l11892-q3564392",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, I a IV, e 10",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 193,
+      "id": "l11892-q3565188",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 12, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 194,
+      "id": "l11892-q3574419",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I a V",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 195,
+      "id": "l11892-q3574499",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, III, IV, VIII e IX, e 8º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 196,
+      "id": "l11892-q3648752",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I, III, V, VII e VIII",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 197,
+      "id": "l11892-q3504104",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I a VI",
+      "note": "Mantida: a articulação integrada ou concomitante e a forma subsequente continuam previstas nos arts. 36-B e 36-C da LDB.",
+      "editorial": []
+    },
+    {
+      "n": 198,
+      "id": "l11892-q3539876",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, II e VI, b a d",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 199,
+      "id": "l11892-q3540000",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 10 a 13",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 200,
+      "id": "l11892-q3540001",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 2º, § 2º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 201,
+      "id": "l11892-q3540257",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, § 2º, 6º, III, 9º, 10 e 12, § 1º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 202,
+      "id": "l11892-q3548325",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único, 5º, § 6º, 6º, I e VII, 7º, III, 11 e 12",
+      "note": "Mantida: a consulta ponderada da comunidade não substitui a nomeação pelo Presidente da República. A alternativa A continua correta; a redação de 2026 obriga a escolha do vencedor da consulta.",
+      "editorial": []
+    },
+    {
+      "n": 203,
+      "id": "l11892-q3262998",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, IV, 6º, VIII, 7º, III, 11 e 17",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 204,
+      "id": "l11892-q3262999",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 10, §§ 1º e 2º, 11, 12 e 13-A",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 205,
+      "id": "l11892-q3263647",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 10 a 12",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 206,
+      "id": "l11892-q3212532",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I a IV",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 207,
+      "id": "l11892-q3212533",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único, 2º, §§ 1º e 3º, 9º e 11",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 208,
+      "id": "l11892-q3219672",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 5º, XXX, e 2º, § 3º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 209,
+      "id": "l11892-q3084469",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 5º, XIII a XVII",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 210,
+      "id": "l11892-q3514981",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 5º, XVIII",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 211,
+      "id": "l11892-q3518261",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 14, §§ 2º e 3º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "options.A",
+          "before": "Ie II",
+          "after": "I e II"
+        },
+        {
+          "field": "statement",
+          "before": "Nos termos da Lei nº 11.892/2008, julgue as assertivas abaixо:\n\nI. Nos campi em processo de implantação, os cargos de Diretor-Geral serão providos em caráter pro tempore, por nomeação do Ministro da Educação, até que seja possível identificar candidatos que atendam aos requisitos previstos na Lei nº 11.892/2008.\n\nII. Nos campi em processo de implantação, os cargos de Diretor-Geral serão providos em caráter pro tempore, por nomeação do Reitor do Instituto Federal, até que seja possível identificar candidatos que atendam aos requisitos previstos na Lei nº 11.892/2008.\n\nIII.O Diretor-Geral nomeado para o cargo de Reitor Pro-Tempore do Instituto Federal, ou de Diretor-Geral ProTempore do Campus, não poderá candidatar-se a um novo mandato, desde que já se encontre no exercício do segundo mandato, em observância ao limite máximo de investidura permitida, que são de 2 (dois) mandatos consecutivos.\n\nIV.O Diretor-Geral nomeado para o cargo de Reitor Pro-Tempore do Instituto Federal, ou de Diretor-Geral ProTempore do Campus, poderá candidatar-se a um novo mandato, mesmo que já se encontre no exercício do segundo mandato, em observância ao limite máximo de investidura permitida, que são de 3 (três) mandatos consecutivos. Está(ão) CORRETA(S) apenas a(s) assertiva(s):",
+          "after": "Nos termos da Lei nº 11.892/2008, julgue as assertivas abaixо:\n\nI. Nos campi em processo de implantação, os cargos de Diretor-Geral serão providos em caráter pro tempore, por nomeação do Ministro da Educação, até que seja possível identificar candidatos que atendam aos requisitos previstos na Lei nº 11.892/2008.\n\nII. Nos campi em processo de implantação, os cargos de Diretor-Geral serão providos em caráter pro tempore, por nomeação do Reitor do Instituto Federal, até que seja possível identificar candidatos que atendam aos requisitos previstos na Lei nº 11.892/2008.\n\nIII. O Diretor-Geral nomeado para o cargo de Reitor Pro-Tempore do Instituto Federal, ou de Diretor-Geral ProTempore do Campus, não poderá candidatar-se a um novo mandato, desde que já se encontre no exercício do segundo mandato, em observância ao limite máximo de investidura permitida, que são de 2 (dois) mandatos consecutivos.\n\nIV. O Diretor-Geral nomeado para o cargo de Reitor Pro-Tempore do Instituto Federal, ou de Diretor-Geral ProTempore do Campus, poderá candidatar-se a um novo mandato, mesmo que já se encontre no exercício do segundo mandato, em observância ao limite máximo de investidura permitida, que são de 3 (três) mandatos consecutivos.\n\nEstá(ão) CORRETA(S) apenas a(s) assertiva(s):"
+        }
+      ]
+    },
+    {
+      "n": 212,
+      "id": "l11892-q3045429",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 10, I e II",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 213,
+      "id": "l11892-q3069627",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, 9º e 10, § 2º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 214,
+      "id": "l11892-q3069644",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, III, e 7º, VI",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 215,
+      "id": "l11892-q3327831",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I a V",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 216,
+      "id": "l11892-q3371507",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 9º a 12",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 217,
+      "id": "l11892-q3011376",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I, IV e VII",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 218,
+      "id": "l11892-q3011380",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, § 1º, 6º, VIII, e 7º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 219,
+      "id": "l11892-q2562096",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 10, § 2º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 220,
+      "id": "l11892-q3368496",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 4º-A, parágrafo único, 7º, V, e 10",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "statement",
+          "before": "DiretorGeral",
+          "after": "Diretor-Geral"
+        },
+        {
+          "field": "statement",
+          "before": "Com base na Lei nº 11.892, de 29 de dezembro de 2008, analise as assertivas a seguir.\n\nI. Um dos objetivos dos Institutos Federais é estimular e apoiar processos educativos que levem à geração de trabalho e renda e à emancipação do cidadão na perspectiva do desenvolvimento socioeconômico local e regional.\n\nII. A administração dos Institutos Federais terá como órgãos superiores o Colégio de Dirigentes e o Conselho Superior. As presidências do Colégio de Dirigentes e do Conselho Superior serão exercidas pelo Reitor do Instituto Federal.\n\nIII. O Colégio de Dirigentes, de caráter consultivo, será composto exclusivamente pelo Reitor e pelo Diretor-Geral de cada um dos campi que integram o Instituto Federal.\n\nIV. O Colégio Pedro II é equiparado aos institutos federais para efeito de incidência das disposições que regem a autonomia e a utilização dos instrumentos de gestão do quadro de pessoal e de ações de regulação, avaliação e supervisão das instituições e dos cursos de educação profissional e superior. Está correto o que se apresenta em:",
+          "after": "Com base na Lei nº 11.892, de 29 de dezembro de 2008, analise as assertivas a seguir.\n\nI. Um dos objetivos dos Institutos Federais é estimular e apoiar processos educativos que levem à geração de trabalho e renda e à emancipação do cidadão na perspectiva do desenvolvimento socioeconômico local e regional.\n\nII. A administração dos Institutos Federais terá como órgãos superiores o Colégio de Dirigentes e o Conselho Superior. As presidências do Colégio de Dirigentes e do Conselho Superior serão exercidas pelo Reitor do Instituto Federal.\n\nIII. O Colégio de Dirigentes, de caráter consultivo, será composto exclusivamente pelo Reitor e pelo Diretor-Geral de cada um dos campi que integram o Instituto Federal.\n\nIV. O Colégio Pedro II é equiparado aos institutos federais para efeito de incidência das disposições que regem a autonomia e a utilização dos instrumentos de gestão do quadro de pessoal e de ações de regulação, avaliação e supervisão das instituições e dos cursos de educação profissional e superior.\n\nEstá correto o que se apresenta em:"
+        }
+      ]
+    },
+    {
+      "n": 221,
+      "id": "l11892-q3369121",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, III, VI e IX, e 7º, III e VI, a",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 222,
+      "id": "l11892-q2448209",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 11, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 223,
+      "id": "l11892-q2583977",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 11, caput e § 2º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 224,
+      "id": "l11892-q3539771",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I e VI, b, e 8º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 225,
+      "id": "l11892-q2353894",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 2º, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 226,
+      "id": "l11892-q2335325",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 12, § 1º, e 13, § 1º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 227,
+      "id": "l11892-q2335326",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 11, § 1º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "statement",
+          "before": "Consideranão-se",
+          "after": "Considerando-se"
+        },
+        {
+          "field": "statement",
+          "before": "podera",
+          "after": "poderá"
+        },
+        {
+          "field": "statement",
+          "before": "minimo",
+          "after": "mínimo"
+        },
+        {
+          "field": "statement",
+          "before": "exercicio",
+          "after": "exercício"
+        },
+        {
+          "field": "statement",
+          "before": "tecnolégica",
+          "after": "tecnológica"
+        },
+        {
+          "field": "statement",
+          "before": "Considere o seguinte currículo: servidor efetivo ocupante do cargo de contador do IFMT desde 2015, graduado em Ciências Contábeis, mestre e doutor em Contabilidade Aplicada ao Setor Público, com cinco anos de experiência como chefe de departamento no Instituto e curso de formação em gestão pública concluído com aproveitamento. Considerando-se como verdadeiras as informações constantes do currículo hipotético apresentado, nos termos da Lei 11.892/08 e da Lei 11.091/05, julgue as assertivas abaixo:\n\nI. Fulano de Tal poderá ser nomeado Pró-Reitor, visto que é ocupante de cargo efetivo com nivel superior da carreira dos técnicos administrativos do Plano de Carreira dos Cargos Técnico-Administrativos em Educação.\n\nII. Fulano de Tal não poderá ser nomeado Pró-Reitor, visto que não é ocupante de cargo efetivo da carreira docente.\n\nIII. Fulano de Tal poderá ser nomeado Pró-Reitor, visto que possui o mínimo de 5 (cinco) anos de efetivo exercício em instituição federal de educação profissional e tecnológica.\n\nIV. Fulano de Tal não poderá ser nomeado Pró-Reitor, visto que não possui o mínimo de 10 (dez) anos de efetivo exercício em instituição federal de educação profissional e tecnológica. Está correto o que se afirma em:",
+          "after": "Considere o seguinte currículo: servidor efetivo ocupante do cargo de contador do IFMT desde 2015, graduado em Ciências Contábeis, mestre e doutor em Contabilidade Aplicada ao Setor Público, com cinco anos de experiência como chefe de departamento no Instituto e curso de formação em gestão pública concluído com aproveitamento. Considerando-se como verdadeiras as informações constantes do currículo hipotético apresentado, nos termos da Lei 11.892/08 e da Lei 11.091/05, julgue as assertivas abaixo:\n\nI. Fulano de Tal poderá ser nomeado Pró-Reitor, visto que é ocupante de cargo efetivo com nível superior da carreira dos técnicos administrativos do Plano de Carreira dos Cargos Técnico-Administrativos em Educação.\n\nII. Fulano de Tal não poderá ser nomeado Pró-Reitor, visto que não é ocupante de cargo efetivo da carreira docente.\n\nIII. Fulano de Tal poderá ser nomeado Pró-Reitor, visto que possui o mínimo de 5 (cinco) anos de efetivo exercício em instituição federal de educação profissional e tecnológica.\n\nIV. Fulano de Tal não poderá ser nomeado Pró-Reitor, visto que não possui o mínimo de 10 (dez) anos de efetivo exercício em instituição federal de educação profissional e tecnológica.\n\nEstá correto o que se afirma em:"
+        }
+      ]
+    },
+    {
+      "n": 228,
+      "id": "l11892-q2658248",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 17",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 229,
+      "id": "l11892-q2281026",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I, IV e V",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 230,
+      "id": "l11892-q2281056",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I, III, IV e V",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 231,
+      "id": "l11892-q2295109",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 6º e 7º, III",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 232,
+      "id": "l11892-q2296178",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, V, 2º, § 1º, 4º-A, 7º, III, 10 e 11",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "options.B",
+          "before": "próreitores",
+          "after": "pró-reitores"
+        }
+      ]
+    },
+    {
+      "n": 233,
+      "id": "l11892-q2226001",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único, 2º, § 1º, e 11",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 234,
+      "id": "l11892-q2639262",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, 5º, XVIII, §§ 1º e 2º, e Anexo I",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 235,
+      "id": "l11892-q2639361",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 16, § 2º; Lei nº 8.112/1990, art. 36",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 236,
+      "id": "l11892-q2639363",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 13, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 237,
+      "id": "l11892-q2175058",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 5º, § 6º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 238,
+      "id": "l11892-q2175064",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 2º, § 1º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 239,
+      "id": "l11892-q2186611",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, I, 7º, VI, d e e, 9º a 12",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 240,
+      "id": "l11892-q2209741",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 2º, § 1º, 4º-A e 6º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 241,
+      "id": "l11892-q2209747",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 7º, II, III, V e VI, a",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 242,
+      "id": "l11892-q2210253",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 243,
+      "id": "l11892-q2211816",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, V e VIII, e 7º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 244,
+      "id": "l11892-q4178346",
+      "status": "mantida",
+      "correctOption": "C",
+      "basis": "Lei nº 11.892/2008 — art. 1º, caput e parágrafo único; Constituição Federal, art. 37, XIX",
+      "note": "Mantida: criação de autarquia por lei específica, compatível com o art. 37, XIX, da Constituição e com o Decreto-Lei nº 200/1967.",
+      "editorial": []
+    },
+    {
+      "n": 245,
+      "id": "l11892-q2062255",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 1º, parágrafo único",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 246,
+      "id": "l11892-q2082090",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 1º, parágrafo único; art. 5º, II",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 247,
+      "id": "l11892-q2432732",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 12, caput, §§ 1º e 3º, e 13",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 248,
+      "id": "l11892-q3255962",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 1º, caput e parágrafo único; Decreto-Lei nº 200/1967, arts. 4º, II, a, 5º, I, e 19 a 26",
+      "note": "Mantida: autarquias são entidades da administração indireta, vinculadas à supervisão ministerial, sem subordinação hierárquica; Decreto-Lei nº 200/1967, arts. 4º, 5º, 19 e 26.",
+      "editorial": []
+    },
+    {
+      "n": 249,
+      "id": "l11892-q4080855",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I a V, e 8º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 250,
+      "id": "l11892-q4097358",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I a III e IX",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 251,
+      "id": "l11892-q4103884",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único, e 2º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 252,
+      "id": "l11892-q3367958",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I, II, III e VI",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "options.B",
+          "before": "nívelsuperior",
+          "after": "nível superior"
+        }
+      ]
+    },
+    {
+      "n": 253,
+      "id": "l11892-q1923945",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — art. 7º, I, II e VI, a",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 254,
+      "id": "l11892-q3073063",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 1º, parágrafo único, e 2º, caput e §§ 1º a 3º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 255,
+      "id": "l11892-q3073347",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I e VI, b, e 8º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 256,
+      "id": "l11892-q3074428",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — arts. 9º a 11",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 257,
+      "id": "l11892-q3972349",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 6º, I a IV",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": [
+        {
+          "field": "statement",
+          "before": "horizontalizarão",
+          "after": "horizontalização"
+        },
+        {
+          "field": "statement",
+          "before": "; Dos itens anteriores",
+          "after": ";\n\nDos itens anteriores"
+        }
+      ]
+    },
+    {
+      "n": 258,
+      "id": "l11892-q3972369",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — art. 2º, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 259,
+      "id": "l11892-q3972370",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 10, §§ 1º a 3º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 260,
+      "id": "l11892-q3972371",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 7º, IV",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 261,
+      "id": "l11892-q3972623",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 6º, V e VII a IX",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 262,
+      "id": "l11892-q3978565",
+      "status": "mantida",
+      "correctOption": "A",
+      "basis": "Lei nº 11.892/2008 — arts. 7º, I e VI, e 8º",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 263,
+      "id": "l11892-q1941925",
+      "status": "mantida",
+      "correctOption": "B",
+      "basis": "Lei nº 11.892/2008 — art. 11, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 264,
+      "id": "l11892-q4161016",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 6º, VII e IX; art. 7º, VI, a e b",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 265,
+      "id": "l11892-q4161041",
+      "status": "mantida",
+      "correctOption": "D",
+      "basis": "Lei nº 11.892/2008 — art. 2º, caput",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    },
+    {
+      "n": 266,
+      "id": "ifsc-2026-admin-q13",
+      "status": "mantida",
+      "correctOption": "E",
+      "basis": "Lei nº 11.892/2008 — arts. 6º, VII e VIII, e 7º, III e IV.",
+      "note": "Enunciado, alternativas e gabarito conferidos com o dispositivo vigente indicado; não depende de redação revogada.",
+      "editorial": []
+    }
+  ]
+}
