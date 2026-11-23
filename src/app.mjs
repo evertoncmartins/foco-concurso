@@ -2,6 +2,7 @@ import {PublicDocuments} from './public-documents.mjs';
 import {openAccountStorage} from './journal-storage.mjs';
 import {progressLinkCandidates} from './bank-progress.mjs';
 import {Store} from './store.mjs';
+import {SessionWrites} from './session-writes.mjs';
 import {validateBank,validateEvents,derive,makeQueue,filterQuestions,breakdown,studyStreak,localDay} from './engine.mjs';
 import {DriveSync} from './drive.mjs';
 import {DriveSettings} from './drive-settings.mjs';
@@ -36,6 +37,30 @@ let guest=false,restoration=null,restoreAuthorization=null,resetSaving=null;
 let googleLoading=false,googleLoadError='';
 let cutQuestion=null,cutOptions=new Set();
 let finishingSession=false;
+let sessionWrites=null;
+function sessionPersistence(){
+  if(sessionWrites?.store===store)return sessionWrites;
+  const owner=store;
+  sessionWrites=new SessionWrites(owner,{onStatus:status=>{
+    if(store!==owner)return;
+    updateSessionSaveStatus(status);
+    if(status==='saved'&&view==='session'&&session&&!session.completed)updateSessionSummary();
+    else if(status==='saved'&&['home','sessions','performance','revision'].includes(view)&&!$('#dialog').open)render();
+  },onError:error=>{if(store===owner)failure(error);}});
+  return sessionWrites;
+}
+function updateSessionSaveStatus(status=sessionWrites?.error?'error':sessionWrites?.pending.length?'saving':'saved'){
+  const label=$('.session-save-status');if(!label)return;
+  label.dataset.status=status;label.textContent=guest?'':status==='saving'?'Salvando…':status==='error'?'Salvamento pendente · tentar novamente':'Salvo neste dispositivo';
+}
+function selectOption(option){
+  if(view!=='session'||!session||session.answers[session.queue[session.index]]!=null)return;
+  if(!sessionQuestion(model,session,session.queue[session.index])?.options.some(item=>item.id===option)||selected===option)return;
+  const key=session.queue[session.index],next={...session,drafts:{...session.drafts,[key]:option}};
+  sessionPersistence().enqueue([{type:'session',session:next}]);session=next;selected=option;draftSelections.set(draftKey(),selected);
+  for(const row of document.querySelectorAll('.option')){const active=row.dataset.option===option;row.classList.toggle('selected',active);row.querySelector('.option-select')?.setAttribute('aria-pressed',String(active));}
+  const button=$('[data-action=answer]');if(button)button.disabled=false;
+}
 const draftSelections=new Map();
 const expandedBankDetails=new Set();
 const systemCatalog=new SystemBanks();
@@ -102,7 +127,7 @@ desktopLayout.addEventListener('change',()=>{
   render();
 });
 function saveConfig(){accountStorage?.setItem('foco:config',JSON.stringify(config));localStorage.setItem('foco:appearance',config.theme);}
-function applyTheme(){document.documentElement.dataset.theme=config.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):config.theme;document.querySelector('meta[name=theme-color]').content=document.documentElement.dataset.theme==='dark'?'#212121':'#f8f9fc';}
+function applyTheme(){document.documentElement.dataset.theme=config.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):config.theme;document.querySelector('meta[name=theme-color]').content=window.getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();}
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),4500);}
 function failure(error){console.error(error);if(['PROGRESS_RESET','SESSION_DELETED'].includes(error?.code)){refreshModel();render();}toast(error?.name==='QuotaExceededError'?'O armazenamento local está cheio. Exporte seu progresso para preservar os dados.':error.message||'Não foi possível concluir. Tente novamente.');}
 function refreshModel(){
@@ -158,6 +183,7 @@ function resumeSession(){return model.sessions.find(s=>s.id===config.activeSessi
 function sessions(){return heading('Minhas sessões','Retome seus estudos e consulte os resultados de cada tentativa.',`<button class="btn primary small" data-action="start">${icon('plus',15)} Nova sessão</button>`)+sessionsView(model,sessionFilters);}
 function currentResultSession(){return resultSessionId?model.sessions.find(s=>s.id===resultSessionId):session;}
 async function resumeStudy(id){
+  await sessionWrites?.flush();
   await accountStorage.refresh?.();store.load();refreshModel();
   const target=id?model.sessions.find(s=>s.id===id):resumeSession();
   if(!target||target.completed||target.abandoned){toast('Esta sessão não está mais disponível para continuar.');return;}
@@ -201,12 +227,12 @@ function originPerformance(){return `<section class="origin-performance" aria-la
 function performance(){const scoped=performanceForBank(model,performanceBank,performanceOrigin);const worst=scoped.questions.filter(q=>scoped.progress.get(q.key)?.wrong).sort((a,b)=>scoped.progress.get(b.key).wrong-scoped.progress.get(a.key).wrong).slice(0,5);const recent=scoped.answers.slice(-20);return heading('Entenda sua evolução','Veja o que já domina e onde vale investir mais atenção.',`<button class="btn small" data-action="nav" data-view="sessions">${icon('clock',15)} Minhas sessões</button>`)+`<div class="history-filters">${bankSelect(model,performanceBank,{id:'performance-bank',attribute:'data-performance-bank'})}<label class="history-filter" for="performance-origin"><span>Origem</span><select id="performance-origin" data-performance-origin>${[['all','Todas as origens'],['system','Sistema'],['personal','Pessoal']].map(([value,label])=>`<option value="${value}" ${performanceOrigin===value?'selected':''}>${label}</option>`).join('')}</select></label></div>`+`<div class="stat-grid">${stat('Taxa de acertos',`${scoped.stats.accuracy}%`,performanceBank?'Tentativas no banco selecionado':'Todas as tentativas do histórico','target')}${stat('Questões respondidas',scoped.stats.answered,`${scoped.stats.attempts} tentativas no total`,'book')}${stat('Últimas 20 respostas',`${recent.length?Math.round(recent.filter(a=>a.correct).length/recent.length*100):0}%`,`${recent.length} tentativas consideradas`,'chart')}${stat('Constância',studyStreak(scoped.answers),'Dias consecutivos de estudo','flame')}</div>${originPerformance()}<div class="performance-grid"><section class="card"><h3>Por disciplina</h3>${performanceRows('discipline',scoped.answers)}</section><section class="card"><h3>Por assunto</h3>${performanceRows('subject',scoped.answers)}</section><section class="card"><h3>Por tópico</h3>${performanceRows('topic',scoped.answers)}</section><section class="card"><h3>Sua última semana</h3>${weekChart(scoped.answers)}<div class="table-wrap" style="margin-top:16px"><table><thead><tr><th>Data</th><th>Respostas</th><th>Acertos</th></tr></thead><tbody>${[...new Set(scoped.answers.map(a=>localDay(a.at)))].slice(-7).reverse().map(d=>{const a=scoped.answers.filter(e=>localDay(e.at)===d);return `<tr><td>${d.split('-').reverse().join('/')}</td><td>${a.length}</td><td>${Math.round(a.filter(e=>e.correct).length/a.length*100)}%</td></tr>`;}).join('')||'<tr><td colspan="3">Nenhuma resposta registrada ainda.</td></tr>'}</tbody></table></div></section></div><section class="card" style="margin-top:22px"><h3 style="margin-bottom:18px">Questões que merecem atenção</h3>${worst.length?`<div class="revision-list">${worst.map(q=>`<div class="revision-row"><div><p>${esc(q.statement.slice(0,140))}${q.statement.length>140?'…':''}</p><small>${sourceTag(q)} ${esc(q.subject)} · ${scoped.progress.get(q.key).wrong} erros no histórico</small></div><button class="btn small" data-action="single" data-key="${esc(q.key)}">Refazer ${icon('arrow',13)}</button></div>`).join('')}</div>`:'<p class="muted" style="font-size:12px">Quando houver erros, as questões aparecerão aqui para revisão.</p>'}</section>`+progressResetPanel();}
 function revision(){const due=filterQuestions(model,{mode:'review'});const next=model.questions.filter(q=>model.progress.has(q.key)&&Date.parse(model.progress.get(q.key).due)>Date.now()).sort((a,b)=>model.progress.get(a.key).due.localeCompare(model.progress.get(b.key).due)).slice(0,5);return heading('Revisar é avançar.','Retome o conteúdo antes de ele ficar distante.',`<button class="btn primary" data-action="start" data-mode="review" ${due.length?'':'disabled'}>${icon('repeat',16)} Começar revisão</button>`)+`<div class="study-shortcuts" style="margin:0 0 26px"><button class="shortcut" data-action="start" data-mode="errors">${icon('repeat',22)}<span><strong>${model.stats.errors} erros para refazer</strong><small>A última resposta ainda pede atenção</small></span></button><button class="shortcut" data-action="start" data-mode="favorites">${icon('heart',22)}<span><strong>${model.stats.favorites} favoritas</strong><small>Suas questões de referência</small></span></button><div class="shortcut">${icon('clock',22)}<span><strong>${due.length} revisões para agora</strong><small>Marcadas ou com prazo vencido</small></span></div></div><h2 style="font-size:18px;margin-bottom:16px">Disponíveis para revisão</h2>${due.length?`<div class="revision-list">${due.map(q=>`<div class="revision-row"><div><p>${esc(q.statement.slice(0,140))}${q.statement.length>140?'…':''}</p><small>${sourceTag(q)} ${esc(q.subject)} · ${model.flags.get(q.key)?.review?'Marcada por você':'Revisão vencida'}</small></div><button class="btn small" data-action="single" data-key="${esc(q.key)}">Revisar ${icon('arrow',13)}</button></div>`).join('')}</div>`:empty('Tudo em dia por aqui.','Marque questões durante o estudo ou retorne quando a próxima revisão vencer.', '<button class="btn" data-action="start">Continuar estudando</button>')}<section class="card" style="margin-top:25px"><h3 style="margin-bottom:15px">Próximas revisões</h3>${next.length?next.map(q=>`<div class="between" style="font-size:12px;margin:12px 0"><span>${esc(q.topic)}</span><span class="badge">${new Date(model.progress.get(q.key).due).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'})}</span></div>`).join(''):'<p class="muted" style="font-size:12px">Seu calendário começa após a primeira resposta.</p>'}<p class="setting-note">Após um erro: revisão em 1 dia. Após acertos consecutivos: 1, 3, 7, 14, 30 e 60 dias. Questões marcadas ficam disponíveis até você retirar a marcação.</p></section>`;}
 function guestSettings(){return heading('Seu espaço de estudo.','Você está usando uma sessão temporária.')+`<div class="settings-grid"><section class="card"><h3 style="margin-bottom:20px">Aparência</h3><div class="theme-options">${[['light','Claro','sun'],['dark','Escuro','moon'],['system','Sistema','system']].map(([key,label,i])=>`<button class="theme-option ${config.theme===key?'active':''}" data-action="theme" data-theme="${key}" aria-pressed="${config.theme===key}">${icon(i,21)}${label}</button>`).join('')}</div></section><section class="card"><h3>Modo visitante</h3><p class="setting-note">Você pode importar questões, responder e testar os modos de estudo. Respostas, favoritos, bancos e estatísticas existem apenas nesta sessão.</p><p class="setting-note">Ao sair ou recarregar a página, seu progresso será perdido. Entre com Google e conecte sua pasta do Drive para salvar os próximos estudos.</p><button class="btn primary" data-action="guest-login">Voltar ao login ${icon('arrow',15)}</button></section></div>`;}
-function settings(){return heading('Um espaço do seu jeito.','Ajuste sua experiência e mantenha o progresso por perto.')+`<div class="settings-grid"><div class="stack"><section class="card"><h3>Aparência</h3><div class="theme-options">${[['light','Claro','sun'],['dark','Escuro','moon'],['system','Sistema','system']].map(([key,label,i])=>`<button class="theme-option ${config.theme===key?'active':''}" data-action="theme" data-theme="${key}" aria-pressed="${config.theme===key}">${icon(i,21)}${label}</button>`).join('')}</div><div class="profile-photo-editor">${profileAvatar('profile-photo-preview')}<div><strong>Sua foto de perfil</strong><div class="settings-actions"><button class="btn small" data-action="change-photo">${icon('upload',15)} Alterar foto</button>${isProfilePhoto(config.photo)?'<button class="btn small ghost" data-action="remove-photo">Remover foto</button>':''}</div><p class="setting-note">JPG, PNG ou WebP até 5 MB. Salva nesta conta, neste navegador.</p></div></div><input type="file" id="profile-photo-file" accept="image/jpeg,image/png,image/webp" class="hidden"><form id="profile-form" style="margin-top:24px"><div class="field"><label for="user-name">Como podemos chamar você?</label><input id="user-name" name="name" value="${esc(config.name)}" maxlength="80" required></div><div class="field"><label for="goal">Meta diária de questões</label><input id="goal" name="goal" type="number" value="${config.dailyGoal}" min="1" max="200" required></div><button class="btn small" type="submit">Salvar preferências</button></form></section><section class="card"><h3>Seu progresso</h3><p class="setting-note">Conta: <strong>${esc(auth.profile.email)}</strong>. Favoritos, respostas, bancos e preferências pertencem somente a este perfil.</p><p class="setting-note">Respostas, favoritos, revisões, bancos e sessões são salvos automaticamente neste navegador. Exporte um arquivo para levar uma cópia com você.</p><div class="settings-actions"><button class="btn small" data-action="export-progress">${icon('download',15)} Exportar progresso</button><button class="btn small" data-action="restore-progress">${icon('upload',15)} Restaurar JSON</button></div><p class="setting-note">A restauração aceita arquivos da mesma conta e une os históricos.</p>${legacyAvailable?'<button class="btn small" data-action="migrate-legacy">Recuperar meus estudos da versão anterior</button>':''}</section><section class="card"><h3>Atalhos para estudar</h3><div class="table-wrap"><table><tbody><tr><td>Selecionar alternativa</td><td><kbd>1</kbd> a <kbd>8</kbd></td></tr><tr><td>Registrar resposta</td><td><kbd>Enter</kbd></td></tr><tr><td>Questão anterior (Desktop)</td><td><kbd>←</kbd></td></tr><tr><td>Próxima questão (Desktop)</td><td><kbd>→</kbd> ou <kbd>Enter</kbd> após registrar</td></tr><tr><td>Concluir sessão (última questão)</td><td><kbd>Enter</kbd></td></tr><tr><td>Riscar ou restaurar seleção (Desktop)</td><td><kbd>T</kbd></td></tr><tr><td>Favoritar</td><td><kbd>F</kbd></td></tr><tr><td>Marcar para revisão</td><td><kbd>R</kbd></td></tr></tbody></table></div></section></div><div class="stack"><section class="card"><div class="between"><h3 style="margin:0">Google Drive</h3>${icon('cloud',21)}</div><div class="connection-card" data-status="${drive.status}" role="status" aria-live="polite">${connectionFeedback()}</div><form id="drive-form"><div class="field"><label for="folder-id">Sua pasta do Google Drive</label><input id="folder-id" name="folderId" value="${esc(config.folderId)}" placeholder="https://drive.google.com/drive/folders/…" required><small>Use uma pasta do seu Meu Drive. Sua conta conectada é ${esc(auth.profile.email)}.</small></div><button class="btn small" type="submit">Salvar e conectar pasta</button></form><div class="settings-actions"><button class="btn primary small" data-action="connect-drive">${icon('cloud',16)}${drive.token?'Renovar acesso ao Drive':'Autorizar minha pasta'}</button><button class="btn small" data-action="sync" ${drive.token?'':'disabled'}>${icon('repeat',14)} Sincronizar</button>${drive.token?'<button class="btn small ghost" data-action="disconnect-drive">Desconectar</button>':''}</div><p id="folder-settings-status" class="setting-note" role="status" data-status="${drive.settings.status}">${esc(drive.settings.message)}</p><p class="setting-note">Entre com a mesma conta Google em outro dispositivo para recuperar esta pasta. O progresso usa um único JSON por conta nesta pasta. Os lotes antigos são consolidados automaticamente e movidos para a lixeira após a conferência. O histórico é carregado após autorizar o Drive. O acesso é renovado automaticamente durante o uso; o Google poderá pedir nova autorização se a permissão precisar ser confirmada.</p><p class="setting-note">Os bancos JSON novos da pasta são importados ao conectar. Bancos existentes não são substituídos automaticamente. <button class="text-link" data-action="refresh-folder-banks">Buscar novos bancos agora</button></p>${drive.lastSync||accountStorage.getItem('foco:lastSync')?`<p class="setting-note">Último envio confirmado: ${new Date(drive.lastSync||accountStorage.getItem('foco:lastSync')).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'})}</p>`:''}</section><section class="card"><h3>Sobre o Foco</h3><div class="download-links"><a data-foco-document href="./privacidade.html">Política de Privacidade</a><a data-foco-document href="./termos.html">Termos de Serviço</a></div></section></div></div>`;}
+function settings(){return heading('Um espaço do seu jeito.','Ajuste sua experiência e mantenha o progresso por perto.')+`<div class="settings-grid"><div class="stack"><section class="card"><h3>Aparência</h3><div class="theme-options">${[['light','Claro','sun'],['dark','Escuro','moon'],['system','Sistema','system']].map(([key,label,i])=>`<button class="theme-option ${config.theme===key?'active':''}" data-action="theme" data-theme="${key}" aria-pressed="${config.theme===key}">${icon(i,21)}${label}</button>`).join('')}</div><div class="profile-photo-editor">${profileAvatar('profile-photo-preview')}<div><strong>Sua foto de perfil</strong><div class="settings-actions"><button class="btn small" data-action="change-photo">${icon('upload',15)} Alterar foto</button>${isProfilePhoto(config.photo)?'<button class="btn small ghost" data-action="remove-photo">Remover foto</button>':''}</div><p class="setting-note">JPG, PNG ou WebP até 5 MB. Salva nesta conta, neste navegador.</p></div></div><input type="file" id="profile-photo-file" accept="image/jpeg,image/png,image/webp" class="hidden"><form id="profile-form" style="margin-top:24px"><div class="field"><label for="user-name">Como podemos chamar você?</label><input id="user-name" name="name" value="${esc(config.name)}" maxlength="80" required></div><div class="field"><label for="goal">Meta diária de questões</label><input id="goal" name="goal" type="number" value="${config.dailyGoal}" min="1" max="200" required></div><button class="btn small" type="submit">Salvar preferências</button></form></section><section class="card"><h3>Seu progresso</h3><p class="setting-note">Conta: <strong>${esc(auth.profile.email)}</strong>. Favoritos, respostas, bancos e preferências pertencem somente a este perfil.</p><p class="setting-note">Respostas, favoritos, revisões, bancos e sessões são salvos automaticamente neste navegador. Exporte um arquivo para levar uma cópia com você.</p><div class="settings-actions"><button class="btn small" data-action="export-progress">${icon('download',15)} Exportar progresso</button><button class="btn small" data-action="restore-progress">${icon('upload',15)} Restaurar JSON</button></div><p class="setting-note">A restauração aceita arquivos da mesma conta e une os históricos.</p>${legacyAvailable?'<button class="btn small" data-action="migrate-legacy">Recuperar meus estudos da versão anterior</button>':''}</section><section class="card"><h3>Atalhos para estudar</h3><div class="table-wrap"><table><tbody><tr><td>Selecionar alternativa</td><td><kbd>1</kbd> a <kbd>8</kbd></td></tr><tr><td>Registrar resposta</td><td><kbd>Enter</kbd></td></tr><tr><td>Questão anterior (Desktop)</td><td><kbd>←</kbd></td></tr><tr><td>Próxima questão (Desktop)</td><td><kbd>→</kbd> ou <kbd>Enter</kbd> após registrar</td></tr><tr><td>Concluir sessão (última questão)</td><td><kbd>Enter</kbd></td></tr><tr><td>Riscar ou restaurar seleção (Desktop)</td><td><kbd>T</kbd></td></tr><tr><td>Pular questão</td><td><kbd>Espaço</kbd></td></tr><tr><td>Favoritar</td><td><kbd>F</kbd></td></tr><tr><td>Marcar para revisão</td><td><kbd>R</kbd></td></tr></tbody></table></div></section></div><div class="stack"><section class="card"><div class="between"><h3 style="margin:0">Google Drive</h3>${icon('cloud',21)}</div><div class="connection-card" data-status="${drive.status}" role="status" aria-live="polite">${connectionFeedback()}</div><form id="drive-form"><div class="field"><label for="folder-id">Sua pasta do Google Drive</label><input id="folder-id" name="folderId" value="${esc(config.folderId)}" placeholder="https://drive.google.com/drive/folders/…" required><small>Use uma pasta do seu Meu Drive. Sua conta conectada é ${esc(auth.profile.email)}.</small></div><button class="btn small" type="submit">Salvar e conectar pasta</button></form><div class="settings-actions"><button class="btn primary small" data-action="connect-drive">${icon('cloud',16)}${drive.token?'Renovar acesso ao Drive':'Autorizar minha pasta'}</button><button class="btn small" data-action="sync" ${drive.token?'':'disabled'}>${icon('repeat',14)} Sincronizar</button>${drive.token?'<button class="btn small ghost" data-action="disconnect-drive">Desconectar</button>':''}</div><p id="folder-settings-status" class="setting-note" role="status" data-status="${drive.settings.status}">${esc(drive.settings.message)}</p><p class="setting-note">Entre com a mesma conta Google em outro dispositivo para recuperar esta pasta. O progresso usa um único JSON por conta nesta pasta. Os lotes antigos são consolidados automaticamente e movidos para a lixeira após a conferência. O histórico é carregado após autorizar o Drive. O acesso é renovado automaticamente durante o uso; o Google poderá pedir nova autorização se a permissão precisar ser confirmada.</p><p class="setting-note">Os bancos JSON novos da pasta são importados ao conectar. Bancos existentes não são substituídos automaticamente. <button class="text-link" data-action="refresh-folder-banks">Buscar novos bancos agora</button></p>${drive.lastSync||accountStorage.getItem('foco:lastSync')?`<p class="setting-note">Último envio confirmado: ${new Date(drive.lastSync||accountStorage.getItem('foco:lastSync')).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'})}</p>`:''}</section><section class="card"><h3>Sobre o Foco</h3><div class="download-links"><a data-foco-document href="./privacidade.html">Política de Privacidade</a><a data-foco-document href="./termos.html">Termos de Serviço</a></div></section></div></div>`;}
 function feedback(q,answer){return questionFeedbackView(q,answer)+(studyPresentation(model,q)?.associatedFrom?'<p class="session-association-note">Progresso associado ao Sistema. A origem Pessoal do registro foi preservada.</p>':'');}
 function resetCuts(){cutQuestion=null;cutOptions.clear();}
 function prepareCuts(q){
   const identity=JSON.stringify([session.id,q.key]);
-  if(cutQuestion!==identity){resetCuts();cutQuestion=identity;}
+  if(cutQuestion!==identity){resetCuts();cutQuestion=identity;cutOptions=new Set(session.eliminatedOptions?.[q.key]||[]);}
 }
 function optionView(o,{answer,answered,show,correctOption}){
   const isSelected=(answer||selected)===o.id,correct=show&&o.id===correctOption,incorrect=show&&isSelected&&!correct;
@@ -219,7 +245,9 @@ function toggleCut(option,value){
   if(!q?.options.some(o=>o.id===option))return;
   prepareCuts(q);
   const cut=typeof value==='boolean'?value:!cutOptions.has(option);
-  if(cut)cutOptions.add(option);else cutOptions.delete(option);
+  const options=new Set(cutOptions);if(cut)options.add(option);else options.delete(option);
+  const next={...session,eliminatedOptions:{...session.eliminatedOptions,[q.key]:[...options]}};
+  sessionPersistence().enqueue([{type:'session',session:next}]);session=next;cutOptions=options;
   const row=$(`[data-option-row="${option}"]`),control=row?.querySelector('.option-cut');
   row?.classList.toggle('eliminated',cut);
   if(control){const label=`${cut?'Restaurar':'Riscar'} alternativa ${option}`;control.setAttribute('aria-pressed',String(cut));control.setAttribute('aria-label',label);control.title=label;}
@@ -237,13 +265,17 @@ function questionActions(answered,{desktopFocus,mobile}){
   const forward=last?`<button class="btn primary session-finish" data-action="finish" aria-label="Concluir sessão" aria-keyshortcuts="Enter" title="Concluir sessão · Enter"><span>Concluir sessão</span>${hint('Enter')}</button>`:`<button class="btn ghost" data-action="next" aria-label="Próxima questão" ${mobile?'':`aria-keyshortcuts="ArrowRight${enterNext?' Enter':''}"`} title="Próxima questão${mobile?'':` · →${enterNext?' / Enter':''}`}><span class="question-nav-label">Próxima</span>${icon('arrow',16)}${hint('→')}${enterNext?hint('Enter'):''}</button>`;
   return `<div class="question-actions"><button class="btn ghost" data-action="previous" aria-label="Questão anterior" ${mobile?'':'aria-keyshortcuts="ArrowLeft"'} title="Questão anterior${mobile?'':' · ←'}" ${session.index===0?'disabled':''}>${icon('back',16)}<span class="question-nav-label">Anterior</span>${hint('←')}</button><button class="btn primary" data-action="answer" ${last||enterNext?'':'aria-keyshortcuts="Enter"'} title="${answered?(guest?'Resposta registrada nesta sessão':'Resposta já registrada'):`Registrar resposta${last?'':' · Enter'}`}" ${answered||!selected?'disabled':''}>${icon('check',16)}<span>Registrar resposta</span></button>${forward}</div>`;
 }
+function sessionSummaryView(q){
+  const exam=session.mode==='exam',mobile=!desktopLayout.matches,answered=session.answers[q.key]!=null,stats=model.answers.filter(a=>a.sessionId===session.id);
+  return `<div class="session-summary-bar">${exam?`<span>${Object.values(session.answers).filter(v=>v).length} respostas registradas</span>`:`<span><strong>${stats.filter(a=>a.correct).length}</strong> acertos</span><span><strong>${stats.filter(a=>!a.correct).length}</strong> erros</span><span><strong>${stats.length?Math.round(stats.filter(a=>a.correct).length/stats.length*100):0}%</strong> na sessão</span>`}${sessionNavigationView(session)}<button class="session-save-status text-link" data-action="retry-session-save" role="status" aria-live="polite"></button><span class="keyboard-tip"><kbd>1</kbd>–<kbd>${q.options.length}</kbd> selecionar · <kbd>Enter</kbd> ${session.index===session.queue.length-1?'concluir sessão':!mobile&&answered?'próxima':'registrar'}${mobile?'':' · <kbd>T</kbd> riscar/restaurar · <kbd>←</kbd> anterior · <kbd>→</kbd> próxima'}</span></div>`;
+}
 function sessionView(){
   if(!session)return empty('Nenhuma sessão em andamento','Escolha um conteúdo para iniciar seu estudo.');
   const key=session.queue[session.index],q=sessionQuestion(model,session,key);
   if(!q)return empty('Conteúdo não disponível','O banco desta questão foi removido. Você pode voltar e iniciar outra sessão.','<button class="btn" data-action="pause">Voltar ao início</button>');
-  const answer=session.answers[key],answered=answer!=null,exam=session.mode==='exam',show=answered&&!exam,f=model.flags.get(key)||{},stats=model.answers.filter(a=>a.sessionId===session.id),mobile=!desktopLayout.matches,desktopFocus=desktopLayout.matches&&focusMode.active;
+  const answer=session.answers[key],answered=answer!=null,exam=session.mode==='exam',show=answered&&!exam,f=model.flags.get(key)||{},mobile=!desktopLayout.matches,desktopFocus=desktopLayout.matches&&focusMode.active;
   prepareCuts(q);
-  return `<div class="session-container"><div class="session-header"><button class="btn ghost small" data-action="pause">${icon('back',15)} Pausar e voltar</button><span class="muted">${modes[session.mode]?.[0]||'Estudo'} · <strong>Questão ${session.index+1} de ${session.queue.length}</strong></span></div><div class="session-progress">${progressBar(session.index/session.queue.length*100)}</div>${mobile?questionPanel(q,f,{mobile:true}):''}<article class="question-card"><div class="question-body" data-question="${esc(key)}" tabindex="0" role="region" aria-label="Questão e alternativas">${mobile?'':questionPanel(q,f)}<h1 class="question-statement">${esc(formatQuestionStatement(q.statement))}</h1><div class="options" role="group" aria-label="Alternativas">${q.options.map(o=>optionView(o,{answer,answered,show,correctOption:q.correctOption})).join('')}</div>${show?feedback(q,answer):exam?'<p class="setting-note" style="margin-bottom:0">Modo simulado: comentários e gabarito aparecem somente ao concluir.</p>':''}</div>${questionActions(answered,{desktopFocus,mobile})}</article><div class="session-summary-bar">${exam?`<span>${Object.values(session.answers).filter(v=>v).length} respostas registradas</span>`:`<span><strong>${stats.filter(a=>a.correct).length}</strong> acertos</span><span><strong>${stats.filter(a=>!a.correct).length}</strong> erros</span><span><strong>${stats.length?Math.round(stats.filter(a=>a.correct).length/stats.length*100):0}%</strong> na sessão</span>`}${sessionNavigationView(session)}<span class="keyboard-tip"><kbd>1</kbd>–<kbd>${q.options.length}</kbd> selecionar · <kbd>Enter</kbd> ${session.index===session.queue.length-1?'concluir sessão':!mobile&&answered?'próxima':'registrar'}${mobile?'':' · <kbd>T</kbd> riscar/restaurar · <kbd>←</kbd> anterior · <kbd>→</kbd> próxima'}</span></div></div>`;
+  return `<div class="session-container"><div class="session-header"><button class="btn ghost small" data-action="pause">${icon('back',15)} Pausar e voltar</button><span class="muted">${modes[session.mode]?.[0]||'Estudo'} · <strong>Questão ${session.index+1} de ${session.queue.length}</strong></span></div><div class="session-progress">${progressBar(session.index/session.queue.length*100)}</div>${mobile?questionPanel(q,f,{mobile:true}):''}<article class="question-card"><div class="question-body" data-question="${esc(key)}" tabindex="0" role="region" aria-label="Questão e alternativas">${mobile?'':questionPanel(q,f)}<h1 class="question-statement">${esc(formatQuestionStatement(q.statement))}</h1><div class="options" role="group" aria-label="Alternativas">${q.options.map(o=>optionView(o,{answer,answered,show,correctOption:q.correctOption})).join('')}</div>${show?feedback(q,answer):exam?'<p class="setting-note" style="margin-bottom:0">Modo simulado: comentários e gabarito aparecem somente ao concluir.</p>':''}</div>${questionActions(answered,{desktopFocus,mobile})}</article>${sessionSummaryView(q)}</div>`;
 }
 function resultView(){
   const source=currentResultSession();
@@ -261,10 +293,27 @@ function resultView(){
       return `<details class="result-item"><summary>${icon(item.correct===null?'clock':item.correct?'check':'x',17)}<span>${i+1}. ${esc(q?.topic||'Conteúdo indisponível')}</span><span class="badge" style="margin-left:auto">${status}</span></summary>${q?`<div class="result-body"><p class="result-bank-source">${sourceTag(item.presentation||item)} ${esc(item.presentation?.displayName||item.displayName)}</p><p>${esc(formatQuestionStatement(q.statement))}</p><p class="setting-note">Correta (${esc(q.correctOption)}): ${esc(formatQuestionText(q.options.find(o=>o.id===q.correctOption)?.text||'Gabarito registrado'))}</p>${feedback(q,item.selected)}</div>`:`<div class="result-unavailable"><p>O conteúdo original desta questão não está disponível nos bancos salvos. Reimporte o banco original para consultá-lo.</p><p>Sua resposta: ${esc(item.selected||'não respondida')}${item.correctOption?` · Gabarito registrado: ${esc(item.correctOption)}`:''}.</p></div>`}</details>`;
     }).join('')}</div></div>`;
 }
-function render(){if(bankUploading){$('#app').innerHTML=bankUploadView(bankUploading);document.title='Preparando banco · Foco';return;}if(resetSaving){renderResetSaving();return;}if(restoration){renderLoading();return;}if((!auth?.profile&&!guest)||!store||!drive){renderLogin();return;}const previousBody=$('.question-body'),previousKey=previousBody?.dataset.question,previousScroll=previousBody?.scrollTop||0;refreshModel();const content=({home,study,sessions,banks,performance,revision,settings:()=>guest?guestSettings():settings(),folder:()=>folderView(auth.profile,config,!!drive.token),session:sessionView,result:resultView})[view]();$('#app').innerHTML=shell(content);document.title=`${({home:'Início',study:'Estudar',sessions:'Minhas sessões',banks:'Banco de questões',performance:'Desempenho',revision:'Revisão',settings:'Ajustes',folder:'Conectar pasta',session:'Estudando',result:'Resultado'})[view]} · Foco`;const body=$('.question-body');if(body&&body.dataset.question===previousKey)body.scrollTop=previousScroll;bindFiles();bindForms();if(view==='settings'&&!guest)drive.prepare().catch(()=>{});}
+function updateSessionSummary(){
+  const summary=$('.session-summary-bar');if(!summary)return;
+  const q=sessionQuestion(model,session,session.queue[session.index]);if(q)summary.outerHTML=sessionSummaryView(q);updateSessionSaveStatus();
+}
+function renderSession(){
+  const container=$('.session-container');if(!container||view!=='session')return false;
+  const body=$('.question-body'),key=body?.dataset.question,scroll=body?.scrollTop||0,focused=document.activeElement;
+  // Keep the sidebar, toolbar, file inputs and their listeners intact.
+  container.outerHTML=sessionView();
+  const nextBody=$('.question-body');if(nextBody?.dataset.question===key)nextBody.scrollTop=scroll;
+  if(focused?.closest?.('.session-container')){
+    const action=focused.dataset.action,option=focused.dataset.option;
+    if(action)$(`[data-action="${action}"]${option?`[data-option="${option}"]`:''}`)?.focus({preventScroll:true});
+  }
+  const toolbar=$('.focus-toolbar');if(toolbar)toolbar.outerHTML=focusToolbar();
+  updateSessionSaveStatus();return true;
+}
+function render(){if(bankUploading){$('#app').innerHTML=bankUploadView(bankUploading);document.title='Preparando banco · Foco';return;}if(resetSaving){renderResetSaving();return;}if(restoration){renderLoading();return;}if((!auth?.profile&&!guest)||!store||!drive){renderLogin();return;}const previousBody=$('.question-body'),previousKey=previousBody?.dataset.question,previousScroll=previousBody?.scrollTop||0;refreshModel();const content=({home,study,sessions,banks,performance,revision,settings:()=>guest?guestSettings():settings(),folder:()=>folderView(auth.profile,config,!!drive.token),session:sessionView,result:resultView})[view]();$('#app').innerHTML=shell(content);document.title=`${({home:'Início',study:'Estudar',sessions:'Minhas sessões',banks:'Banco de questões',performance:'Desempenho',revision:'Revisão',settings:'Ajustes',folder:'Conectar pasta',session:'Estudando',result:'Resultado'})[view]} · Foco`;const body=$('.question-body');if(body&&body.dataset.question===previousKey)body.scrollTop=previousScroll;updateSessionSaveStatus();bindFiles();bindForms();if(view==='settings'&&!guest)drive.prepare().catch(()=>{});}
 function navigate(next){
   if(restoration||resetSaving)return;
-  view=next;selected=next==='session'?draftSelections.get(draftKey())||null:null;
+  view=next;selected=next==='session'?draftSelections.get(draftKey())||session?.drafts?.[session.queue[session.index]]||null:null;
   let focusChange;
   if(next!=='session')focusChange=focusMode.exit();
   else if(!desktopLayout.matches&&session&&!session.completed)focusChange=focusMode.enter({automatic:true});
@@ -321,7 +370,7 @@ async function resetPersonalProgress(){
     if(drive.busy||drive.connecting){toast('Aguarde a sincronização terminar e tente novamente. Nenhum progresso foi zerado.');return;}
     resetSaving=resetSaveProgress(null);renderResetSaving();$('#main')?.focus({preventScroll:true});
     currentDrive.addEventListener('progress',updateProgress);clearTimeout(currentDrive.timer);
-    await currentStore.resetProgress();
+    await sessionWrites?.flush();await currentStore.resetProgress();
     session=null;selected=null;draftSelections.clear();resetCuts();config.activeSession=null;render();
     if(!drive.token){toast(guest?'Progresso temporário zerado. Você pode começar de novo.':'Progresso zerado neste dispositivo. Conecte o Drive para sincronizar o reinício.');return;}
     clearTimeout(currentDrive.timer);
@@ -385,6 +434,7 @@ function startDialog(mode='smart',bankId=''){
   };
 }
 async function newSession(queue,mode='smart'){
+  await sessionWrites?.flush();
   const owner=store,generation=auth?.generation;
   const questions=new Map(model.questions.map(q=>[q.key,q]));
   const selectedBanks=new Set(queue.map(key=>questions.get(key)?.bankId));
@@ -401,12 +451,12 @@ async function newSession(queue,mode='smart'){
   next.questionSources=Object.fromEntries(queue.map(key=>[key,questionSource(questions.get(key))]));
   await store.add([{type:'session',session:next}]);session=next;resultSessionId=null;resetCuts();config.activeSession=session.id;saveConfig();selected=null;
 }
-async function answer(){if(!selected||!session)return;const key=session.queue[session.index];if(session.answers[key])return;const q=sessionQuestion(model,session,key);const result=chooseAnswer(session,q,selected);await store.add(result.events);session=result.session;draftSelections.delete(draftKey());render();$('.feedback')?.scrollIntoView({behavior:'smooth',block:'nearest'});}
+async function answer(){if(!selected||!session)return;const key=session.queue[session.index];if(session.answers[key])return;const q=sessionQuestion(model,session,key);const result=chooseAnswer(session,q,selected);sessionPersistence().enqueue(result.events);session=result.session;draftSelections.delete(draftKey());renderSession();$('.feedback')?.scrollIntoView({behavior:'smooth',block:'nearest'});}
 async function move(direction,{index}={}){
   if(view!=='session'||!session||session.completed)return;
   const result=index===undefined?moveSession(session,direction):jumpSession(session,index);if(!result.events.length)return;
-  await store.add(result.events);session=result.session;selected=draftSelections.get(draftKey())||null;resetCuts();
-  render();window.scrollTo(0,0);(sessionFinishButton()||$('.question-body'))?.focus({preventScroll:true});
+  sessionPersistence().enqueue(result.events);session=result.session;selected=draftSelections.get(draftKey())||session.drafts?.[session.queue[session.index]]||null;resetCuts();
+  renderSession();window.scrollTo(0,0);(sessionFinishButton()||$('.question-body'))?.focus({preventScroll:true});
 }
 function questionList(){
   if(view!=='session'||!session||session.completed)return;
@@ -431,6 +481,7 @@ async function finish(){
   finishingSession=true;
   let returnedToQuestion=false;
   try{
+    await sessionWrites?.flush();
     const unanswered=session.queue.filter(key=>!session.answers[key]).length;
     if(unanswered){
       const choice=await confirmSessionFinish(unanswered);
@@ -661,7 +712,7 @@ document.addEventListener('click',async event=>{
     if(action==='import'){$('#bank-file').click();return;}
     if(action==='system-bank-import'){if(guest||!bankManagement.admin)throw new Error('Somente a administração pode enviar bancos do Sistema.');$('#bank-file')?.click();return;}
     if(action==='restore-progress'){$('#progress-file').click();return;}
-    if(action==='export-progress'){download(`foco-progresso-exportado-${localDay(Date.now())}.json`,store.export());return;}
+    if(action==='export-progress'){await sessionWrites?.flush();download(`foco-progresso-exportado-${localDay(Date.now())}.json`,store.export());return;}
     if(action==='reset-progress'){await resetPersonalProgress();return;}
     if(action==='bank-export'){await manageBank('export',target.dataset.bank);return;}
     if(action==='bank-details'){
@@ -695,7 +746,7 @@ document.addEventListener('click',async event=>{
     if(action==='sessions-page'&&view==='sessions'){sessionFilters.page=Math.max(1,Number(target.dataset.page)||1);render();return;}
     if(action==='pause'){await navigate('home');return;}
     if(action==='toggle-cut'){toggleCut(target.dataset.option);return;}
-    if(action==='select'){if(view!=='session'||!session||session.answers[session.queue[session.index]]!=null)return;selected=target.dataset.option;draftSelections.set(draftKey(),selected);render();$(`.option-select[data-option="${selected}"]`)?.focus({preventScroll:true});return;}
+    if(action==='select'){if(view!=='session'||!session||session.answers[session.queue[session.index]]!=null)return;selectOption(target.dataset.option);$(`.option-select[data-option="${selected}"]`)?.focus({preventScroll:true});return;}
     if(action==='single'){await newSession([target.dataset.key]);navigate('session');return;}
     if(action==='session-errors'){
       const source=currentResultSession();if(!source?.completed)return;
@@ -706,6 +757,7 @@ document.addEventListener('click',async event=>{
     if(action==='flag'){working=true;await toggleFlag(target.dataset.flag);return;}
     if(action==='answer'){working=true;await answer();return;}
     if(action==='previous'||action==='next'){working=true;await move(action==='previous'?-1:1);return;}
+    if(action==='retry-session-save'){await sessionWrites?.flush();return;}
     if(action==='question-list'){questionList();return;}
     if(action==='jump-question'){
       if(view!=='session'||!session||session.completed||target.dataset.session!==session.id)return;
@@ -719,7 +771,7 @@ document.addEventListener('click',async event=>{
     if(action==='finish'){working=true;await finish();return;}
     if(action==='connect-drive'){working=true;toast('Abrindo a autorização do Google…');await drive.connect();config.onboardingDone=true;saveConfig();if(view==='folder')view='home';render();toast('Pasta salva na sua conta Google e progresso sincronizado.');return;}
     if(action==='disconnect-drive'){drive.disconnect();render();return;}
-    if(action==='sync'){await drive.sync();await syncSystemCatalog({apply:false});render();toast(systemCatalog.updates.size?'Drive sincronizado. Há atualizações no Banco de questões.':'Históricos sincronizados com o Drive.');return;}
+    if(action==='sync'){await sessionWrites?.flush();await drive.sync();await syncSystemCatalog({apply:false});render();toast(systemCatalog.updates.size?'Drive sincronizado. Há atualizações no Banco de questões.':'Históricos sincronizados com o Drive.');return;}
     if(action==='drive-banks'){await driveBanks();return;}
   }catch(error){if(action==='connect-drive')render();failure(error);}finally{working=false;if(!auth?.profile&&!guest&&!restoration)renderLogin();}
 });
@@ -758,6 +810,10 @@ document.addEventListener('keydown',async event=>{
   const q=sessionQuestion(model,session,session.queue[session.index]);if(!q)return;
   try{
     if(event.altKey||event.ctrlKey||event.metaKey)return;
+    if(event.code==='Space'||event.key===' '){
+      if(event.shiftKey||usesQuestionNavigation(event.target)||event.target.closest?.('button,a[href]'))return;
+      event.preventDefault();if(event.repeat)return;working=true;await move(1);return;
+    }
     if(event.key==='Enter'&&(enterAction==='finish'||!enterButton)&&sessionFinishButton()){
       const ownsEnter=target=>usesQuestionNavigation(target)||!!target?.closest?.('a[href]');
       if(event.shiftKey||ownsEnter(event.target)||event.composedPath?.().some(ownsEnter))return;
@@ -786,7 +842,7 @@ document.addEventListener('keydown',async event=>{
     if(['f','r'].includes(event.key.toLowerCase())){event.preventDefault();if(event.repeat)return;working=true;await toggleFlag(event.key.toLowerCase()==='f'?'favorite':'review');return;}
     if(event.repeat)return;
     const option=/^[1-8]$/.test(event.key)?q.options[Number(event.key)-1]?.id:q.options.find(o=>o.id===event.key.toUpperCase())?.id;
-    if(option&&!session.answers[q.key]){event.preventDefault();selected=option;draftSelections.set(draftKey(),selected);render();}
+    if(option&&!session.answers[q.key]){event.preventDefault();selectOption(option);}
     if(event.key==='Enter'&&!session.answers[q.key]&&selected){event.preventDefault();working=true;await answer();sessionFinishButton()?.focus({preventScroll:true});}
   }catch(e){failure(e);}finally{working=false;}
 });
@@ -796,7 +852,7 @@ async function refreshAccountJournal(){
   store.load();refreshModel();if(view!=='session'&&!$('#dialog').open)render();
 }
 window.addEventListener('storage',event=>{if(auth?.profile&&accountStorage?.ownsKey(event.key)&&event.key.includes(':foco:v1:event:'))void refreshAccountJournal().catch(failure);});
-window.addEventListener('online',()=>{if(!restoration&&!resetSaving&&drive?.token&&!drive.connecting)drive.sync().catch(()=>{});});
+window.addEventListener('online',()=>{if(sessionWrites?.pending.length)void sessionWrites.flush().catch(()=>{});if(!restoration&&!resetSaving&&drive?.token&&!drive.connecting)drive.sync().catch(()=>{});});
 window.addEventListener('focus',()=>{void refreshAccountJournal().then(()=>{if(!restoration&&!resetSaving&&drive?.token&&!drive.busy&&!drive.connecting)return drive.sync();}).catch(()=>{});});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(config.theme==='system'){applyTheme();render();}});
 async function loadGoogleForLogin(){
@@ -813,12 +869,13 @@ function renderLogin(){
   const form=$('#oauth-preview-form');if(form)form.onsubmit=e=>{e.preventDefault();const id=form.elements.namedItem('clientId').value.trim();if(!validClientId(id)){loginErrorCode='';loginError='Informe apenas o ID público de um cliente OAuth Google Web.';renderLogin();return;}localStorage.setItem('foco:oauth-preview',id);auth.clientId=id;loginError='';renderLogin();void loadGoogleForLogin();};
 }
 async function openAccount(result){
+  await sessionWrites?.close();sessionWrites=null;
   bankManagement.reset();
   guest=false;resetHistoryUI();restoreAuthorization=result;restoration=restoreProgress(null,{stage:'profile'});renderLoading();
   const profile=result.profile;accountStorage?.close?.();accountStorage=await openAccountStorage(localStorage,profile.sub);
   const ownStorage=accountStorage;
   accountStorage.addEventListener?.('change',()=>{if(accountStorage!==ownStorage||!store||restoration)return;try{store.load();refreshModel();if(view!=='session'&&!$('#dialog').open)render();}catch(error){failure(error);}});
-  config={...defaults,...JSON.parse(accountStorage.getItem('foco:config')||'{}')};config.name=config.name==='Estudante'?profile.name:config.name;applyTheme();store=new Store(accountStorage);
+  config={...defaults,...JSON.parse(accountStorage.getItem('foco:config')||'{}')};config.name=config.name==='Estudante'?profile.name:config.name;applyTheme();store=new Store(accountStorage);await SessionWrites.recover(store);
   await loadSystemCatalog();
   legacyAvailable=false;
   if(publicConfig.legacyOwnerEmailSha256){const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(profile.email.toLowerCase()));const hash=[...new Uint8Array(digest)].map(v=>v.toString(16).padStart(2,'0')).join('');legacyAvailable=hash===publicConfig.legacyOwnerEmailSha256&&Array.from({length:localStorage.length},(_,i)=>localStorage.key(i)).some(k=>k?.startsWith('foco:v1:event:'));}
@@ -872,6 +929,7 @@ async function handleRestorationAction(action){
   finally{working=false;}
 }
 async function openGuest(){
+  await sessionWrites?.close();sessionWrites=null;
   bankManagement.reset();
   await auth.signOut();resetHistoryUI();guest=true;legacyAvailable=false;accountStorage=new TemporaryStorage();
   config={...defaults,name:'Visitante',onboardingDone:true,theme:localStorage.getItem('foco:appearance')||'light'};
@@ -884,6 +942,7 @@ async function openGuest(){
 }
 
 async function logout(){
+  await sessionWrites?.close();sessionWrites=null;
   if(drive?.busy||drive?.connecting){toast('Aguarde a sincronização terminar para sair.');return;}
   if(drive?.token&&drive.status==='pending'){working=true;try{await drive.sync();}catch{toast('O envio não foi concluído. O progresso local desta conta foi preservado.');}}
   await focusMode.exit();drive?.close();await auth.signOut();bankManagement.reset();guest=false;restoration=null;restoreAuthorization=null;closeDialog();store=null;model=null;drive=null;accountStorage?.close?.();accountStorage=null;session=null;selected=null;draftSelections.clear();resetCuts();resetHistoryUI();expandedBankDetails.clear();view='home';legacyAvailable=false;working=false;loginError='';loginErrorCode='';config={...defaults,theme:localStorage.getItem('foco:appearance')||'light'};applyTheme();renderLogin();window.scrollTo(0,0);

@@ -5,8 +5,23 @@ const PREFIX='foco:v1:event:';
 const resetError=()=>Object.assign(new Error('Seu progresso foi reiniciado. Inicie uma nova sessão de estudo.'),{code:'PROGRESS_RESET'});
 const deletedError=()=>Object.assign(new Error('Esta sessão foi excluída. Inicie outra sessão para continuar seus estudos.'),{code:'SESSION_DELETED'});
 export class Store extends EventTarget {
-  constructor(storage=globalThis.localStorage) { super(); this.storage=storage; this.events=[];this.systemBanks=[];this.load(); }
-  load() { const list=[]; for(let i=0;i<this.storage.length;i++){const key=this.storage.key(i);if(key?.startsWith(PREFIX)){let e;try{e=JSON.parse(this.storage.getItem(key));}catch{throw new Error('Há dados locais corrompidos. Não serão substituídos. Exporte uma cópia antes de restaurar.');}list.push(e);}} this.events=mergeEvents(validateEvents({schemaVersion:1,events:list}));return this.events; }
+  constructor(storage=globalThis.localStorage) { super(); this.storage=storage; this.events=[];this.systemBanks=[];this.records=new Map();this.load(); }
+  load() {
+    const keys=this.storage.keys?.()||Array.from({length:this.storage.length},(_,i)=>this.storage.key(i)),records=new Map(),list=[];
+    let changed=false;
+    for(const key of keys)if(key?.startsWith(PREFIX)){
+      const raw=this.storage.getItem(key),previous=this.records.get(key);let event;
+      if(previous?.raw===raw)event=previous.event;
+      else{
+        let parsed;try{parsed=JSON.parse(raw);}catch{throw new Error('Há dados locais corrompidos. Não serão substituídos. Exporte uma cópia antes de restaurar.');}
+        event=validateEvents({schemaVersion:1,events:[parsed]})[0];changed=true;
+      }
+      records.set(key,{raw,event});list.push(event);
+    }
+    if(list.length>100000)throw new Error('Arquivo de progresso inválido ou versão incompatível.');
+    if(changed||records.size!==this.records.size)this.events=mergeEvents(list);
+    this.records=records;return this.events;
+  }
   async add(items) {
     await this.storage.refresh?.();
     this.load();const epoch=currentProgressEpoch(this.events),hasStudy=items.some(isStudyEvent),resetting=items.some(e=>e.type==='progress-reset');
@@ -52,8 +67,14 @@ export class Store extends EventTarget {
     // check so another tab cannot lose events appended while reconciliation runs.
     for(let attempt=0;attempt<6;attempt++){
       await this.storage.refresh?.();
-      const before=this.load(),merged=await reconcileEvents(before,incoming),current=this.load();
-      if(before.length!==current.length||before.some((event,index)=>!sameEvent(event,current[index])))continue;
+      const before=this.load(),ids=new Set(before.map(e=>e.id));
+      // New IDs cannot conflict. Previously validated records need no full
+      // cloning/hashing on every cursor movement. Imports/collisions retain the
+      // complete reconciliation and recovery path.
+      const appendOnly=new Set(incoming.map(e=>e.id)).size===incoming.length&&incoming.every(e=>!ids.has(e.id)&&e.type!=='event-conflict')&&!before.some(e=>e.type==='event-conflict');
+      const merged=appendOnly?mergeEvents(before,incoming):await reconcileEvents(before,incoming),current=this.load();
+      if(merged.length>100000)throw new Error('Arquivo de progresso inválido ou versão incompatível.');
+      if(before!==current)continue;
       if(this.storage.commitEvents){
         try{await this.storage.commitEvents(merged);}catch(error){if(error.code==='JOURNAL_CHANGED')continue;throw error;}
         this.load();this.dispatchEvent(new Event('change'));return incoming;
@@ -67,11 +88,15 @@ export class Store extends EventTarget {
         if(old!==null&&sameEvent(JSON.parse(old),event))continue;
         this.storage.setItem(key,JSON.stringify(event));previous.push({key,old});
       }}catch(error){for(const {key,old} of previous.reverse()){if(old===null)this.storage.removeItem(key);else this.storage.setItem(key,old);}this.load();throw error;}
-      this.events=merged;this.dispatchEvent(new Event('change'));return incoming;
+      this.load();this.dispatchEvent(new Event('change'));return incoming;
     }
     throw new Error('O histórico está mudando em outra aba. Aguarde um instante e tente novamente; seus dados foram preservados.');
   }
   setSystemBanks(banks){this.systemBanks=structuredClone(banks);return this.model();}
-  model(){return derive(this.events,Date.now(),this.systemBanks);}
+  model(){
+    const minute=Math.floor(Date.now()/60000),cache=this.derived;
+    if(!cache||cache.events!==this.events||cache.banks!==this.systemBanks||cache.minute!==minute)this.derived={events:this.events,banks:this.systemBanks,minute,value:derive(this.events,Date.now(),this.systemBanks)};
+    return this.derived.value;
+  }
   export(){const model=this.model();return {schemaVersion:1,app:'foco-concursos',...(this.storage.userId?{owner:{provider:'google',subject:this.storage.userId}}:{}),exportedAt:new Date().toISOString(),events:this.events,summary:model.stats,performance:{questions:Object.fromEntries(model.progress),flags:Object.fromEntries(model.flags),byDiscipline:breakdown(model.answers,'discipline'),bySubject:breakdown(model.answers,'subject'),byTopic:breakdown(model.answers,'topic'),studyStreak:studyStreak(model.answers),recentAnswers:model.answers.slice(-20),sessions:model.sessions}};}
 }

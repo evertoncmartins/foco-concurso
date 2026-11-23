@@ -11,17 +11,32 @@ const entriesEvents=items=>validateEvents({schemaVersion:1,events:[...items].fil
 // tabs from replacing a newer journal with an older in-memory copy.
 export async function openIndexedJournal(indexedDB){
   const db=await new Promise((resolve,reject)=>{
-    const request=indexedDB.open('foco-study-journals',1);let blocked=false;
-    request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains('accounts'))request.result.createObjectStore('accounts',{keyPath:'subject'});};
+    const request=indexedDB.open('foco-study-journals',2);let blocked=false;
+    request.onupgradeneeded=()=>{
+      if(!request.result.objectStoreNames.contains('accounts'))request.result.createObjectStore('accounts',{keyPath:'subject'});
+      if(!request.result.objectStoreNames.contains('revisions')){
+        const revisions=request.result.createObjectStore('revisions');
+        const cursor=request.transaction.objectStore('accounts').openCursor();
+        cursor.onsuccess=()=>{if(cursor.result){revisions.put(cursor.result.value.revision,cursor.result.key);cursor.result.continue();}};
+      }
+    };
     request.onsuccess=()=>{if(blocked){request.result.close();return;}resolve(request.result);};request.onerror=()=>reject(request.error);
     request.onblocked=()=>{blocked=true;reject(new Error('Feche as outras abas do Foco para preparar o armazenamento dos estudos.'));};
   });
   db.onversionchange=()=>db.close();
   return {
-    read(subject){return new Promise((resolve,reject)=>{const tx=db.transaction('accounts','readonly'),request=tx.objectStore('accounts').get(subject);tx.oncomplete=()=>resolve(request.result||{subject,revision:0,items:[]});tx.onabort=tx.onerror=()=>reject(tx.error||request.error);});},
+    read(subject,knownRevision){return new Promise((resolve,reject)=>{
+      const tx=db.transaction(['accounts','revisions'],'readonly'),request=tx.objectStore('revisions').get(subject);let record;
+      request.onsuccess=()=>{
+        const revision=request.result||0;
+        if(knownRevision===revision)record={subject,revision};
+        else{const data=tx.objectStore('accounts').get(subject);data.onsuccess=()=>{record=data.result||{subject,revision:0,items:[]};};}
+      };
+      tx.oncomplete=()=>resolve(record);tx.onabort=tx.onerror=()=>reject(tx.error||request.error);
+    });},
     commit(subject,expected,items){return new Promise((resolve,reject)=>{
-      const tx=db.transaction('accounts','readwrite'),store=tx.objectStore('accounts'),request=store.get(subject);let conflict=false;
-      request.onsuccess=()=>{if((request.result?.revision||0)!==expected){conflict=true;tx.abort();return;}store.put({subject,revision:expected+1,items:[...items]});};
+      const tx=db.transaction(['accounts','revisions'],'readwrite'),store=tx.objectStore('accounts'),revisions=tx.objectStore('revisions'),request=revisions.get(subject);let conflict=false;
+      request.onsuccess=()=>{if((request.result||0)!==expected){conflict=true;tx.abort();return;}store.put({subject,revision:expected+1,items:[...items]});revisions.put(expected+1,subject);};
       tx.oncomplete=()=>resolve(expected+1);tx.onabort=tx.onerror=()=>reject(conflict?changed():tx.error||request.error||new Error('Não foi possível salvar seus estudos.'));
     });},
     close(){db.close();}
@@ -47,8 +62,8 @@ export class JournalStorage extends EventTarget{
     // Older versions may still write localStorage. Merge those records before
     // removing any legacy copy, including unsent records in a Drive cache.
     for(let attempt=0;attempt<6;attempt++){
-      const record=await this.driver.read(this.userId),items=new Map(record.items),legacy=new Map(this.legacy.keys().filter(managed).map(key=>[key,this.legacy.getItem(key)]));
-      if(!legacy.size){entriesEvents(items);this.install(record);return;}
+      const record=await this.driver.read(this.userId,this.revision),items=record.items?new Map(record.items):new Map(this.items),legacy=new Map(this.legacy.keys().filter(managed).map(key=>[key,this.legacy.getItem(key)]));
+      if(!legacy.size){if(record.revision!==this.revision)entriesEvents(items);if(record.items)this.install(record);return;}
       const incoming=entriesEvents(legacy);
       for(const [key,value] of legacy)if(key.startsWith('foco:drive:')){
         const cache=JSON.parse(value);if(cache.pending?.document){assertProgressOwner(cache.pending.document,this.userId);incoming.push(...validateEvents(cache.pending.document));}
@@ -68,7 +83,8 @@ export class JournalStorage extends EventTarget{
   }
   async commitEvents(events){
     const revision=this.revision,items=new Map(this.items);
-    for(const event of events)items.set(eventPrefix+event.id,JSON.stringify(event));
+    this.serialized??=new WeakMap();
+    for(const event of events){let raw=this.serialized.get(event);if(raw===undefined){raw=JSON.stringify(event);this.serialized.set(event,raw);}items.set(eventPrefix+event.id,raw);}
     const next=await this.driver.commit(this.userId,revision,items);this.install({revision:next,items});
     this.channel?.postMessage({subject:this.userId});
   }

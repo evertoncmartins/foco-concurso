@@ -73,6 +73,7 @@ test('restauração aceita colisões dentro de um só arquivo sem apagar versõe
 test('registro de recuperação adulterado ou aninhado é recusado',async()=>{
   const repaired=await reconcileEvents([flag(true),flag(false)]),record=repaired.find(event=>event.type==='event-conflict');
   await assert.rejects(()=>reconcileEvents([{...record,event:{...record.event,key:'altered'}}]),/recuperação inválido/);
+  await assert.rejects(()=>new Store(new MemoryStorage()).merge([{...record,event:{...record.event,key:'altered'}}]),/recuperação inválido/);
   assert.throws(()=>validateEvents({schemaVersion:1,events:[{...record,event:record}]}),/recuperação inválido/);
 });
 

@@ -90,6 +90,11 @@ export function validateEvents(document) {
       if (!s || typeof s.id !== 'string' || !Array.isArray(s.queue) || s.queue.length > 5000 || s.queue.some(k => typeof k !== 'string') || !Number.isInteger(s.index) || s.index < 0 || s.index > s.queue.length || !s.answers || typeof s.answers !== 'object' || !['smart','random','new','errors','favorites','review','subject','exam'].includes(s.mode)) throw new Error('Sessão inválida.');
       if(Object.hasOwn(s,'deleted')&&(s.deleted!==true||s.abandoned!==true))throw new Error('Exclusão de sessão inválida.');
       for (const v of Object.values(s.answers)) if (v !== null && !/^[A-H]$/.test(v)) throw new Error('Alternativa da sessão inválida.');
+      for(const field of ['drafts','eliminatedOptions'])if(s[field]!=null){
+        if(typeof s[field]!=='object'||Array.isArray(s[field]))throw new Error('Rascunho da sessão inválido.');
+        const queue=new Set(s.queue);
+        for(const [key,value] of Object.entries(s[field]))if(!queue.has(key)||(field==='drafts'?!/^[A-H]$/.test(value):!Array.isArray(value)||value.length>8||value.some(id=>!/^[A-H]$/.test(id))||new Set(value).size!==value.length))throw new Error('Rascunho da sessão inválido.');
+      }
       if (Object.hasOwn(s,'progressEpoch') && s.progressEpoch!==null && (typeof s.progressEpoch!=='string'||!s.progressEpoch||s.progressEpoch.length>300)) throw new Error('Etapa da sessão inválida.');
       if (Object.hasOwn(e,'progressEpoch') && e.progressEpoch!==(s.progressEpoch??null)) throw new Error('Etapa da sessão inconsistente.');
     } else if (e.type !== 'progress-reset') throw new Error('Tipo de evento desconhecido.');
@@ -118,13 +123,22 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
     if (e.type === 'bank-state') states.set(aliases.get(e.bankId)||e.bankId, e.value);
     if(e.type==='system-bank-preference')nativePreferences.set(e.bankId,e.value);
     if(e.type==='bank-metadata')metadata.set(aliases.get(e.bankId)||e.bankId,e.displayName);
-    if (e.type === 'session') {const s=structuredClone(e.session),sources=s.questionSources||{};s.queue=s.queue.map(k=>keyAlias(k,sources[k]?.sourceType));s.answers=Object.fromEntries(Object.entries(s.answers).map(([k,v])=>[keyAlias(k,sources[k]?.sourceType),v]));if(s.questionSources)s.questionSources=Object.fromEntries(Object.entries(sources).map(([k,v])=>[keyAlias(k,v.sourceType),v]));sessions.set(s.id,s);sessionUpdatedAt.set(s.id,e.at);}
+    if (e.type === 'session') {sessions.set(e.session.id,e.session);sessionUpdatedAt.set(e.session.id,e.at);}
     if (e.type === 'flag') flagEvents.push({...e,key:keyAlias(e.key,e.sourceType)});
     if (e.type === 'answer') {
       const key=keyAlias(e.key,e.sourceType);answers.push({...e,key,bankId:key.split(':')[0],sourceType:sourceType(e)});
     }
   }
   for(const id of deletedSessions){sessions.delete(id);sessionUpdatedAt.delete(id);}
+  // Only the final snapshot of each session is observable. Normalize that one,
+  // rather than cloning every historical cursor snapshot and its whole queue.
+  for(const [id,value] of sessions){
+    const s=structuredClone(value),sources=s.questionSources||{};
+    s.queue=s.queue.map(k=>keyAlias(k,sources[k]?.sourceType));
+    for(const field of ['answers','drafts','eliminatedOptions'])if(s[field])s[field]=Object.fromEntries(Object.entries(s[field]).map(([k,v])=>[keyAlias(k,sources[k]?.sourceType),v]));
+    if(s.questionSources)s.questionSources=Object.fromEntries(Object.entries(sources).map(([k,v])=>[keyAlias(k,v.sourceType),v]));
+    sessions.set(id,s);
+  }
   const links=deriveProgressLinks(ordered,bankHistory,systemBanks);
   for(const e of answers){
       const key=linkedStudyKey(e,e.key,links.keys,bankHistory);e.progressKey=key;const p = progress.get(key) || {attempts:0, correct:0, wrong:0, streak:0};

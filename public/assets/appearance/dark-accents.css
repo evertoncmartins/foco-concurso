@@ -1,0 +1,35 @@
+/* Functional accents; large surfaces remain graphite. Only the dark theme. */
+:root[data-theme=dark] .sidebar{background:var(--sidebar-bg)}
+:root[data-theme=dark] :is(input:not([type=checkbox],[type=radio]),select,textarea){background-color:var(--input-bg);color:var(--text);border-color:var(--border)}
+:root[data-theme=dark] :is(a,.text-link){color:var(--link)}
+:root[data-theme=dark] :is(.btn.primary,.home-primary){color:var(--on-accent)}
+:root[data-theme=dark] :is(.btn.primary,.home-primary):active:not(:disabled){background:var(--accent-active)}
+:root[data-theme=dark] .btn.primary[data-action=answer]{background:var(--confirm);border-color:var(--confirm)}
+:root[data-theme=dark] .btn.primary[data-action=answer]:hover:not(:disabled){background:var(--success)}
+:root[data-theme=dark] .nav-btn[data-view=home]{--nav-accent:var(--accent)}
+:root[data-theme=dark] .nav-btn[data-view=study]{--nav-accent:var(--success)}
+:root[data-theme=dark] .nav-btn[data-view=sessions]{--nav-accent:var(--info)}
+:root[data-theme=dark] .nav-btn[data-view=banks]{--nav-accent:var(--purple)}
+:root[data-theme=dark] .nav-btn[data-view=performance]{--nav-accent:var(--info)}
+:root[data-theme=dark] .nav-btn[data-view=revision]{--nav-accent:var(--warning)}
+:root[data-theme=dark] .nav-btn[data-view=settings]{--nav-accent:var(--warning)}
+:root[data-theme=dark] .nav-btn>svg{color:var(--nav-accent,var(--accent))}
+:root[data-theme=dark] .nav-btn.selected{background:var(--surface-highlight);box-shadow:inset 3px 0 0 var(--nav-accent,var(--accent));color:var(--text)}
+:root[data-theme=dark] [data-action=toggle-theme]{color:var(--warning)}
+:root[data-theme=dark] :is(.icon-btn[data-flag=favorite],.home-mode-icon.errors){color:var(--error)}
+:root[data-theme=dark] .icon-btn[data-flag=review]{color:var(--warning)}
+:root[data-theme=dark] .btn.danger:hover:not(:disabled){color:var(--error);background:var(--error-bg);border-color:var(--error)}
+:root[data-theme=dark] .theme-option[data-theme=dark]{background:var(--surface);color:var(--text);border-color:var(--border)}
+:root[data-theme=dark] .theme-option.active{background:var(--accent-soft);border-color:var(--accent-border)}
+:root[data-theme=dark] :is(button,a,input,select,textarea,summary,.question-body):focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+:root[data-theme=dark] input:is([type=checkbox],[type=radio]){accent-color:var(--accent)}
+:root[data-theme=dark] dialog::backdrop{background:var(--overlay)}
+:root[data-theme=dark] .question-meta{color:var(--text-secondary)}
+:root[data-theme=dark] .option:not(.answered){transition:background-color var(--interaction-duration) ease,border-color var(--interaction-duration) ease}
+:root[data-theme=dark] .option.eliminated .option-text{opacity:1;color:var(--muted)}
+:root[data-theme=dark] #toast{background:var(--surface-highlight);color:var(--text);border:1px solid var(--border-strong)}
+.session-save-status{border:0;background:transparent;padding:0;font:inherit;color:var(--muted);min-height:24px}
+.session-save-status:empty{display:none}
+.session-save-status[data-status=error]{color:var(--error)}
+@media(max-width:700px){.session-save-status{font-size:10px;flex-basis:100%;text-align:center}}
+@media(prefers-reduced-motion:reduce){:root[data-theme=dark] .option:not(.answered){transition:none}}

@@ -22,3 +22,7 @@ jobs:
       - run: npm test
       - run: npm run check
       - run: npm run build
+      - run: npx playwright-core install --with-deps chromium
+      - run: npm run test:browser
+        env:
+          FOCO_BROWSER_CHANNEL: chromium
