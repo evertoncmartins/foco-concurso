@@ -6,14 +6,13 @@
 :root[data-theme=dark] :is(.btn.primary,.home-primary):active:not(:disabled){background:var(--accent-active)}
 :root[data-theme=dark] .btn.primary[data-action=answer]{background:var(--confirm);border-color:var(--confirm)}
 :root[data-theme=dark] .btn.primary[data-action=answer]:hover:not(:disabled){background:var(--success)}
-:root[data-theme=dark] .nav-btn[data-view=home]{--nav-accent:var(--accent)}
-:root[data-theme=dark] .nav-btn[data-view=study]{--nav-accent:var(--success)}
-:root[data-theme=dark] .nav-btn[data-view=sessions]{--nav-accent:var(--info)}
-:root[data-theme=dark] .nav-btn[data-view=banks]{--nav-accent:var(--purple)}
-:root[data-theme=dark] .nav-btn[data-view=performance]{--nav-accent:var(--info)}
-:root[data-theme=dark] .nav-btn[data-view=revision]{--nav-accent:var(--warning)}
-:root[data-theme=dark] .nav-btn[data-view=settings]{--nav-accent:var(--warning)}
-:root[data-theme=dark] .nav-btn>svg{color:var(--nav-accent,var(--accent))}
+:root[data-theme=dark] :is(.nav-btn,.mobile-nav>button)[data-view=home]{--nav-accent:var(--accent)}
+:root[data-theme=dark] :is(.nav-btn,.mobile-nav>button)[data-view=study]{--nav-accent:var(--success)}
+:root[data-theme=dark] :is(.nav-btn,.mobile-nav>button)[data-view=sessions]{--nav-accent:var(--info)}
+:root[data-theme=dark] :is(.nav-btn,.mobile-nav>button)[data-view=banks]{--nav-accent:var(--purple)}
+:root[data-theme=dark] :is(.nav-btn,.mobile-nav>button)[data-view=performance]{--nav-accent:var(--info)}
+:root[data-theme=dark] :is(.nav-btn,.mobile-nav>button)[data-view=revision]{--nav-accent:var(--warning)}
+:root[data-theme=dark] :is(.nav-btn,.mobile-nav>button)[data-view=settings]{--nav-accent:var(--warning)}
 :root[data-theme=dark] .nav-btn.selected{background:var(--surface-highlight);box-shadow:inset 3px 0 0 var(--nav-accent,var(--accent));color:var(--text)}
 :root[data-theme=dark] [data-action=toggle-theme]{color:var(--warning)}
 :root[data-theme=dark] :is(.icon-btn[data-flag=favorite],.home-mode-icon.errors){color:var(--error)}
@@ -28,6 +27,26 @@
 :root[data-theme=dark] .option:not(.answered){transition:background-color var(--interaction-duration) ease,border-color var(--interaction-duration) ease}
 :root[data-theme=dark] .option.eliminated .option-text{opacity:1;color:var(--muted)}
 :root[data-theme=dark] #toast{background:var(--surface-highlight);color:var(--text);border:1px solid var(--border-strong)}
+/* Reuse semantic accents wherever a shared icon appears, including mobile.
+   Only the glyph is colored; labels and large surfaces retain neutral tokens. */
+:root[data-theme=dark] svg[data-icon]{color:var(--icon-color,inherit)}
+:root[data-theme=dark] svg:is([data-icon=home],[data-icon=play],[data-icon=pause],[data-icon=spark],[data-icon=plus],[data-icon=maximize],[data-icon=minimize]){--icon-color:var(--accent)}
+:root[data-theme=dark] svg:is([data-icon=book],[data-icon=shuffle],[data-icon=grid],[data-icon=scissors]){--icon-color:var(--purple)}
+:root[data-theme=dark] svg:is([data-icon=cloud],[data-icon=file],[data-icon=upload],[data-icon=download],[data-icon=clock],[data-icon=chart],[data-icon=filter],[data-icon=list],[data-icon=info],[data-icon=panel-open],[data-icon=panel-close]){--icon-color:var(--info)}
+:root[data-theme=dark] svg:is([data-icon=target],[data-icon=check]){--icon-color:var(--success)}
+:root[data-theme=dark] svg:is([data-icon=repeat],[data-icon=flag],[data-icon=skip-back],[data-icon=settings],[data-icon=sun],[data-icon=moon],[data-icon=system],[data-icon=flame],[data-icon=trophy],[data-icon=alert],[data-icon=logout]){--icon-color:var(--warning)}
+:root[data-theme=dark] svg:is([data-icon=heart],[data-icon=trash],[data-icon=x]){--icon-color:var(--error)}
+:root[data-theme=dark] :is(.nav-btn,.mobile-nav>button)>svg[data-icon]{color:var(--nav-accent,var(--accent))}
+:root[data-theme=dark] [data-mode=smart]{--study-icon:var(--accent)}
+:root[data-theme=dark] :is([data-mode=random],[data-mode=exam]){--study-icon:var(--purple)}
+:root[data-theme=dark] :is([data-mode=new],[data-mode=subject]){--study-icon:var(--info)}
+:root[data-theme=dark] :is([data-mode=errors],[data-mode=review]){--study-icon:var(--warning)}
+:root[data-theme=dark] [data-mode=favorites]{--study-icon:var(--error)}
+:root[data-theme=dark] :is(.mode-card,.home-mode-icon)>svg[data-icon]{color:var(--study-icon,var(--icon-color,inherit))}
+:root[data-theme=dark] :is(.bank-symbol,.home-bank-icon){background:var(--surface2);border-color:var(--purple-border)}
+/* Preserve filled-button contrast and existing result/synchronization states. */
+:root[data-theme=dark] :is(.btn.primary,.home-primary,.sync-label,.connection-card strong,.option-result,.feedback-title)>svg[data-icon]{color:inherit}
+:root[data-theme=dark] .option.eliminated .option-cut>svg[data-icon]{color:var(--muted)}
 .session-save-status{border:0;background:transparent;padding:0;font:inherit;color:var(--muted);min-height:24px}
 .session-save-status:empty{display:none}
 .session-save-status[data-status=error]{color:var(--error)}

@@ -11,4 +11,4 @@ paths.maximize='<path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5"/>';
 paths.minimize='<path d="M3 8h5V3m8 0v5h5M8 21v-5H3m18 0h-5v5"/>';
 paths['panel-close']='<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18m7-12-3 3 3 3"/>';
 paths['panel-open']='<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18m4-12 3 3-3 3"/>';
-export const icon=(name,size=19)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.book}</svg>`;
+export const icon=(name,size=19)=>{const key=Object.hasOwn(paths,name)?name:'book';return `<svg data-icon="${key}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[key]}</svg>`;};

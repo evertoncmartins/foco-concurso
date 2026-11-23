@@ -8,6 +8,11 @@ try{
   for(const mobile of [false,true]){
     const {page,context,errors}=await auditPage(browser,url,{viewport:mobile?{width:390,height:844}:{width:1365,height:900}});
     await page.evaluate(async()=>{await __audit.seed(80,0,'smart');await __audit.navigate('session');__audit.writes.delay=60000;});
+    const toolColors=await page.evaluate(()=>{
+      const color=selector=>getComputedStyle(document.querySelector(selector)).color;
+      return {heart:color('.question-tools [data-icon=heart]'),cut:color('.option-cut [data-icon=scissors]'),primaryIcon:color('[data-action=answer] [data-icon=check]'),primaryText:color('[data-action=answer]')};
+    });
+    assert.notEqual(toolColors.heart,toolColors.cut);assert.equal(toolColors.primaryIcon,toolColors.primaryText,'filled buttons retain icon contrast');
     await page.locator('.question-body').focus();await page.keyboard.press('1');await page.keyboard.press('2');
     assert.equal(await page.locator('.option-select[data-option=B]').getAttribute('aria-pressed'),'true');
     await page.locator('.option[data-option=A]').hover();await page.locator('.option-cut[data-option=A]').click();
@@ -52,6 +57,12 @@ try{
     await page.screenshot({path:'.sites-runtime/performance/dark-'+(mobile?'mobile':'desktop')+'.png',fullPage:true});
     await page.evaluate(()=>__audit.theme('light'));assert.equal(await page.evaluate(()=>getComputedStyle(document.body).backgroundColor),'rgb(248, 249, 252)');
     await page.screenshot({path:'.sites-runtime/performance/light-'+(mobile?'mobile':'desktop')+'.png',fullPage:true});
+    const lightIconColor=await page.locator('.option-cut [data-icon=scissors]').first().evaluate(node=>({icon:getComputedStyle(node).color,control:getComputedStyle(node.parentElement).color}));
+    assert.equal(lightIconColor.icon,lightIconColor.control,'light icons keep their existing inherited colors');
+    await page.evaluate(async()=>{await __audit.theme('dark');await __audit.navigate('home');});
+    const navColors=await page.locator(mobile?'.mobile-nav>button>svg':'.nav-btn>svg').evaluateAll(nodes=>nodes.map(node=>getComputedStyle(node).color));
+    assert(new Set(navColors).size>=4,'navigation uses distinct functional accents on desktop and mobile');
+    if(mobile)await page.screenshot({path:'.sites-runtime/performance/dark-icons-mobile.png',fullPage:true});
     assert.deepEqual(errors,[]);console.log(JSON.stringify({viewport:mobile?'mobile':'desktop',passed:true,slowDriveNavigationMs:duringSync.elapsed}));await context.close();
   }
   // Actual native banks still work without login or Drive.
@@ -87,10 +98,18 @@ try{
   const visual=await auditPage(browser,url);await visual.page.evaluate(()=>__audit.native());await visual.page.evaluate(()=>__audit.theme('dark'));
   for(const view of ['home','banks','performance','settings']){
     await visual.page.evaluate(view=>__audit.navigate(view),view);
+    if(view==='home'){
+      const modes=await visual.page.locator('.home-mode-icon>svg').evaluateAll(nodes=>nodes.map(node=>getComputedStyle(node).color));
+      assert.equal(new Set(modes).size,4,'home study shortcuts retain four discreet colors');
+    }
     await visual.page.screenshot({path:'.sites-runtime/performance/dark-'+view+'.png',fullPage:true});
     assert.equal(await visual.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,view+' overflows');
   }
-  await visual.page.evaluate(()=>__audit.navigate('study'));await visual.page.locator('[data-action=start]').first().click();await visual.page.locator('#dialog[open]').waitFor();
+  await visual.page.evaluate(()=>__audit.navigate('study'));
+  const modeColors=await visual.page.locator('.mode-card>svg').evaluateAll(nodes=>nodes.map(node=>getComputedStyle(node).color));
+  assert(new Set(modeColors).size>=5,'study modes must not fall back to a single accent');
+  await visual.page.screenshot({path:'.sites-runtime/performance/dark-icons-study.png',fullPage:true});
+  await visual.page.locator('[data-action=start]').first().click();await visual.page.locator('#dialog[open]').waitFor();
   assert.equal(await visual.page.locator('#dialog').evaluate(node=>getComputedStyle(node).backgroundColor),'rgb(32, 32, 32)');
   await visual.page.screenshot({path:'.sites-runtime/performance/dark-setup.png',fullPage:true});assert.deepEqual(visual.errors,[]);await visual.context.close();console.log('Dark home, banks, performance, settings and session modal: passed.');
 }finally{await audit.close();}
