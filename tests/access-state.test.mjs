@@ -13,7 +13,7 @@ import {longBank} from './helpers/long-bank.mjs';
 
 const bank=validateBank(JSON.parse(await readFile(new URL('./fixtures/lei-8112.json',import.meta.url))));
 const imports={};
-for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','bank-management','bank-publication','bank-scope','session','session-navigator','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage'])Object.assign(imports,await import(`../src/${module}.mjs`));
+for(const module of ['store','engine','drive','drive-settings','auth','account','access-views','icons','home-view','bank-view','bank-catalog-view','bank-management','bank-publication','bank-scope','session','session-navigator','focus-mode','temporary-storage','restore-progress','question-origin','explanation-view','statement-view','profile-photo','sessions-view','session-setup','bank-source','system-banks','public-documents','bank-progress','journal-storage','session-writes'])Object.assign(imports,await import(`../src/${module}.mjs`));
 const source=(await readFile(new URL('../src/app.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/\ninit\(\);\s*$/,'');
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
 async function tick(){await new Promise(resolve=>setImmediate(resolve));}
@@ -32,8 +32,11 @@ function runtime(options={}){
     if(!nodes.has(selector)){
       const el=element();
       if(selector==='#dialog')el.querySelector=selector=>node(selector);
+      if(selector==='.session-summary-bar')Object.defineProperty(el,'outerHTML',{set:value=>node('#app').replaceMarkup(/<div class="session-summary-bar">[\s\S]*?<\/div>(?=<\/div>)/,value)});
+      if(selector==='.focus-toolbar')Object.defineProperty(el,'outerHTML',{set:value=>node('#app').replaceMarkup(/<div class="focus-toolbar">[\s\S]*?(?=<main)/,value+'\n  ')});
+      if(selector==='.session-container')Object.defineProperty(el,'outerHTML',{set:value=>{node('#app').innerHTML=node('#app').innerHTML.replace(/<div class="session-container">[\s\S]*?(?=<\/main>)/,value);}});
       if(selector==='#app'){
-        let html='';Object.defineProperty(el,'innerHTML',{get:()=>html,set:value=>{
+        let html='';el.replaceMarkup=(pattern,value)=>{html=html.replace(pattern,value);};Object.defineProperty(el,'innerHTML',{get:()=>html,set:value=>{
           html=value;renders++;const question=html.match(/class="question-body" data-question="([^"]+)"/);
           if(question)nodes.set('.question-body',{dataset:{question:question[1]},scrollTop:0,focus(){document.focused='.question-body';}});else nodes.delete('.question-body');
           const finish=html.match(/<button class="btn primary session-finish"[^>]*>/)?.[0];
@@ -43,7 +46,7 @@ function runtime(options={}){
           for(const [,classes,id,content] of html.matchAll(/<div class="(option [^"]*)" data-option-row="([^"]+)"[^>]*>([\s\S]*?)<\/div>/g)){
             const row=element(classes),control=element('option-cut'),tag=content.match(/<button[^>]*class="option-cut"[^>]*>/)?.[0]||'';
             for(const [,name,value] of tag.matchAll(/(aria-pressed|aria-label|title)="([^"]*)"/g))control.setAttribute(name,value);
-            row.dataset.optionRow=id;row.closest=selector=>selector==='[data-option-row]'?row:null;row.getBoundingClientRect=()=>({width:300});
+            row.dataset.optionRow=id;row.dataset.option=id;row.closest=selector=>selector==='[data-option-row]'?row:null;row.getBoundingClientRect=()=>({width:300});
             row.querySelector=selector=>selector==='.option-cut'?control:null;
             nodes.set(`[data-option-row="${id}"]`,row);
           }
@@ -54,16 +57,18 @@ function runtime(options={}){
     return nodes.get(selector);
   };
   const document={documentElement:{dataset:{theme:'light'}},fullscreenElement:null,addEventListener(name,fn){(listeners[name]??=[]).push(fn);},querySelector(selector){
+    if(['.session-summary-bar','.focus-toolbar'].includes(selector))return node('#app').innerHTML.includes('class="'+selector.slice(1)+'"')?node(selector):null;
+    if(selector==='.session-container')return node('#app').innerHTML.includes('class="session-container"')?node(selector):null;
     if(['.sync-label','.connection-card'].includes(selector))return node('#app').innerHTML.includes('class="'+selector.slice(1)+'"')?node(selector):null;
     if(selector==='.question-body'||selector==='.question-actions [data-action=finish]'||selector.startsWith('[data-option-row='))return nodes.get(selector)||null;
     if(['#app','#toast','#dialog','#main','#bank-file','#system-bank-file','#progress-file','#profile-photo-file','meta[name=theme-color]'].includes(selector)||selector.startsWith('[data-action=')||selector.startsWith('[data-option='))return node(selector);
     if(selector==='dialog[open],[aria-modal="true"]:not([hidden])'&&options.otherModal)return element();
     return null;
-  },async emit(name,event){for(const fn of listeners[name]??[])await fn(event);}};
+  },querySelectorAll(selector){return selector==='.option'?[...nodes.entries()].filter(([key])=>key.startsWith('[data-option-row=')).map(([,row])=>row):[];},async emit(name,event){for(const fn of listeners[name]??[])await fn(event);}};
   document.documentElement.requestFullscreen=async requestOptions=>{document.fullscreenRequests=(document.fullscreenRequests||0)+1;document.requestOptions=requestOptions;if(options.fullscreenError)throw new Error('Requires user activation');document.fullscreenElement=document.documentElement;await document.emit('fullscreenchange',{});};
   if(options.fullscreenUnavailable)delete document.documentElement.requestFullscreen;
   document.exitFullscreen=async()=>{document.fullscreenElement=null;await document.emit('fullscreenchange',{});};
-  const windowEvents={},window={location:{origin:'https://foco-concurso-wine.vercel.app',href:'https://foco-concurso-wine.vercel.app/'},getComputedStyle(node){return {visibility:node.visibility||'visible'};},addEventListener(name,fn){(windowEvents[name]??=[]).push(fn);},scrollTo(){}};
+  const windowEvents={},window={location:{origin:'https://foco-concurso-wine.vercel.app',href:'https://foco-concurso-wine.vercel.app/'},getComputedStyle(node){return {visibility:node.visibility||'visible',getPropertyValue:()=>node.dataset?.theme==='dark'?'#121212':'#f8f9fc'};},addEventListener(name,fn){(windowEvents[name]??=[]).push(fn);},scrollTo(){}};
   const history=[null];let historyPosition=0;
   window.history={get state(){return history[historyPosition];},pushState(state){history.splice(++historyPosition);history.push(state);},replaceState(state){history[historyPosition]=state;},go(delta){queueMicrotask(()=>{historyPosition+=delta;for(const fn of windowEvents.popstate??[])fn({state:history[historyPosition]});});}};
   if(options.realDocuments){
@@ -112,13 +117,14 @@ function runtime(options={}){
   const context=vm.createContext({...imports,Store:FixtureStore,SystemBanks:FixtureCatalog,BankManagement:FixtureManagement,prepareProfilePhoto:options.preparePhoto||imports.prepareProfilePhoto,PublicDocuments:Documents,GoogleAccount:options.init?function(){return auth;}:imports.GoogleAccount,consumeGoogleReturn:()=>options.notice||null,isGoogleReady:()=>googleReady,prepareGoogle:async()=>{if(options.sdkWait)await options.sdkWait.promise;if(options.sdkError)throw options.sdkError;googleReady=true;},DriveSettings:Settings,DriveSync:Drive,document,localStorage:browserStorage,matchMedia,window,console,crypto:globalThis.crypto,setTimeout(){return 1;},clearTimeout(){},structuredClone,Map,Set,Date,Event,URL,Blob,fetch:async url=>new Response(JSON.stringify(String(url).includes('app-config')?{googleClientId:auth.clientId}:bank),{headers:{'content-type':'application/json'}}),testAuth:auth,authorization,bank});
   vm.runInContext(source,context);vm.runInContext('auth=testAuth;',context);
   const value=code=>vm.runInContext(code,context);
+  const flush=()=>value('!working&&!finishingSession?sessionWrites?.flush():undefined');
   const target=dataset=>({dataset,disabled:false,closest(selector){return selector==='[data-action]'||selector==='button'?this:null;},matches(){return false;}});
   const resize=async mobile=>{const query='(min-width: 701px)',m=matchMedia(query);m.matches=!mobile;for(const callback of mediaListeners.get(query)||[])await callback({matches:m.matches});};
   const keyEvent=async overrides=>{
     const event={key:' ',code:overrides?.key?'':'Space',target:{dataset:{},closest(){return null;},matches(){return false;}},defaultPrevented:false,preventDefault(){this.defaultPrevented=true;},altKey:false,ctrlKey:false,metaKey:false,shiftKey:false,repeat:false,isComposing:false,...overrides};
-    await document.emit('keydown',event);return event;
+    await document.emit('keydown',event);await flush();return event;
   };
-  return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>document.emit('click',{target:target({action,...extra})}),scope:choice=>node(`#bank-scope-${choice||'cancel'}`).onclick(),confirm:accepted=>node(accepted?'#confirm-ok':'#confirm-cancel').onclick(),finish:async()=>{const pending=document.emit('click',{target:target({action:'finish'})});await tick();if(node('#dialog').open)node('#confirm-ok').onclick();await pending;},key:async(key,action,extra={})=>document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false}),start:()=>value('openAccount(authorization())')};
+  return {keyEvent,resize,auth,document,browserStorage,value,get restores(){return restores;},get authorizations(){return authorizations;},get preparations(){return preparations;},get renders(){return renders;},html:()=>node('#app').innerHTML,click:async(action,extra={})=>{await document.emit('click',{target:target({action,...extra})});await flush()?.catch(()=>{});},scope:choice=>node(`#bank-scope-${choice||'cancel'}`).onclick(),confirm:accepted=>node(accepted?'#confirm-ok':'#confirm-cancel').onclick(),finish:async()=>{const pending=document.emit('click',{target:target({action:'finish'})});await tick();if(node('#dialog').open)node('#confirm-ok').onclick();await pending;},key:async(key,action,extra={})=>{await document.emit('keydown',{key,target:target({action,...extra}),preventDefault(){},altKey:false,ctrlKey:false,metaKey:false});await flush();},start:()=>value('openAccount(authorization())')};
 }
 
 test('catálogo sincroniza na abertura e no botão com loading, remoções e histórico no Desktop e Mobile',async()=>{
@@ -877,12 +883,12 @@ async function dragOption(app,option,dx,dy=0){
   return move;
 }
 
-test('tesoura Mobile risca e restaura sem selecionar, responder, gravar ou mudar rolagem',async()=>{
-  const app=await studyRuntime({mobile:true});await app.click('select',{option:'B'});const before=app.value('JSON.stringify(store.events)'),renders=app.renders,body=app.document.querySelector('.question-body');body.scrollTop=180;
+test('tesoura Mobile risca e restaura sem selecionar, pontuar ou mudar rolagem',async()=>{
+  const app=await studyRuntime({mobile:true});await app.click('select',{option:'B'});const before=app.value('JSON.stringify(model.answers)'),renders=app.renders,body=app.document.querySelector('.question-body');body.scrollTop=180;
   assert.match(app.html(),/id="option-letter-A">A<\/span><button type="button" class="option-cut"[\s\S]*?<\/button><button type="button" class="option-select"/);
   assert(!app.html().includes('option-gesture-tip'));assert(!app.html().includes('Deslize para riscar'));
   for(const cut of [true,false,true,false]){
-    await app.click('toggle-cut',{option:'A'});assert.equal(cutRow(app,'A').classList.contains('eliminated'),cut);assert.equal(cutControl(app,'A').getAttribute('aria-pressed'),String(cut));assert.equal(app.value('selected'),'B');assert.equal(app.renders,renders);assert.equal(body.scrollTop,180);assert.equal(app.value('JSON.stringify(store.events)'),before);
+    await app.click('toggle-cut',{option:'A'});assert.equal(cutRow(app,'A').classList.contains('eliminated'),cut);assert.equal(cutControl(app,'A').getAttribute('aria-pressed'),String(cut));assert.equal(app.value('selected'),'B');assert.equal(app.renders,renders);assert.equal(body.scrollTop,180);assert.equal(app.value('JSON.stringify(model.answers)'),before);
   }
   assert.equal(app.value('JSON.stringify(session.answers)'),'{}');assert.equal(app.value('model.stats.attempts'),0);
   await app.click('select',{option:'A'});assert.equal(app.value('selected'),'A');
@@ -898,9 +904,9 @@ test('arrastes Mobile deixam de riscar e não interceptam rolagem ou toques segu
 });
 
 test('tesoura Mobile mantém gabarito e resposta registrada após responder',async()=>{
-  const app=await studyRuntime({mobile:true});await app.click('select',{option:'B'});await app.click('answer');const before=app.value('JSON.stringify(store.events)'),answer=app.value('session.answers[session.queue[0]]');
+  const app=await studyRuntime({mobile:true});await app.click('select',{option:'B'});await app.click('answer');const before=app.value('JSON.stringify(model.answers)'),answer=app.value('session.answers[session.queue[0]]');
   const correct=app.value('model.questions.find(q=>q.key===session.queue[0]).correctOption');assert(cutRow(app,correct).classList.contains('correct'));
-  await app.click('toggle-cut',{option:correct});assert(cutRow(app,correct).classList.contains('eliminated'));await app.click('toggle-cut',{option:correct});assert(!cutRow(app,correct).classList.contains('eliminated'));assert(cutRow(app,correct).classList.contains('correct'));assert.equal(app.value('session.answers[session.queue[0]]'),answer);assert.equal(app.value('JSON.stringify(store.events)'),before);
+  await app.click('toggle-cut',{option:correct});assert(cutRow(app,correct).classList.contains('eliminated'));await app.click('toggle-cut',{option:correct});assert(!cutRow(app,correct).classList.contains('eliminated'));assert(cutRow(app,correct).classList.contains('correct'));assert.equal(app.value('session.answers[session.queue[0]]'),answer);assert.equal(app.value('JSON.stringify(model.answers)'),before);
 });
 const cutControl=(app,option)=>cutRow(app,option).querySelector('.option-cut');
 
@@ -916,7 +922,7 @@ test('setas navegam uma questão por vez no Desktop normal e foco, mantendo rasc
     await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),0);const answers=app.value('JSON.stringify(session.answers)'),attempts=app.value('model.stats.attempts');
     await app.keyEvent({key:'ArrowRight'});await app.keyEvent({key:'ArrowLeft'});await app.keyEvent({key:'Enter'});
     assert.equal(app.value('JSON.stringify(session.answers)'),answers);assert.equal(app.value('model.stats.attempts'),attempts);
-    const events=app.value('JSON.stringify(store.events)');assert.equal((await app.keyEvent()).defaultPrevented,false);assert.equal(app.value('JSON.stringify(store.events)'),events);
+    const answersBeforeSpace=app.value('JSON.stringify(model.answers)'),indexBeforeSpace=app.value('session.index');assert.equal((await app.keyEvent()).defaultPrevented,true);assert.equal(app.value('session.index'),indexBeforeSpace+1);assert.equal(app.value('JSON.stringify(model.answers)'),answersBeforeSpace);
   }
   const normal=await studyRuntime();await normal.keyEvent({key:'ArrowRight'});assert.equal(normal.value('session.index'),1);
   const mobile=await studyRuntime({mobile:true});assert.equal((await mobile.keyEvent({key:'ArrowRight'})).defaultPrevented,false);assert.equal(mobile.value('session.index'),0);
@@ -943,10 +949,12 @@ test('setas respeitam campos, controles com navegação própria, modais e modif
   assert.equal(app.value('session.index'),1,'focused alternative buttons do not swallow arrow navigation');
 });
 
-test('navegação não avança duas vezes enquanto a gravação está pendente',async()=>{
+test('navegação aceita ações rápidas com gravação pendente e preserva a ordem',async()=>{
   const app=await studyRuntime();await app.value('var unlockMove;const originalAdd=store.add.bind(store);store.add=async events=>{await new Promise(resolve=>unlockMove=resolve);return originalAdd(events);};');
-  const first=app.keyEvent({key:'ArrowRight'});assert(app.value('working'));await app.keyEvent({key:'ArrowRight'});await app.click('next');assert.equal(app.value('session.index'),0);
-  app.value('unlockMove();');await first;assert.equal(app.value('session.index'),1);assert.equal(app.value('model.stats.attempts'),0);assert(!app.value('working'));
+  await app.value('move(1);move(1);move(-1);');
+  assert.equal(app.value('session.index'),1);assert.equal(app.value('sessionWrites.pending.length'),3);
+  const saved=app.value('sessionWrites.flush()');await tick();app.value('unlockMove();');await saved;
+  assert.equal(app.value('model.sessions.at(-1).index'),1);assert.equal(app.value('model.stats.attempts'),0);assert(!app.value('working'));
 });
 
 test('três botões mantêm registro no centro, limites de navegação e revisão sem novas tentativas',async()=>{
@@ -987,9 +995,9 @@ test('simulado conserva respostas ao voltar e só apresenta comentários e resul
   const events=app.value('JSON.stringify(store.events)');await app.click('finish');assert.equal(app.value('JSON.stringify(store.events)'),events);assert.equal(app.value(`session.answers['${key}']`),'A');
 });
 
-test('falha ao salvar navegação conserva questão, seleção, leitura e respostas',async()=>{
+test('falha na cópia de recuperação conserva questão, seleção, leitura e respostas',async()=>{
   const app=await studyRuntime();await app.click('select',{option:'B'});app.document.querySelector('.question-body').scrollTop=180;
-  await app.value('failure=()=>{};store.add=async()=>{throw new Error("Falha simulada");};');const before=app.value('JSON.stringify(session)');
+  await app.value('failure=()=>{};accountStorage.setItem=()=>{throw new Error("Falha simulada");};');const before=app.value('JSON.stringify(session)');
   await app.click('next');assert.equal(app.value('JSON.stringify(session)'),before);assert.equal(app.value('selected'),'B');assert.equal(app.document.querySelector('.question-body').scrollTop,180);assert(!app.value('working'));
 });
 
@@ -1024,40 +1032,40 @@ test('aviso de conclusão leva às não respondidas sem concluir; falha no salto
     assert.match(d.innerHTML,/Ir para as não respondidas/);d.querySelector('#finish-unanswered').onclick();await pending;
     assert.equal(app.value('session.index'),0);assert(!app.value('session.completed'));assert.equal(app.value('view'),'session');assert.equal(app.value('model.stats.attempts'),0);assert.equal(app.document.focused,'.question-body');
     await app.click('question-list');const id=app.value('session.id'),before=app.value('JSON.stringify(session)');
-    app.value('failure=()=>{};var originalJumpAdd=store.add.bind(store);store.add=async()=>{throw new Error("falha de salto");};');
+    app.value('failure=()=>{};var originalJumpAdd=accountStorage.setItem.bind(accountStorage);accountStorage.setItem=()=>{throw new Error("falha de salto");};');
     await app.click('jump-question',{session:id,index:'2'});assert.equal(app.value('JSON.stringify(session)'),before);assert(d.open);assert(!app.value('working'));
-    app.value('store.add=originalJumpAdd;');await app.click('jump-question',{session:id,index:'2'});assert.equal(app.value('session.index'),2);assert(!d.open);
+    app.value('accountStorage.setItem=originalJumpAdd;');await app.click('jump-question',{session:id,index:'2'});assert.equal(app.value('session.index'),2);assert(!d.open);
   }
 });
 
-test('Ajustes descreve setas Desktop e Enter para registrar, sem o antigo atalho Pular',async()=>{
+test('Ajustes descreve setas Desktop e Enter para registrar, e Espaço para pular',async()=>{
   const app=runtime();await app.start();await app.click('nav',{view:'settings'});
-  assert.match(app.html(),/Registrar resposta<\/td><td><kbd>Enter/);assert.match(app.html(),/Questão anterior \(Desktop\)/);assert.match(app.html(),/Próxima questão \(Desktop\)/);assert(!app.html().includes('Pular questão'));assert(!app.html().includes('<kbd>Espaço</kbd>'));
+  assert.match(app.html(),/Registrar resposta<\/td><td><kbd>Enter/);assert.match(app.html(),/Questão anterior \(Desktop\)/);assert.match(app.html(),/Próxima questão \(Desktop\)/);assert(app.html().includes('Pular questão'));assert(app.html().includes('<kbd>Espaço</kbd>'));
   assert.match(app.html(),/Riscar ou restaurar seleção \(Desktop\)<\/td><td><kbd>T/);
   assert(!app.html().includes('Selecionar alternativa C (Desktop)'));
   assert.match(app.html(),/<kbd>Enter<\/kbd> após registrar/);
 });
 
-test('T risca e restaura a seleção Desktop sem responder, trocar seleção ou gravar progresso',async()=>{
+test('T risca e restaura a seleção Desktop sem responder nem trocar seleção',async()=>{
   for(const focus of [false,true])for(const mode of ['smart','exam']){
     const app=await studyRuntime({},mode);if(focus)await app.click('toggle-focus');
-    const initial=app.value('JSON.stringify(store.events)');
-    await app.keyEvent({key:'t'});assert.equal(app.value('selected'),null);assert.equal(app.value('JSON.stringify(store.events)'),initial);
+    const initial=app.value('JSON.stringify(model.answers)');
+    await app.keyEvent({key:'t'});assert.equal(app.value('selected'),null);assert.equal(app.value('JSON.stringify(model.answers)'),initial);
     await app.keyEvent({key:'a'});assert.equal(app.value('selected'),'A');
     const renders=app.renders,body=app.document.querySelector('.question-body');body.scrollTop=240;
     for(const [key,expected] of [['t',true],['T',false],['t',true]]){
       assert.equal((await app.keyEvent({key})).defaultPrevented,true);
       assert.equal(cutRow(app,'A').classList.contains('eliminated'),expected);
       assert.equal(cutControl(app,'A').getAttribute('aria-pressed'),String(expected));
-      assert.equal(app.value('selected'),'A');assert.equal(app.value('JSON.stringify(store.events)'),initial);
+      assert.equal(app.value('selected'),'A');assert.equal(app.value('JSON.stringify(model.answers)'),initial);
       assert.equal(app.renders,renders);assert.equal(body.scrollTop,240);
     }
     await app.keyEvent({key:'t',repeat:true});assert(cutRow(app,'A').classList.contains('eliminated'));
     await app.keyEvent({key:'c'});assert.equal(app.value('selected'),'C');assert(!cutRow(app,'C').classList.contains('eliminated'));
     await app.keyEvent({key:'a'});await app.keyEvent({key:'3'});assert.equal(app.value('selected'),'C');
     await app.keyEvent({key:'t'});assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('selected'),'C');
-    await app.keyEvent({key:'Enter'});const recorded=app.value('JSON.stringify(store.events)');
-    await app.keyEvent({key:'t'});assert(!cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('JSON.stringify(store.events)'),recorded);
+    await app.keyEvent({key:'Enter'});const recorded=app.value('JSON.stringify(model.answers)');
+    await app.keyEvent({key:'t'});assert(!cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('JSON.stringify(model.answers)'),recorded);
     await app.keyEvent({key:'ArrowRight'});await app.keyEvent({key:'ArrowLeft'});assert.equal(app.value('selected'),null);
     await app.keyEvent({key:'t'});assert(cutRow(app,'C').classList.contains('eliminated'));assert.equal(app.value('session.answers[session.queue[0]]'),'C');
   }
@@ -1123,18 +1131,14 @@ test('Enter mantém a ação nativa de outros botões e trata elementos internos
   assert.equal((await app.keyEvent({key:'Enter',target:child})).defaultPrevented,true);assert.equal(app.value('session.index'),1);
 });
 
-test('Enter aguarda gravação, não duplica resposta nem navegação e conserva seleção se falhar',async()=>{
+test('Enter registra sem esperar a transação, preserva a tentativa única e permite navegação rápida',async()=>{
   const app=await studyRuntime();await app.keyEvent({key:'a'});
   app.value('var unlockKey;const addKey=store.add.bind(store);store.add=async events=>{await new Promise(resolve=>unlockKey=resolve);return addKey(events);};');
-  let pending=app.keyEvent({key:'Enter'});assert(app.value('working'));
-  await app.keyEvent({key:'Enter'});await app.keyEvent({key:'ArrowRight'});assert.equal(app.value('session.index'),0);
-  app.value('unlockKey()');await pending;assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('session.index'),0);
-  pending=app.keyEvent({key:'Enter'});await app.keyEvent({key:'Enter'});await app.keyEvent({key:'ArrowRight'});
-  app.value('unlockKey()');await pending;assert.equal(app.value('session.index'),1);
-  app.value('store.add=async()=>{throw new Error("Falha de teste")};failure=()=>{};');
-  await app.keyEvent({key:'b'});const before=app.value('JSON.stringify(store.events)');
-  await app.keyEvent({key:'Enter'});assert.equal(app.value('session.index'),1);assert.equal(app.value('selected'),'B');
-  assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.value('working'),false);
+  await app.value('answer();answer();move(1);move(-1);');
+  assert.equal(app.value('session.index'),0);assert.equal(app.value('session.answers[session.queue[0]]'),'A');
+  assert.equal(app.value('sessionWrites.pending.filter(e=>e.type==="answer").length'),1);
+  const pending=app.value('sessionWrites.flush()');await tick();app.value('unlockKey()');await pending;
+  assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('model.sessions.at(-1).index'),0);
 });
 
 test('último botão alterna entre Próxima e Concluir na mesma posição, inclusive em sessão única',async()=>{
@@ -1365,8 +1369,8 @@ test('Mobile reinicia a rolagem ao navegar e libera a navegação normal ao paus
   await app.click('pause');assert.equal(app.value('view'),'home');assert(!app.html().includes('class="shell session '));assert.equal(app.document.querySelector('.question-body'),null);
 });
 
-test('tesoura alterna instantaneamente sem selecionar, responder, gravar ou refazer a página',async()=>{
-  const app=await studyRuntime(),before=app.value('JSON.stringify(store.events)'),renders=app.renders,question=app.document.querySelector('.question-body');
+test('tesoura alterna instantaneamente sem selecionar, pontuar ou refazer a página',async()=>{
+  const app=await studyRuntime(),before=app.value('JSON.stringify(model.answers)'),renders=app.renders,question=app.document.querySelector('.question-body');
   question.scrollTop=180;
   assert.match(app.html(),/id="option-letter-A">A<\/span><button type="button" class="option-cut"[\s\S]*?<\/button><button type="button" class="option-select"[\s\S]*?id="option-text-A"/);
   const optionMarkup=app.html().match(/<div class="options"[\s\S]*?<\/div><\/div>/)?.[0];
@@ -1379,7 +1383,7 @@ test('tesoura alterna instantaneamente sem selecionar, responder, gravar ou refa
     assert.equal(cutControl(app,'A').getAttribute('aria-pressed'),String(cut));
     assert.equal(cutControl(app,'A').getAttribute('aria-label'),`${cut?'Restaurar':'Riscar'} alternativa A`);
     assert.equal(app.value('selected'),null);assert.equal(app.value('JSON.stringify(session.answers)'),'{}');
-    assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.renders,renders);
+    assert.equal(app.value('JSON.stringify(model.answers)'),before);assert.equal(app.renders,renders);
     assert.equal(app.document.querySelector('.question-body'),question);assert.equal(question.scrollTop,180);
   }
   assert.equal(app.value('model.stats.attempts'),0);
@@ -1393,9 +1397,9 @@ test('cortar mantém a seleção existente e a correção original; restaurar pe
   await app.click('select',{option:correct});await app.click('answer');
   assert.equal(app.value('session.answers[session.queue[0]]'),correct);assert.equal(app.value('model.stats.attempts'),1);assert.equal(app.value('model.stats.accuracy'),100);
   assert(cutRow(app,correct).classList.contains('correct'));
-  const before=app.value('JSON.stringify(store.events)');
+  const before=app.value('JSON.stringify(model.answers)');
   await app.click('toggle-cut',{option:correct});await app.click('toggle-cut',{option:correct});await app.click('select',{option:wrong});
-  assert.equal(app.value('session.answers[session.queue[0]]'),correct);assert.equal(app.value('selected'),correct);assert.equal(app.value('JSON.stringify(store.events)'),before);
+  assert.equal(app.value('session.answers[session.queue[0]]'),correct);assert.equal(app.value('selected'),correct);assert.equal(app.value('JSON.stringify(model.answers)'),before);
 });
 
 test('cortes acompanham tema, foco e pausa da mesma questão e reiniciam ao avançar ou iniciar sessão',async()=>{
@@ -1421,8 +1425,8 @@ test('Enter na tesoura não confirma nem avança; atalhos de resposta continuam 
 
 test('tesoura funciona no mobile e no simulado sem emitir respostas antes da conclusão',async()=>{
   const app=await studyRuntime({mobile:true},'exam');assert.equal(app.value('desktopLayout.matches'),false);
-  const before=app.value('JSON.stringify(store.events)');await app.click('toggle-cut',{option:'A'});await app.click('toggle-cut',{option:'C'});
-  assert.equal(app.value('JSON.stringify(store.events)'),before);assert.equal(app.value('selected'),null);
+  const before=app.value('JSON.stringify(model.answers)');await app.click('toggle-cut',{option:'A'});await app.click('toggle-cut',{option:'C'});
+  assert.equal(app.value('JSON.stringify(model.answers)'),before);assert.equal(app.value('selected'),null);
   await app.click('select',{option:'B'});assert(cutRow(app,'A').classList.contains('eliminated'));await app.click('answer');
   assert.equal(app.value('model.stats.attempts'),0);assert.equal(app.value('session.answers[session.queue[0]]'),'B');assert(!app.html().includes('Alternativa correta:'));
   await app.click('toggle-cut',{option:'A'});assert(!cutRow(app,'A').classList.contains('eliminated'));

@@ -1,6 +1,7 @@
 // A fresh instance for every guest session; nothing is written to browser storage.
 export class TemporaryStorage {
   #values=new Map();
+  keys(){return [...this.#values.keys()];}
   get length(){return this.#values.size;}
   key(index){return [...this.#values.keys()][index]??null;}
   getItem(key){return this.#values.get(String(key))??null;}

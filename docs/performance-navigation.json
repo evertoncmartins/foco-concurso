@@ -1,0 +1,541 @@
+{
+  "baseline": "caa885d8e0d5c6cb01a986d6c9fd5a7541678f16",
+  "date": "2026-11-23",
+  "method": "6 warmup moves; 30 navigation samples; 20 selection handler samples; Chrome CDP CPU profile; 2 animation frames after DOM update",
+  "before": [
+    {
+      "name": "small",
+      "count": 25,
+      "history": 5,
+      "navigation": {
+        "median": 36.6,
+        "p95": 80.9,
+        "max": 89.4
+      },
+      "selectionHandler": {
+        "median": 4.1,
+        "p95": 4.6,
+        "max": 4.6
+      },
+      "shellReplacements": 50,
+      "longTasks": 0,
+      "profileTop": [
+        [
+          "(idle)",
+          460.0169999999996
+        ],
+        [
+          "(anonymous)",
+          297.3409999999999
+        ],
+        [
+          "derive",
+          165.615
+        ],
+        [
+          "(program)",
+          115.70300000000003
+        ],
+        [
+          "validateEvents",
+          113.054
+        ],
+        [
+          "canonicalJSON",
+          74.442
+        ],
+        [
+          "render",
+          73.70100000000001
+        ],
+        [
+          "load",
+          54.477000000000004
+        ],
+        [
+          "focus",
+          50.70199999999999
+        ],
+        [
+          "keyAlias",
+          35.652
+        ],
+        [
+          "structuredClone",
+          26.371
+        ],
+        [
+          "(garbage collector)",
+          22.573000000000004
+        ],
+        [
+          "keys",
+          8.695
+        ],
+        [
+          "mergeEvents",
+          8.326
+        ]
+      ],
+      "errors": []
+    },
+    {
+      "name": "large",
+      "count": 1000,
+      "history": 30,
+      "navigation": {
+        "median": 1318,
+        "p95": 1618.3,
+        "max": 1627.5
+      },
+      "selectionHandler": {
+        "median": 111.8,
+        "p95": 123.3,
+        "max": 123.3
+      },
+      "shellReplacements": 50,
+      "longTasks": 120,
+      "profileTop": [
+        [
+          "(anonymous)",
+          18330.10600000014
+        ],
+        [
+          "derive",
+          7284.811999999982
+        ],
+        [
+          "keyAlias",
+          3891.3940000000066
+        ],
+        [
+          "load",
+          2861.1490000000013
+        ],
+        [
+          "canonicalJSON",
+          2598.970999999999
+        ],
+        [
+          "(garbage collector)",
+          2337.8710000000005
+        ],
+        [
+          "(idle)",
+          1005.679
+        ],
+        [
+          "(program)",
+          791.4640000000005
+        ],
+        [
+          "tx.oncomplete",
+          647.5399999999998
+        ],
+        [
+          "request.onsuccess",
+          461.99599999999975
+        ],
+        [
+          "commitEvents",
+          242.75499999999994
+        ],
+        [
+          "put",
+          166.89999999999995
+        ],
+        [
+          "structuredClone",
+          130.11799999999997
+        ],
+        [
+          "render",
+          86.93599999999998
+        ]
+      ],
+      "errors": []
+    },
+    {
+      "name": "mobile",
+      "count": 1000,
+      "history": 30,
+      "navigation": {
+        "median": 1303.1,
+        "p95": 1622.6,
+        "max": 1628.2
+      },
+      "selectionHandler": {
+        "median": 115.5,
+        "p95": 128,
+        "max": 128
+      },
+      "shellReplacements": 50,
+      "longTasks": 120,
+      "profileTop": [
+        [
+          "(anonymous)",
+          18963.874000000047
+        ],
+        [
+          "derive",
+          6799.026999999979
+        ],
+        [
+          "keyAlias",
+          4254.622999999996
+        ],
+        [
+          "load",
+          2875.3059999999987
+        ],
+        [
+          "(garbage collector)",
+          2399.1929999999984
+        ],
+        [
+          "canonicalJSON",
+          2396.897999999997
+        ],
+        [
+          "(idle)",
+          1103.8699999999988
+        ],
+        [
+          "(program)",
+          745.495
+        ],
+        [
+          "tx.oncomplete",
+          686.4179999999998
+        ],
+        [
+          "request.onsuccess",
+          480.51599999999985
+        ],
+        [
+          "commitEvents",
+          235.85200000000006
+        ],
+        [
+          "structuredClone",
+          180.92700000000002
+        ],
+        [
+          "put",
+          158.66400000000004
+        ],
+        [
+          "render",
+          75.015
+        ]
+      ],
+      "errors": []
+    }
+  ],
+  "after": [
+    {
+      "name": "small",
+      "count": 25,
+      "history": 5,
+      "navigation": {
+        "median": 35.8,
+        "p95": 36.9,
+        "max": 37.2
+      },
+      "selectionHandler": {
+        "median": 0.8,
+        "p95": 2.2,
+        "max": 2.2
+      },
+      "shellReplacements": 0,
+      "longTasks": 0,
+      "profileTop": [
+        [
+          "(idle)",
+          928.8900000000009
+        ],
+        [
+          "(program)",
+          91.66600000000003
+        ],
+        [
+          "focus",
+          61.02199999999999
+        ],
+        [
+          "(anonymous)",
+          16.206999999999997
+        ],
+        [
+          "put",
+          3.298
+        ],
+        [
+          "get",
+          3.2649999999999997
+        ],
+        [
+          "request.onsuccess",
+          3.247
+        ],
+        [
+          "derive",
+          3.207
+        ],
+        [
+          "tx.oncomplete",
+          3.193
+        ],
+        [
+          "drain",
+          1.808
+        ],
+        [
+          "move",
+          1.704
+        ],
+        [
+          "setItem",
+          1.685
+        ],
+        [
+          "querySelectorAll",
+          1.684
+        ],
+        [
+          "renderSession",
+          1.64
+        ]
+      ],
+      "errors": []
+    },
+    {
+      "name": "large",
+      "count": 1000,
+      "history": 30,
+      "navigation": {
+        "median": 36.1,
+        "p95": 38.9,
+        "max": 39.6
+      },
+      "selectionHandler": {
+        "median": 0.4,
+        "p95": 1.2,
+        "max": 1.2
+      },
+      "shellReplacements": 0,
+      "longTasks": 0,
+      "profileTop": [
+        [
+          "(idle)",
+          418.3189999999999
+        ],
+        [
+          "request.onsuccess",
+          223.71400000000006
+        ],
+        [
+          "put",
+          169.11299999999994
+        ],
+        [
+          "(program)",
+          131.08500000000006
+        ],
+        [
+          "(anonymous)",
+          114.049
+        ],
+        [
+          "focus",
+          59.041000000000004
+        ],
+        [
+          "derive",
+          45.763999999999996
+        ],
+        [
+          "load",
+          27.241
+        ],
+        [
+          "renderSession",
+          22.272000000000002
+        ],
+        [
+          "keyAlias",
+          21.184
+        ],
+        [
+          "(garbage collector)",
+          17.77
+        ],
+        [
+          "commitEvents",
+          12.571000000000002
+        ],
+        [
+          "removeItem",
+          4.786
+        ],
+        [
+          "innerSerialize",
+          3.292
+        ]
+      ],
+      "errors": []
+    },
+    {
+      "name": "mobile",
+      "count": 1000,
+      "history": 30,
+      "navigation": {
+        "median": 36,
+        "p95": 38.9,
+        "max": 39
+      },
+      "selectionHandler": {
+        "median": 0.3,
+        "p95": 1.1,
+        "max": 1.1
+      },
+      "shellReplacements": 0,
+      "longTasks": 0,
+      "profileTop": [
+        [
+          "(idle)",
+          444.17500000000007
+        ],
+        [
+          "request.onsuccess",
+          194.342
+        ],
+        [
+          "put",
+          174.537
+        ],
+        [
+          "(anonymous)",
+          116.99499999999999
+        ],
+        [
+          "(program)",
+          113.63999999999999
+        ],
+        [
+          "focus",
+          45.857
+        ],
+        [
+          "derive",
+          37.384
+        ],
+        [
+          "commitEvents",
+          24.348
+        ],
+        [
+          "keyAlias",
+          21.377
+        ],
+        [
+          "renderSession",
+          19.802
+        ],
+        [
+          "(garbage collector)",
+          19.796000000000003
+        ],
+        [
+          "load",
+          12.983
+        ],
+        [
+          "randomUUID",
+          6.2250000000000005
+        ],
+        [
+          "originalPresentation",
+          4.925
+        ]
+      ],
+      "errors": []
+    },
+    {
+      "name": "maximum",
+      "count": 5000,
+      "history": 3,
+      "navigation": {
+        "median": 36.4,
+        "p95": 53.5,
+        "max": 60.3
+      },
+      "selectionHandler": {
+        "median": 0.5,
+        "p95": 1.5,
+        "max": 1.5
+      },
+      "shellReplacements": 0,
+      "longTasks": 5,
+      "profileTop": [
+        [
+          "(anonymous)",
+          605.6210000000002
+        ],
+        [
+          "(idle)",
+          387.6159999999999
+        ],
+        [
+          "commitEvents",
+          184.15200000000002
+        ],
+        [
+          "request.onsuccess",
+          166.28999999999996
+        ],
+        [
+          "(program)",
+          162.0229999999999
+        ],
+        [
+          "put",
+          136.70799999999997
+        ],
+        [
+          "(garbage collector)",
+          109.58500000000001
+        ],
+        [
+          "load",
+          99.23100000000004
+        ],
+        [
+          "derive",
+          94.91400000000002
+        ],
+        [
+          "focus",
+          37.903999999999996
+        ],
+        [
+          "keyAlias",
+          26.034000000000002
+        ],
+        [
+          "renderSession",
+          13.192
+        ],
+        [
+          "sessionQuestion",
+          6.571
+        ],
+        [
+          "innerSerialize",
+          6.088
+        ]
+      ],
+      "errors": []
+    }
+  ]
+}

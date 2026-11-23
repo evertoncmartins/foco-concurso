@@ -1,0 +1,20 @@
+/* Palette shared with Monitor AVA. Light values retain Foco's existing theme. */
+:root{color-scheme:light;--bg:#f8f9fc;--surface:#fff;--surface2:#f0f2f7;--text:#252638;--muted:#666a7d;--border:#e1e5ee;--accent:#00001F;--accent-hover:#191b43;--tint:#eef0f8;--tint2:#d8def1;--coral:#ad654d;--error:#a7443d;--error-bg:#fff1ee;--success:#2d6549;--success-bg:#edf5eb;--detail-blue:#526993;--detail-blue-soft:#edf2fc;--detail-violet:#78619b;--detail-violet-soft:#f3eff9;--detail-amber:#936832;--detail-amber-soft:#fcf4e9;--detail-rose:#9a526a;--detail-rose-soft:#f9eef2;--on-accent:#fff;--shadow:0 14px 50px #00001f0d;--font:'DM Sans',system-ui,-apple-system,sans-serif;--serif:'Instrument Serif',Georgia,serif}
+:root[data-theme=dark]{
+  color-scheme:dark;
+  --bg:#121212;--surface:#202020;--surface2:#242424;--surface-highlight:#303030;--input-bg:#262626;--sidebar-bg:#181818;
+  --text:#f1f1f1;--text-secondary:#b8b8b8;--muted:#a3a3a3;--border:#363636;--border-strong:#707070;
+  --accent:#79ccc2;--accent-hover:#97ded5;--accent-active:#62b6ab;--on-accent:#181818;
+  --tint:var(--surface-highlight);--tint2:var(--border-strong);--accent-soft:#213833;--accent-border:#477970;
+  --link:#9dc5ff;--info:var(--link);--info-soft:#202d3d;--confirm:#89cba8;
+  --success:#8fceb0;--success-bg:#1b3c34;--success-border:#376653;
+  --warning:#e4bd80;--warning-bg:#3d3325;--warning-border:#705b3b;
+  --error:#e8a49f;--error-bg:#432e32;--error-border:#784c50;--coral:var(--error);
+  --purple:#c0ace2;--purple-bg:#352f49;--purple-border:#605078;
+  --focus:#94bfff;--focus-ring:#94bfff40;--overlay:#000000bd;
+  --detail-blue:var(--info);--detail-blue-soft:var(--info-soft);
+  --detail-violet:var(--purple);--detail-violet-soft:var(--purple-bg);
+  --detail-amber:var(--warning);--detail-amber-soft:var(--warning-bg);
+  --detail-rose:var(--error);--detail-rose-soft:var(--error-bg);
+  --interaction-duration:120ms;--shadow:0 14px 50px #00000050;
+}

@@ -8,9 +8,14 @@
     "build": "node scripts/build.mjs",
     "test": "node --test tests/*.test.mjs",
     "check": "node scripts/check.mjs",
-    "dev": "node scripts/dev.mjs"
+    "dev": "node scripts/dev.mjs",
+    "test:browser": "npm run build && node tests/browser-navigation.mjs",
+    "profile:navigation": "npm run build && node scripts/profile-navigation.mjs"
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.62.1"
   }
 }

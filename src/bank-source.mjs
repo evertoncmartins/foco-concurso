@@ -21,11 +21,17 @@ export function latestNativeFeedback(question,current){
   if(!question||question.sourceType!=='system'||current?.sourceType!=='system'||questionIdentity(question)!==questionIdentity(current)||!current.optionExplanations)return question;
   return {...question,explanation:current.explanation,optionExplanations:current.optionExplanations,fundamentoLegal:current.fundamentoLegal,reference:current.reference};
 }
+const questionIndexes=new WeakMap();
 export function sessionQuestion(model,session,key){
-  const current=model.questions.find(q=>q.key===key),source=session.questionSources?.[key];
+  let index=questionIndexes.get(model);
+  if(!index){index={current:new Map(model.questions.map(q=>[q.key,q])),resolved:new Map()};questionIndexes.set(model,index);}
+  const current=index.current.get(key),source=session.questionSources?.[key];
   if(source?.sourceType!=='system')return current;
+  const cached=index.resolved.get(key);
+  if(cached?.source===source)return cached.question;
   if(current?.sourceType==='system'&&current.bankRevision===source.bankRevision&&model.systemBanks?.some(b=>b.id===source.bankId&&b.revision===source.bankRevision))return current;
   const saved=model.bankHistory?.findLast(e=>e.type==='system-bank-snapshot'&&e.bank.id===source.bankId&&e.revision===source.bankRevision);
   const q=saved?.bank.questions.find(q=>`${source.bankId}:${q.id}`===key);
-  return q?latestNativeFeedback({...q,key,...source,bankName:source.displayName,enabled:false},current):current;
+  const question=q?latestNativeFeedback({...q,key,...source,bankName:source.displayName,enabled:false},current):current;
+  index.resolved.set(key,{source,question});return question;
 }

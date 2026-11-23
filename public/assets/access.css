@@ -45,15 +45,15 @@
 .guest-banner .text-link{display:flex;align-items:center;gap:7px;min-height:32px;padding:0;white-space:nowrap}
 .focus-mode .guest-banner{background:transparent;padding:0;border:0;margin-bottom:15px;font-size:10px}
 .focus-mode .guest-banner .text-link{display:none}
-[data-theme=dark] .sidebar{background:#171717}
+[data-theme=dark] .sidebar{background:var(--sidebar-bg)}
 [data-theme=dark] .home-focus{box-shadow:none;border:1px solid var(--border)}
 [data-theme=dark] .home-focus-label,[data-theme=dark] .home-streak,
 [data-theme=dark] .home-focus>p,[data-theme=dark] .home-daily>div,
-[data-theme=dark] .home-daily strong small{color:#b4b4b4}
+[data-theme=dark] .home-daily strong small{color:var(--text-secondary)}
 [data-theme=dark] .home-primary{color:var(--home-on-cta)}
 [data-theme=dark] .home-primary:hover{background:var(--accent-hover)}
-[data-theme=dark] .home-secondary{color:#ececec}
-[data-theme=dark] .entry-card .google-button{border-color:#646464}
+[data-theme=dark] .home-secondary{color:var(--text)}
+[data-theme=dark] .entry-card .google-button{border-color:var(--border-strong)}
 [data-theme=dark] .focus-mode .question-card{box-shadow:none}
 /* Small accents identify study actions while the page stays calm. */
 .home-welcome h1>span{color:var(--detail-violet)}

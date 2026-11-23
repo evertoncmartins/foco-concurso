@@ -7,7 +7,8 @@ export function answerEvent(session,q,chosen){return {id:`answer-${session.id}-$
 export function chooseAnswer(session,q,chosen){
   if(session.completed||session.queue[session.index]!==q.key||session.answers[q.key])throw new Error('Esta questão já foi respondida ou não está ativa.');
   if(!q.options.some(o=>o.id===chosen))throw new Error('Selecione uma alternativa válida.');
-  const next={...structuredClone(session),answers:{...session.answers,[q.key]:chosen}};
+  const next={...session,answers:{...session.answers,[q.key]:chosen},drafts:{...session.drafts}};
+  delete next.drafts[q.key];
   const events=[{type:'session',session:next}];if(session.mode!=='exam')events.unshift(answerEvent(session,q,chosen));
   return {session:next,events};
 }
@@ -15,13 +16,13 @@ export function moveSession(session,direction){
   if(session.completed)throw new Error('Esta sessão já foi concluída.');
   if(direction!==-1&&direction!==1)throw new Error('Navegue uma questão por vez.');
   const index=session.index+direction;
-  if(index<0||index>=session.queue.length)return {session:structuredClone(session),events:[]};
+  if(index<0||index>=session.queue.length)return {session,events:[]};
   return jumpSession(session,index);
 }
 export function jumpSession(session,index){
   if(session.completed)throw new Error('Esta sessão já foi concluída.');
   if(!Number.isInteger(index)||index<0||index>=session.queue.length)throw new Error('Escolha uma questão válida da sessão.');
-  const next=structuredClone(session);
+  const next={...session,answers:{...session.answers}};
   if(index===next.index)return {session:next,events:[]};
   const key=next.queue[next.index];
   if(!next.answers[key])next.answers[key]=null;
