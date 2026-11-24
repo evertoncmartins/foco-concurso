@@ -1,0 +1,2020 @@
+{
+  "schemaVersion": 1,
+  "id": "lei-13146",
+  "name": "Lei nº 13.146/2015",
+  "subtitle": "Estatuto da Pessoa com Deficiência",
+  "description": "Disposições preliminares, educação, cultura, esporte, turismo, lazer, acessibilidade e ciência e tecnologia: Título I; Título II, capítulos IV e IX; Títulos III e IV do Livro I.",
+  "questions": [
+    {
+      "id": "lbi-q4344864",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Disposições preliminares",
+      "topic": "Avaliação biopsicossocial",
+      "statement": "Segundo o § 1º do art. 2º da Lei nº 13.146/2015 (Lei Brasileira de Inclusão), a avaliação da deficiência, quando necessária, será biopsicossocial, realizada por equipe multiprofissional e interdisciplinar, considerando os",
+      "explanation": "A avaliação biopsicossocial reúne quatro dimensões: impedimentos corporais; fatores socioambientais, psicológicos e pessoais; limitação de atividades; e restrição de participação. Não se reduz a diagnóstico ou exame médico.",
+      "difficulty": "medium",
+      "tags": [
+        "IFSC-2026",
+        "Lei nº 13.146/2015",
+        "Disposições preliminares",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "impedimentos nas funções e nas estruturas do corpo, os fatores socioambientais, psicológicos e pessoais, a limitação no desempenho de atividades e a restrição de participação."
+        },
+        {
+          "id": "B",
+          "text": "impedimentos nas funções e nas estruturas do corpo, exclusivamente os fatores médicos relacionados à mobilidade e à condição de saúde da pessoa, além da limitação no desempenho de atividades laborais."
+        },
+        {
+          "id": "C",
+          "text": "fatores econômicos e sociais da pessoa avaliada, o histórico educacional e profissional como critérios determinantes e a existência de diagnóstico clínico da deficiência exclusivamente estabelecido por médico neurologista."
+        },
+        {
+          "id": "D",
+          "text": "fatores econômicos e sociais da pessoa avaliada, a existência de laudo médico, o diagnóstico da deficiência e o grau de comprometimento funcional definido exclusivamente por profissional da área da saúde."
+        },
+        {
+          "id": "E",
+          "text": "impedimentos nas funções e nas estruturas do corpo, os fatores econômicos e sociais da pessoa avaliada, as características pessoais do indivíduo, o tempo de tratamento realizado e os recursos terapêuticos utilizados no acompanhamento da condição de saúde."
+        }
+      ],
+      "correctOption": "A",
+      "optionExplanations": {
+        "A": "Correta. Reproduz as quatro dimensões dos incisos I a IV do § 1º do art. 2º, sem restringir a deficiência a aspectos médicos.",
+        "B": "Incorreta. A avaliação não considera exclusivamente fatores médicos nem somente atividades laborais; inclui os fatores socioambientais, psicológicos e pessoais e a participação social (art. 2º, § 1º, II–IV).",
+        "C": "Incorreta. Histórico escolar e profissional e diagnóstico exclusivo de neurologista não substituem os quatro fatores legais nem a equipe multiprofissional e interdisciplinar (art. 2º, § 1º).",
+        "D": "Incorreta. O diagnóstico exclusivo de profissional da saúde não caracteriza a avaliação biopsicossocial; faltam as dimensões de atividade e participação e a atuação da equipe legalmente prevista (art. 2º, § 1º).",
+        "E": "Incorreta. Tempo de tratamento e recursos terapêuticos não são a enumeração exigida; a alternativa omite a limitação de atividades e a restrição de participação (art. 2º, § 1º, III e IV)."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 2º, § 1º, I–IV",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFSC",
+      "tag": "IFSC-2026",
+      "banca": "FAURGS",
+      "cargo": "Arquiteto e Urbanista",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 2º, § 1º, I–IV",
+      "ano": 2026,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q4344864. Questões de Provas - Questões de Concursos _ Qconcursos.com.pdf — página 1, item 1. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "A"
+      }
+    },
+    {
+      "id": "lbi-q4403940",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Incumbências do poder público",
+      "statement": "De acordo com a Lei Brasileira de Inclusão da Pessoa com Deficiência (Lei nº 13.146/2015), acerca das incumbências do poder público na área da educação, é correto afirmar:",
+      "explanation": "A inclusão educacional é um dever de assegurar acesso, permanência, participação e aprendizagem em todos os níveis, com apoio e acessibilidade. O poder público organiza essas medidas e a LBI estende obrigações expressas às instituições privadas.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "A oferta de educação bilíngue em Libras como primeira língua e na modalidade escrita da língua portuguesa como segunda língua é uma faculdade das redes de ensino podendo ser substituída por atendimentos em salas de recursos multifuncionais."
+        },
+        {
+          "id": "B",
+          "text": "A elaboração do plano de atendimento educacional especializado e a organização de recursos e serviços de acessibilidade são de responsabilidade da família do estudante com deficiência."
+        },
+        {
+          "id": "C",
+          "text": "O poder público deve assegurar, criar, desenvolver, implementar, incentivar, acompanhar e avaliar o sistema educacional inclusivo em todos os níveis e modalidades, bem como o aprendizado ao longo de toda a vida."
+        },
+        {
+          "id": "D",
+          "text": "A participação dos estudantes com deficiência e de suas famílias nas diversas instâncias de atuação da comunidade escolar é opcional, ficando a critério da gestão escolar autorizá-la."
+        },
+        {
+          "id": "E",
+          "text": "A oferta de profissionais de apoio escolar e de tradutores e intérpretes da Libras é obrigatória apenas nas instituições públicas de ensino, sendo facultativa nas instituições privadas."
+        }
+      ],
+      "correctOption": "C",
+      "optionExplanations": {
+        "A": "Incorreta. O art. 28, IV, prevê a oferta bilíngue com Libras como primeira língua e português escrito como segunda, não uma faculdade substituível por sala de recursos.",
+        "B": "Incorreta. O planejamento do estudo de caso, do plano de AEE e dos recursos de acessibilidade é incumbência legal do poder público, com participação da família, não responsabilidade exclusiva dela (art. 28, VII e VIII).",
+        "C": "Correta. Corresponde ao art. 28, I: sistema educacional inclusivo em todos os níveis e modalidades e aprendizado ao longo de toda a vida.",
+        "D": "Incorreta. O art. 28, VIII, impõe assegurar a participação dos estudantes e das famílias nas instâncias da comunidade escolar; ela não depende de autorização discricionária da gestão.",
+        "E": "Incorreta. A oferta de profissionais de apoio e intérpretes integra os incisos XI e XVII, também obrigatórios para instituições privadas pelo § 1º do art. 28."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 27 e 28, I, IV, VII, VIII, XI e XVII, e § 1º",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 27 e 28, I, IV, VII, VIII, XI e XVII, e § 1º",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial. Também presente nos PDFs do usuário: Q4403940. Questões de Provas - Questões de Concursos _ Qconcursos.com.pdf — página 1, item 2. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "questaoOriginal": 32,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "C"
+      }
+    },
+    {
+      "id": "lbi-q4403948",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Ciência e tecnologia",
+      "topic": "Pesquisa, fomento e acessibilidade digital",
+      "statement": "A Lei Brasileira de Inclusão da Pessoa com Deficiência (Lei nº 13.146/2015) estabelece medidas destinadas ao desenvolvimento, ao fomento e ao acesso à tecnologia assistiva. Considerando as disposições da referida Lei, assinale a alternativa correta.",
+      "explanation": "A LBI articula acesso à tecnologia assistiva e fomento científico: plano renovado a cada quatro anos, avaliação de seus procedimentos ao menos bienal e incentivo à pesquisa, à formação e à capacitação de instituições públicas e privadas. A acessibilidade digital e o governo eletrônico também devem ser ampliados.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Ciência e tecnologia",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "O plano específico de medidas deve ser renovado a cada 4 (quatro) anos, e seus procedimentos devem ser avaliados bienalmente; contudo, as linhas de crédito subsidiadas para aquisição de tecnologia assistiva são restritas a pessoas físicas com deficiência, não se estendendo a instituições ou organizações que as atendam."
+        },
+        {
+          "id": "B",
+          "text": "O fomento à pesquisa e ao desenvolvimento de tecnologia assistiva limita-se à criação de cursos de pós-graduação na área, não abrangendo a capacitação tecnológica de instituições privadas, uma vez que estas atuam no mercado e não integram a administração pública."
+        },
+        {
+          "id": "C",
+          "text": "A priorização pelo poder público, da geração de conhecimentos e técnicas voltados à prevenção e ao tratamento de deficiências exclui o desenvolvimento de tecnologias sociais, pois estas são consideradas de natureza não científica e, portanto, fora do escopo do fomento estatal."
+        },
+        {
+          "id": "D",
+          "text": "O estímulo à difusão de tecnologias voltadas para ampliar o acesso da pessoa com deficiência às tecnologias da informação e comunicação abrange, entre outras medidas, a adoção de soluções e a difusão de normas que visem ampliar a acessibilidade a sítios da internet, incluindo os serviços de governo eletrônico."
+        },
+        {
+          "id": "E",
+          "text": "A avaliação periódica das medidas é uma faculdade do poder público, que pode realizá-la conforme a disponibilidade orçamentária, não constituindo obrigação legal sujeita a prazo ou periodicidade definida."
+        }
+      ],
+      "correctOption": "D",
+      "optionExplanations": {
+        "A": "Incorreta. Os prazos estão corretos, mas a lei não estabelece a restrição absoluta das linhas subsidiadas a pessoas físicas; prevê também crédito e parcerias para fomento à pesquisa e à produção nacional (art. 75, I e III).",
+        "B": "Incorreta. A formação em pós-graduação é apenas uma medida. O art. 77, § 3º, prevê expressamente capacitação tecnológica de instituições públicas e privadas.",
+        "C": "Incorreta. O art. 77, § 1º, inclui expressamente o desenvolvimento de tecnologias assistiva e social, sem a exclusão alegada.",
+        "D": "Correta. O art. 78, parágrafo único, inclui soluções e normas para ampliar a acessibilidade a sítios da internet, especialmente serviços de governo eletrônico.",
+        "E": "Incorreta. A avaliação dos procedimentos do plano é obrigatória, pelo menos a cada dois anos, conforme o art. 75, parágrafo único."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 75, I e III e parágrafo único; 77, §§ 1º–3º; e 78, caput e parágrafo único",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 75, I e III e parágrafo único; 77, §§ 1º–3º; e 78, caput e parágrafo único",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial. Também presente nos PDFs do usuário: Q4403948. Questões de Provas - Questões de Concursos _ Qconcursos.com.pdf — página 3, item 5. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "questaoOriginal": 40,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "D"
+      }
+    },
+    {
+      "id": "lbi-q4219180",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Acesso, permanência, participação e aprendizagem",
+      "statement": "De acordo com a Lei nº 13.146/2015 (Lei Brasileira de Inclusão da Pessoa com Deficiência), no que se refere ao direito à educação, assinale a alternativa correta.",
+      "explanation": "A educação inclusiva exige acesso, permanência, participação e aprendizagem, com eliminação de barreiras. A insuficiência de estrutura não afasta o dever de acessibilidade, e as instituições privadas não podem transferir ao estudante a cobrança adicional pelo cumprimento de suas obrigações.",
+      "difficulty": "medium",
+      "tags": [
+        "IFCE-2026",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "A instituição de ensino pode recusar matrícula de estudante com deficiência quando não dispuser de estrutura especializada."
+        },
+        {
+          "id": "B",
+          "text": "A cobrança de valores adicionais na mensalidade de pessoa com deficiência é admitida para custear recursos de acessibilidade e apoio pedagógico."
+        },
+        {
+          "id": "C",
+          "text": "O atendimento educacional especializado substitui a matrícula na classe comum do ensino regular."
+        },
+        {
+          "id": "D",
+          "text": "O sistema educacional deve assegurar condições de acesso, permanência, participação e aprendizagem às pessoas com deficiência, em igualdade de oportunidades com as demais."
+        },
+        {
+          "id": "E",
+          "text": "A oferta de profissionais de apoio escolar depende de autorização prévia do sistema de ensino."
+        }
+      ],
+      "correctOption": "D",
+      "optionExplanations": {
+        "A": "Incorreta. A falta de estrutura não autoriza negar o direito à educação; a instituição deve cumprir as medidas inclusivas dos arts. 27 e 28.",
+        "B": "Incorreta. O art. 28, § 1º, veda valores adicionais de qualquer natureza em mensalidades, anuidades e matrículas para cumprir as obrigações inclusivas.",
+        "C": "Incorreta. O AEE deve integrar o projeto pedagógico e garantir pleno acesso ao currículo, não funcionar como substituição geral da escolarização inclusiva (art. 28, III).",
+        "D": "Correta. O art. 28, II, explicita as quatro condições e a eliminação de barreiras por serviços e recursos de acessibilidade.",
+        "E": "Incorreta. A LBI prevê a oferta de profissionais de apoio escolar como incumbência no art. 28, XVII; não a condiciona à autorização prévia mencionada."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 27 e 28, I–III e XVII, e § 1º",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFCE",
+      "tag": "IFCE-2026",
+      "banca": "Instituto AOCP",
+      "cargo": "Pedagogo — Área",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 27 e 28, I–III e XVII, e § 1º",
+      "ano": 2026,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q4219180. Questões de Provas - Questões de Concursos _ Qconcursos.com.pdf — página 3, item 6. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "D"
+      }
+    },
+    {
+      "id": "lbi-q3616543",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Definição de profissional de apoio escolar",
+      "statement": "Segundo o Estatuto da Pessoa com Deficiência (Lei nº 13.146/2015), incumbe ao poder público assegurar a oferta de profissionais de apoio escolar. Tal profissional, conforme define a própria lei, corresponde à pessoa que",
+      "explanation": "O profissional de apoio escolar auxilia na alimentação, higiene e locomoção e nas atividades escolares em que necessário, em todos os níveis e modalidades. A definição não lhe atribui automaticamente a docência, a avaliação pedagógica ou procedimentos de profissões regulamentadas.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2022",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "atua junto ao professor regente da classe regular que tenha alunos com deficiência, dando apoio ao planejamento e à realização das atividades em todos os espaços da escola, bem como nas ações de intervenção pedagógica e de avaliação."
+        },
+        {
+          "id": "B",
+          "text": "disponibiliza apoio ao estudante com deficiência, quando necessário, em suas atividades de comunicação, interação social, locomoção, alimentação e cuidados pessoais."
+        },
+        {
+          "id": "C",
+          "text": "exerce atividades de alimentação, higiene e locomoção do estudante com deficiência e atua em todas as atividades escolares nas quais se fizer necessária, em todos os níveis e modalidades de ensino, excluídas as técnicas ou os procedimentos identificados com profissões legalmente estabelecidas."
+        },
+        {
+          "id": "D",
+          "text": "desempenha atividades próprias de educação especial a alunos com deficiência matriculados em escola de ensino regular ou, em regime domiciliar, àqueles que, por mobilidade reduzida ou saúde fragilizada, estejam impedidos de frequentá-la."
+        },
+        {
+          "id": "E",
+          "text": "atua como facilitadora na execução das atividades escolares, oferecendo cuidados de vida diária e suporte pedagógico ao aluno com deficiência, além de suporte ao professor na sala de recursos multifuncionais."
+        }
+      ],
+      "correctOption": "C",
+      "optionExplanations": {
+        "A": "Incorreta. Descreve apoio à docência, ao planejamento e à avaliação, mas não a definição legal do profissional de apoio escolar do art. 3º, XIII.",
+        "B": "Incorreta. Há atividades de apoio compatíveis com a inclusão, mas a descrição não corresponde à definição legal exigida no comando: alimentação, higiene, locomoção e atuação escolar com a exclusão de procedimentos profissionais regulamentados (art. 3º, XIII).",
+        "C": "Correta. Reproduz o núcleo do art. 3º, XIII, inclusive o alcance a todos os níveis e modalidades e a exclusão das técnicas ou procedimentos de profissões legalmente estabelecidas.",
+        "D": "Incorreta. A LBI não define esse profissional como responsável por atividades próprias de educação especial ou por ensino domiciliar (art. 3º, XIII).",
+        "E": "Incorreta. Agrega suporte pedagógico e atuação na sala de recursos como características definidoras, que não constam da definição do art. 3º, XIII."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 3º, XIII, e 28, XVII",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2022",
+      "banca": "FCC",
+      "cargo": "Procurador de Universidade Assistente — Nível 1",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 3º, XIII, e 28, XVII",
+      "ano": 2022,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q3616543. Questões de Provas - Questões de Concursos _ Qconcursos.com.pdf — página 8, item 18. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "C"
+      }
+    },
+    {
+      "id": "lbi-q1036827",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Apoio escolar e educação bilíngue",
+      "statement": "A Lei nº 13.146, de 6 de julho de 2015, institui a Lei Brasileira de Inclusão da Pessoa com Deficiência. De acordo com a referida lei, assinale a alternativa CORRETA.",
+      "explanation": "A LBI adota uma concepção de deficiência que considera impedimento de longo prazo em interação com barreiras. Na educação, garante igualdade de oportunidades, medidas que maximizem o desenvolvimento, educação bilíngue nos termos legais e apoio escolar.",
+      "difficulty": "medium",
+      "tags": [
+        "IFPE-2019",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "A pessoa com deficiência deve ter acesso à Educação Superior e à Educação Profissional e Tecnológica diferenciado em relação às demais pessoas."
+        },
+        {
+          "id": "B",
+          "text": "Considera-se pessoa com deficiência aquela que tem impedimentos de longo e curto prazos de natureza física, mental, intelectual ou sensorial, os quais, em interação com uma ou mais barreiras, podem obstruir sua participação plena e efetiva na sociedade em igualdade de condições com as demais pessoas."
+        },
+        {
+          "id": "C",
+          "text": "A pessoa com deficiência tem direito à adoção de medidas individualizadas e coletivas em ambientes que dificultem o desenvolvimento acadêmico e social dos estudantes com deficiência, desfavorecendo o acesso, a permanência, a participação e a aprendizagem em instituições de ensino."
+        },
+        {
+          "id": "D",
+          "text": "O poder público deve prover meios para a oferta de educação bilíngue na modalidade escrita da língua portuguesa, como primeira língua, e em Libras, como segunda língua, em escolas e classes bilíngues e em escolas inclusivas."
+        },
+        {
+          "id": "E",
+          "text": "O profissional de apoio escolar é a pessoa que exerce atividades de alimentação, higiene e locomoção do estudante com deficiência e atua em todas as atividades escolares nas quais se fizer necessária, em todos os níveis e modalidades de ensino, em instituições públicas e privadas, excluídas as técnicas ou os procedimentos identificados com profissões legalmente estabelecidas."
+        }
+      ],
+      "correctOption": "E",
+      "optionExplanations": {
+        "A": "Incorreta. O art. 28, XIII, assegura acesso à educação superior e profissional em igualdade de oportunidades e condições; recursos diferenciados servem a essa igualdade, não a um regime genérico de acesso desigual.",
+        "B": "Incorreta. O art. 2º exige impedimento de longo prazo; a inclusão indiscriminada do curto prazo altera o conceito legal.",
+        "C": "Incorreta. O art. 28, V, exige ambientes que maximizem o desenvolvimento e favoreçam acesso, permanência, participação e aprendizagem; a alternativa inverte a finalidade.",
+        "D": "Incorreta. O art. 28, IV, estabelece Libras como primeira língua e português escrito como segunda, em ordem inversa à alternativa.",
+        "E": "Correta. A definição corresponde ao art. 3º, XIII, inclusive atuação em instituições públicas e privadas e exclusão de procedimentos de profissões regulamentadas."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 2º, caput; 3º, XIII; e 28, IV, V e XIII",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFPE",
+      "tag": "IFPE-2019",
+      "banca": "IFPE",
+      "cargo": "Técnico em Assuntos Educacionais",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 2º, caput; 3º, XIII; e 28, IV, V e XIII",
+      "ano": 2019,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q1036827. Questões de Provas - Questões de Concursos _ Qconcursos.com.pdf — página 9, item 19. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "E"
+      }
+    },
+    {
+      "id": "lbi-q2004995",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Tecnologia assistiva",
+      "topic": "Conceito de ajudas técnicas",
+      "statement": "A educação de surdos pode ser efetuada com ajudas técnicas no processo de aprendizagem. A expressão “ajudas técnicas”, presente na Lei Brasileira de Inclusão nº 13.146 de 2015, refere-se a",
+      "explanation": "Tecnologia assistiva ou ajuda técnica compreende um conjunto amplo de produtos, recursos, metodologias, estratégias, práticas e serviços voltados à funcionalidade, autonomia e participação da pessoa com deficiência ou com mobilidade reduzida. Não se limita a equipamentos nem a uma única profissão.",
+      "difficulty": "medium",
+      "tags": [
+        "IFPA-2018",
+        "Lei nº 13.146/2015",
+        "Tecnologia assistiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "produtos, equipamentos, dispositivos, recursos, metodologias, estratégias, práticas e serviços que objetivem promover a funcionalidade, relacionada à atividade e à participação da pessoa com deficiência."
+        },
+        {
+          "id": "B",
+          "text": "profissionais qualificados que promovem acessibilidade comunicacional às pessoas surdas, ajudando os professores na sala de aula que tem alunos surdos matriculados. A ajuda técnica é o principal serviço que permite a inclusão."
+        },
+        {
+          "id": "C",
+          "text": "técnicos especializados que promovem a inclusão da pessoa com deficiência auditiva/surdez. Os técnicos são professores surdos que ajudam os alunos surdos a aprenderem a Libras e Língua portuguesa no AEE."
+        },
+        {
+          "id": "D",
+          "text": "produtos, equipamentos, dispositivos, recursos, metodologias, estratégias diferenciadas que objetivem garantir ao docente maior possibilidade de construção de ações inclusivas aos alunos com superdotação/altas habilidades."
+        },
+        {
+          "id": "E",
+          "text": "produtos e professores qualificados que ajudam na garantia da acessibilidade de pessoas com deficiência, mas o maior beneficiado é o professor do ensino regular que recebe ajudas técnicas."
+        }
+      ],
+      "correctOption": "A",
+      "optionExplanations": {
+        "A": "Correta. Expressa o núcleo da definição de tecnologia assistiva ou ajuda técnica do art. 3º, III: recursos e serviços voltados à funcionalidade, à atividade e à participação.",
+        "B": "Incorreta. Reduz ajuda técnica a profissionais de comunicação e a um serviço principal, enquanto o art. 3º, III, abrange múltiplos recursos e serviços.",
+        "C": "Incorreta. A ajuda técnica não se define como um grupo de professores surdos ou técnicos especializados, mas pelo conjunto de recursos e serviços e sua finalidade (art. 3º, III).",
+        "D": "Incorreta. Substitui o destinatário e a finalidade legais por apoio ao docente para ações dirigidas a altas habilidades; isso não corresponde ao conceito do art. 3º, III.",
+        "E": "Incorreta. O objetivo é a funcionalidade e a inclusão da pessoa com deficiência ou com mobilidade reduzida, não colocar o professor como principal beneficiário (art. 3º, III)."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 3º, III",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFPA",
+      "tag": "IFPA-2018",
+      "banca": "FADESP",
+      "cargo": "Professor — Letras: Português e Libras",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 3º, III",
+      "ano": 2018,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q2004995. Questões de Provas - Questões de Concursos _ Qconcursos.com.pdf — página 9, item 20. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "A"
+      }
+    },
+    {
+      "id": "lbi-q3689602",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Adaptações curriculares e necessidades individuais",
+      "statement": "O Estatuto da Pessoa com Deficiência (Lei nº 13.146/2015) constitui um avanço relativo às condições de permanência de estudantes com deficiência nas instituições de ensino. Um dos avanços mais significativos refere-se às adaptações curriculares. Nesse sentido, o Estatuto consolidou o entendimento de",
+      "explanation": "As adaptações razoáveis e as medidas individualizadas devem responder às características e necessidades de aprendizagem do estudante, para viabilizar seu acesso ao currículo e sua participação. São deveres inclusivos, não mera oportunidade facultativa nem simples reprodução de um relatório médico.",
+      "difficulty": "medium",
+      "tags": [
+        "IFPE-2025",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Médio"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "oportunidade de adaptações curriculares de acordo com a modalidade de ensino do estudante."
+        },
+        {
+          "id": "B",
+          "text": "obrigatoriedade das adaptações curriculares conforme a necessidade individual dos estudantes."
+        },
+        {
+          "id": "C",
+          "text": "obrigatoriedade de adaptações curriculares segundo relatório médico apresentado pelo estudante."
+        },
+        {
+          "id": "D",
+          "text": "oportunidade de adaptações curriculares em consonância com a solicitação do estudante."
+        },
+        {
+          "id": "E",
+          "text": "obrigatoriedade de adaptações curriculares em conformidade com as orientações fornecidas pelo estudante."
+        }
+      ],
+      "correctOption": "B",
+      "optionExplanations": {
+        "A": "Incorreta. A modalidade não afasta o dever nem substitui a análise das necessidades de cada estudante (art. 28, III e V).",
+        "B": "Correta. As medidas devem atender às características e necessidades individuais, com adaptações razoáveis e apoio planejado (art. 28, III, V e VII).",
+        "C": "Incorreta. O relatório médico pode fornecer informações, mas o art. 28, III e VII, não o estabelece como fundamento exclusivo ou condição geral para as adaptações pedagógicas.",
+        "D": "Incorreta. O dever de adequação não se converte em mera oportunidade condicionada à solicitação do estudante; exige planejamento inclusivo (art. 28, III, V e VII).",
+        "E": "Incorreta. O estudante deve participar, mas as medidas não decorrem somente de suas orientações: devem ser planejadas conforme suas características e necessidades (art. 28, III, V e VII)."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 28, III, V e VII",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFPE",
+      "tag": "IFPE-2025",
+      "banca": "FUNCERN",
+      "cargo": "Assistente de Alunos",
+      "nivelCargo": "Médio",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 28, III, V e VII",
+      "ano": 2025,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q3689602. Questões de Provas - Questões de Concursos - Página 2 _ Qconcursos.com.pdf — página 1, item 21. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "B"
+      }
+    },
+    {
+      "id": "lbi-q3565204",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Acessibilidade",
+      "topic": "Barreiras arquitetônicas e na comunicação",
+      "statement": "Durante inspeção, a equipe escolar identificou ausência de rampa em um acesso, falta de sinalização tátil no piso e inexistência de cartazes em braile. Segundo a Lei nº 13.146/2015 (Estatuto da Pessoa com Deficiência), nesse caso, pode-se identificar barreiras:",
+      "explanation": "A ausência de rampa no edifício cria obstáculo físico, e a falta de sinalização tátil e de comunicação em Braille dificulta o acesso a mensagens e informações. O caso reúne barreiras arquitetônicas e nas comunicações e na informação.",
+      "difficulty": "medium",
+      "tags": [
+        "IFSertãoPE-2025",
+        "Lei nº 13.146/2015",
+        "Acessibilidade",
+        "Médio"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Arquitetônicas e metodológicas."
+        },
+        {
+          "id": "B",
+          "text": "Arquitetônicas e comunicacionais."
+        },
+        {
+          "id": "C",
+          "text": "Tecnológicas e atitudinais."
+        },
+        {
+          "id": "D",
+          "text": "Comunicacionais e atitudinais."
+        },
+        {
+          "id": "E",
+          "text": "Arquitetônicas, comunicacionais e tecnológicas."
+        }
+      ],
+      "correctOption": "B",
+      "optionExplanations": {
+        "A": "Incorreta. A rampa se relaciona à arquitetura, mas o caso não descreve método de ensino; a falta de sinalização e Braille envolve comunicação e informação (art. 3º, IV, b e d).",
+        "B": "Correta. Identifica os obstáculos físicos no edifício e os obstáculos para perceber mensagens e informações, nos termos do art. 3º, IV, b e d.",
+        "C": "Incorreta. Não foram narradas dificuldades de acesso a tecnologias nem atitudes discriminatórias; os obstáculos descritos são físicos e comunicacionais (art. 3º, IV).",
+        "D": "Incorreta. A dimensão comunicacional existe, mas não há conduta atitudinal narrada e a alternativa omite a barreira arquitetônica (art. 3º, IV, b, d e e).",
+        "E": "Incorreta. Acrescenta barreiras tecnológicas sem fato que demonstre impedimento de acesso às tecnologias, cuja definição está na alínea f do art. 3º, IV."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 3º, IV, b e d",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFSertãoPE",
+      "tag": "IFSertãoPE-2025",
+      "banca": "FUNDATEC",
+      "cargo": "Assistente de Aluno",
+      "nivelCargo": "Médio",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 3º, IV, b e d",
+      "ano": 2025,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q3565204. Questões de Provas - Questões de Concursos - Página 2 _ Qconcursos.com.pdf — página 1, item 22. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "B"
+      }
+    },
+    {
+      "id": "lbi-q3094576",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Tecnologia assistiva",
+      "topic": "Tecnologia assistiva e conceitos relacionados",
+      "statement": "De acordo com a Lei nº 13.146/2015, como são denominados os produtos, equipamentos, dispositivos, recursos, metodologias, estratégias, práticas e serviços que objetivem promover a funcionalidade, relacionada à atividade e à participação da pessoa com deficiência ou com mobilidade reduzida, visando à sua autonomia, independência, qualidade de vida e inclusão social?",
+      "explanation": "A definição apresentada é a de tecnologia assistiva ou ajuda técnica. O critério central é promover funcionalidade e participação com autonomia, independência, qualidade de vida e inclusão.",
+      "difficulty": "medium",
+      "tags": [
+        "IFAP-2024",
+        "Lei nº 13.146/2015",
+        "Tecnologia assistiva",
+        "Médio"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Desenho universal."
+        },
+        {
+          "id": "B",
+          "text": "Barreira."
+        },
+        {
+          "id": "C",
+          "text": "Elemento de urbanização."
+        },
+        {
+          "id": "D",
+          "text": "Tecnologia assistiva ou ajuda técnica."
+        },
+        {
+          "id": "E",
+          "text": "Mobiliário urbano."
+        }
+      ],
+      "correctOption": "D",
+      "optionExplanations": {
+        "A": "Incorreta. Desenho universal é a concepção para uso por todas as pessoas sem adaptação ou projeto específico (art. 3º, II).",
+        "B": "Incorreta. Barreira é o entrave ou obstáculo à participação e aos direitos, e não o recurso para superá-lo (art. 3º, IV).",
+        "C": "Incorreta. Elementos de urbanização são componentes de obras urbanísticas, como pavimentação e saneamento (art. 3º, VII).",
+        "D": "Correta. O enunciado corresponde à definição de tecnologia assistiva ou ajuda técnica do art. 3º, III.",
+        "E": "Incorreta. Mobiliário urbano é o conjunto de objetos adicionados às vias e espaços públicos, como bancos e semáforos (art. 3º, VIII)."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 3º, II–IV, VII e VIII",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFAP",
+      "tag": "IFAP-2024",
+      "banca": "FUNDATEC",
+      "cargo": "Assistente de Aluno",
+      "nivelCargo": "Médio",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 3º, II–IV, VII e VIII",
+      "ano": 2024,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q3094576. Questões de Provas - Questões de Concursos - Página 2 _ Qconcursos.com.pdf — página 2, item 25. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "D"
+      }
+    },
+    {
+      "id": "lbi-q3094644",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Disposições preliminares",
+      "topic": "Fatores da avaliação biopsicossocial",
+      "statement": "De acordo com a Lei nº 13.146/2015, a avaliação da deficiência, quando necessária, será biopsicossocial, realizada por equipe multiprofissional e interdisciplinar, e considerará, EXCETO:",
+      "explanation": "O comando pede a exceção à lista expressa do art. 2º, § 1º. A avaliação é biopsicossocial e considera impedimentos corporais, fatores socioambientais, psicológicos e pessoais, limitação de atividades e restrição de participação. “Grau da deficiência” não é um quinto item dessa enumeração.",
+      "difficulty": "medium",
+      "tags": [
+        "IFAP-2024",
+        "Lei nº 13.146/2015",
+        "Disposições preliminares",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Os impedimentos nas funções e nas estruturas do corpo."
+        },
+        {
+          "id": "B",
+          "text": "Os fatores socioambientais, psicológicos e pessoais."
+        },
+        {
+          "id": "C",
+          "text": "A limitação no desempenho de atividades."
+        },
+        {
+          "id": "D",
+          "text": "O grau da deficiência."
+        },
+        {
+          "id": "E",
+          "text": "A restrição de participação."
+        }
+      ],
+      "correctOption": "D",
+      "optionExplanations": {
+        "A": "Não atende ao EXCETO. Os impedimentos nas funções e estruturas do corpo constam expressamente do inciso I.",
+        "B": "Não atende ao EXCETO. Os fatores socioambientais, psicológicos e pessoais são o conteúdo do inciso II.",
+        "C": "Não atende ao EXCETO. A limitação no desempenho de atividades é prevista no inciso III.",
+        "D": "Gabarito do EXCETO. “O grau da deficiência” não integra a enumeração dos quatro fatores do § 1º. Isso não significa proibição de graduar a deficiência em avaliações previstas em outros contextos.",
+        "E": "Não atende ao EXCETO. A restrição de participação é o quarto fator expressamente previsto, no inciso IV."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 2º, § 1º, I–IV",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFAP",
+      "tag": "IFAP-2024",
+      "banca": "FUNDATEC",
+      "cargo": "Técnico em Assuntos Educacionais",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 2º, § 1º, I–IV",
+      "ano": 2024,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q3094644. Questões de Provas - Questões de Concursos - Página 2 _ Qconcursos.com.pdf — página 2, item 26; Questões de Provas - Questões de Concursos _ Qconcursos.com.pdf — página 5, item 10. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "D"
+      }
+    },
+    {
+      "id": "lbi-q3045433",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Acessibilidade",
+      "topic": "Telecentros e lan houses",
+      "statement": "De acordo com a Lei nº 13.146/2015 (Estatuto da Pessoa com Deficiência), os telecentros comunitários que receberem recursos públicos federais para seu custeio ou sua instalação, e lan houses, devem possuir equipamentos e instalações acessíveis. O percentual de computadores com recursos de acessibilidade para pessoas com deficiência visual que os estabelecimentos citados devem garantir, no mínimo, é:",
+      "explanation": "Telecentros comunitários custeados ou instalados com recursos públicos federais e lan houses devem ter instalações acessíveis e reservar ao menos 10% dos computadores com recursos para deficiência visual. Quando o percentual resultar em menos de uma unidade, garante-se pelo menos um equipamento.",
+      "difficulty": "medium",
+      "tags": [
+        "IFSP-2024",
+        "Lei nº 13.146/2015",
+        "Acessibilidade",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "50% (cinquenta por cento) de seus computadores."
+        },
+        {
+          "id": "B",
+          "text": "30% (trinta por cento) de seus computadores."
+        },
+        {
+          "id": "C",
+          "text": "20% (vinte por cento) de seus computadores."
+        },
+        {
+          "id": "D",
+          "text": "10% (dez por cento) de seus computadores."
+        }
+      ],
+      "correctOption": "D",
+      "optionExplanations": {
+        "A": "Incorreta. Cinquenta por cento supera o mínimo legal, mas não é o percentual mínimo fixado no art. 63, § 3º.",
+        "B": "Incorreta. O mínimo legal não é de trinta por cento, e sim de dez por cento (art. 63, § 3º).",
+        "C": "Incorreta. O art. 63, § 3º, não fixa vinte por cento; estabelece dez por cento, com ao menos um equipamento.",
+        "D": "Correta. O mínimo é dez por cento, observado o piso de um computador quando o resultado percentual for inferior a um (art. 63, § 3º)."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 63, §§ 2º e 3º",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFSP",
+      "tag": "IFSP-2024",
+      "banca": "IFSP",
+      "cargo": "Professor EBTT — Arquitetura",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 63, §§ 2º e 3º",
+      "ano": 2024,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q3045433. Questões de Provas - Questões de Concursos - Página 2 _ Qconcursos.com.pdf — página 3, item 28. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "D"
+      }
+    },
+    {
+      "id": "lbi-q3011360",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Disposições preliminares",
+      "topic": "Conceito de pessoa com deficiência",
+      "statement": "Nos termos da Lei nº 13.146/2015, Estatuto da Pessoa com Deficiência, considera-se pessoa com deficiência aquela que tem:",
+      "explanation": "O conceito legal relaciona impedimentos de longo prazo e barreiras que podem obstruir a participação plena e efetiva em igualdade de condições. A avaliação, quando necessária, é biopsicossocial; a criação dos instrumentos cabe ao Poder Executivo.",
+      "difficulty": "medium",
+      "tags": [
+        "IFSC-2024",
+        "Lei nº 13.146/2015",
+        "Disposições preliminares",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Uma redução efetiva e acentuada da capacidade de integração social, com necessidade de equipamentos e adaptações."
+        },
+        {
+          "id": "B",
+          "text": "Uma condição que pode ser permanente ou temporária, visível ou não, do corpo ou da mente, e que não é impedida por fatores socioambientais, psicológicos e pessoais."
+        },
+        {
+          "id": "C",
+          "text": "Impedimento de longo prazo de natureza física, mental, intelectual ou sensorial, e que passa por avaliação de equipe multiprofissional e interdisciplinar, que cria instrumentos para avaliação da deficiência e da renda."
+        },
+        {
+          "id": "D",
+          "text": "Impedimento de longo prazo de natureza física, mental, intelectual ou sensorial, o qual, em interação com uma ou mais barreiras, pode obstruir sua participação plena e efetiva na sociedade em igualdade de condições com as demais pessoas."
+        },
+        {
+          "id": "E",
+          "text": "Impedimento de curto, médio e/ou longo prazo de natureza física, mental, intelectual ou sensorial, o qual, em interação com uma ou mais barreiras, pode obstruir sua participação plena e efetiva na sociedade em igualdade de condições com as demais pessoas."
+        }
+      ],
+      "correctOption": "D",
+      "optionExplanations": {
+        "A": "Incorreta. Usa uma formulação de integração social que não reproduz o conceito relacional de impedimento de longo prazo e barreiras do art. 2º.",
+        "B": "Incorreta. A formulação admite transitoriedade de modo genérico e nega a interação com fatores e barreiras, contrariando o art. 2º e seu § 1º.",
+        "C": "Incorreta. A equipe realiza a avaliação quando necessária, mas o art. 2º, § 2º, atribui ao Poder Executivo a criação dos instrumentos; avaliação de renda também não é elemento da definição.",
+        "D": "Correta. Reproduz o conceito do art. 2º, caput, com impedimento de longo prazo e interação com barreiras.",
+        "E": "Incorreta. A inclusão de impedimentos de curto e médio prazo como elementos indistintos não corresponde ao art. 2º, que exige longo prazo."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 2º, caput e §§ 1º e 2º",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFSC",
+      "tag": "IFSC-2024",
+      "banca": "FUNDATEC",
+      "cargo": "Assistente Social",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 2º, caput e §§ 1º e 2º",
+      "ano": 2024,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q3011360. Questões de Provas - Questões de Concursos - Página 2 _ Qconcursos.com.pdf — página 4, item 30; Questões de Provas - Questões de Concursos _ Qconcursos.com.pdf — página 6, item 13. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "D"
+      }
+    },
+    {
+      "id": "lbi-q2562100",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Acessibilidade",
+      "topic": "Barreiras urbanísticas",
+      "statement": "Segundo a Lei nº 13.146/2015, os entraves, obstáculos, atitudes ou comportamentos que limitem ou impeçam a participação social da pessoa, existentes nas vias e nos espaços públicos e privados abertos ao público ou de uso coletivo, são denominados barreiras",
+      "explanation": "As barreiras urbanísticas situam-se nas vias e nos espaços públicos ou privados abertos ao público ou de uso coletivo. As arquitetônicas, por sua vez, existem nos edifícios públicos e privados.",
+      "difficulty": "medium",
+      "tags": [
+        "IFNMG-2024",
+        "Lei nº 13.146/2015",
+        "Acessibilidade",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "arquitetônicas."
+        },
+        {
+          "id": "B",
+          "text": "urbanísticas."
+        },
+        {
+          "id": "C",
+          "text": "tecnológicas."
+        },
+        {
+          "id": "D",
+          "text": "locomotivas."
+        },
+        {
+          "id": "E",
+          "text": "logísticas."
+        }
+      ],
+      "correctOption": "B",
+      "optionExplanations": {
+        "A": "Incorreta. Barreiras arquitetônicas são as existentes nos edifícios, e não a categoria definida pelo enunciado (art. 3º, IV, b).",
+        "B": "Correta. É a definição de barreiras urbanísticas do art. 3º, IV, a.",
+        "C": "Incorreta. Barreiras tecnológicas dificultam ou impedem o acesso às tecnologias (art. 3º, IV, f).",
+        "D": "Incorreta. “Locomotivas” não é uma das categorias de barreiras do art. 3º, IV; o dispositivo diferencia, entre outras, urbanísticas e nos transportes.",
+        "E": "Incorreta. “Logísticas” não é a denominação legal para os obstáculos descritos nem uma categoria do art. 3º, IV."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 3º, IV, a–f",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFNMG",
+      "tag": "IFNMG-2024",
+      "banca": "Instituto Verbena/UFG",
+      "cargo": "Professor EBTT — Administração",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 3º, IV, a–f",
+      "ano": 2024,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q2562100. Questões de Provas - Questões de Concursos - Página 2 _ Qconcursos.com.pdf — página 4, item 31. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "B"
+      }
+    },
+    {
+      "id": "lbi-q2281189",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Acessibilidade em processos seletivos",
+      "statement": "De acordo com a Lei nº 13.146/2015 (Estatuto da Pessoa com Deficiência), os processos seletivos para ingresso e permanência nos cursos oferecidos pelas instituições de ensino superior e de educação profissional e tecnológica, públicas e privadas, devem adotar algumas medidas em relação às pessoas com deficiência. Sobre essa afirmação, assinale a alternativa correta:",
+      "explanation": "Os processos de ingresso e permanência no ensino superior e na educação profissional e tecnológica devem oferecer acessibilidade. A LBI exige tradução integral do edital e das retificações em Libras, provas acessíveis às necessidades específicas e recursos previamente solicitados e escolhidos pelo candidato.",
+      "difficulty": "medium",
+      "tags": [
+        "IFSP-2023",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Disponibilização de recursos de acessibilidade e de tecnologia assistiva adequados, escolhidos pelo candidato com deficiência, somente na hora da prova."
+        },
+        {
+          "id": "B",
+          "text": "Atendimento preferencial à pessoa com deficiência exclusivamente nas dependências das instituições de Ensino Médio."
+        },
+        {
+          "id": "C",
+          "text": "Tradução completa do edital e de suas retificações em Libras."
+        },
+        {
+          "id": "D",
+          "text": "Disponibilização de provas em formatos acessíveis para atendimento somente aos candidatos com deficiência visual."
+        }
+      ],
+      "correctOption": "C",
+      "optionExplanations": {
+        "A": "Incorreta. Os recursos devem ser previamente solicitados e escolhidos, não somente selecionados na hora da prova (art. 30, IV).",
+        "B": "Incorreta. O inciso I prevê atendimento nas instituições de ensino superior e seus serviços; o caput também alcança educação profissional e tecnológica, sem a exclusividade mencionada.",
+        "C": "Correta. A tradução completa do edital e das retificações em Libras é exigida pelo art. 30, VII.",
+        "D": "Incorreta. As provas devem atender às necessidades específicas do candidato com deficiência, sem restringir o direito à deficiência visual (art. 30, III)."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 30, I, III, IV e VII",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFSP",
+      "tag": "IFSP-2023",
+      "banca": "IFSP",
+      "cargo": "Engenheiro Civil",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 30, I, III, IV e VII",
+      "ano": 2023,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q2281189. Questões de Provas - Questões de Concursos - Página 2 _ Qconcursos.com.pdf — página 5, item 35. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "C"
+      }
+    },
+    {
+      "id": "lbi-q2289767",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Atribuições do profissional de apoio escolar",
+      "statement": "A rotina de um profissional de apoio escolar para alunos com deficiência é bem complexa, pois esse profissional deve oportunizar a acessibilidade do sujeito em diversas atividades. A partir desse pressuposto, leia o texto abaixo da Lei nº 13.146/2015 e complete as lacunas: “Profissional de apoio escolar: pessoa que exerce atividades de _________, higiene e locomoção do estudante com deficiência e atua em todas as atividades escolares nas quais se fizer necessária, em todos os níveis e modalidades de ensino, em instituições públicas e privadas, __________ as técnicas ou procedimentos identificados com profissões legalmente estabelecidas.”",
+      "explanation": "A definição legal de profissional de apoio escolar começa pelas atividades de alimentação, higiene e locomoção. Ela exclui as técnicas e os procedimentos próprios de profissões legalmente estabelecidas.",
+      "difficulty": "medium",
+      "tags": [
+        "IFSULDEMINAS-2023",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Médio"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "saúde / incluídas"
+        },
+        {
+          "id": "B",
+          "text": "ensino / excluídas"
+        },
+        {
+          "id": "C",
+          "text": "alimentação / excluídas"
+        },
+        {
+          "id": "D",
+          "text": "monitoria / incluídas"
+        }
+      ],
+      "correctOption": "C",
+      "optionExplanations": {
+        "A": "Incorreta. A primeira lacuna é “alimentação”; a segunda é “excluídas”, não saúde e incluídas (art. 3º, XIII).",
+        "B": "Incorreta. Embora “excluídas” esteja correta, a primeira atividade da definição é alimentação, e não ensino (art. 3º, XIII).",
+        "C": "Correta. As palavras completam fielmente a definição: alimentação, higiene e locomoção, excluídas as técnicas ou procedimentos de profissões legalmente estabelecidas (art. 3º, XIII).",
+        "D": "Incorreta. Monitoria não é a palavra da primeira lacuna, e a lei exclui os procedimentos profissionais regulamentados, em vez de incluí-los (art. 3º, XIII)."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 3º, XIII",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFSULDEMINAS",
+      "tag": "IFSULDEMINAS-2023",
+      "banca": "IFSULDEMINAS",
+      "cargo": "Assistente de Alunos",
+      "nivelCargo": "Médio",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 3º, XIII",
+      "ano": 2023,
+      "fonte": {
+        "statusGabarito": "Gabarito do PDF fornecido pelo usuário (Qconcursos); sem confirmação independente do definitivo",
+        "observacao": "Q2289767. Questões de Provas - Questões de Concursos - Página 2 _ Qconcursos.com.pdf — página 6, item 36. Resposta confrontada com a legislação consolidada em 2026-11-24. Dificuldade editorial. Revisão de ortografia e espaços sem alteração do sentido.",
+        "consultaEm": "2026-11-24",
+        "gabaritoOriginal": "C"
+      }
+    },
+    {
+      "id": "lbi-unicamp-2026-q28",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Disposições preliminares",
+      "topic": "Avaliação biopsicossocial e cordão de girassóis",
+      "statement": "Analise as afirmativas a seguir sobre a Lei Brasileira de Inclusão (Estatuto da Pessoa com Deficiência - Lei nº 13.146/2015).\n\nI. Considera-se pessoa com deficiência aquela que tem impedimento de longo prazo de natureza física, mental, intelectual ou sensorial, sendo indispensável, para sua caracterização legal, a apresentação de laudo médico emitido por especialista.\nII. A avaliação da deficiência, quando necessária, será biopsicossocial, realizada por equipe multiprofissional e interdisciplinar, considerando os impedimentos nas funções e estruturas do corpo, os fatores socioambientais, psicológicos e pessoais, a limitação no desempenho de atividades e a restrição de participação.\nIII. O cordão de fita com desenhos de girassóis constitui símbolo nacional de identificação das pessoas com deficiências ocultas e, quando utilizado, dispensa a apresentação de documento comprobatório da deficiência perante autoridade competente.\n\nEstá(ão) correta(s) a(s) afirmativa(s)",
+      "explanation": "Apenas II está correta. A LBI adota avaliação biopsicossocial quando necessária e não reduz a definição legal a um laudo de especialista. O cordão de girassóis tem uso opcional e não dispensa comprovação documental quando solicitada.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Disposições preliminares",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "I, apenas."
+        },
+        {
+          "id": "B",
+          "text": "II, apenas."
+        },
+        {
+          "id": "C",
+          "text": "I e III, apenas."
+        },
+        {
+          "id": "D",
+          "text": "III, apenas."
+        },
+        {
+          "id": "E",
+          "text": "I, II e III."
+        }
+      ],
+      "correctOption": "B",
+      "optionExplanations": {
+        "A": "Incorreta. I é falsa: a caracterização legal envolve impedimento de longo prazo em interação com barreiras; o caput não impõe, em todos os casos, laudo de médico especialista (art. 2º).",
+        "B": "Correta. Somente II reproduz o art. 2º, § 1º, com os quatro fatores da avaliação. I acrescenta condição absoluta não prevista e III contraria o art. 2º-A, § 2º.",
+        "C": "Incorreta. I e III são falsas: o laudo de especialista não integra como condição absoluta o conceito legal, e o cordão não dispensa documento comprobatório quando solicitado (arts. 2º e 2º-A, § 2º).",
+        "D": "Incorreta. III é falsa. O cordão identifica deficiências ocultas, mas não substitui a documentação eventualmente solicitada (art. 2º-A, § 2º).",
+        "E": "Incorreta. Somente II é verdadeira; I restringe indevidamente o conceito e III atribui ao cordão um efeito documental que a lei nega."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 2º, caput e § 1º, e 2º-A, §§ 1º e 2º",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 2º, caput e § 1º, e 2º-A, §§ 1º e 2º",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial.",
+        "questaoOriginal": 28,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-unicamp-2026-q29",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Igualdade e não discriminação",
+      "topic": "Capacidade civil e dever de comunicar violações",
+      "statement": "Analise as afirmativas a seguir à luz das disposições sobre igualdade e não discriminação previstas na Lei Brasileira de Inclusão da Pessoa com Deficiência (Lei nº 13.146/2015).\n\nI. Uma estudante com síndrome de Down comunica à professora que deseja ter filhos no futuro. A professora informa-lhe que pessoas com deficiência intelectual são proibidas por lei de exercer direitos sexuais e reprodutivos, bem como de decidir sobre o número de filhos, como forma de proteção à sua integridade.\nII. Um estudante com autismo é vítima de chacotas e apelidos depreciativos por parte de colegas, com a conivência silenciosa de alguns professores. Uma professora da turma presencia os fatos e decide comunicar formalmente à direção da escola e ao Conselho Tutelar, entendendo ser seu dever comunicar qualquer forma de ameaça ou violação aos direitos da pessoa com deficiência.\nIII. Uma estudante com deficiência intelectual de 18 anos comunica à professora que deseja casar-se. A professora explica-lhe que, em razão de sua deficiência intelectual, ela não possui capacidade civil para contrair casamento.\n\nEstá(ão) correta(s) a(s) afirmativa(s)",
+      "explanation": "Apenas II está correta. A deficiência, por si só, não retira a capacidade civil para casar, exercer direitos sexuais e reprodutivos ou decidir sobre filhos. Todos têm o dever de comunicar ameaças e violações aos direitos da pessoa com deficiência.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Igualdade e não discriminação",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "I, apenas."
+        },
+        {
+          "id": "B",
+          "text": "II, apenas."
+        },
+        {
+          "id": "C",
+          "text": "I e III, apenas."
+        },
+        {
+          "id": "D",
+          "text": "III, apenas."
+        },
+        {
+          "id": "E",
+          "text": "I, II e III."
+        }
+      ],
+      "correctOption": "B",
+      "optionExplanations": {
+        "A": "Incorreta. I é falsa: a proibição narrada contraria o art. 6º, II e III, que preserva os direitos sexuais e reprodutivos e a decisão sobre filhos.",
+        "B": "Correta. II expressa o dever de comunicar a violação à autoridade competente, previsto no art. 7º, e a proteção contra discriminação do art. 5º.",
+        "C": "Incorreta. I e III negam direitos preservados pelo art. 6º: direitos reprodutivos e capacidade para casar. Não são consequências automáticas da deficiência intelectual.",
+        "D": "Incorreta. III é falsa. A deficiência não impede, por si só, o casamento, conforme art. 6º, I.",
+        "E": "Incorreta. Apenas II é verdadeira; I e III reproduzem restrições discriminatórias incompatíveis com o art. 6º."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 5º; 6º, I–III; e 7º",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 5º; 6º, I–III; e 7º",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial.",
+        "questaoOriginal": 29,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-unicamp-2026-q30",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Disposições preliminares",
+      "topic": "Associação de conceitos legais de acessibilidade",
+      "statement": "Relacione os conceitos da COLUNA I com as respectivas definições legais, de acordo com a Lei Brasileira de Inclusão da Pessoa com Deficiência (Estatuto da Pessoa com Deficiência — Lei nº 13.146/2015) na COLUNA II.\n\nCOLUNA I\n1. Acessibilidade\n2. Desenho universal\n3. Tecnologia assistiva\n4. Barreiras atitudinais\n5. Adaptações razoáveis\n\nCOLUNA II\n(   ) Concepção de produtos, ambientes, programas e serviços a serem usados por todas as pessoas, sem necessidade de adaptação ou de projeto específico, incluindo os recursos de tecnologia assistiva.\n(   ) Produtos, equipamentos, dispositivos, recursos, metodologias, estratégias, práticas e serviços que objetivem promover a funcionalidade, relacionada à atividade e à participação da pessoa com deficiência ou com mobilidade reduzida.\n(   ) Entraves, obstáculos ou comportamentos que impeçam ou prejudiquem a participação social da pessoa com deficiência em igualdade de condições e oportunidades com as demais pessoas.\n(   ) Possibilidade e condição de alcance para utilização, com segurança e autonomia, de espaços, mobiliários, equipamentos urbanos, edificações, transportes, informação e comunicação.\n(   ) Adaptações, modificações e ajustes necessários e adequados que não acarretem ônus desproporcional e indevido, quando requeridos em cada caso.\n\nAssinale a sequência correta.",
+      "explanation": "A associação correta é 2–3–4–1–5: desenho universal; tecnologia assistiva; barreiras atitudinais; acessibilidade; adaptações razoáveis. O desenho universal atende a todos desde a concepção; a adaptação razoável responde a uma necessidade concreta sem ônus desproporcional e indevido.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Disposições preliminares",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "1 3 4 2 5"
+        },
+        {
+          "id": "B",
+          "text": "2 3 4 1 5"
+        },
+        {
+          "id": "C",
+          "text": "2 3 5 1 4"
+        },
+        {
+          "id": "D",
+          "text": "3 2 4 1 5"
+        },
+        {
+          "id": "E",
+          "text": "2 4 3 1 5"
+        }
+      ],
+      "correctOption": "B",
+      "optionExplanations": {
+        "A": "Incorreta. Inverte acessibilidade e desenho universal nas posições 1 e 4. Concepção para todas as pessoas é desenho universal, item 2 (art. 3º, I e II).",
+        "B": "Correta. Associa as cinco definições aos itens 2, 3, 4, 1 e 5, conforme art. 3º, II, III, IV, e, I e VI.",
+        "C": "Incorreta. A terceira definição é barreira atitudinal, item 4, e a quinta é adaptação razoável, item 5; a alternativa troca essas posições (art. 3º, IV, e, e VI).",
+        "D": "Incorreta. A primeira definição corresponde ao desenho universal, item 2, e a segunda à tecnologia assistiva, item 3 (art. 3º, II e III).",
+        "E": "Incorreta. A segunda definição é tecnologia assistiva, item 3, e a terceira é barreira atitudinal, item 4; a alternativa as inverte (art. 3º, III e IV, e)."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 3º, I, II, III, IV, e, e VI",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 3º, I, II, III, IV, e, e VI",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial.",
+        "questaoOriginal": 30,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-unicamp-2026-q33",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Intérpretes de Libras e alcance do direito à educação",
+      "statement": "Considerando o disposto na Lei Brasileira de Inclusão da Pessoa com Deficiência (Estatuto da Pessoa com Deficiência), acerca da disponibilização de tradutores e intérpretes da Libras e do direito à educação da pessoa com deficiência, assinale a alternativa correta.",
+      "explanation": "Pela literalidade da LBI, a educação básica exige, no mínimo, ensino médio completo e certificado de proficiência em Libras. Para interpretação em salas de graduação e pós-graduação, a lei exige nível superior, prioritariamente em Tradução e Interpretação em Libras. O direito à educação abrange todos os níveis e toda a vida.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Os tradutores e intérpretes da Libras atuantes na educação básica devem, no mínimo, possuir ensino superior completo e certificado de proficiência na Libras."
+        },
+        {
+          "id": "B",
+          "text": "Os tradutores e intérpretes da Libras, quando atuantes nos cursos de graduação e pós-graduação, devem possuir nível superior, com habilitação, prioritariamente, em Tradução e Interpretação em Libras."
+        },
+        {
+          "id": "C",
+          "text": "O direito da pessoa com deficiência à educação assegura o acesso à educação básica, não abrangendo o aprendizado ao longo de toda a vida."
+        },
+        {
+          "id": "D",
+          "text": "É dever do Estado assegurar educação de qualidade à pessoa com deficiência, estando a família, a comunidade escolar e a sociedade isentas de responsabilidade."
+        },
+        {
+          "id": "E",
+          "text": "A educação constitui direito da pessoa com deficiência, devendo o sistema educacional inclusivo ser garantido nos níveis de ensino fundamental e médio."
+        }
+      ],
+      "correctOption": "B",
+      "optionExplanations": {
+        "A": "Incorreta. O art. 28, § 2º, I, enuncia, para a educação básica, ensino médio completo e certificado de proficiência; não o mínimo de ensino superior afirmado.",
+        "B": "Correta. Reproduz a exigência do art. 28, § 2º, II, para interpretação nas salas de graduação e pós-graduação.",
+        "C": "Incorreta. O art. 27 assegura aprendizado ao longo de toda a vida, além de sistema inclusivo em todos os níveis.",
+        "D": "Incorreta. O dever também é da família, da comunidade escolar e da sociedade, conforme art. 27, parágrafo único.",
+        "E": "Incorreta. A LBI não limita o sistema inclusivo ao fundamental e médio; abrange todos os níveis (art. 27)."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 27, caput e parágrafo único, e 28, § 2º, I e II",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 27, caput e parágrafo único, e 28, § 2º, I e II",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial.",
+        "questaoOriginal": 33,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-unicamp-2026-q34",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Processos seletivos e medidas de acessibilidade",
+      "statement": "De acordo com a Lei Brasileira de Inclusão da Pessoa com Deficiência (Lei nº 13.146/2015), acerca das medidas a serem adotadas nos processos seletivos para ingresso e permanência nos cursos oferecidos pelas instituições de ensino superior e de educação profissional e tecnológica, públicas e privadas, assinale a alternativa correta.",
+      "explanation": "As medidas do art. 30 alcançam instituições públicas e privadas. Incluem provas acessíveis, recursos previamente solicitados e escolhidos pelo candidato, dilação de tempo com comprovação da necessidade, critérios sensíveis à singularidade linguística e tradução integral do edital em Libras.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "A dilação de tempo para realização de exames de seleção e atividades acadêmicas é um direito da pessoa com deficiência, mas somente será concedida mediante prévia solicitação, não sendo necessária a comprovação da necessidade, bastando a autodeclaração do candidato."
+        },
+        {
+          "id": "B",
+          "text": "A disponibilização de provas em formatos acessíveis é obrigatória apenas quando houver mais de um candidato com deficiência inscrito para o mesmo curso, evitando-se custos desproporcionais para a instituição de ensino."
+        },
+        {
+          "id": "C",
+          "text": "A tradução completa do edital e de suas retificações em Libras é uma medida obrigatória, devendo ser garantida pelas instituições de ensino superior e de educação profissional e tecnológica, públicas e privadas."
+        },
+        {
+          "id": "D",
+          "text": "Os critérios de avaliação das provas escritas, discursivas ou de redação devem ser uniformes para todos os candidatos, não podendo haver qualquer tipo de diferenciação, ainda que motivada pela singularidade linguística da pessoa com deficiência."
+        },
+        {
+          "id": "E",
+          "text": "A escolha dos recursos de acessibilidade e de tecnologia assistiva a serem disponibilizados ao candidato com deficiência compete à instituição de ensino, que definirá tecnicamente os recursos mais adequados."
+        }
+      ],
+      "correctOption": "C",
+      "optionExplanations": {
+        "A": "Incorreta. O art. 30, V, exige prévia solicitação e comprovação da necessidade, não apenas autodeclaração.",
+        "B": "Incorreta. A obrigação do art. 30, III, não exige número mínimo de candidatos com deficiência.",
+        "C": "Correta. A tradução completa do edital e de suas retificações em Libras é medida expressa do art. 30, VII, aplicável às instituições referidas no caput.",
+        "D": "Incorreta. O art. 30, VI, exige que os critérios considerem a singularidade linguística no domínio do português escrito.",
+        "E": "Incorreta. O art. 30, IV, prevê recursos previamente solicitados e escolhidos pelo candidato, sem atribuir escolha exclusiva à instituição."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 30, III–VII",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 30, III–VII",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial.",
+        "questaoOriginal": 34,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-unicamp-2026-q37",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Cultura, esporte, turismo e lazer",
+      "topic": "Espaços e assentos reservados em eventos",
+      "statement": "De acordo com a Lei Brasileira de Inclusão da Pessoa com Deficiência (Lei nº 13.146/2015), no que se refere à reserva de espaços e assentos para a pessoa com deficiência em teatros, cinemas, auditórios, estádios, ginásios de esporte, locais de espetáculos e de conferências e similares, assinale a alternativa correta.",
+      "explanation": "Os espaços reservados devem ser distribuídos pelo recinto e garantir boa visibilidade e acomodação de ao menos um acompanhante. A ocupação excepcional por outras pessoas depende da ausência comprovada de procura e do regulamento; acessibilidade não autoriza ingresso mais caro.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Cultura, esporte, turismo e lazer",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Os espaços e assentos reservados à pessoa com deficiência devem ser concentrados em um setor do recinto, de modo a facilitar a evacuação em caso de emergência e evitar a dispersão do público."
+        },
+        {
+          "id": "B",
+          "text": "No caso de não haver comprovada procura pelos assentos reservados, esses podem, excepcionalmente, ser ocupados por pessoas sem deficiência ou que não tenham mobilidade reduzida, observado o disposto em regulamento."
+        },
+        {
+          "id": "C",
+          "text": "Os espaços e assentos reservados devem situar-se em locais que garantam a acomodação de, no mínimo, 2 (dois) acompanhantes da pessoa com deficiência ou com mobilidade reduzida, resguardado o direito de se acomodar proximamente a grupo familiar e comunitário."
+        },
+        {
+          "id": "D",
+          "text": "O valor do ingresso da pessoa com deficiência poderá ser superior ao valor cobrado das demais pessoas quando houver necessidade de disponibilização de recursos de acessibilidade adicionais, como legendagem ou audiodescrição."
+        },
+        {
+          "id": "E",
+          "text": "Nos locais referidos no caput do art. 44, as rotas de fuga e saídas de emergência acessíveis são obrigatórias quando a capacidade de lotação da edificação for superior a 500 (quinhentas) pessoas."
+        }
+      ],
+      "correctOption": "B",
+      "optionExplanations": {
+        "A": "Incorreta. O art. 44, § 1º, determina distribuição em locais diversos, não concentração em setor segregado.",
+        "B": "Correta. É a hipótese excepcional expressa do art. 44, § 2º: ausência comprovada de procura, observado o regulamento.",
+        "C": "Incorreta. O mínimo legal é um acompanhante, e não dois; preserva-se a proximidade do grupo familiar e comunitário (art. 44, § 3º).",
+        "D": "Incorreta. O art. 44, § 7º, proíbe ingresso com valor superior ao cobrado das demais pessoas.",
+        "E": "Incorreta. O art. 44, § 4º, exige rotas de fuga e saídas de emergência acessíveis sem o limite de 500 pessoas inventado na alternativa."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 44, §§ 1º–4º e 7º",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 44, §§ 1º–4º e 7º",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial.",
+        "questaoOriginal": 37,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-unicamp-2026-q38",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Acessibilidade",
+      "topic": "Desenho universal, reforma e certificação",
+      "statement": "No âmbito de uma universidade pública, a Pró-Reitoria de Graduação decide reformar o edifício da Faculdade de Educação para instalar um novo laboratório de tecnologia assistiva. Paralelamente, o Departamento de Licitações da instituição abre processo para concessão de uma lanchonete no campus, e a Diretoria de Projetos encaminha à agência de fomento estadual pedido de financiamento para uma linha de pesquisa sobre educação inclusiva. Considerando a sistemática normativa da acessibilidade na Lei nº 13.146/2015 (Estatuto da Pessoa com Deficiência), assinale a alternativa que apresenta a análise correta e coerente.",
+      "explanation": "O desenho universal é regra geral e a adaptação razoável é a solução quando sua adoção comprovadamente não for possível. Reformas e edificações existentes também devem observar acessibilidade; a exigência alcança concessões, alvarás e projetos apoiados por agências públicas de pesquisa.",
+      "difficulty": "hard",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Acessibilidade",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "A aprovação do projeto arquitetônico da reforma do edifício da Faculdade de Educação dispensa a certificação das regras de acessibilidade, pois a edificação pública já existente é regida pela regra da adaptação razoável, que se sobrepõe ao desenho universal nesses casos."
+        },
+        {
+          "id": "B",
+          "text": "A concessão da lanchonete no campus universitário não se sujeita ao cumprimento das normas de acessibilidade, uma vez que a outorga de concessão, permissão, autorização ou habilitação está submetida à legislação de licitações e contratos, não havendo interação com a matéria regulada pela Lei nº 13.146/2015."
+        },
+        {
+          "id": "C",
+          "text": "A linha de pesquisa sobre educação inclusiva encaminhada à agência de fomento estadual não precisa, obrigatoriamente, incluir temas voltados ao desenho universal, pois a determinação do §4º do art. 55 aplica-se aos projetos desenvolvidos com apoio de órgãos federais de fomento à pesquisa, e o pedido aqui se refere a uma agência estadual."
+        },
+        {
+          "id": "D",
+          "text": "A reforma do edifício da Faculdade de Educação deve ser executada de modo a torná-lo acessível, observando-se a regra do desenho universal e, somente quando esta não puder ser empreendida, será adotada adaptação razoável, cumprindo à universidade, após certificada a acessibilidade da edificação ou de seus serviços, providenciar a colocação do símbolo internacional de acesso em locais de ampla visibilidade."
+        },
+        {
+          "id": "E",
+          "text": "A concessão da lanchonete no campus está condicionada à certificação das regras de acessibilidade quando se tratar de edificação nova, pois o §1º do art. 60 estabelece que a renovação de alvará de funcionamento dispensa a observância das regras de acessibilidade para atividades em prédios públicos já existentes."
+        }
+      ],
+      "correctOption": "D",
+      "optionExplanations": {
+        "A": "Incorreta. A reforma deve observar acessibilidade e certificação. A condição de prédio existente não afasta a regra geral do desenho universal (arts. 55, 56 e 57).",
+        "B": "Incorreta. A outorga de concessão, permissão, autorização ou habilitação deve observar acessibilidade, conforme art. 54, II.",
+        "C": "Incorreta. O art. 55, § 4º, refere-se a organismos públicos de auxílio à pesquisa e agências de fomento, sem limitar o dever à esfera federal.",
+        "D": "Correta. Articula os arts. 55, §§ 1º e 2º, e 56, caput e § 3º: acessibilidade na reforma, desenho universal como regra e símbolo de acesso após certificação.",
+        "E": "Incorreta. O art. 60, § 1º, condiciona tanto a concessão como a renovação de alvará às regras de acessibilidade, sem excluir prédios existentes."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 54, I e II; 55, §§ 1º, 2º e 4º; 56, caput e §§ 2º e 3º; 57; e 60, § 1º",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 54, I e II; 55, §§ 1º, 2º e 4º; 56, caput e §§ 2º e 3º; 57; e 60, § 1º",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial.",
+        "questaoOriginal": 38,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-unicamp-2026-q39",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Acessibilidade",
+      "topic": "Informação, comunicação, livros e pesquisa",
+      "statement": "A Lei Brasileira de Inclusão da Pessoa com Deficiência (Lei nº 13.146/2015) estabelece garantias de acessibilidade à informação, à comunicação e à produção e difusão do conhecimento. Considerando as disposições da referida Lei, assinale a alternativa correta.",
+      "explanation": "A acessibilidade informacional alcança sites governamentais e empresariais, livros, informações ao consumidor e eventos científico-culturais. A lei também vincula a pesquisa apoiada pelo poder público à tecnologia assistiva e prevê formação de profissionais de comunicação acessível.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Acessibilidade",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "A obrigatoriedade de acessibilidade nos sítios da internet aplica-se a órgãos de governo federal, sendo facultativa para demais empresas com sede no país, desde que estas disponibilizem um canal de atendimento telefônico para pessoas com deficiência."
+        },
+        {
+          "id": "B",
+          "text": "Ao tratar da acessibilidade em livros, a legislação restringe a obrigatoriedade de formatos acessíveis às publicações da administração pública direta, excluindo as obras financiadas com recursos públicos, uma vez que estas são de natureza privada."
+        },
+        {
+          "id": "C",
+          "text": "A exigência de janela com intérprete da Libras e audiodescrição para serviços de radiodifusão não se estende aos eventos científico-culturais promovidos por instituições privadas, sendo aplicável somente àqueles financiados pelo poder público."
+        },
+        {
+          "id": "D",
+          "text": "Ao tratar da informação ao consumidor com deficiência, a legislação determina que a disponibilização de materiais em formato acessível (como bulas e prospectos) é obrigatória para produtos comercializados em ambiente virtual, ficando os canais físicos isentos dessa responsabilidade."
+        },
+        {
+          "id": "E",
+          "text": "Os programas, as linhas de pesquisa e os projetos desenvolvidos com o apoio de agências de financiamento e de órgãos e entidades da administração pública que atuem no auxílio à pesquisa devem contemplar temas voltados à tecnologia assistiva, cabendo também ao poder público promover a capacitação de tradutores e intérpretes da Libras e de profissionais habilitados em Braille e audiodescrição."
+        }
+      ],
+      "correctOption": "E",
+      "optionExplanations": {
+        "A": "Incorreta. O art. 63 abrange empresas com sede ou representação comercial no país e órgãos de governo; um canal telefônico não cria dispensa.",
+        "B": "Incorreta. O art. 68 inclui publicações da administração e financiadas com recursos públicos, além do incentivo amplo a livros acessíveis.",
+        "C": "Incorreta. O art. 70 impõe recursos mínimos de acessibilidade às instituições promotoras de eventos científico-culturais, sem restringi-los aos financiados pelo poder público.",
+        "D": "Incorreta. O art. 69, § 2º, exige materiais acessíveis mediante solicitação sem isentar fornecedores em canais físicos.",
+        "E": "Correta. Reúne os arts. 72 e 73: temas de tecnologia assistiva em pesquisas apoiadas e capacitação de intérpretes e profissionais habilitados em comunicação acessível."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 63; 67; 68; 69, § 2º; 70–73",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 63; 67; 68; 69, § 2º; 70–73",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial.",
+        "questaoOriginal": 39,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-unicamp-2026-q48",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Educação ao longo da vida e projeto pedagógico",
+      "statement": "Analise as afirmativas a seguir sobre o Estatuto da Pessoa com Deficiência (Lei nº 13.146/2015).\n\nI. A educação constitui direito da pessoa com deficiência, assegurados sistema educacional inclusivo em todos os níveis e aprendizado ao longo de toda a vida, de forma a alcançar o máximo desenvolvimento possível de seus talentos e habilidades físicas, sensoriais, intelectuais e sociais, segundo suas características, interesses e necessidades de aprendizagem.\nII. Os tradutores e intérpretes da Libras atuantes na educação básica, graduação e pós-graduação devem possuir nível superior, com habilitação, prioritariamente, em Tradução e Interpretação em Libras.\nIII. Incumbe ao poder público assegurar projeto pedagógico que institucionalize o atendimento educacional especializado, assim como os demais serviços e adaptações razoáveis, para atender às características dos estudantes com deficiência e garantir o seu pleno acesso ao currículo em condições de igualdade, promovendo a conquista e o exercício de sua autonomia.\n\nEstá correto o que se afirma em:",
+      "explanation": "I e III estão corretas. A educação inclusiva vale para todos os níveis e toda a vida, e o projeto pedagógico deve institucionalizar o AEE e as adaptações razoáveis. II generaliza para a educação básica a exigência de nível superior prevista para graduação e pós-graduação.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "I, apenas."
+        },
+        {
+          "id": "B",
+          "text": "II, apenas."
+        },
+        {
+          "id": "C",
+          "text": "III, apenas."
+        },
+        {
+          "id": "D",
+          "text": "I e III, apenas."
+        },
+        {
+          "id": "E",
+          "text": "I, II e III."
+        }
+      ],
+      "correctOption": "D",
+      "optionExplanations": {
+        "A": "Incorreta. I é verdadeira pelo art. 27, mas III também é verdadeira pelo art. 28, III; a seleção está incompleta.",
+        "B": "Incorreta. II é falsa na literalidade do art. 28, § 2º: os requisitos da educação básica e do ensino superior são distintos.",
+        "C": "Incorreta. III é verdadeira, mas I também; ambas devem ser selecionadas (arts. 27 e 28, III).",
+        "D": "Correta. I reproduz o art. 27 e III reproduz o art. 28, III. II contraria a distinção de escolaridade do § 2º.",
+        "E": "Incorreta. Inclui II, que atribui à educação básica o requisito de ensino superior que o art. 28, § 2º, II, estabelece para graduação e pós-graduação."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 27 e 28, III e § 2º, I e II",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 27 e 28, III e § 2º, I e II",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial.",
+        "questaoOriginal": 48,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-unicamp-2026-q49",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Cultura, esporte, turismo e lazer",
+      "topic": "Acesso a obras e protagonismo cultural",
+      "statement": "Analise as afirmativas a seguir sobre o direito à cultura, ao esporte, ao turismo e ao lazer, previsto na Lei Brasileira de Inclusão da Pessoa com Deficiência (Lei nº 13.146/2015).\n\nI. É vedada a recusa de oferta de obra intelectual em formato acessível à pessoa com deficiência, sob qualquer argumento, inclusive sob a alegação de proteção dos direitos de propriedade intelectual.\nII. O poder público deve promover a participação da pessoa com deficiência em atividades artísticas, intelectuais, culturais, esportivas e recreativas, com vistas ao seu protagonismo, devendo assegurar a participação da pessoa com deficiência em jogos e atividades recreativas, esportivas, de lazer, culturais e artísticas, inclusive no sistema escolar, em igualdade de condições com as demais pessoas.\nIII. A pessoa com deficiência tem direito à cultura, ao esporte, ao turismo e ao lazer em igualdade de oportunidades com as demais pessoas.\n\nEstá correto o que se afirma em:",
+      "explanation": "As três afirmativas estão corretas. A LBI assegura igualdade no acesso à cultura e ao lazer, veda recusa de obra intelectual em formato acessível e exige promoção da participação e do protagonismo, inclusive nas atividades escolares.",
+      "difficulty": "medium",
+      "tags": [
+        "UNICAMP-2026",
+        "Lei nº 13.146/2015",
+        "Cultura, esporte, turismo e lazer",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "I, apenas."
+        },
+        {
+          "id": "B",
+          "text": "II, apenas."
+        },
+        {
+          "id": "C",
+          "text": "III, apenas."
+        },
+        {
+          "id": "D",
+          "text": "I e III, apenas."
+        },
+        {
+          "id": "E",
+          "text": "I, II e III."
+        }
+      ],
+      "correctOption": "E",
+      "optionExplanations": {
+        "A": "Incorreta. I está correta pelo art. 42, § 1º, mas II e III também estão previstas nos arts. 43, III, e 42, caput.",
+        "B": "Incorreta. II está correta pelo art. 43, III, porém não é a única: I e III também são verdadeiras.",
+        "C": "Incorreta. III está correta pelo art. 42, caput, mas a seleção omite I e II, também verdadeiras.",
+        "D": "Incorreta. I e III são verdadeiras, mas II também expressa a participação assegurada no art. 43, III.",
+        "E": "Correta. I corresponde ao art. 42, § 1º; II ao art. 43, III; e III ao art. 42, caput."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 42, caput e § 1º, e 43, III",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UNICAMP",
+      "tag": "UNICAMP-2026",
+      "banca": "FUNCAMP",
+      "cargo": "Profissional de Apoio Universitário — Professor em Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 42, caput e § 1º, e 43, III",
+      "ano": 2026,
+      "fonte": {
+        "prova": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/c8a14bcf-f198-4d89-b67b-a8aea888bc72.pdf",
+        "gabarito": "https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/03932b99-a1cc-4eb3-8b51-15fbe7273e7c.pdf",
+        "editalUrl": "https://funcamp.selecao.net.br/informacoes/56/",
+        "edital": "057/2026",
+        "statusGabarito": "Oficial; conferido com resultado dos recursos de 09/11/2026 (sem anulação deste item)",
+        "observacao": "Prova e gabarito obtidos no portal oficial da FUNCAMP. Resultado dos recursos: https://anexos-r2.selecao.net.br/uploads/782/concursos/56/anexos/5abb9400-7647-4167-a32e-e25378276177.pdf. As anulações publicadas para a questão 23 não atingem este item. Dificuldade editorial.",
+        "questaoOriginal": 49,
+        "dataProva": "2026-09-27",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-ufv-2025-q03",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Adaptações e vedação de cobrança adicional",
+      "statement": "A Lei Brasileira de Inclusão da Pessoa com Deficiência, Lei nº 13.146, de 6 de julho de 2015 (Brasil, 2015), estabelece diretrizes fundamentais para garantir o direito à educação inclusiva. Sobre as disposições dessa lei, analise as assertivas a seguir:\n\nI. É dever do sistema educacional público e privado garantir a educação inclusiva em todos os níveis e modalidades de ensino, com adaptações razoáveis e recursos de acessibilidade para atender às necessidades específicas das pessoas com deficiência.\nII. As instituições privadas de ensino poderão cobrar valores adicionais de estudantes com deficiência caso os serviços de apoio pedagógico especializado ou a efetivação de recursos de acessibilidade exijam adaptações específicas e individualizadas.\nIII. A implementação da educação inclusiva requer a formação continuada dos profissionais de ensino, o uso de recursos de tecnologias assistivas e a oferta de materiais pedagógicos adaptados, que promovam a plena participação do estudante com deficiência.\nIV. O projeto pedagógico deve institucionalizar o Atendimento Educacional Especializado, assim como os demais serviços e adaptações razoáveis, para atender às características dos estudantes com deficiência e garantir o seu pleno acesso ao currículo em condições de igualdade.\n\nEstá CORRETO o que se afirma em:",
+      "explanation": "I, III e IV estão corretas. O projeto pedagógico e a formação docente devem viabilizar a inclusão. II é falsa porque o art. 28, § 1º, proíbe valores adicionais para o cumprimento das obrigações inclusivas nas instituições privadas.",
+      "difficulty": "medium",
+      "tags": [
+        "UFV-2025",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "I, III e IV, apenas."
+        },
+        {
+          "id": "B",
+          "text": "I e IV, apenas."
+        },
+        {
+          "id": "C",
+          "text": "III e IV, apenas."
+        },
+        {
+          "id": "D",
+          "text": "I, II, III e IV."
+        }
+      ],
+      "correctOption": "A",
+      "optionExplanations": {
+        "A": "Correta. I corresponde aos arts. 27 e 28, I–III e § 1º; III aos incisos X–XII; e IV ao inciso III. II viola a proibição de cobrança adicional do § 1º.",
+        "B": "Incorreta. I e IV são verdadeiras, mas III também é, pois a lei prevê formação continuada e recursos de acessibilidade e tecnologia assistiva (art. 28, X–XII).",
+        "C": "Incorreta. III e IV são verdadeiras, mas I também: a obrigação inclusiva alcança instituições públicas e privadas (art. 28, § 1º).",
+        "D": "Incorreta. Inclui II, que admite cobrança vedada expressamente pelo art. 28, § 1º."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — arts. 27 e 28, I–III, X–XII e § 1º",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UFV",
+      "tag": "UFV-2025",
+      "banca": "UFV",
+      "cargo": "Fonoaudiólogo",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — arts. 27 e 28, I–III, X–XII e § 1º",
+      "ano": 2025,
+      "fonte": {
+        "prova": "https://concursos.ufv.br/wp-content/uploads/2025/04/FONOAUDIOLOGO_PROVA.pdf",
+        "gabarito": "https://concursos.ufv.br/wp-content/uploads/2025/04/CPUFV24-7-Gabarito_Fonoaudiologo.pdf",
+        "edital": "07/2024",
+        "statusGabarito": "Gabarito oficial; relatório de recursos consultado, sem anulação ou alteração identificada neste item",
+        "observacao": "Fontes obtidas no portal oficial da UFV. Relatório de recursos: https://concursos.ufv.br/wp-content/uploads/2025/04/CPUFV24-7_Recursos.pdf. Dificuldade editorial.",
+        "questaoOriginal": 3,
+        "paginaProva": 2,
+        "dataProva": "2025-04-06",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-ufv-2025-q04",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Disposições preliminares",
+      "topic": "Conceito legal de deficiência",
+      "statement": "Segundo a Lei Brasileira de Inclusão da Pessoa com Deficiência, Lei nº 13.146, de 6 de julho de 2015 (Brasil, 2015), é CORRETO considerar pessoa com deficiência aquela que:",
+      "explanation": "O art. 2º adota conceito relacional: impedimento de longo prazo e interação com barreiras. Definições baseadas exclusivamente em permanência, anormalidade corporal ou incapacidade de integração não reproduzem esse modelo.",
+      "difficulty": "medium",
+      "tags": [
+        "UFV-2025",
+        "Lei nº 13.146/2015",
+        "Disposições preliminares",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "possui deficiência permanente, que ocorreu ou se estabilizou durante um período de tempo suficiente para não permitir recuperação ou ter probabilidade de que se altere, apesar de novos tratamentos."
+        },
+        {
+          "id": "B",
+          "text": "apresenta perda ou anormalidade de uma estrutura ou função psicológica, fisiológica ou anatômica que gere incapacidade para o desempenho de atividade, dentro do padrão considerado normal para o ser humano."
+        },
+        {
+          "id": "C",
+          "text": "tem uma incapacidade para integração social, necessitando de equipamentos, adaptações, meios ou recursos especiais para que possa receber ou transmitir informações necessárias ao desempenho de função ou atividade a ser exercida."
+        },
+        {
+          "id": "D",
+          "text": "tem impedimento de longo prazo de natureza física, mental, intelectual ou sensorial, o qual, em interação com uma ou mais barreiras, pode obstruir sua participação plena e efetiva na sociedade em igualdade de condições com as demais pessoas."
+        }
+      ],
+      "correctOption": "D",
+      "optionExplanations": {
+        "A": "Incorreta. “Permanente” e ausência de recuperação não são a definição do art. 2º, que usa longo prazo e interação com barreiras.",
+        "B": "Incorreta. Limita o conceito a perda ou anormalidade e incapacidade individual, omitindo a interação com barreiras e a participação em igualdade de condições (art. 2º).",
+        "C": "Incorreta. A necessidade de equipamentos ou recursos especiais não substitui os elementos da definição do art. 2º.",
+        "D": "Correta. Corresponde à definição integral do art. 2º, caput."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 2º, caput",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "UFV",
+      "tag": "UFV-2025",
+      "banca": "UFV",
+      "cargo": "Fonoaudiólogo",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 2º, caput",
+      "ano": 2025,
+      "fonte": {
+        "prova": "https://concursos.ufv.br/wp-content/uploads/2025/04/FONOAUDIOLOGO_PROVA.pdf",
+        "gabarito": "https://concursos.ufv.br/wp-content/uploads/2025/04/CPUFV24-7-Gabarito_Fonoaudiologo.pdf",
+        "edital": "07/2024",
+        "statusGabarito": "Gabarito oficial; relatório de recursos consultado, sem anulação ou alteração identificada neste item",
+        "observacao": "Fontes obtidas no portal oficial da UFV. Relatório de recursos: https://concursos.ufv.br/wp-content/uploads/2025/04/CPUFV24-7_Recursos.pdf. Dificuldade editorial.",
+        "questaoOriginal": 4,
+        "paginaProva": 2,
+        "dataProva": "2025-04-06",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-ifpa-2022-q45",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Educação inclusiva",
+      "topic": "Acessibilidade no ingresso no ensino superior",
+      "statement": "A inclusão educacional de Pessoas com Deficiência (PcD) nas Instituições de Ensino Superior (IES) é uma realidade cada vez mais evidente no Brasil. Para garantir o ingresso dos alunos com deficiência, em especial os alunos surdos, ao ensino superior a Lei Brasileira de Inclusão nº 13.146/2015 garante no art. 30:\n\nI. atendimento preferencial à pessoa com deficiência nas dependências das Instituições de Ensino Superior (IES) e nos serviços;\nII. disponibilização de provas em formatos acessíveis para atendimento às necessidades específicas do candidato com deficiência;\nIII. adoção de critérios de avaliação das provas escritas, discursivas ou de redação que considerem a singularidade linguística da pessoa com deficiência, no domínio da modalidade escrita da língua portuguesa;\nIV. tradução parcial do edital e de suas retificações em Libras.\n\nEstão corretas somente:",
+      "explanation": "I, II e III reproduzem garantias do art. 30. IV é falsa: a tradução do edital e das retificações deve ser completa, não parcial. A questão 45 foi mantida como C no gabarito definitivo, ao contrário da questão 44 do mesmo caderno, que foi anulada e excluída desta seleção.",
+      "difficulty": "medium",
+      "tags": [
+        "IFPA-2022",
+        "Lei nº 13.146/2015",
+        "Educação inclusiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "I, II, III, IV."
+        },
+        {
+          "id": "B",
+          "text": "I, II."
+        },
+        {
+          "id": "C",
+          "text": "I, II, III."
+        },
+        {
+          "id": "D",
+          "text": "I, II, IV."
+        },
+        {
+          "id": "E",
+          "text": "I, III."
+        }
+      ],
+      "correctOption": "C",
+      "optionExplanations": {
+        "A": "Incorreta. Inclui IV, que restringe indevidamente a tradução a parte do edital; o art. 30, VII, exige tradução completa.",
+        "B": "Incorreta. I e II estão corretas, mas III também é garantia expressa do art. 30, VI.",
+        "C": "Correta. I corresponde ao inciso I, II ao inciso III e III ao inciso VI do art. 30; IV contraria o inciso VII.",
+        "D": "Incorreta. Inclui IV, falsa, e omite III, verdadeira (art. 30, VI e VII).",
+        "E": "Incorreta. I e III estão corretas, mas II também reproduz a disponibilização de provas acessíveis do art. 30, III."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 30, I, III, VI e VII",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFPA",
+      "tag": "IFPA-2022",
+      "banca": "IFPA",
+      "cargo": "Professor EBTT — Libras",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 30, I, III, VI e VII",
+      "ano": 2022,
+      "fonte": {
+        "prova": "https://concursos.ifpa.edu.br/ensino/documentos/concursos-publicos-2022/professor-ebtt-edital-n-xx-20xx/provas-gabaritos-professor-ebtt-edital-n-06-2022",
+        "gabarito": "https://concursos.ifpa.edu.br/ensino/documentos/concursos-publicos-2022/professor-ebtt-edital-n-xx-20xx/gabarito/6327-gabarito-definitivo-com-justificativas-de-alterac-a-o/file",
+        "edital": "06/2022",
+        "statusGabarito": "Definitivo oficial — C; versão com justificativas publicada em 01/06/2022",
+        "observacao": "Caderno original de Libras também reproduzido em https://arquivos.qconcursos.com/prova/arquivo_prova/140373/if-pa-2022-if-pa-professor-ebtt-libras-prova.pdf. Conferência no gabarito oficial do IFPA. Dificuldade editorial.",
+        "questaoOriginal": 45,
+        "paginaProva": 20,
+        "paginaGabarito": 21,
+        "dataProva": "2022-05-01",
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-ifsc-2017-q17",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Tecnologia assistiva",
+      "topic": "Recursos e serviços de tecnologia assistiva",
+      "statement": "De acordo com a Lei Brasileira de Inclusão nº 13.146/2015, que define Tecnologia Assistiva como todo o conjunto de recursos e serviços que contribuem para proporcionar ou ampliar habilidades funcionais de pessoas com deficiência e consequentemente promover vida independente e inclusão, marque (V) para as afirmativas verdadeiras e (F), para as falsas.\n\n(   ) Auxílios para a vida diária ou vida prática\n(   ) Comunicação aumentativa e alternativa\n(   ) Caderno brochura\n(   ) Projetos arquitetônicos para acessibilidade\n(   ) Cadeira de rodas\n\nAssinale a alternativa que contém a sequência CORRETA de cima para baixo.",
+      "explanation": "A sequência é V–V–F–V–V. Auxílios para vida diária, comunicação aumentativa e alternativa, projetos de acessibilidade e cadeiras de rodas podem promover funcionalidade, autonomia e participação. Um caderno comum, sem característica assistiva indicada, não é automaticamente tecnologia assistiva. A comunicação aumentativa e alternativa também passou a receber previsões específicas na LBI pela Lei nº 15.249/2025.",
+      "difficulty": "medium",
+      "tags": [
+        "IFSC-2017",
+        "Lei nº 13.146/2015",
+        "Tecnologia assistiva",
+        "Superior"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "V, F, V, F, F."
+        },
+        {
+          "id": "B",
+          "text": "F, V, V, F, F."
+        },
+        {
+          "id": "C",
+          "text": "V, F, F, V, V."
+        },
+        {
+          "id": "D",
+          "text": "V, F, F, V, F."
+        },
+        {
+          "id": "E",
+          "text": "V, V, F, V, V."
+        }
+      ],
+      "correctOption": "E",
+      "optionExplanations": {
+        "A": "Incorreta. A comunicação aumentativa e alternativa é recurso assistivo; o caderno comum não foi caracterizado assim; projetos acessíveis e cadeira de rodas também atendem à finalidade (art. 3º, III).",
+        "B": "Incorreta. Exclui os auxílios de vida diária e inclui um caderno comum sem adaptação, além de excluir projetos acessíveis e cadeira de rodas (art. 3º, III).",
+        "C": "Incorreta. Acerta os demais itens, mas classifica como falsa a comunicação aumentativa e alternativa, que pode constituir tecnologia assistiva (art. 3º, III).",
+        "D": "Incorreta. Comunicação aumentativa e alternativa e cadeira de rodas também integram os recursos assistivos descritos; ambas deveriam ser V (art. 3º, III).",
+        "E": "Correta. A sequência V–V–F–V–V distingue recursos voltados à funcionalidade do mero caderno comum, conforme a definição ampla do art. 3º, III."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 3º, III; arts. 28, XIX, e 62-A (incluídos pela Lei nº 15.249/2025)",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFSC",
+      "tag": "IFSC-2017",
+      "banca": "IFSC",
+      "cargo": "Professor — Educação Especial",
+      "nivelCargo": "Superior",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 3º, III; arts. 28, XIX, e 62-A (incluídos pela Lei nº 15.249/2025)",
+      "ano": 2017,
+      "fonte": {
+        "prova": "https://www.ifsc.edu.br/web/campus-ararangua/concurso-publico-2017",
+        "gabarito": "https://liferay-balanceador.ifsc.edu.br/documents/517516/645698/GABARITOS%2BOFICIAIS.pdf/f80f5201-e2fa-3bfa-07bd-d83b7d25c77c",
+        "edital": "33/2017",
+        "statusGabarito": "Definitivo oficial — E, após revisão de recursos (31/10/2017)",
+        "observacao": "Prova original disponibilizada no portal do IFSC e reproduzida em https://arquivos.qconcursos.com/prova/arquivo_prova/55872/if-sc-2017-if-sc-professor-educacao-especial-prova.pdf. Conferência visual/OCR da página 14 e confronto com gabarito oficial. Dificuldade editorial.",
+        "questaoOriginal": 17,
+        "paginaProva": 14,
+        "paginaGabarito": 1,
+        "consultaEm": "2026-11-24"
+      }
+    },
+    {
+      "id": "lbi-ifsp-2025-q14",
+      "discipline": "Legislação da pessoa com deficiência",
+      "subject": "Ciência e tecnologia",
+      "topic": "Fomento público à ciência, pesquisa e capacitação",
+      "statement": "De acordo com o Título IV (Da Ciência e Tecnologia) da Lei Brasileira de Inclusão (Lei nº 13.146/2015), visando a melhoria da qualidade de vida da pessoa com deficiência e a sua inclusão social, o poder público deve fomentar:\n\nI. o desenvolvimento científico;\nII. a pesquisa e a inovação;\nIII. capacitação tecnológica.\n\nAssinale a alternativa CORRETA:",
+      "explanation": "Os três itens estão corretos: o art. 77 determina fomento ao desenvolvimento científico, à pesquisa, à inovação e à capacitação tecnológica, voltados à qualidade de vida, ao trabalho e à inclusão social da pessoa com deficiência.",
+      "difficulty": "medium",
+      "tags": [
+        "IFSP-2025",
+        "Lei nº 13.146/2015",
+        "Ciência e tecnologia",
+        "Médio"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Estão corretos apenas os itens I e III."
+        },
+        {
+          "id": "B",
+          "text": "Estão corretos os itens I, II e III."
+        },
+        {
+          "id": "C",
+          "text": "Está correto apenas o item II."
+        },
+        {
+          "id": "D",
+          "text": "Estão corretos apenas os itens I e II."
+        }
+      ],
+      "correctOption": "B",
+      "optionExplanations": {
+        "A": "Incorreta. I e III estão previstos, mas II também: o art. 77 inclui expressamente pesquisa e inovação.",
+        "B": "Correta. Os três itens integram o dever de fomento previsto no art. 77, caput.",
+        "C": "Incorreta. II está correto, porém I e III também são expressamente previstos no art. 77.",
+        "D": "Incorreta. O art. 77 não se limita a desenvolvimento científico, pesquisa e inovação: inclui também capacitação tecnológica, item III."
+      },
+      "reference": {
+        "label": "Lei nº 13.146/2015 — art. 77, caput",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm"
+      },
+      "instituicao": "IFSP",
+      "tag": "IFSP-2025",
+      "banca": "IFSP",
+      "cargo": "Assistente em Administração",
+      "nivelCargo": "Médio",
+      "tipo": "Questão de concurso — original",
+      "fundamentoLegal": "Lei nº 13.146/2015 — art. 77, caput",
+      "ano": 2025,
+      "fonte": {
+        "prova": "https://arquivos.qconcursos.com/prova/arquivo_prova/142299/if-sp-2025-if-sp-assistente-em-administracao-prova.pdf",
+        "gabarito": "https://arquivos.qconcursos.com/prova/arquivo_gabarito/142299/if-sp-2025-if-sp-assistente-em-administracao-gabarito.pdf",
+        "edital": "229/2025",
+        "statusGabarito": "Definitivo — comunicado oficial de 20/01/2026, reproduzido pelo Qconcursos",
+        "observacao": "Caderno original do IFSP e Comunicado nº 1/2026 — CONC-IFSP/RET/IFSP consultados em cópias do Qconcursos. O documento identifica expressamente o gabarito definitivo e mantém a questão 14 em B. Sem atribuir ao espelho a condição de portal oficial. Dificuldade editorial.",
+        "questaoOriginal": 14,
+        "paginaGabarito": 1,
+        "consultaEm": "2026-11-24"
+      }
+    }
+  ],
+  "publishedAt": "2026-11-24T17:41:50.179Z"
+}
