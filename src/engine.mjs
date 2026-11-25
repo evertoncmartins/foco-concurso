@@ -2,6 +2,7 @@ import {normalizeQuestionOrigin} from './question-origin.mjs';
 import {bankPresentation} from './bank-names.mjs';
 import {personalBankId,sourceType} from './bank-source.mjs';
 import {deriveProgressLinks,linkedStudyKey,questionIdentity} from './bank-progress.mjs';
+import {validBankId,validSystemBankId} from './bank-id.mjs';
 export const VERSION = 1;
 export const DAY = 86400000;
 export const questionKey = (b, q) => `${b}:${q}`;
@@ -26,10 +27,10 @@ function optionText(value,label){
 }
 export function validateBank(raw) {
   if (!raw || raw.schemaVersion !== 1) throw new Error('schemaVersion deve ser 1. Baixe o modelo JSON.');
-  const bank = {schemaVersion: 1, id: text(raw.id, 'ID do banco', 120), name: text(raw.name, 'Nome'), description: typeof raw.description === 'string' ? raw.description : '', questions: []};
+  const bank = {schemaVersion: 1, id: text(raw.id, 'ID do banco', 134), name: text(raw.name, 'Nome'), description: typeof raw.description === 'string' ? raw.description : '', questions: []};
   if(raw.displayName!=null)bank.displayName=text(raw.displayName,'Nome de exibição');
   if(typeof raw.subtitle==='string')bank.subtitle=raw.subtitle;
-  if (!/^[a-zA-Z0-9_-]+$/.test(bank.id)) throw new Error('ID do banco: use letras, números, _ ou -.');
+  if (!validBankId(bank.id)) throw new Error('ID do banco: use até 120 letras, números, _ ou - (além do prefixo pessoal interno, quando presente).');
   if (!Array.isArray(raw.questions) || !raw.questions.length || raw.questions.length > 5000) throw new Error('O banco deve conter de 1 a 5.000 questões.');
   const ids = new Set();
   bank.questions = raw.questions.map((q, i) => {
@@ -67,14 +68,14 @@ export function validateEvents(document) {
       return {...e,event:original};
     }
     if (e.type === 'bank') return {...e, bank: validateBank(e.bank)};
-    if(e.type==='system-bank-snapshot'){const bank=validateBank(e.bank);if(!/^lei-[1-9]\d*$/.test(bank.id)||typeof e.revision!=='string'||!e.revision)throw new Error('Versão histórica de banco inválida.');return {...e,bank:{...bank,revision:e.revision,sourceType:'system'}};}
+    if(e.type==='system-bank-snapshot'){const bank=validateBank(e.bank);if(!validSystemBankId(bank.id)||typeof e.revision!=='string'||!e.revision)throw new Error('Versão histórica de banco inválida.');return {...e,bank:{...bank,revision:e.revision,sourceType:'system'}};}
     if (e.type === 'bank-state'||e.type==='system-bank-state') { if (typeof e.bankId !== 'string' || !(e.type==='system-bank-state'?['enabled','disabled']:['enabled','disabled','deleted']).includes(e.value)) throw new Error('Estado de banco inválido.'); }
-    else if(e.type==='system-bank-preference'){if(typeof e.bankId!=='string'||!/^lei-[1-9]\d*$/.test(e.bankId)||!['enabled','disabled','hidden'].includes(e.value))throw new Error('Preferência pessoal de banco inválida.');}
-    else if(e.type==='bank-metadata'){text(e.bankId,'Banco');text(e.displayName,'Nome de exibição');}
+    else if(e.type==='system-bank-preference'){if(!validSystemBankId(e.bankId)||!['enabled','disabled','hidden'].includes(e.value))throw new Error('Preferência pessoal de banco inválida.');}
+    else if(e.type==='bank-metadata'){text(e.bankId,'Banco');text(e.displayName,'Nome de exibição');if(e.sourceType!=null&&!['personal','system'].includes(e.sourceType))throw new Error('Origem do banco inválida.');}
     else if(e.type==='bank-progress-link'||e.type==='bank-progress-unlink'){
-      if(typeof e.fromBankId!=='string'||!/^[\w-]{1,120}$/.test(e.fromBankId))throw new Error('Banco de origem da associação inválido.');
+      if(!validBankId(e.fromBankId))throw new Error('Banco de origem da associação inválido.');
       if(e.type==='bank-progress-link'){
-        if(typeof e.toBankId!=='string'||!/^lei-[1-9]\d*$/.test(e.toBankId)||e.fromBankId===e.toBankId||typeof e.fromEventId!=='string'||!e.fromEventId||e.fromEventId.length>300||typeof e.toRevision!=='string'||!e.toRevision)throw new Error('Destino da associação inválido.');
+        if(!validSystemBankId(e.toBankId)||e.fromBankId===e.toBankId||typeof e.fromEventId!=='string'||!e.fromEventId||e.fromEventId.length>300||typeof e.toRevision!=='string'||!e.toRevision)throw new Error('Destino da associação inválido.');
         if(!Array.isArray(e.questions)||!e.questions.length||e.questions.length>5000||e.questions.some(q=>!q||typeof q.from!=='string'||typeof q.to!=='string'||!/^[\w-]{1,120}$/.test(q.from)||!/^[\w-]{1,120}$/.test(q.to))||new Set(e.questions.map(q=>q.from)).size!==e.questions.length||new Set(e.questions.map(q=>q.to)).size!==e.questions.length)throw new Error('Questões da associação inválidas.');
       }
     }
@@ -108,12 +109,21 @@ export function mergeEvents(...collections) {
   return [...map.values()].sort((a,b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id));
 }
 export function derive(events, now = Date.now(), systemBanks=[]) {
-  const banks = new Map(), states = new Map(), nativePreferences=new Map(), metadata=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], flagEvents=[],bankHistory=[], sessionUpdatedAt=new Map();
+  const banks = new Map(), states = new Map(), nativePreferences=new Map(), metadata=new Map(), nativeMetadata=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], flagEvents=[],bankHistory=[], sessionUpdatedAt=new Map();
   const ordered=mergeEvents(events),progressEpoch=ordered.findLast(e=>e.type==='progress-reset')?.id??null;
   // Deletion wins over later/offline session snapshots and old backups. Keep
   // answers in the progress journal; this operation removes only the session.
   const deletedSessions=new Set(ordered.filter(e=>e.type==='session'&&e.session.deleted===true&&studyEpoch(e)===progressEpoch).map(e=>e.session.id));
-  const aliases=new Map(ordered.filter(e=>e.type==='bank'&&personalBankId(e.bank.id)!==e.bank.id).map(e=>[e.bank.id,personalBankId(e.bank.id)]));
+  const systemIds=new Set(systemBanks.map(b=>b.id));
+  const rememberPersonalId=id=>{if(typeof id==='string'&&id.startsWith('personal_bank_'))systemIds.add(id.slice('personal_bank_'.length));};
+  for(const e of ordered){
+    if(e.type==='system-bank-snapshot')systemIds.add(e.bank.id);
+    if(e.sourceType==='system'&&e.bankId)systemIds.add(e.bankId);
+    if(e.type==='bank')rememberPersonalId(e.bank.id);
+    rememberPersonalId(e.bankId);if(e.key)rememberPersonalId(e.key.split(':')[0]);
+    if(e.type==='session')for(const [key,value] of Object.entries(e.session.questionSources||{})){if(value.sourceType==='system')systemIds.add(value.bankId);else{rememberPersonalId(value.bankId);rememberPersonalId(key.split(':')[0]);}}
+  }
+  const aliases=new Map(ordered.filter(e=>e.type==='bank'&&personalBankId(e.bank.id,systemIds)!==e.bank.id).map(e=>[e.bank.id,personalBankId(e.bank.id,systemIds)]));
   const keyAlias=(key,origin)=>origin==='system'?key:aliases.has(key.split(':')[0])?`${aliases.get(key.split(':')[0])}${key.slice(key.indexOf(':'))}`:key;
   for (const e of ordered) {
     // Retired generations stay inactive even when an old device has a fast clock.
@@ -122,7 +132,7 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
     if(e.type==='system-bank-snapshot')bankHistory.push({...e,bank:{...e.bank,bankId:e.bank.id,sourceType:'system'}});
     if (e.type === 'bank-state') states.set(aliases.get(e.bankId)||e.bankId, e.value);
     if(e.type==='system-bank-preference')nativePreferences.set(e.bankId,e.value);
-    if(e.type==='bank-metadata')metadata.set(aliases.get(e.bankId)||e.bankId,e.displayName);
+    if(e.type==='bank-metadata'){if(e.sourceType==='system')nativeMetadata.set(e.bankId,e.displayName);else metadata.set(aliases.get(e.bankId)||e.bankId,e.displayName);}
     if (e.type === 'session') {sessions.set(e.session.id,e.session);sessionUpdatedAt.set(e.session.id,e.at);}
     if (e.type === 'flag') flagEvents.push({...e,key:keyAlias(e.key,e.sourceType)});
     if (e.type === 'answer') {
@@ -136,7 +146,7 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
     const s=structuredClone(value),sources=s.questionSources||{};
     s.queue=s.queue.map(k=>keyAlias(k,sources[k]?.sourceType));
     for(const field of ['answers','drafts','eliminatedOptions'])if(s[field])s[field]=Object.fromEntries(Object.entries(s[field]).map(([k,v])=>[keyAlias(k,sources[k]?.sourceType),v]));
-    if(s.questionSources)s.questionSources=Object.fromEntries(Object.entries(sources).map(([k,v])=>[keyAlias(k,v.sourceType),v]));
+    if(s.questionSources)s.questionSources=Object.fromEntries(Object.entries(sources).map(([k,v])=>[keyAlias(k,v.sourceType),v.sourceType!=='system'&&aliases.has(v.bankId)?{...v,bankId:aliases.get(v.bankId)}:v]));
     sessions.set(id,s);
   }
   const links=deriveProgressLinks(ordered,bankHistory,systemBanks);
@@ -153,10 +163,10 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
     if(progress.has(link.key))progress.set(key,progress.get(link.key));if(flags.has(link.key))flags.set(key,flags.get(link.key));
   }
   const personal=[...banks.values()].filter(b => states.get(b.id) !== 'deleted').map(b=>({...b,displayName:metadata.get(b.id)||bankPresentation(b).title,enabled:!links.banks.has(b.id)&&states.get(b.id)!=='disabled',linkedTo:links.banks.get(b.id)||null}));
-  for(const event of bankHistory){const custom=metadata.get(event.bank.id);if(custom)event.bank={...event.bank,displayName:custom};}
+  for(const event of bankHistory){const custom=(event.type==='system-bank-snapshot'?nativeMetadata:metadata).get(event.bank.id);if(custom)event.bank={...event.bank,displayName:custom};}
   // Legacy per-account state events stay in the journal. System availability
   // now follows the administrator's published catalog for every account.
-  const native=systemBanks.map(b=>({...b,bankId:b.id,sourceType:'system',editable:false,removable:false,personalState:nativePreferences.get(b.id)||'enabled',enabled:b.active!==false&&(!nativePreferences.has(b.id)||nativePreferences.get(b.id)==='enabled')}));
+  const native=systemBanks.map(b=>({...b,displayName:nativeMetadata.get(b.id)||b.displayName,bankId:b.id,sourceType:'system',editable:false,removable:false,personalState:nativePreferences.get(b.id)||'enabled',enabled:b.active!==false&&(!nativePreferences.has(b.id)||nativePreferences.get(b.id)==='enabled')}));
   const visibleBanks=[...native.filter(b=>b.personalState!=='hidden'),...personal];
   const questions = [...native,...personal].flatMap(b => b.questions.map(q => ({...q, key:questionKey(b.id,q.id), bankId:b.id, bankName:b.displayName||b.name, displayName:b.displayName||b.name,sourceType:b.sourceType,bankRevision:b.revision||null,enabled:b.enabled})));
   const available=new Set(questions.map(q=>q.key)),needed=new Set([...sessions.values()].filter(s=>!s.completed&&!s.abandoned).flatMap(s=>s.queue));
@@ -166,7 +176,7 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
   const uniqueQuestions=[...new Map(questions.map(q=>[q.progressKey,q])).values()];
   const correct = answers.filter(e => e.correct).length;
   const stats = {attempts:answers.length, correct, wrong:answers.length-correct, accuracy:answers.length?Math.round(correct/answers.length*100):0, answered:uniqueQuestions.filter(q=>progress.has(q.progressKey)).length, pending:uniqueQuestions.filter(q=>!progress.has(q.progressKey)).length, errors:uniqueQuestions.filter(q=>progress.get(q.progressKey)?.lastCorrect===false).length, favorites:uniqueQuestions.filter(q=>flags.get(q.progressKey)?.favorite).length, review:uniqueQuestions.filter(q=>flags.get(q.progressKey)?.review || (progress.has(q.progressKey)&&Date.parse(progress.get(q.progressKey).due)<=now)).length};
-  return {banks:visibleBanks,systemBanks:native,personalBanks:personal,questions,progress,flags,answers,sessions:[...sessions.values()],stats,progressEpoch,bankHistory,sessionUpdatedAt,deletedSessions,bankLinks:links.banks,progressLinks:links.keys};
+  return {banks:visibleBanks,systemBanks:native,systemBankIds:systemIds,personalBanks:personal,questions,progress,flags,answers,sessions:[...sessions.values()],stats,progressEpoch,bankHistory,sessionUpdatedAt,deletedSessions,bankLinks:links.banks,progressLinks:links.keys};
 }
 export function filterQuestions(model, options, now = Date.now()) {
   return model.questions.filter(q => {

@@ -11,6 +11,13 @@ test('loading aguarda a revisão exata, a ativação e a confirmação administr
   assert(stages.some(s=>s.percent===55));assert(stages.some(s=>s.percent===80));
 });
 
+test('renomeação também sincroniza banco desativado sem reativá-lo',async()=>{
+  let applied=false;const bank={id:'decreto-12345',revision:'renamed',active:false};
+  const catalog={banks:[],async check(){this.available={banks:[bank]};},apply(){applied=true;}};
+  assert.equal(await waitForPublishedBank({catalog,id:bank.id,revision:bank.revision,requireActive:false}),bank);
+  assert(applied);assert.equal(bank.active,false);
+});
+
 test('falha de consulta é recuperável; limite de espera informa que não se deve reenviar',async()=>{
   let calls=0,applied=false;
   const catalog={banks:[],async check(){calls++;throw new Error('offline');},apply(){applied=true;}};

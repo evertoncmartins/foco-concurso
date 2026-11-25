@@ -2,9 +2,9 @@ import {questionIdentity} from './bank-progress.mjs';
 export const sourceType=value=>value?.sourceType==='system'?'system':'personal';
 export const sourceLabel=value=>sourceType(value)==='system'?'Sistema':'Pessoal';
 export const sourceTag=value=>`<span class="bank-source ${sourceType(value)}"${value?.associatedFrom?' title="Progresso associado ao Sistema; registro original Pessoal." aria-label="Sistema, com progresso associado de um banco Pessoal"':''}>${sourceLabel(value)}</span>`;
-export const personalBankId=id=>/^lei-\d+$/.test(id)?`personal_bank_${id}`:id;
+export const personalBankId=(id,systemIds=new Set())=>/^lei-\d+$/.test(id)||systemIds.has(id)?`personal_bank_${id}`:id;
 export function questionSource(question){return {bankId:question.bankId,sourceType:sourceType(question),displayName:question.displayName||question.bankName||'',...(question.bankRevision?{bankRevision:question.bankRevision}:{})};}
-export function preparePersonalBank(bank){return {...bank,id:personalBankId(bank.id),sourceType:'personal'};}
+export function preparePersonalBank(bank,systemIds){return {...bank,id:personalBankId(bank.id,systemIds),sourceType:'personal'};}
 // Presentation only. Keep original keys, questionSources and answer origins in
 // the journal; display the verified association's current native destination.
 export function studyPresentation(model,value){

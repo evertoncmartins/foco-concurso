@@ -3,10 +3,10 @@ import publicConfig from '../public/app-config.json' with {type:'json'};
 import {LEGACY_SYSTEM_BANK_IDS,SYSTEM_BANK_UPLOAD_LIMIT} from '../src/bank-management.mjs';
 import {repositoryCatalog,repositoryBanksDirectory,repositoryBank} from './repository-banks.mjs';
 import {BankAssignments} from './bank-assignments.mjs';
+import {validSystemBankId as validId} from '../src/bank-id.mjs';
 
 const ORIGIN='https://foco-concurso-wine.vercel.app',MIRROR='https://foco-concursos.ecmdigital.chatgpt.site';
 const REPOSITORY='evertoncmartins/foco-concurso',PATH='public/data/question-banks/';
-const validId=id=>typeof id==='string'&&/^lei-[1-9]\d*$/.test(id);
 const problem=(message,status=503)=>Object.assign(new Error(message),{status});
 
 export function createBankManagementHandler({env=process.env,fetcher=globalThis.fetch,registry=new BankAssignments({env,fetcher}),directory=repositoryBanksDirectory}={}){
@@ -55,11 +55,11 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
     const raw=JSON.parse(content.toString('utf8').replace(/^\uFEFF/,''));
     return {path,file,raw,bank:repositoryBank(raw,`${id}.json`)};
   }
-  async function publishBank(id,raw,{create=false,sha}={}){
+  async function publishBank(id,raw,{create=false,sha,message}={}){
     const operation=randomUUID(),reservation=await registry.reservePublication(id,operation,{create});
     if(!reservation.reserved)throw problem('Este banco tem uma alteração em processamento. Sincronize o catálogo antes de continuar.',409);
     let response;
-    try{response=await github(`contents/${PATH}${id}.json`,'PUT',{message:create?`Publica banco do Sistema ${id}`:`${raw.active===false?'Desativa':'Ativa'} banco do Sistema ${id}`,content:Buffer.from(JSON.stringify(raw,null,2)+'\n').toString('base64'),branch:'main',...(sha?{sha}:{})});}
+    try{response=await github(`contents/${PATH}${id}.json`,'PUT',{message:message||(create?`Publica banco do Sistema ${id}`:`${raw.active===false?'Desativa':'Ativa'} banco do Sistema ${id}`),content:Buffer.from(JSON.stringify(raw,null,2)+'\n').toString('base64'),branch:'main',...(sha?{sha}:{})});}
     catch{throw problem('A confirmação do envio ficou pendente. O banco permanece bloqueado para novas sessões até a conferência.');}
     if(!response.ok){
       if([400,401,403,404,409,422].includes(response.status))await registry.finish(id,operation,{release:!reservation.previousDeleted});
@@ -89,12 +89,12 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
       if(body.action==='create'){
         if(!user.admin)throw problem('Somente a administração pode enviar bancos do Sistema.',403);
         if(!publication)throw problem('A publicação do Sistema ainda não foi configurada.');
-        if(!validId(body.bank?.id))throw problem('Use um ID de banco no formato lei-NUMERO.',400);
+        if(!validId(body.bank?.id))throw problem('ID do banco: use até 120 letras, números, _ ou -. index e o prefixo personal_bank_ são reservados.',400);
         let bank;try{bank=repositoryBank(body.bank,`${body.bank.id}.json`);}catch(error){throw problem(error.message,400);}
         const existing=await github(`contents/${PATH}${bank.id}.json?ref=main`,'GET',undefined,'application/vnd.github.object+json');
-        if(existing.ok)throw problem('Já existe um banco desta lei no Sistema. O envio não substitui bancos existentes.',409);
+        if(existing.ok||banks.some(b=>b.id!==bank.id&&b.id.toLowerCase()===bank.id.toLowerCase()))throw problem('Já existe um banco com este ID no Sistema. O envio não substitui bancos existentes.',409);
         if(existing.status!==404)throw problem('Não foi possível verificar se o banco já existe no GitHub.');
-        const document={schemaVersion:bank.schemaVersion,id:bank.id,name:bank.name,subtitle:bank.subtitle,description:bank.description,questions:bank.questions,publishedAt:typeof body.bank.publishedAt==='string'&&Number.isFinite(Date.parse(body.bank.publishedAt))?bank.publishedAt:new Date().toISOString(),...(bank.active===false?{active:false}:{})};
+        const document={schemaVersion:bank.schemaVersion,id:bank.id,name:bank.name,...(body.bank.displayName?{displayName:bank.displayName}:{}),subtitle:bank.subtitle,description:bank.description,questions:bank.questions,publishedAt:typeof body.bank.publishedAt==='string'&&Number.isFinite(Date.parse(body.bank.publishedAt))?bank.publishedAt:new Date().toISOString(),...(bank.active===false?{active:false}:{})};
         return reply({created:true,...await publishBank(bank.id,document,{create:true})});
       }
       if(Buffer.byteLength(text)>8192)throw problem('Solicitação muito grande.',413);
@@ -106,6 +106,14 @@ export function createBankManagementHandler({env=process.env,fetcher=globalThis.
         if(!tracking)throw problem('O controle de atribuições ainda não foi ativado.');
         if(!await registry.assign(requested,user.sub))throw problem('Um banco foi desativado ou está em alteração. Sincronize antes de estudar.',409);
         return reply({assigned:true});
+      }
+      if(body.action==='rename'){
+        if(!user.admin)throw problem('Somente a administração pode renomear bancos para todos.',403);
+        if(!publication)throw problem('A publicação do Sistema ainda não foi configurada.');
+        if(!validId(body.bankId)||typeof body.revision!=='string'||body.revision.length>128||typeof body.displayName!=='string'||!body.displayName.trim())throw problem('Banco, revisão ou nome inválido.',400);
+        const {raw,file,bank}=await readBank(body.bankId);
+        if(bank.revision!==body.revision)throw problem('O banco foi atualizado. Sincronize antes de renomear.',409);
+        return reply({updated:true,...await publishBank(bank.id,{...raw,displayName:body.displayName.trim()},{sha:file.sha,message:`Renomeia card do Sistema ${bank.id}`})});
       }
       if(body.action==='set-active'){
         if(!user.admin)throw problem('Somente a administração pode ativar ou desativar bancos do Sistema.',403);

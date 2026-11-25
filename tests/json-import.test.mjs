@@ -69,6 +69,8 @@ test('JSON Schema limita apenas os IDs técnicos, não os conteúdos textuais',a
     for(const [key,item] of Object.entries(value))inspect(item,`${path}/${key}`);
   }
   inspect(schema);
-  assert.deepEqual(limits,[['/properties/id',120],['/$defs/question/properties/id',120]]);
+  assert.deepEqual(limits,[['/properties/id',134],['/$defs/question/properties/id',120]]);
+  const bankId=new RegExp(schema.properties.id.pattern);
+  assert(!bankId.test('x'.repeat(121)));assert(bankId.test('personal_bank_'+'x'.repeat(120)));
   assert.deepEqual(schema.$defs.question.properties.options.items.properties.text.anyOf,[{$ref:'#/$defs/longText'},{type:'number'}]);
 });

@@ -71,4 +71,8 @@ export class BankManagement{
     if(!this.presentation(bank.id)?.canToggle)throw new Error('Apenas a administração pode ativar ou desativar bancos do Sistema.');
     return this.request(auth,{method:'POST',body:{action:'set-active',bankId:bank.id,revision:bank.revision,active}});
   }
+  async rename(bank,displayName,auth){
+    if(!this.presentation(bank.id)?.canToggle)throw new Error('Somente a administração pode renomear bancos para todos.');
+    return this.request(auth,{method:'POST',body:{action:'rename',bankId:bank.id,revision:bank.revision,displayName}});
+  }
 }

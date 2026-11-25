@@ -20,7 +20,7 @@ export async function syncImportedBank(drive,{current=()=>true,sleep=ms=>new Pro
 
 // The POST only confirms the repository commit. Wait for the exact public
 // revision and the administration service before enabling study in this tab.
-export async function waitForPublishedBank({catalog,id,revision,current=()=>true,inspect=async()=>true,onProgress=()=>{},sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms)),attempts=60,interval=3000,maxWait=180000,now=Date.now}){
+export async function waitForPublishedBank({catalog,id,revision,requireActive=true,current=()=>true,inspect=async()=>true,onProgress=()=>{},sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms)),attempts=60,interval=3000,maxWait=180000,now=Date.now}){
   if(!revision)throw new Error('O envio foi recebido, mas a versão publicada não foi confirmada. Sincronize o catálogo antes de reenviar.');
   const deadline=now()+maxWait;
   for(let attempt=0;attempt<attempts;attempt++){
@@ -29,7 +29,7 @@ export async function waitForPublishedBank({catalog,id,revision,current=()=>true
     onProgress({percent:55,message:'Aguardando a publicação…',detail:'O envio foi recebido. Estamos conferindo a disponibilidade do banco.'});
     try{
       await catalog.check();if(!current())return null;
-      const bank=(catalog.available?.banks||catalog.banks).find(b=>b.id===id&&b.revision===revision&&b.active!==false);
+      const bank=(catalog.available?.banks||catalog.banks).find(b=>b.id===id&&b.revision===revision&&(!requireActive||b.active!==false));
       if(bank){
         onProgress({percent:80,message:'Habilitando e sincronizando…',detail:'Conferindo o banco publicado para liberar novas sessões.'});
         const ready=await inspect();if(!current())return null;

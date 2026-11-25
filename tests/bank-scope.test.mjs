@@ -34,7 +34,7 @@ test('preferência pessoal nunca reativa banco desativado globalmente; eventos a
   await store.add([{type:'system-bank-preference',bankId:native.id,value:'enabled'},{type:'system-bank-state',bankId:native.id,value:'enabled'}]);
   assert.equal(store.model().banks[0].enabled,false);assert.equal(filterQuestions(store.model(),{mode:'random'}).length,0);
   store.setSystemBanks([native]);await store.add([{type:'system-bank-state',bankId:native.id,value:'disabled'}]);assert.equal(store.model().banks[0].enabled,true);
-  for(const item of [{bankId:'personal',value:'hidden'},{bankId:native.id,value:'deleted'}])assert.throws(()=>validateEvents({schemaVersion:1,events:[{id:'bad',at:new Date().toISOString(),type:'system-bank-preference',...item}]}),/Preferência/);
+  for(const item of [{bankId:'../personal',value:'hidden'},{bankId:native.id,value:'deleted'}])assert.throws(()=>validateEvents({schemaVersion:1,events:[{id:'bad',at:new Date().toISOString(),type:'system-bank-preference',...item}]}),/Preferência/);
 });
 
 test('seletor informa os dois alcances, oferece cancelamento e explica opção global bloqueada',()=>{

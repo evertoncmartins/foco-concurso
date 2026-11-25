@@ -145,7 +145,7 @@ test('revisão expressa libera só a retenção antiga da lei escolhida e nunca 
 test('revisão desatualizada e caminhos inválidos não chegam à exclusão',async t=>{
   const app=await fixture(t);
   assert.equal((await app.handler(request({action:'delete',bankId:bank.id,revision:'old'}))).status,409);
-  for(const id of ['../lei-12345','lei-12345.json','Lei-12345'])assert.equal((await app.handler(request({action:'delete',bankId:id,revision:bank.revision}))).status,400);
+  for(const id of ['../lei-12345','lei-12345.json','nome com espaços','index','personal_bank_reserved'])assert.equal((await app.handler(request({action:'delete',bankId:id,revision:bank.revision}))).status,400);
   assert(!app.calls.some(c=>c[0]==='reserve'));
   assert.equal((await app.handler(request({action:'assign',bankIds:['lei-99999']}))).status,409);
 });
@@ -241,7 +241,7 @@ test('envio do Sistema valida privilégio e conteúdo, cria na main sem sobrescr
     assert([401,403,503].includes((await denied.handler(request({action:'create',bank:raw}))).status));
     assert(!denied.calls.some(c=>c[0]==='github'));
   }
-  for(const change of [value=>value.id='../other',value=>value.name='Lei nº 9.394/1996',value=>delete value.questions[0].optionExplanations,value=>value.active='false',value=>value.questions[0].reference.url='https://example.test']){
+  for(const change of [value=>value.id='../other',value=>value.name=' ',value=>delete value.questions[0].optionExplanations,value=>value.active='false',value=>value.questions[0].reference.url='https://example.test']){
     const value=structuredClone(raw);change(value);const invalid=await fixture(t,{fileStatus:404});
     assert.equal((await invalid.handler(request({action:'create',bank:value}))).status,400);assert.equal(invalid.calls.length,0);
   }
@@ -290,4 +290,41 @@ test('adapter publica e altera disponibilidade com operações atômicas, manten
   await registry.finishPublication(bank.id,'operation',false);
   assert.equal(calls[0][1],PUBLISH_SCRIPT);assert.equal(calls[1][1],ACTIVATE_SCRIPT);
   assert.equal(calls[1].at(-1),'disabled');assert(!JSON.stringify(calls).includes(':users'));
+});
+
+test('decreto e tema livre passam por publicação, atribuição, disponibilidade e exclusão',async t=>{
+  for(const [id,name] of [['decreto-12345','Decreto nº 12.345/2026'],['Portugues_2026','Português — revisão geral']]){
+    const source={...raw,id,name,displayName:'Nome escolhido para o card'};
+    const upload=await fixture(t,{bank:source,fileStatus:404});
+    assert.equal((await upload.handler(request({action:'create',bank:source}))).status,200);
+    const put=upload.calls.find(c=>c[0]==='github'&&c[1]==='PUT');
+    const document=JSON.parse(Buffer.from(put[3].content,'base64'));
+    assert.equal(document.name,name);assert.equal(document.displayName,source.displayName);
+    assert(put[2].endsWith(`/${id}.json`));
+    const active=await fixture(t,{bank:source});
+    assert.equal((await active.handler(request({action:'assign',bankIds:[id]}))).status,200);
+    assert.equal((await active.handler(request({action:'set-active',bankId:id,revision:active.bank.revision,active:false}))).status,200);
+    assert.equal((await active.handler(request({action:'assign',bankIds:[id]}))).status,409);
+    assert.equal((await active.handler(request({action:'delete',bankId:id,revision:active.bank.revision}))).status,409);
+    const unused=await fixture(t,{bank:source});
+    assert.equal((await unused.handler(request({action:'delete',bankId:id,revision:unused.bank.revision}))).status,200);
+  }
+});
+
+test('renomeação global exige admin e revisão atual; preserva conteúdo, ID, estado e atribuições',async t=>{
+  const source={...raw,id:'decreto-8112',name:'Decreto nº 8.112/2013',active:false};
+  const app=await fixture(t,{bank:source});app.members.add('existing-user');
+  const response=await app.handler(request({action:'rename',bankId:source.id,revision:app.bank.revision,displayName:'Decreto — meu nome livre'}));
+  assert.equal(response.status,200);
+  const result=await response.json(),put=app.calls.find(c=>c[0]==='github'&&c[1]==='PUT'),document=JSON.parse(Buffer.from(put[3].content,'base64'));
+  assert.deepEqual(document,{...source,displayName:'Decreto — meu nome livre'});
+  assert.equal(put[3].sha,app.sha);assert.equal(put[3].branch,'main');
+  assert.equal(result.revision,repositoryBank(document,`${source.id}.json`).revision);
+  assert.notEqual(result.revision,app.bank.revision);assert.equal(app.members.size,1);assert(app.disabled.has(source.id));
+  for(const settings of [{email:'user@example.test'},{stale:true},{blank:true},{env:{BANK_GITHUB_TOKEN:''}}]){
+    const denied=await fixture(t,{bank:source,...settings});
+    const reply=await denied.handler(request({action:'rename',bankId:source.id,revision:settings.stale?'old':denied.bank.revision,displayName:settings.blank?' ':'Novo nome'}));
+    assert.equal(reply.status,settings.stale?409:settings.blank?400:settings.email?403:503);
+    assert(!denied.calls.some(c=>c[0]==='reservePublication'));
+  }
 });

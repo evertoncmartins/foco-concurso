@@ -15,13 +15,18 @@
     },
     "id": {
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_-]+$",
+      "pattern": "^(?:[a-zA-Z0-9_-]{1,120}|personal_bank_[a-zA-Z0-9_-]{1,120})$",
       "minLength": 1,
-      "maxLength": 120
+      "maxLength": 134
     },
     "name": {
       "type": "string",
       "minLength": 1
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Título livre exibido no card, preservando o nome original e o ID."
     },
     "description": {
       "type": "string"
@@ -301,6 +306,9 @@
         },
         {
           "properties": {
+            "id": {
+              "pattern": "^(?![iI][nN][dD][eE][xX]$)(?![pP][eE][rR][sS][oO][nN][aA][lL]_[bB][aA][nN][kK]_)[a-zA-Z0-9_-]{1,120}$"
+            },
             "active": {
               "type": "boolean",
               "default": true,

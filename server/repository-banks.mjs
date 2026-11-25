@@ -4,6 +4,7 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {canonicalJSON} from '../src/engine.mjs';
 import {validateSystemBank,requireNativeFeedback} from '../src/system-banks.mjs';
+import {validSystemBankId} from '../src/bank-id.mjs';
 
 export const repositoryBanksDirectory=fileURLToPath(new URL('../public/data/question-banks/',import.meta.url));
 const digest=value=>createHash('sha256').update(canonicalJSON(value)).digest('hex');
@@ -18,12 +19,14 @@ export function repositoryBank(raw,file){
 
 // The directory is the source of truth. No hand-maintained index or storage service.
 export function repositoryCatalog(directory=repositoryBanksDirectory){
-  const banks=[];
+  const banks=[],ids=new Set();
   for(const entry of readdirSync(directory,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name,'en',{numeric:true}))){
     const file=entry.name;
     if(file==='index.json'||!/\.json$/i.test(file))continue;
     try{
-      if(!entry.isFile()||!/^lei-[1-9]\d*\.json$/.test(file))throw new Error('Use um arquivo lei-NUMERO.json, sem pontos ou ano no nome.');
+      if(!entry.isFile()||!file.endsWith('.json')||!validSystemBankId(file.slice(0,-5)))throw new Error('Use ID.json, com letras, números, _ ou - no ID.');
+      if(ids.has(file.toLowerCase()))throw new Error('ID de banco repetido, diferindo apenas em maiúsculas e minúsculas.');
+      ids.add(file.toLowerCase());
       const raw=JSON.parse(readFileSync(join(directory,file),'utf8').replace(/^\uFEFF/,''));
       banks.push(repositoryBank(raw,file));
     }catch(error){throw new Error(`${file}: ${error.message}`,{cause:error});}

@@ -8,7 +8,7 @@ No GitHub, use **Add file → Upload files**, envie o JSON diretamente nesta pas
 | `lei-8069.json` | `lei-8069` | `Lei nº 8.069/1990` |
 | `lei-9394.json` | `lei-9394` | `Lei nº 9.394/1996` |
 
-- Use `lei-NUMERO.json` e o mesmo `id`, sem pontos ou ano.
+- Use `ID.json` e o mesmo `id`, com até 120 letras, números, `_` ou `-`. Não é obrigatório usar `lei-`: decretos e outros conteúdos são aceitos. `index` e o prefixo `personal_bank_` são reservados.
 - Use o formato JSON do Foco e IDs estáveis para as questões.
 - Para adicionar questões à mesma lei, substitua seu arquivo existente.
 - Não edite nem envie `index.json`: o catálogo e as revisões são gerados automaticamente.

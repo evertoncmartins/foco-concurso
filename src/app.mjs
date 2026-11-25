@@ -541,25 +541,27 @@ async function manageBank(action,id){
   const owner=store,generation=auth?.generation;
   const bank=model.banks.find(b=>b.id===id)||model.systemBanks.find(b=>b.id===id)||bankCatalogCards(model).find(b=>b.id===id);
   if(!bank)return;
-  if(sourceType(bank)==='system'&&!bankManagement.admin&&action!=='export'&&action!=='hide')throw new Error('A disponibilidade dos bancos do Sistema é gerenciada pela administração.');
+  if(sourceType(bank)==='system'&&!bankManagement.admin&&!['export','hide','rename'].includes(action))throw new Error('A disponibilidade dos bancos do Sistema é gerenciada pela administração.');
   const candidates=progressLinkCandidates(model,bank);
   const native=sourceType(bank)==='system'&&!bank.unavailable?bank:bank.linkedTo?model.systemBanks.find(b=>b.id===bank.linkedTo.toBankId):candidates.length===1?candidates[0]:null;
   const permission=native?bankManagement.presentation(native.id):null;
   const titles={delete:'Onde deseja excluir o banco?',toggle:'Onde alterar a disponibilidade?',rename:'Onde deseja renomear?',export:'Qual versão deseja exportar?',hide:'Onde remover este card?',restore:'Onde restaurar este banco?'};
-  const systemReason=['rename','hide','restore'].includes(action)?'Esta ação é uma preferência pessoal. O título e a disponibilidade pública permanecem sob os controles do Sistema.':
+  const systemReason=['hide','restore'].includes(action)?'Esta ação é uma preferência pessoal. O título e a disponibilidade pública permanecem sob os controles do Sistema.':
+    action==='rename'&&sourceType(bank)!=='system'?'Para renomear no Sistema, abra o card do próprio banco do Sistema.':
     !native?'Este banco não tem uma versão correspondente no catálogo do Sistema. Envie o JSON para publicá-lo.':
-    action==='delete'&&!permission?.canDelete?permission?.reason||'Exclusão global indisponível.':action==='toggle'&&!permission?.canToggle?'A alteração do Sistema está indisponível.':'';
+    action==='delete'&&!permission?.canDelete?permission?.reason||'Exclusão global indisponível.':['toggle','rename'].includes(action)&&!permission?.canToggle?'A alteração do Sistema está indisponível.':'';
   const scope=await selectBankScope({title:titles[action],personal:action==='delete'||action==='hide'?'Remover apenas da sua lista, preservando sessões e resultados.':action==='toggle'?'Ativar ou desativar somente para seus estudos.':action==='export'?'Baixar uma cópia para uso pessoal.':'Aplicar somente na sua conta.',system:action==='delete'?'Excluir do catálogo público para todos os usuários.':action==='toggle'?'Ativar ou desativar novas sessões para todos os usuários.':action==='export'?'Baixar a versão pública do Sistema.':'Aplicar ao banco público para todos os usuários.',systemReason});
   if(!scope)return;
   if(scope==='system'){
     if(systemReason||!native)throw new Error(systemReason||'Banco do Sistema indisponível.');
     if(action==='delete')return deleteSystemBank(native.id);
     if(action==='toggle')return toggleSystemBank(native.id);
+    if(action==='rename')return renameBank(native.id,{global:true});
     if(action==='export'){download(`${native.id}.json`,native);return;}
   }
-  if(action==='export'){const {enabled,personalState,...raw}=bank;download(`${bank.id}.json`,bankManagement.admin?preparePersonalBank(raw):raw);return;}
+  if(action==='export'){const {enabled,personalState,...raw}=bank;download(`${bank.id}.json`,bankManagement.admin?preparePersonalBank(raw,model.systemBankIds):raw);return;}
   if(action==='hide')return hideUnavailableBank(id);
-  if(action==='rename')return renamePersonalBank(id);
+  if(action==='rename')return renameBank(id);
   if(sourceType(bank)==='personal'){
     if(action==='delete')return deletePersonalBank(bank);
     if(action==='toggle'){await store.add([{type:'bank-state',bankId:id,value:bank.enabled?'disabled':'enabled'}]);render();return;}
@@ -574,7 +576,7 @@ async function manageBank(action,id){
   }
 }
 async function importBank(raw){
-  const owner=store,generation=auth?.generation,ownDrive=drive,bank=preparePersonalBank(validateBank(raw)),old=model.banks.find(b=>b.id===bank.id&&sourceType(b)==='personal');
+  const owner=store,generation=auth?.generation,ownDrive=drive,bank=preparePersonalBank(validateBank(raw),model.systemBankIds),old=model.banks.find(b=>b.id===bank.id&&sourceType(b)==='personal');
   const current=()=>store===owner&&auth?.generation===generation;
   if(old&&!(await confirmDialog('Atualizar banco?',`Já existe “${old.displayName||old.name}” com este ID. O conteúdo será atualizado, preservando seu histórico de respostas. Mantenha IDs existentes apenas para as mesmas questões.`,'Atualizar')))return false;
   if(!current())return false;
@@ -593,7 +595,7 @@ async function importBank(raw){
 async function deleteSystemBank(id){
   const bank=model.banks.find(b=>b.id===id&&sourceType(b)==='system'),owner=store,generation=auth?.generation;
   if(!bank||!bankManagement.presentation(id)?.canDelete)throw new Error('Este banco não está liberado para exclusão global.');
-  if(!await confirmDialog('Excluir banco para todos?',`“${bankPresentation(bank).title}” será removido do catálogo global. A exclusão só será concluída se nenhum usuário tiver iniciado uma sessão nessa lei. Para suspender novas sessões e preservar o banco, use Desativar banco para todos.`,'Excluir para todos'))return;
+  if(!await confirmDialog('Excluir banco para todos?',`“${bankPresentation(bank).title}” será removido do catálogo global. A exclusão só será concluída se nenhum usuário tiver iniciado uma sessão neste banco. Para suspender novas sessões e preservar o banco, use Desativar banco para todos.`,'Excluir para todos'))return;
   if(store!==owner||auth?.generation!==generation)return;
   working=true;
   try{
@@ -658,10 +660,25 @@ async function toggleSystemBank(id){
     await bankManagement.inspect(auth);render();toast('Alteração enviada. Aguarde a publicação e sincronize o catálogo.');
   }finally{working=false;}
 }
-async function renamePersonalBank(id){
-  const bank=model.banks.find(b=>b.id===id&&sourceType(b)==='personal');if(!bank){toast('Apenas bancos pessoais podem ser renomeados.');return;}
-  const ownStore=store,d=showDialog(`<form id="rename-bank-form"><div class="dialog-title"><h2 id="dialog-title">Renomear banco pessoal</h2><p>Escolha o nome que prefere usar nos seus estudos.</p></div><div class="field"><label for="bank-display-name">Nome do banco</label><input id="bank-display-name" name="displayName" value="${esc(bank.displayName||bank.name)}" required autofocus></div><p class="setting-note">Questões, respostas e sessões continuam associadas a este banco.</p><div class="dialog-actions"><button class="btn" type="button" data-action="close-dialog">Cancelar</button><button class="btn primary" type="submit">Salvar nome</button></div></form>`);
-  const form=$('#rename-bank-form',d);form.onsubmit=async event=>{event.preventDefault();const displayName=form.elements.namedItem('displayName').value.trim();if(!displayName||store!==ownStore)return;const button=form.querySelector('[type=submit]');button.disabled=true;try{await store.add([{type:'bank-metadata',bankId:id,displayName}]);closeDialog();render();toast('Nome atualizado.');}catch(error){failure(error);}finally{button.disabled=false;}};
+async function renameBank(id,{global:all=false}={}){
+  const bank=model.banks.find(b=>b.id===id);if(!bank)return;
+  const ownStore=store,generation=auth?.generation,current=()=>store===ownStore&&auth?.generation===generation;
+  const published=all?systemCatalog.banks.find(b=>b.id===id):null;
+  if(all&&(!published||!bankManagement.presentation(id)?.canToggle))throw new Error('A renomeação do Sistema está indisponível.');
+  const d=showDialog(`<form id="rename-bank-form"><div class="dialog-title"><h2 id="dialog-title">${all?'Renomear banco para todos':'Renomear banco para você'}</h2><p>${all?'O novo nome aparecerá para todos os usuários após a publicação.':'Escolha o nome que prefere usar nos seus estudos.'}</p></div><div class="field"><label for="bank-display-name">Nome do banco</label><input id="bank-display-name" name="displayName" value="${esc(bankPresentation(published||bank).title)}" required autofocus></div><p class="setting-note">Questões, respostas e sessões continuam associadas a este banco.</p><div class="dialog-actions"><button class="btn" type="button" data-action="close-dialog">Cancelar</button><button class="btn primary" type="submit">${all?'Salvar para todos':'Salvar nome'}</button></div></form>`);
+  const form=$('#rename-bank-form',d);form.onsubmit=async event=>{
+    event.preventDefault();const displayName=form.elements.namedItem('displayName').value.trim();if(!displayName||!current())return;
+    const button=form.querySelector('[type=submit]');button.disabled=true;
+    try{
+      if(all){
+        working=true;const result=await bankManagement.rename(published,displayName,auth);if(!current())return;
+        closeDialog();bankUploading={percent:65,message:'Publicando o nome…',detail:'Aguardando a atualização do catálogo.'};render();
+        await waitForPublishedBank({catalog:systemCatalog,id,revision:result.revision,requireActive:false,current,onProgress:value=>{if(current()){bankUploading=value;render();}}});
+        if(!current())return;ownStore.setSystemBanks(systemCatalog.banks);
+      }else await ownStore.add([{type:'bank-metadata',bankId:id,sourceType:sourceType(bank),displayName}]);
+      if(!current())return;closeDialog();render();toast(all?'Nome publicado e sincronizado.':'Nome atualizado para seus estudos.');
+    }catch(error){if(current())failure(error);}finally{if(all){bankUploading=null;working=false;if(current())render();}button.disabled=false;}
+  };
 }
 function bindFiles(){
   $('#bank-file').onchange=async event=>{const files=[...event.target.files],owner=store,generation=auth?.generation;event.target.value='';if(working)return;for(const file of files){try{const raw=await readJSON(file);if(store!==owner||auth?.generation!==generation)return;if(await receiveBank(raw,file))toast(`Banco importado e pronto: ${file.name}`);}catch(e){failure(e);}}if(store===owner&&auth?.generation===generation)navigate('banks');};

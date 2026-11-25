@@ -16,6 +16,20 @@ const bank=(number='9394',year='1996')=>({schemaVersion:1,id:`lei-${number}`,nam
 async function directory(t){const root=await mkdtemp(join(tmpdir(),'foco-repository-'));t.after(()=>rm(root,{recursive:true,force:true}));return root;}
 const save=(root,value)=>writeFile(join(root,`${value.id}.json`),JSON.stringify(value));
 
+test('descobre decretos e outros temas, carrega pelo espelho e conserva nomes livres',async t=>{
+  const root=await directory(t);
+  const decree={...bank(),id:'decreto-8112',name:'Decreto nº 8.112/2013',displayName:'Meu decreto — revisão',subtitle:'Organização administrativa'};
+  const other={...bank(),id:'Portugues_2026',name:'Português e interpretação de textos'};
+  await save(root,decree);await save(root,other);
+  const {manifest,banks}=repositoryCatalog(root);
+  const catalog=new SystemBanks(async url=>Response.json(url.endsWith('index.json')?manifest:banks.find(b=>url.includes(`/${b.id}.json`))),{origin:'https://foco-concursos.ecmdigital.chatgpt.site'});
+  await catalog.load();assert.equal(catalog.banks.length,2);
+  assert.equal(catalog.banks.find(b=>b.id===decree.id).displayName,decree.displayName);
+  assert.equal(catalog.banks.find(b=>b.id===other.id).displayName,other.name);
+  const invalid=new SystemBanks(async()=>Response.json({schemaVersion:1,banks:[{id:'../outside'}]}));
+  await assert.rejects(invalid.load(),/Identificador/);
+});
+
 test('descobre novos JSONs e remoções sem cadastrar um índice e gera revisões pelo conteúdo',async t=>{
   const root=await directory(t),raw=bank();await save(root,raw);
   await writeFile(join(root,'index.json'),'índice antigo inválido e ignorado');
@@ -31,9 +45,9 @@ test('descobre novos JSONs e remoções sem cadastrar um índice e gera revisõe
   await unlink(join(root,'lei-8112.json'));assert.deepEqual(repositoryCatalog(root).manifest.banks,[]);
 });
 
-test('padroniza o título sem aceitar displayName arbitrário nos bancos do Sistema',async t=>{
+test('respeita o título livre do Sistema e preserva o nome original para exportação',async t=>{
   const root=await directory(t);await save(root,{...bank(),name:'LDB — Lei 9.394/1996',subtitle:'Lei de Diretrizes e Bases da Educação Nacional',displayName:'Nome livre pessoal'});
-  const published=repositoryCatalog(root).banks[0];assert.equal(published.name,'Lei nº 9.394/1996');assert.equal(published.displayName,published.name);assert.equal(published.subtitle,'Lei de Diretrizes e Bases da Educação Nacional');
+  const published=repositoryCatalog(root).banks[0];assert.equal(published.name,'LDB — Lei 9.394/1996');assert.equal(published.displayName,'Nome livre pessoal');assert.equal(published.subtitle,'Lei de Diretrizes e Bases da Educação Nacional');
 });
 
 test('disponibilidade global muda revisão sem alterar questões e ausência de active preserva a revisão anterior',async t=>{
@@ -51,9 +65,9 @@ test('publicação de qualquer novo banco recusa feedback incompleto e referênc
   }
 });
 
-test('recusa arquivo, ID, lei, JSON e gabarito inconsistentes com o arquivo identificado no erro',async t=>{
+test('recusa arquivo, ID, JSON e gabarito inconsistentes com o arquivo identificado no erro',async t=>{
   const root=await directory(t);
-  const cases=[['eca-8069.json',bank()],['lei-9394.json',{...bank(),id:'other-id'}],['lei-9394.json',{...bank(),name:'Lei nº 8.112/1990'}],['lei-9394.json','{invalid'],['lei-9394.json',{...bank(),questions:[{...bank().questions[0],correctOption:'C'}]}]];
+  const cases=[['eca-8069.json',bank()],['lei-9394.json',{...bank(),id:'other-id'}],['lei-9394.json',{...bank(),name:' '}],['lei-9394.json','{invalid'],['lei-9394.json',{...bank(),questions:[{...bank().questions[0],correctOption:'C'}]}]];
   for(const [file,raw] of cases){await writeFile(join(root,file),typeof raw==='string'?raw:JSON.stringify(raw));assert.throws(()=>repositoryCatalog(root),error=>error.message.startsWith(`${file}:`));await unlink(join(root,file));}
 });
 

@@ -9,9 +9,10 @@ const laws=[
 // Shared naming for banks, questions, filters and history.
 // Preserve imported names/IDs; format only a single, explicitly identified law.
 function originalPresentation(bank){
-  const name=String(bank.name||''),matched=laws.filter(l=>l.matches(name));
+  const name=String(bank.name||''),otherAct=/\b(?:decreto|portaria|resolução|instrução normativa|constituição)\b/iu.test(name),matched=otherAct?[]:laws.filter(l=>l.matches(name));
   const disciplines=[...new Set((bank.questions||[]).map(q=>q.discipline).filter(Boolean))];
   const fallback={law:null,title:name,subtitle:disciplines.join(' · ')||'Banco de questões'};
+  if(otherAct)return fallback;
   const explicit=[...name.matchAll(/\bLei\s+(?:n[º°o.]?\s*)?(\d+(?:\.\d+)*)\s*\/\s*(\d{4})\b/giu)].filter(m=>!/Decreto\s*[-–—]\s*$/iu.test(name.slice(0,m.index)));
   const normalizeNumber=n=>n.replace(/\./g,'').replace(/^0+(?=\d)/u,'').replace(/\B(?=(\d{3})+(?!\d))/gu,'.');
   const identified=new Set(explicit.map(m=>`Lei nº ${normalizeNumber(m[1])}/${m[2]}`));

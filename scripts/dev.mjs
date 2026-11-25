@@ -16,7 +16,7 @@ const server=createServer(async(req,res)=>{
     }
     // Local development discovers changes directly in the official folder,
     // including deletions, even when dist still contains an earlier build.
-    const asset=pathname.match(/^\/data\/question-banks\/(index|lei-[1-9]\d*)\.json$/);
+    const asset=pathname.match(/^\/data\/question-banks\/([a-zA-Z0-9_-]{1,120})\.json$/);
     if(asset){
       try{
         const {manifest,banks}=repositoryCatalog(resolve('public/data/question-banks'));
