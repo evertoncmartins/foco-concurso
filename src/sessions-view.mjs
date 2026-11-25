@@ -43,9 +43,12 @@ export function sessionSummary(s,model,context={}){
   let answered=0,correct=0,wrong=0,ungraded=0;
   for(const key of s.queue)if(s.answers[key]){answered++;const grade=grades.get(key);if(!grade)ungraded++;else if(s.answers[key]===grade.correctOption)correct++;else wrong++;}
   const bankIds=sessionBankIds(s),origins=context.origins||sourceContext(model,catalog),presentations=s.queue.map(key=>recordedQuestion(s,model,key,grades.get(key),origins).presentation);
-  const names=[...new Map(presentations.map(p=>[p.bankId,p.displayName])).values()],sources=[...new Set(presentations.map(sourceType))],associated=presentations.some(p=>p.associatedFrom);
+  const banks=[...new Map(presentations.map(p=>[p.bankId,p])).values()].map(p=>{
+    const bank=origins.bankMap.get(p.bankId)||model.systemBanks?.find(b=>b.id===p.bankId)||{name:p.displayName};
+    return {id:p.bankId,title:p.displayName,subtitle:bankPresentation(bank).subtitle};
+  }),sources=[...new Set(presentations.map(sourceType))],associated=presentations.some(p=>p.associatedFrom);
   const available=context.available||new Set(model.questions.map(q=>q.key));
-  return {id:s.id,session:s,bankIds,sources,associated,title:names.join(' · ')||'Sessão de estudo',total:s.queue.length,answered,correct,wrong,ungraded,skipped:s.queue.length-answered,
+  return {id:s.id,session:s,bankIds,banks,sources,associated,title:banks.map(b=>b.title).join(' · ')||'Sessão de estudo',total:s.queue.length,answered,correct,wrong,ungraded,skipped:s.queue.length-answered,
     accuracy:s.completed&&!ungraded?Math.round(correct/s.queue.length*100)||0:null,
     canResume:!s.completed&&!s.abandoned&&s.index<s.queue.length&&s.queue.every(key=>available.has(key)),
     updatedAt:model.sessionUpdatedAt?.get(s.id)||s.completedAt||s.startedAt||'',exam:s.mode==='exam',completed:!!s.completed};
@@ -87,7 +90,7 @@ export function sessionsView(model,filters){
     <p class="session-list-count" role="status">${library.total} ${library.total===1?'sessão encontrada':'sessões encontradas'}</p>
     ${library.rows.length?`<div class="saved-sessions">${library.rows.map(row=>`<article class="saved-session">
       <header><span class="saved-session-kind ${row.exam?'is-exam':''}">${icon(row.exam?'clock':'book',14)} ${row.exam?'Simulado':'Estudo'}</span><time>${esc(sessionDate(row.updatedAt))}</time></header>
-      <h2>${esc(row.title)}</h2><p class="session-sources">${row.sources.map(sourceType=>sourceTag({sourceType})).join(' ')}</p>${row.associated?'<p class="session-association-note">Progresso associado ao Sistema · registro original Pessoal.</p>':''}<p class="saved-session-description">${row.total} questões${row.completed?'':` · Parou na questão ${Math.min(row.total,row.session.index+1)}`}</p>
+      <div class="saved-session-banks">${row.banks.length?row.banks.map(bank=>`<div><h2>${esc(bank.title)}</h2><p class="saved-session-subtitle">${esc(bank.subtitle)}</p></div>`).join(''):`<h2>${esc(row.title)}</h2>`}</div><p class="session-sources">${row.sources.map(sourceType=>sourceTag({sourceType})).join(' ')}</p>${row.associated?'<p class="session-association-note">Progresso associado ao Sistema · registro original Pessoal.</p>':''}<p class="saved-session-description">${row.total} questões${row.completed?'':` · Parou na questão ${Math.min(row.total,row.session.index+1)}`}</p>
       ${row.completed?`<dl class="saved-session-stats"><div><dt>Aproveitamento</dt><dd>${row.accuracy===null?'—':`${row.accuracy}%`}</dd></div><div><dt>Acertos</dt><dd>${row.correct}</dd></div><div><dt>Erros</dt><dd>${row.wrong}</dd></div></dl>`:`<div class="saved-session-progress"><span>${row.answered} de ${row.total} respostas registradas</span><progress max="${row.total}" value="${row.answered}" aria-label="${row.answered} de ${row.total} respostas registradas"></progress></div>`}
       ${!row.completed&&!row.canResume?'<p class="session-unavailable">Reimporte o banco original para recuperar as questões desta sessão.</p>':''}
       ${row.completed&&row.ungraded?'<p class="session-unavailable">Há respostas sem correção registrada no histórico.</p>':''}
