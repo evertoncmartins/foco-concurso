@@ -7,7 +7,7 @@ raw.questions=raw.questions.slice(0,2);raw.id='decreto-12345';raw.name='Decreto 
 const appSource=await readFile(new URL('../dist/assets/app.mjs',import.meta.url),'utf8');
 const setup=`
 globalThis.__bankAudit={
-  published:[],calls:[],
+  published:[],calls:[],admin:true,
   async setup(){
     await __audit.seed(2,0,'smart');guest=false;auth.profile={sub:'bank-browser-fixture',email:'fixture@example.test'};
     auth.ensureAccess=async()=>({token:'synthetic-browser-fixture'});
@@ -26,10 +26,11 @@ globalThis.__bankAudit={
         }
         throw new Error('Unexpected mutation: '+body.action);
       }
-      return Response.json({admin:true,tracking:true,deletion:true,publication:true,banks:this.published.map(b=>({id:b.id,assigned:1,protected:false,state:null}))});
+      return Response.json({admin:this.admin,tracking:true,deletion:true,publication:this.admin,banks:this.published.map(b=>({id:b.id,assigned:1,protected:false,state:null}))});
     };
     store.setSystemBanks([]);await bankManagement.inspect(auth);view='banks';render();
   },
+  async regular(){this.admin=false;await bankManagement.inspect(auth);drive.token=null;expandedBankDetails.clear();view='banks';render();},
   state(){return {calls:this.calls,publicBank:this.published[0],bank:model.systemBanks[0],uploading:bankUploading,working};}
 };`;
 
@@ -57,6 +58,22 @@ try{
     await page.locator('[data-action=banks-layout][data-layout=list]').click();
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
     await page.screenshot({path:'.sites-runtime/banks/'+(mobile?'mobile':'desktop')+'.png',fullPage:true});
-    assert.deepEqual(errors,[]);await context.close();console.log(JSON.stringify({viewport:mobile?'mobile':'desktop',upload:true,rename:true,passed:true}));
+    await page.evaluate(()=>__bankAudit.regular());
+    await page.getByRole('heading',{name:'Decreto — título escolhido',exact:true}).waitFor();
+    assert.equal(await page.locator(`[data-action=bank-rename][data-bank="${raw.id}"]`).count(),0);
+    const own={...raw,id:'meu-decreto-pessoal',name:'Questões pessoais do decreto',sourceType:'system'};
+    await page.locator('#bank-file').setInputFiles({name:'Meu decreto.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(own))});
+    await page.getByRole('heading',{name:own.name,exact:true}).waitFor();
+    await page.locator(`[data-action=bank-details][data-bank="${own.id}"]`).click();
+    await page.locator(`[data-action=bank-rename][data-bank="${own.id}"]`).click();
+    assert.equal(await page.locator('#bank-scope-personal').isVisible(),false);
+    await page.locator('#bank-display-name').fill('Minhas questões — nome pessoal');await page.getByRole('button',{name:'Salvar nome',exact:true}).click();
+    await page.getByRole('heading',{name:'Minhas questões — nome pessoal',exact:true}).waitFor();
+    const regular=await page.evaluate(()=>({personal:__audit.store.model().personalBanks.find(b=>b.id==='meu-decreto-pessoal'),native:__audit.store.model().systemBanks[0],calls:__bankAudit.calls.length}));
+    assert.equal(regular.personal.sourceType,'personal');assert.equal(regular.personal.displayName,'Minhas questões — nome pessoal');
+    assert.equal(regular.native.displayName,'Decreto — título escolhido');assert.equal(regular.calls,2);
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    await page.screenshot({path:'.sites-runtime/banks/regular-'+(mobile?'mobile':'desktop')+'.png',fullPage:true});
+    assert.deepEqual(errors,[]);await context.close();console.log(JSON.stringify({viewport:mobile?'mobile':'desktop',admin:true,regularUpload:true,regularRename:true,systemProtected:true,passed:true}));
   }
 }finally{await audit.close();}

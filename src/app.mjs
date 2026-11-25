@@ -131,6 +131,7 @@ function applyTheme(){document.documentElement.dataset.theme=config.theme==='sys
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),4500);}
 function failure(error){console.error(error);if(['PROGRESS_RESET','SESSION_DELETED'].includes(error?.code)){refreshModel();render();}toast(error?.name==='QuotaExceededError'?'O armazenamento local está cheio. Exporte seu progresso para preservar os dados.':error.message||'Não foi possível concluir. Tente novamente.');}
 function refreshModel(){
+  store.canRenameSystemBanks=!guest&&bankManagement.known&&bankManagement.admin;
   const next=store.model(),changed=!!model&&model.progressEpoch!==next.progressEpoch;model=next;
   if(changed||(session&&(session.progressEpoch??null)!==model.progressEpoch)){
     session=null;selected=null;draftSelections.clear();resetCuts();resetHistoryUI();config.activeSession=null;
@@ -541,7 +542,7 @@ async function manageBank(action,id){
   const owner=store,generation=auth?.generation;
   const bank=model.banks.find(b=>b.id===id)||model.systemBanks.find(b=>b.id===id)||bankCatalogCards(model).find(b=>b.id===id);
   if(!bank)return;
-  if(sourceType(bank)==='system'&&!bankManagement.admin&&!['export','hide','rename'].includes(action))throw new Error('A disponibilidade dos bancos do Sistema é gerenciada pela administração.');
+  if(sourceType(bank)==='system'&&!bankManagement.admin&&!['export','hide'].includes(action))throw new Error('Os bancos do Sistema são gerenciados pela administração. Você pode renomear os bancos pessoais que importou.');
   const candidates=progressLinkCandidates(model,bank);
   const native=sourceType(bank)==='system'&&!bank.unavailable?bank:bank.linkedTo?model.systemBanks.find(b=>b.id===bank.linkedTo.toBankId):candidates.length===1?candidates[0]:null;
   const permission=native?bankManagement.presentation(native.id):null;
@@ -662,7 +663,9 @@ async function toggleSystemBank(id){
 }
 async function renameBank(id,{global:all=false}={}){
   const bank=model.banks.find(b=>b.id===id);if(!bank)return;
-  const ownStore=store,generation=auth?.generation,current=()=>store===ownStore&&auth?.generation===generation;
+  const system=sourceType(bank)==='system',canRename=()=>!system||!guest&&bankManagement.known&&bankManagement.admin;
+  if(!canRename())throw new Error('Você pode renomear apenas os bancos pessoais que importou.');
+  const ownStore=store,generation=auth?.generation,current=()=>store===ownStore&&auth?.generation===generation&&canRename();
   const published=all?systemCatalog.banks.find(b=>b.id===id):null;
   if(all&&(!published||!bankManagement.presentation(id)?.canToggle))throw new Error('A renomeação do Sistema está indisponível.');
   const d=showDialog(`<form id="rename-bank-form"><div class="dialog-title"><h2 id="dialog-title">${all?'Renomear banco para todos':'Renomear banco para você'}</h2><p>${all?'O novo nome aparecerá para todos os usuários após a publicação.':'Escolha o nome que prefere usar nos seus estudos.'}</p></div><div class="field"><label for="bank-display-name">Nome do banco</label><input id="bank-display-name" name="displayName" value="${esc(bankPresentation(published||bank).title)}" required autofocus></div><p class="setting-note">Questões, respostas e sessões continuam associadas a este banco.</p><div class="dialog-actions"><button class="btn" type="button" data-action="close-dialog">Cancelar</button><button class="btn primary" type="submit">${all?'Salvar para todos':'Salvar nome'}</button></div></form>`);

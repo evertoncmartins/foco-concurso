@@ -108,7 +108,7 @@ export function mergeEvents(...collections) {
   for (const e of collections.flat()) { const old = map.get(e.id); if (old && !sameEvent(old,e)) throw new Error('Conflito: dois eventos com o mesmo ID têm conteúdos diferentes.'); map.set(e.id, e); }
   return [...map.values()].sort((a,b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id));
 }
-export function derive(events, now = Date.now(), systemBanks=[]) {
+export function derive(events, now = Date.now(), systemBanks=[], {canRenameSystemBanks=false}={}) {
   const banks = new Map(), states = new Map(), nativePreferences=new Map(), metadata=new Map(), nativeMetadata=new Map(), progress = new Map(), flags = new Map(), sessions = new Map(), answers = [], flagEvents=[],bankHistory=[], sessionUpdatedAt=new Map();
   const ordered=mergeEvents(events),progressEpoch=ordered.findLast(e=>e.type==='progress-reset')?.id??null;
   // Deletion wins over later/offline session snapshots and old backups. Keep
@@ -132,7 +132,7 @@ export function derive(events, now = Date.now(), systemBanks=[]) {
     if(e.type==='system-bank-snapshot')bankHistory.push({...e,bank:{...e.bank,bankId:e.bank.id,sourceType:'system'}});
     if (e.type === 'bank-state') states.set(aliases.get(e.bankId)||e.bankId, e.value);
     if(e.type==='system-bank-preference')nativePreferences.set(e.bankId,e.value);
-    if(e.type==='bank-metadata'){if(e.sourceType==='system')nativeMetadata.set(e.bankId,e.displayName);else metadata.set(aliases.get(e.bankId)||e.bankId,e.displayName);}
+    if(e.type==='bank-metadata'){if(e.sourceType==='system'){if(canRenameSystemBanks===true)nativeMetadata.set(e.bankId,e.displayName);}else metadata.set(aliases.get(e.bankId)||e.bankId,e.displayName);}
     if (e.type === 'session') {sessions.set(e.session.id,e.session);sessionUpdatedAt.set(e.session.id,e.at);}
     if (e.type === 'flag') flagEvents.push({...e,key:keyAlias(e.key,e.sourceType)});
     if (e.type === 'answer') {

@@ -5,7 +5,7 @@ const PREFIX='foco:v1:event:';
 const resetError=()=>Object.assign(new Error('Seu progresso foi reiniciado. Inicie uma nova sessão de estudo.'),{code:'PROGRESS_RESET'});
 const deletedError=()=>Object.assign(new Error('Esta sessão foi excluída. Inicie outra sessão para continuar seus estudos.'),{code:'SESSION_DELETED'});
 export class Store extends EventTarget {
-  constructor(storage=globalThis.localStorage) { super(); this.storage=storage; this.events=[];this.systemBanks=[];this.records=new Map();this.load(); }
+  constructor(storage=globalThis.localStorage) { super(); this.storage=storage; this.events=[];this.systemBanks=[];this.canRenameSystemBanks=false;this.records=new Map();this.load(); }
   load() {
     const keys=this.storage.keys?.()||Array.from({length:this.storage.length},(_,i)=>this.storage.key(i)),records=new Map(),list=[];
     let changed=false;
@@ -94,8 +94,8 @@ export class Store extends EventTarget {
   }
   setSystemBanks(banks){this.systemBanks=structuredClone(banks);return this.model();}
   model(){
-    const minute=Math.floor(Date.now()/60000),cache=this.derived;
-    if(!cache||cache.events!==this.events||cache.banks!==this.systemBanks||cache.minute!==minute)this.derived={events:this.events,banks:this.systemBanks,minute,value:derive(this.events,Date.now(),this.systemBanks)};
+    const minute=Math.floor(Date.now()/60000),cache=this.derived,canRenameSystemBanks=this.canRenameSystemBanks===true;
+    if(!cache||cache.events!==this.events||cache.banks!==this.systemBanks||cache.minute!==minute||cache.canRenameSystemBanks!==canRenameSystemBanks)this.derived={events:this.events,banks:this.systemBanks,minute,canRenameSystemBanks,value:derive(this.events,Date.now(),this.systemBanks,{canRenameSystemBanks})};
     return this.derived.value;
   }
   export(){const model=this.model();return {schemaVersion:1,app:'foco-concursos',...(this.storage.userId?{owner:{provider:'google',subject:this.storage.userId}}:{}),exportedAt:new Date().toISOString(),events:this.events,summary:model.stats,performance:{questions:Object.fromEntries(model.progress),flags:Object.fromEntries(model.flags),byDiscipline:breakdown(model.answers,'discipline'),bySubject:breakdown(model.answers,'subject'),byTopic:breakdown(model.answers,'topic'),studyStreak:studyStreak(model.answers),recentAnswers:model.answers.slice(-20),sessions:model.sessions}};}

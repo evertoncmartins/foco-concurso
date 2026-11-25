@@ -412,7 +412,7 @@ test('visitante usa bancos do sistema e pessoais, com origem por questão e reno
   for(const mobile of [false,true]){
     const native=imports.validateSystemBank({...bank,id:'lei-8112',sourceType:'system',revision:'fixture',questions:bank.questions.slice(0,2)}),app=runtime({mobile,systemBanks:[native]});
     app.auth.signOut();await app.click('guest');assert.equal(app.value('model.systemBanks.length'),1);assert.equal(app.value('model.personalBanks.length'),0);
-    await app.click('nav',{view:'banks'});assert(app.html().includes('bank-source system'));assert(!app.html().includes('data-action="system-add"'));assert(app.html().includes('data-action="bank-rename"'));
+    await app.click('nav',{view:'banks'});assert(app.html().includes('bank-source system'));assert(!app.html().includes('data-action="system-add"'));assert(!app.html().includes('data-action="bank-rename"'));
     await app.value('(async()=>{const own=structuredClone(bank);own.id="my-import";await importBank(own);})()');await app.click('nav',{view:'banks'});
     const d=app.document.querySelector('#dialog'),form=d.querySelector('#rename-bank-form'),input={value:'Concurso IFSP — RJU do meu jeito'},button={disabled:false};form.elements={namedItem(){return input;}};form.querySelector=()=>button;
     await app.click('bank-rename',{bank:'my-import'});await form.onsubmit({preventDefault(){}});assert.equal(app.value('model.personalBanks[0].displayName'),input.value);assert(app.html().includes(input.value));
@@ -421,6 +421,31 @@ test('visitante usa bancos do sistema e pessoais, com origem por questão e reno
     assert(app.html().includes('bank-source system'));await app.click('select',{option:'A'});await app.click('answer');await app.click('next');assert(app.html().includes('bank-source personal'));await app.click('select',{option:'B'});await app.click('answer');await app.click('previous');assert(app.html().includes('bank-source system'));await app.click('next');await app.finish();
     assert.equal(app.value('model.answers.filter(a=>a.sourceType==="system").length'),1);assert.equal(app.value('model.answers.filter(a=>a.sourceType==="personal").length'),1);assert(app.html().includes('bank-source system'));assert(app.html().includes('bank-source personal'));assert(app.html().includes(input.value));
     await app.click('nav',{view:'performance'});await app.document.emit('change',{target:{dataset:{performanceOrigin:''},value:'system'}});assert.equal(app.value('performanceOrigin'),'system');assert(app.html().includes('Desempenho por origem'));
+  }
+});
+
+test('conta comum envia e renomeia só o próprio JSON; card do Sistema rejeita ação direta e nomes antigos no Desktop e Mobile',async()=>{
+  for(const mobile of [false,true]){
+    const native=imports.validateSystemBank({...bank,id:'lei-8112',questions:bank.questions.slice(0,2)}),app=runtime({mobile,systemBanks:[native]});
+    await app.start();await app.value('bankManagement.inspect(auth)');await app.click('nav',{view:'banks'});
+    assert.equal(app.value('bankManagement.admin'),false);assert(!app.html().includes('data-action="bank-rename"'));
+    const before=app.value('JSON.stringify(store.events)');
+    await assert.rejects(app.value('renameBank("lei-8112")'),/apenas os bancos pessoais/);
+    await assert.rejects(app.value('manageBank("rename","lei-8112")'),/gerenciados pela administração/);
+    assert.equal(app.value('JSON.stringify(store.events)'),before);assert(!app.document.querySelector('#dialog').open);
+    await app.value('store.add([{type:"bank-metadata",bankId:"lei-8112",sourceType:"system",displayName:"Antigo nome pessoal indevido"}])');app.value('render()');
+    assert.equal(app.value('model.systemBanks[0].displayName'),native.displayName);assert(!app.html().includes('Antigo nome pessoal indevido'));
+    const personal={...bank,id:'meu-decreto',name:'Questões do meu decreto',sourceType:'system'};
+    const input=app.document.querySelector('#bank-file');await input.onchange({target:{files:[{name:'Decreto.json',text:async()=>JSON.stringify(personal)}],value:'Decreto.json'}});
+    assert.equal(app.value('model.personalBanks[0].id'),personal.id);assert.equal(app.value('model.personalBanks[0].sourceType'),'personal');
+    assert(!app.document.querySelector('#dialog').open);
+    const d=app.document.querySelector('#dialog'),form=d.querySelector('#rename-bank-form'),value={value:'Meu decreto — revisão'},button={disabled:false};
+    form.elements={namedItem(){return value;}};form.querySelector=()=>button;
+    await app.click('bank-rename',{bank:personal.id});await form.onsubmit({preventDefault(){}});
+    assert.equal(app.value('model.personalBanks[0].displayName'),value.value);assert(app.html().includes(value.value));
+    assert.equal(app.value('model.systemBanks[0].displayName'),native.displayName);
+    app.auth.generation++;app.auth.profile={sub:'another-account',name:'Outra conta',email:'another@example.test'};await app.value('openAccount(authorization())');
+    assert.equal(app.value('model.personalBanks.length'),0);assert.equal(app.value('model.systemBanks[0].displayName'),native.displayName);
   }
 });
 

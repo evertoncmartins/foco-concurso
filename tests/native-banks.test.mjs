@@ -16,11 +16,12 @@ const native=validateSystemBank({...fullRju,questions:fullRju.questions.slice(0,
 const at=n=>new Date(Date.parse('2026-10-16T10:00:00Z')+n*1000).toISOString();
 const event=(id,type,data,n=1)=>({id,type,at:at(n),...data});
 
-test('decretos não recebem título de lei e renomeação pessoal do Sistema sincroniza só na conta',async()=>{
+test('decretos não recebem título de lei e só administração aplica renomeação pessoal do Sistema',async()=>{
   const decree=validateSystemBank({...native,id:'decreto-8112',name:'Decreto nº 8.112/2013',displayName:undefined});
   assert.equal(bankPresentation(decree).title,decree.name);assert.equal(bankPresentation(decree).law,null);
   const own=new Store(new TemporaryStorage()),other=new Store(new TemporaryStorage()),remote=new Store(new TemporaryStorage());
   for(const store of [own,other,remote])store.setSystemBanks([decree]);
+  own.canRenameSystemBanks=true;remote.canRenameSystemBanks=true;
   const q=own.model().questions[0],session=createSession([q.key]);session.questionSources={[q.key]:questionSource(q)};
   await own.add([{type:'system-bank-snapshot',bank:decree,revision:decree.revision},...chooseAnswer(session,q,q.correctOption).events]);
   await own.add([{type:'bank-metadata',bankId:decree.id,sourceType:'system',displayName:'Meu estudo do decreto'}]);
@@ -31,6 +32,11 @@ test('decretos não recebem título de lei e renomeação pessoal do Sistema sin
     assert.equal(store.model().questions[0].displayName,'Meu estudo do decreto');
   }
   assert.equal(other.model().banks[0].displayName,decree.name);assert.equal(decree.displayName,decree.name);
+  await other.merge(validateEvents(own.export()));assert.equal(other.model().banks[0].displayName,decree.name);
+  assert.equal(other.model().bankHistory[0].bank.displayName,decree.name);
+  assert.equal(other.model().questions[0].displayName,decree.name);assert.equal(sessionBankCatalog(other.model())[0].title,decree.name);
+  own.canRenameSystemBanks=false;assert.equal(own.model().banks[0].displayName,decree.name);
+  own.canRenameSystemBanks=true;assert.equal(own.model().banks[0].displayName,'Meu estudo do decreto');
   own.setSystemBanks([{...decree,displayName:'Novo nome público',revision:'new'}]);
   assert.equal(own.model().banks[0].displayName,'Meu estudo do decreto');
   await own.resetProgress();assert.equal(own.model().banks[0].displayName,'Meu estudo do decreto');
@@ -47,7 +53,7 @@ test('IDs iguais de decreto pessoal e nativo separam respostas, favoritos, nomes
     event('native-snapshot','system-bank-snapshot',{bank:decree,revision:decree.revision},7)];
   const model=derive(validateEvents({schemaVersion:1,events}),Date.now(),[decree]);
   assert.equal(model.personalBanks[0].id,`personal_bank_${decree.id}`);assert.equal(model.banks.length,2);
-  assert.equal(model.personalBanks[0].displayName,'Minha cópia pessoal');assert.equal(model.systemBanks[0].displayName,'Meu decreto nativo');
+  assert.equal(model.personalBanks[0].displayName,'Minha cópia pessoal');assert.equal(model.systemBanks[0].displayName,decree.displayName);
   assert.equal(model.answers[0].key,`personal_bank_${key}`);assert.equal(model.answers[1].key,key);
   assert.equal(model.sessions[0].queue[0],`personal_bank_${key}`);
   assert.equal(model.sessions[0].questionSources[`personal_bank_${key}`].bankId,`personal_bank_${decree.id}`);
@@ -119,7 +125,8 @@ test('sessão mista preserva procedência ao voltar, concluir, atualizar ou remo
 test('bancos nativos não são removidos ou renomeados por eventos pessoais e a UI respeita as permissões',()=>{
   const model=derive([event('forged-delete','bank-state',{bankId:native.id,value:'deleted'}),event('forged-name','bank-metadata',{bankId:native.id,displayName:'Falso'})],Date.now(),[native]);
   assert.equal(model.systemBanks.length,1);assert.equal(model.systemBanks[0].displayName,native.displayName);
-  const html=bankCardView({...native,enabled:true},{detailsOpen:true});assert(!html.includes('data-action="bank-delete"'));assert(html.includes('data-action="bank-rename"'));assert(html.includes('bank-source system'));
+  const html=bankCardView({...native,enabled:true},{detailsOpen:true});assert(!html.includes('data-action="bank-delete"'));assert(!html.includes('data-action="bank-rename"'));assert(html.includes('bank-source system'));
+  assert(bankCardView({...native,enabled:true},{detailsOpen:true,management:{admin:true}}).includes('data-action="bank-rename"'));
   const renamed={...personal,enabled:true,displayName:'<script>meu nome</script>'},own=bankCardView(renamed,{detailsOpen:true});assert(own.includes('data-action="bank-rename"'));assert(own.includes('&lt;script&gt;'));assert(!own.includes('<script>'));
   const setup=sessionSetupView({banks:[native,renamed],modes:{smart:['Estudo','Pratique']}});assert(setup.includes('bank-source system'));assert(setup.includes('bank-source personal'));
   assert.throws(()=>validateEvents({schemaVersion:1,events:[event('delete','system-bank-state',{bankId:native.id,value:'deleted'})]}),/Estado/);
